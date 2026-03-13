@@ -5,57 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Монополия</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="game-container">
+        <!-- Верхняя панель -->
         <header>
-            <h1>Монополия</h1>
-            <div class="balance-info">
-                <span>💰 <span id="current-balance">0</span></span>
-                <button id="apply-start-balance" class="btn-gold">Изменить</button>
+            <div class="logo">MONOPOLY</div>
+            <div class="balance">
+                <i class="fas fa-coins"></i>
+                <span id="current-balance">0</span>
+                <button id="apply-start-balance" class="btn-gold"><i class="fas fa-pen"></i></button>
             </div>
         </header>
 
-        <div class="board">
-            <canvas id="gameCanvas" width="800" height="600"></canvas>
-        </div>
+        <div class="main-area">
+            <!-- Игровое поле -->
+            <div class="board-container">
+                <canvas id="boardCanvas" width="800" height="800"></canvas>
+            </div>
 
-        <div class="controls">
-            <button id="roll-dice" class="btn-gold">🎲 Бросить кубик</button>
-            <div class="dice-result" id="dice-result">0</div>
-            <button id="reset-btn" class="btn-danger">🔄 Новая игра</button>
-        </div>
+            <!-- Правая панель -->
+            <div class="right-panel">
+                <div class="dice-box">
+                    <div class="dice" id="dice1">🎲</div>
+                    <div class="dice" id="dice2">🎲</div>
+                </div>
+                <button id="roll-dice" class="btn-primary">Бросить кубики</button>
 
-        <div class="history">
-            <h3>📋 Хроника</h3>
-            <div id="history-list"></div>
+                <div class="player-info">
+                    <div class="player-token" id="playerToken">🚗</div>
+                    <div class="player-stats">
+                        <div>Ваша фишка</div>
+                        <div id="player-position">Клетка 1</div>
+                    </div>
+                </div>
+
+                <div class="history-title">📜 История</div>
+                <div class="history-list" id="history-list"></div>
+
+                <button id="reset-btn" class="btn-danger">🔄 Новая игра</button>
+            </div>
         </div>
     </div>
 
     <!-- Модалка задания -->
     <div id="task-modal" class="modal hidden">
         <div class="modal-content">
-            <h2>Клетка <span id="cell-number"></span></h2>
+            <h2>🏦 Налоговая инспекция</h2>
             <p id="task-description"></p>
             <div class="balance-input">
-                <label>Новый баланс:</label>
+                <label>Ваш новый баланс после сделки:</label>
                 <input type="number" id="new-balance" step="100">
             </div>
             <div class="modal-buttons">
-                <button id="complete-task" class="btn-success">✅ Выполнено</button>
-                <button id="fail-task" class="btn-danger">⚠️ Провал</button>
+                <button id="complete-task" class="btn-success"><i class="fas fa-check"></i> Оплачено</button>
+                <button id="fail-task" class="btn-danger"><i class="fas fa-times"></i> Банкрот</button>
             </div>
         </div>
     </div>
 
-    <!-- Модалка конца игры -->
+    <!-- Модалка окончания игры -->
     <div id="completion-modal" class="modal hidden">
         <div class="modal-content">
-            <h2>🏆 Игра завершена</h2>
+            <h2>🏁 Игра завершена</h2>
             <p id="final-message"></p>
-            <p>Итоговый баланс: <span id="final-balance"></span> ₽</p>
+            <p>Итоговый капитал: <span id="final-balance"></span> ₽</p>
             <button id="completion-reset-btn" class="btn-gold">🔄 Новая игра</button>
         </div>
     </div>
