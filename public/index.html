@@ -8,7 +8,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Фон с колбами и химическими формулами (через псевдоэлемент) -->
+    <!-- Анимированные пузырьки на заднем фоне -->
+    <canvas id="bubbles-canvas"></canvas>
+    <!-- Статичный фон с колбами -->
     <div class="lab-bg"></div>
 
     <div class="game-container">
@@ -66,7 +68,7 @@
         </div>
     </div>
 
-    <!-- Модалка правил (можно открыть по кнопке, добавим позже) -->
+    <!-- Модалка правил (можно открыть по кнопке) -->
     <div id="rules-modal" class="modal hidden">
         <div class="modal-content">
             <h2>📜 Правила</h2>

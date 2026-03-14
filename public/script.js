@@ -113,9 +113,6 @@ function generateCardsForLevel() {
         selected: false,
         completed: false
     }));
-    // Удаляем эти карты из пула на сервере? В реальности пул должен обновляться на сервере,
-    // но для простоты будем считать, что сервер уже отдал пул, и мы не удаляем отсюда,
-    // а при выполнении задания уведомим сервер. Сервер сам удалит.
 }
 
 function updateUI() {
@@ -248,7 +245,6 @@ function selectTask(taskId) {
         }
     }, 500);
 
-    // Сообщаем серверу о выборе (для статистики, но не обязательно)
     socket.emit('selectTask', taskId);
 }
 
@@ -302,9 +298,7 @@ function completeTask(success) {
 }
 
 function applyPenalty(taskId) {
-    // Сразу открываем модалку для ввода нового баланса, но без отметки успеха
     openTaskModal(taskId);
-    // При нажатии "Взрыв" вызовется completeTask(false)
 }
 
 function addHistoryEntry(text) {
@@ -328,7 +322,7 @@ function renderHistory() {
 }
 
 function endGame() {
-    finalMessage.textContent = gameState.playerScore > gameState.opponentScore ? '🏆 Вы победили!' : '😔 Противник сильнее...';
+    finalMessage.textContent = 'Эксперимент завершён!';
     finalBalanceSpan.textContent = gameState.currentBalance;
     completionModal.classList.remove('hidden');
     clearSavedGame();
@@ -382,7 +376,7 @@ startQuestBtn.addEventListener('click', () => {
     if (dontShowCheckbox.checked) localStorage.setItem('quest_rules_hidden', 'true');
     rulesModal.classList.add('hidden');
 });
-// кнопка для правил добавится потом
+// кнопка для правил добавится позже
 // пока можно через консоль открыть
 
 window.addEventListener('click', (e) => {
@@ -405,4 +399,54 @@ window.addEventListener('click', (e) => {
         }
     `;
     document.head.appendChild(style);
+})();
+
+// ------------------- Анимация пузырьков на заднем фоне -------------------
+(function initBubbles() {
+    const canvas = document.getElementById('bubbles-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    const bubbles = [];
+    const BUBBLE_COUNT = 50;
+
+    function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    for (let i = 0; i < BUBBLE_COUNT; i++) {
+        bubbles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            radius: Math.random() * 10 + 5,
+            speed: Math.random() * 0.5 + 0.2,
+            opacity: Math.random() * 0.5 + 0.3,
+            color: `rgba(100, 255, 100, ${Math.random()*0.3+0.2})`
+        });
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+        bubbles.forEach(b => {
+            b.y -= b.speed;
+            if (b.y + b.radius < 0) {
+                b.y = height + b.radius;
+                b.x = Math.random() * width;
+            }
+            ctx.beginPath();
+            ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+            ctx.fillStyle = b.color;
+            ctx.shadowColor = '#0f0';
+            ctx.shadowBlur = 15;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        });
+        requestAnimationFrame(animate);
+    }
+    animate();
 })();
