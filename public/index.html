@@ -3,76 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Монополия</title>
+    <title>Лаборатория безумного учёного</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Фон с колбами и химическими формулами (через псевдоэлемент) -->
+    <div class="lab-bg"></div>
+
     <div class="game-container">
-        <!-- Верхняя панель -->
-        <header>
-            <div class="logo">MONOPOLY</div>
-            <div class="balance">
-                <i class="fas fa-coins"></i>
-                <span id="current-balance">0</span>
-                <button id="apply-start-balance" class="btn-gold"><i class="fas fa-pen"></i></button>
+        <!-- Шапка с уровнем и балансом -->
+        <header class="header">
+            <h1 class="level-title">Эксперимент <span id="current-level">1</span>/30</h1>
+            <div class="balance-panel">
+                <span class="balance-label">🔬 Очки науки</span>
+                <span class="balance-value" id="current-balance">0</span>
+                <button id="apply-start-balance" class="btn-neon">Изменить</button>
             </div>
         </header>
 
-        <div class="main-area">
-            <!-- Игровое поле -->
-            <div class="board-container">
-                <canvas id="boardCanvas" width="800" height="800"></canvas>
-            </div>
+        <!-- Три пробирки с заданиями -->
+        <div class="cards-container" id="cards-container"></div>
 
-            <!-- Правая панель -->
-            <div class="right-panel">
-                <div class="dice-box">
-                    <div class="dice" id="dice1">🎲</div>
-                    <div class="dice" id="dice2">🎲</div>
-                </div>
-                <button id="roll-dice" class="btn-primary">Бросить кубики</button>
+        <!-- Панель статистики (осталось заданий) -->
+        <div class="stats-panel" id="pool-stats"></div>
 
-                <div class="player-info">
-                    <div class="player-token" id="playerToken">🚗</div>
-                    <div class="player-stats">
-                        <div>Ваша фишка</div>
-                        <div id="player-position">Клетка 1</div>
-                    </div>
-                </div>
+        <!-- История экспериментов -->
+        <div class="history-panel">
+            <h2>📋 Лабораторный журнал</h2>
+            <div id="history-list" class="history-list"></div>
+        </div>
 
-                <div class="history-title">📜 История</div>
-                <div class="history-list" id="history-list"></div>
-
-                <button id="reset-btn" class="btn-danger">🔄 Новая игра</button>
-            </div>
+        <!-- Кнопка сброса -->
+        <div class="control-panel">
+            <button id="reset-btn" class="btn-danger hidden">🔄 Новый эксперимент</button>
         </div>
     </div>
 
     <!-- Модалка задания -->
     <div id="task-modal" class="modal hidden">
         <div class="modal-content">
-            <h2>🏦 Налоговая инспекция</h2>
+            <h2>🧪 Задание</h2>
             <p id="task-description"></p>
             <div class="balance-input">
-                <label>Ваш новый баланс после сделки:</label>
+                <label>Новый баланс после опыта:</label>
                 <input type="number" id="new-balance" step="100">
             </div>
             <div class="modal-buttons">
-                <button id="complete-task" class="btn-success"><i class="fas fa-check"></i> Оплачено</button>
-                <button id="fail-task" class="btn-danger"><i class="fas fa-times"></i> Банкрот</button>
+                <button id="complete-task" class="btn-success">✅ Успех</button>
+                <button id="fail-task" class="btn-danger">💥 Взрыв</button>
             </div>
         </div>
     </div>
 
-    <!-- Модалка окончания игры -->
+    <!-- Модалка завершения игры -->
     <div id="completion-modal" class="modal hidden">
-        <div class="modal-content">
-            <h2>🏁 Игра завершена</h2>
+        <div class="modal-content completion-content">
+            <h2>🏆 Эксперимент завершён</h2>
             <p id="final-message"></p>
-            <p>Итоговый капитал: <span id="final-balance"></span> ₽</p>
-            <button id="completion-reset-btn" class="btn-gold">🔄 Новая игра</button>
+            <p>Итоговый баланс: <span id="final-balance"></span> 🔬</p>
+            <button id="completion-reset-btn" class="btn-neon">🔄 Новый эксперимент</button>
+        </div>
+    </div>
+
+    <!-- Модалка правил (можно открыть по кнопке, добавим позже) -->
+    <div id="rules-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>📜 Правила</h2>
+            <p>Вы — учёный в лаборатории. Каждый уровень — три пробирки с реактивами (заданиями). Выберите одну, проведите опыт (выполните задание в казино) и введите новый баланс. При успехе вы получаете очки науки. При провале — взрыв, теряются лёгкие реактивы. 30 уровней безумия!</p>
+            <label><input type="checkbox" id="dont-show-rules"> Больше не показывать</label>
+            <button id="start-quest-btn" class="btn-neon">Понятно</button>
         </div>
     </div>
 

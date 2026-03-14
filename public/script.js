@@ -1,50 +1,27 @@
 const socket = io();
 
-// Конфигурация поля Monopoly (40 клеток)
-const BOARD_CELLS = 40;
-const CELL_NAMES = [
-    "Старт", "Балтийская ул.", "Обществ. казна", "Восток. ул.", "Налог",
-    "Ж/д вокзал", "Орловская ул.", "Шанс", "Гоголевская ул.", "Тюрьма",
-    "Петроградская ул.", "Электричество", "Пушкинская ул.", "Невский пр.", "Ж/д вокзал",
-    "Каменноостровский", "Обществ. казна", "Московский пр.", "Шанс", "Бесплатная стоянка",
-    "Тверская ул.", "Шанс", "Малая Бронная", "Ж/д вокзал", "Арбат",
-    "Налог", "Ул. Горького", "Водопровод", "Большая Полянка", "Ж/д вокзал",
-    "Кутузовский пр.", "Обществ. казна", "Шанс", "Ленинский пр.", "Смоленская пл.",
-    "Шанс", "Профсоюзная ул.", "Налог", "Ж/д вокзал", "Воробьёвы горы"
-];
-const CELL_COLORS = [
-    "#8B4513", "#8B4513", "#DDD", "#87CEEB", "#DDD",
-    "#000", "#87CEEB", "#DDD", "#87CEEB", "#666",
-    "#FF69B4", "#DDD", "#FF69B4", "#FF69B4", "#000",
-    "#FF8C00", "#DDD", "#FF8C00", "#DDD", "#EEE",
-    "#DC143C", "#DDD", "#DC143C", "#000", "#DC143C",
-    "#DDD", "#FFFF00", "#DDD", "#FFFF00", "#000",
-    "#00FF00", "#DDD", "#DDD", "#00FF00", "#00FF00",
-    "#DDD", "#4169E1", "#DDD", "#000", "#4169E1"
-]; // упрощённо, но для демо
+// Ключ сохранения
+const SAVE_KEY = 'lab_save';
 
+// Состояние игры
 let gameState = {
-    playerPosition: 0,
+    level: 1,
     currentBalance: 1500000,
     balanceHistory: [],
     availableTasks: [],
-    currentTaskId: null,
-    gameCompleted: false,
-    playerToken: '🚗' // можно выбрать случайно
+    currentCards: [],
+    selectedTaskId: null,
+    gameCompleted: false
 };
 
 // DOM элементы
-const canvas = document.getElementById('boardCanvas');
-const ctx = canvas.getContext('2d');
+const levelSpan = document.getElementById('current-level');
 const balanceSpan = document.getElementById('current-balance');
+const cardsContainer = document.getElementById('cards-container');
 const historyDiv = document.getElementById('history-list');
-const dice1 = document.getElementById('dice1');
-const dice2 = document.getElementById('dice2');
-const rollBtn = document.getElementById('roll-dice');
+const poolStatsDiv = document.getElementById('pool-stats');
 const resetBtn = document.getElementById('reset-btn');
 const applyBalanceBtn = document.getElementById('apply-start-balance');
-const playerTokenSpan = document.getElementById('playerToken');
-const playerPositionSpan = document.getElementById('player-position');
 const taskModal = document.getElementById('task-modal');
 const taskDesc = document.getElementById('task-description');
 const newBalanceInput = document.getElementById('new-balance');
@@ -54,87 +31,231 @@ const completionModal = document.getElementById('completion-modal');
 const finalMessage = document.getElementById('final-message');
 const finalBalanceSpan = document.getElementById('final-balance');
 const completionResetBtn = document.getElementById('completion-reset-btn');
+const rulesModal = document.getElementById('rules-modal');
+const dontShowCheckbox = document.getElementById('dont-show-rules');
+const startQuestBtn = document.getElementById('start-quest-btn');
 
-// Выбор случайной фишки
-const tokens = ['🚗', '🐕', '🚢', '🧵', '👞', '🎩'];
-gameState.playerToken = tokens[Math.floor(Math.random() * tokens.length)];
-playerTokenSpan.textContent = gameState.playerToken;
+let selectedTaskInProgress = false;
+let isAnimating = false;
+let pendingState = null;
 
-// ------------------- Отрисовка поля -------------------
-function drawBoard() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const centerX = canvas.width/2;
-    const centerY = canvas.height/2;
-    const radius = 320; // радиус круга
-    const cellWidth = 60;
-    const cellHeight = 40;
+// ------------------- Функции сохранения -------------------
+function saveGameState() {
+    try {
+        const saveData = {
+            ...gameState,
+            timestamp: Date.now()
+        };
+        localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
+    } catch (e) {}
+}
 
-    // Рисуем клетки по кругу
-    for (let i = 0; i < BOARD_CELLS; i++) {
-        const angle = (i / BOARD_CELLS) * Math.PI * 2 - Math.PI/2; // начинаем с верхней точки
-        const x = centerX + radius * Math.cos(angle);
-        const y = centerY + radius * Math.sin(angle);
-
-        // Прямоугольник клетки (повёрнутый)
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.rotate(angle + Math.PI/2); // чтобы текст читался
-        ctx.fillStyle = CELL_COLORS[i % CELL_COLORS.length];
-        ctx.strokeStyle = 'gold';
-        ctx.lineWidth = 3;
-        ctx.fillRect(-cellWidth/2, -cellHeight/2, cellWidth, cellHeight);
-        ctx.strokeRect(-cellWidth/2, -cellHeight/2, cellWidth, cellHeight);
-        ctx.restore();
-
-        // Номер клетки
-        ctx.fillStyle = 'white';
-        ctx.font = 'bold 12px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(i+1, x, y-10);
+function loadGameState() {
+    try {
+        const saved = localStorage.getItem(SAVE_KEY);
+        if (!saved) return null;
+        const data = JSON.parse(saved);
+        if (Date.now() - data.timestamp > 24*60*60*1000) {
+            localStorage.removeItem(SAVE_KEY);
+            return null;
+        }
+        return data;
+    } catch (e) {
+        return null;
     }
-
-    // Рисуем фишку игрока
-    const playerAngle = (gameState.playerPosition / BOARD_CELLS) * Math.PI * 2 - Math.PI/2;
-    const px = centerX + radius * Math.cos(playerAngle);
-    const py = centerY + radius * Math.sin(playerAngle);
-    ctx.font = '48px "Segoe UI Emoji"';
-    ctx.fillStyle = 'black';
-    ctx.shadowColor = 'gold';
-    ctx.shadowBlur = 15;
-    ctx.fillText(gameState.playerToken, px-20, py-20);
-    ctx.shadowBlur = 0;
 }
 
-// ------------------- Бросок кубиков -------------------
-function rollDice() {
-    if (gameState.gameCompleted) return;
-    const d1 = Math.floor(Math.random() * 6) + 1;
-    const d2 = Math.floor(Math.random() * 6) + 1;
-    dice1.textContent = ['⚀','⚁','⚂','⚃','⚄','⚅'][d1-1];
-    dice2.textContent = ['⚀','⚁','⚂','⚃','⚄','⚅'][d2-1];
-    const steps = d1 + d2;
-    movePlayer(steps);
+function clearSavedGame() {
+    localStorage.removeItem(SAVE_KEY);
 }
 
-function movePlayer(steps) {
-    gameState.playerPosition = (gameState.playerPosition + steps) % BOARD_CELLS;
-    playerPositionSpan.textContent = `Клетка ${gameState.playerPosition+1}`;
-    drawBoard();
+// ------------------- Подключение к серверу -------------------
+socket.on('connect', () => {
+    const saved = loadGameState();
+    if (saved && !saved.gameCompleted) {
+        if (confirm('Найден сохранённый эксперимент. Восстановить?')) {
+            gameState = saved;
+            updateUI();
+            updatePoolStats();
+            return;
+        } else {
+            clearSavedGame();
+        }
+    }
+    socket.emit('reset', 1500000);
+});
 
-    // Анимация движения можно добавить позже
+socket.on('state', (serverState) => {
+    if (isAnimating) {
+        pendingState = serverState;
+    } else {
+        // Копируем пул заданий, историю, баланс
+        gameState.currentBalance = serverState.currentBalance;
+        gameState.balanceHistory = serverState.balanceHistory;
+        gameState.availableTasks = serverState.availableTasks;
+        // Генерируем карточки для текущего уровня
+        generateCardsForLevel();
+        updateUI();
+        updatePoolStats();
+        saveGameState();
+    }
+});
 
-    // Открываем задание для текущей клетки
-    openTaskModal();
-}
-
-// ------------------- Задание -------------------
-function openTaskModal() {
+function generateCardsForLevel() {
     if (gameState.availableTasks.length === 0) {
-        alert('Нет заданий');
+        gameState.currentCards = [];
         return;
     }
-    const task = gameState.availableTasks[Math.floor(Math.random() * gameState.availableTasks.length)];
-    gameState.currentTaskId = task.id;
+    // Берём 3 случайных задания из пула
+    const shuffled = [...gameState.availableTasks].sort(() => 0.5 - Math.random());
+    gameState.currentCards = shuffled.slice(0, 3).map(task => ({
+        ...task,
+        selected: false,
+        completed: false
+    }));
+    // Удаляем эти карты из пула на сервере? В реальности пул должен обновляться на сервере,
+    // но для простоты будем считать, что сервер уже отдал пул, и мы не удаляем отсюда,
+    // а при выполнении задания уведомим сервер. Сервер сам удалит.
+}
+
+function updateUI() {
+    levelSpan.textContent = gameState.level;
+    renderCards();
+    renderHistory();
+    balanceSpan.textContent = gameState.currentBalance;
+    if (gameState.level >= 30) {
+        resetBtn.classList.remove('hidden');
+    } else {
+        resetBtn.classList.add('hidden');
+    }
+}
+
+function updatePoolStats() {
+    const counts = { '1★': 0, '2★': 0, '3★': 0, '4★': 0, '5★': 0, '6★': 0 };
+    gameState.availableTasks.forEach(task => {
+        const key = task.difficulty + '★';
+        counts[key] = (counts[key] || 0) + 1;
+    });
+    poolStatsDiv.innerHTML = `
+        <span>🧪 1★: ${counts['1★']}</span>
+        <span>🧪 2★: ${counts['2★']}</span>
+        <span>🧪 3★: ${counts['3★']}</span>
+        <span>🧪 4★: ${counts['4★']}</span>
+        <span>🧪 5★: ${counts['5★']}</span>
+        <span>🧪 6★: ${counts['6★']}</span>
+    `;
+}
+
+function renderCards() {
+    cardsContainer.innerHTML = '';
+    if (gameState.selectedTaskId) {
+        // Режим одной выбранной карточки (после выбора)
+        const task = gameState.currentCards.find(t => t.id === gameState.selectedTaskId);
+        if (task) {
+            const card = createCardElement(task, true);
+            cardsContainer.appendChild(card);
+        }
+    } else {
+        gameState.currentCards.forEach(task => {
+            const card = createCardElement(task, false);
+            cardsContainer.appendChild(card);
+        });
+    }
+}
+
+function createCardElement(task, isSelected) {
+    const card = document.createElement('div');
+    card.className = `card ${task.selected ? 'selected' : ''} ${task.completed ? 'completed' : ''}`;
+    card.dataset.id = task.id;
+
+    const stars = '★'.repeat(task.difficulty) + '☆'.repeat(6 - task.difficulty);
+    const difficultyHTML = `<div class="difficulty" style="color: ${getColorForDifficulty(task.difficulty)}">${stars}</div>`;
+    const taskText = `<div class="task-text">${task.description}</div>`;
+
+    let buttons = '';
+    if (!task.selected && !task.completed && !gameState.selectedTaskId) {
+        buttons = `<button class="select-btn">🧪 Выбрать</button>`;
+    } else if (task.selected && !task.completed) {
+        buttons = `
+            <button class="complete-btn">✅ Успех</button>
+            <button class="penalty-btn">💥 Взрыв</button>
+        `;
+    } else if (task.completed) {
+        buttons = `<button disabled>✔ Выполнено</button>`;
+    }
+
+    card.innerHTML = difficultyHTML + taskText + `<div class="card-actions">${buttons}</div>`;
+
+    // Обработчики
+    if (!task.selected && !task.completed && !gameState.selectedTaskId) {
+        card.querySelector('.select-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectTask(task.id);
+        });
+    } else if (task.selected && !task.completed) {
+        card.querySelector('.complete-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            openTaskModal(task.id);
+        });
+        card.querySelector('.penalty-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            applyPenalty(task.id);
+        });
+    }
+    return card;
+}
+
+function getColorForDifficulty(diff) {
+    const colors = ['#0f0', '#ff0', '#f90', '#f0f', '#0ff', '#f00'];
+    return colors[diff-1] || '#fff';
+}
+
+function selectTask(taskId) {
+    const task = gameState.currentCards.find(t => t.id === taskId);
+    if (!task) return;
+
+    // Помечаем выбранную карту, остальные сжигаем (анимация)
+    gameState.currentCards.forEach(t => {
+        if (t.id !== taskId) {
+            t.completed = true; // для анимации сгорания
+        }
+    });
+    renderCards();
+
+    // Добавляем класс burn для невыбранных
+    document.querySelectorAll('.card').forEach(c => {
+        if (c.dataset.id !== taskId) {
+            c.classList.add('burn');
+        }
+    });
+
+    isAnimating = true;
+    setTimeout(() => {
+        // После анимации оставляем только выбранную карту
+        gameState.currentCards = [task];
+        task.selected = true;
+        gameState.selectedTaskId = taskId;
+        renderCards();
+        isAnimating = false;
+        if (pendingState) {
+            gameState.currentBalance = pendingState.currentBalance;
+            gameState.balanceHistory = pendingState.balanceHistory;
+            gameState.availableTasks = pendingState.availableTasks;
+            generateCardsForLevel();
+            updateUI();
+            updatePoolStats();
+            pendingState = null;
+        }
+    }, 500);
+
+    // Сообщаем серверу о выборе (для статистики, но не обязательно)
+    socket.emit('selectTask', taskId);
+}
+
+function openTaskModal(taskId) {
+    const task = gameState.currentCards.find(t => t.id === taskId);
+    if (!task) return;
+    gameState.currentTaskId = taskId;
     taskDesc.textContent = task.description;
     newBalanceInput.value = gameState.currentBalance;
     taskModal.classList.remove('hidden');
@@ -145,14 +266,45 @@ function completeTask(success) {
     if (isNaN(newBalance)) return;
 
     const change = newBalance - gameState.currentBalance;
+    const taskId = gameState.currentTaskId;
+
     if (success) {
-        socket.emit('completeTask', gameState.currentTaskId, change);
-        addHistoryEntry(`✅ Сделка закрыта: ${change>0?'+'+change:change}₽`);
+        socket.emit('completeTask', taskId, change);
+        addHistoryEntry(`✅ Эксперимент успешен: ${change>0?'+'+change:change} 🔬`);
     } else {
-        socket.emit('penaltyWithBalance', gameState.currentTaskId, newBalance);
-        addHistoryEntry(`❌ Банкротство: ${change}₽`);
+        socket.emit('penaltyWithBalance', taskId, newBalance);
+        addHistoryEntry(`💥 Взрыв! Потеряно реактивов`);
     }
+
+    // Обновляем карточку
+    const task = gameState.currentCards.find(t => t.id === taskId);
+    if (task) {
+        task.completed = true;
+        task.selected = false;
+    }
+    gameState.selectedTaskId = null;
+    gameState.currentTaskId = null;
+
+    // Переход на следующий уровень
+    if (gameState.level < 30) {
+        gameState.level++;
+        generateCardsForLevel();
+    } else {
+        // Завершение игры
+        gameState.gameCompleted = true;
+        endGame();
+    }
+
     taskModal.classList.add('hidden');
+    updateUI();
+    updatePoolStats();
+    saveGameState();
+}
+
+function applyPenalty(taskId) {
+    // Сразу открываем модалку для ввода нового баланса, но без отметки успеха
+    openTaskModal(taskId);
+    // При нажатии "Взрыв" вызовется completeTask(false)
 }
 
 function addHistoryEntry(text) {
@@ -162,37 +314,6 @@ function addHistoryEntry(text) {
     historyDiv.appendChild(entry);
     historyDiv.scrollTop = historyDiv.scrollHeight;
 }
-
-function endGame(message) {
-    gameState.gameCompleted = true;
-    finalMessage.textContent = message;
-    finalBalanceSpan.textContent = gameState.currentBalance;
-    completionModal.classList.remove('hidden');
-}
-
-function resetGame() {
-    gameState.playerPosition = 0;
-    gameState.currentBalance = 1500000;
-    gameState.gameCompleted = false;
-    playerPositionSpan.textContent = 'Клетка 1';
-    historyDiv.innerHTML = '';
-    socket.emit('reset', gameState.currentBalance);
-    drawBoard();
-}
-
-// ------------------- Socket -------------------
-socket.on('connect', () => {
-    socket.emit('reset', 1500000);
-});
-
-socket.on('state', (serverState) => {
-    gameState.currentBalance = serverState.currentBalance;
-    gameState.balanceHistory = serverState.balanceHistory;
-    gameState.availableTasks = serverState.availableTasks;
-    balanceSpan.textContent = gameState.currentBalance;
-    renderHistory();
-    drawBoard();
-});
 
 function renderHistory() {
     historyDiv.innerHTML = '';
@@ -206,23 +327,82 @@ function renderHistory() {
     });
 }
 
+function endGame() {
+    finalMessage.textContent = gameState.playerScore > gameState.opponentScore ? '🏆 Вы победили!' : '😔 Противник сильнее...';
+    finalBalanceSpan.textContent = gameState.currentBalance;
+    completionModal.classList.remove('hidden');
+    clearSavedGame();
+}
+
+function resetGame() {
+    gameState = {
+        level: 1,
+        currentBalance: 1500000,
+        balanceHistory: [],
+        availableTasks: [],
+        currentCards: [],
+        selectedTaskId: null,
+        gameCompleted: false
+    };
+    socket.emit('reset', 1500000);
+    clearSavedGame();
+    updateUI();
+    updatePoolStats();
+}
+
 // ------------------- Обработчики -------------------
-rollBtn.addEventListener('click', rollDice);
-completeBtn.addEventListener('click', () => completeTask(true));
-failBtn.addEventListener('click', () => completeTask(false));
-resetBtn.addEventListener('click', resetGame);
 applyBalanceBtn.addEventListener('click', () => {
     const newBal = prompt('Введите новый начальный баланс:', gameState.currentBalance);
     if (newBal && !isNaN(newBal)) {
         gameState.currentBalance = parseFloat(newBal);
         balanceSpan.textContent = gameState.currentBalance;
-        socket.emit('addBalance', 'Изменение капитала', 0);
+        socket.emit('addBalance', 'Изменение баланса', 0);
     }
 });
+
+resetBtn.addEventListener('click', () => {
+    if (confirm('Начать новый эксперимент?')) {
+        resetGame();
+    }
+});
+
+completeBtn.addEventListener('click', () => completeTask(true));
+failBtn.addEventListener('click', () => completeTask(false));
+
 completionResetBtn.addEventListener('click', () => {
     completionModal.classList.add('hidden');
     resetGame();
 });
 
-// Инициализация
-drawBoard();
+// Правила
+if (!localStorage.getItem('quest_rules_hidden')) {
+    setTimeout(() => rulesModal.classList.remove('hidden'), 500);
+}
+startQuestBtn.addEventListener('click', () => {
+    if (dontShowCheckbox.checked) localStorage.setItem('quest_rules_hidden', 'true');
+    rulesModal.classList.add('hidden');
+});
+// кнопка для правил добавится потом
+// пока можно через консоль открыть
+
+window.addEventListener('click', (e) => {
+    if (e.target.classList.contains('modal')) {
+        e.target.classList.add('hidden');
+    }
+});
+
+// Анимация сгорания
+(function addBurnAnimation() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .card.burn {
+            animation: burn 0.5s forwards;
+            pointer-events: none;
+        }
+        @keyframes burn {
+            0% { opacity:1; transform:scale(1); filter:brightness(1); }
+            100% { opacity:0; transform:scale(0) rotate(10deg); filter:brightness(2); }
+        }
+    `;
+    document.head.appendChild(style);
+})();
