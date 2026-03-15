@@ -33,10 +33,12 @@ const completionResetBtn = document.getElementById('completion-reset-btn');
 const rulesModal = document.getElementById('rules-modal');
 const dontShowCheckbox = document.getElementById('dont-show-rules');
 const startQuestBtn = document.getElementById('start-quest-btn');
+const toast = document.getElementById('toast');
 
 let selectedTaskInProgress = false;
 let isAnimating = false;
 let pendingState = null;
+let toastTimeout = null;
 
 function getReagentClass(diff) {
     const classes = ['F', 'D', 'C', 'B', 'A', 'S'];
@@ -46,6 +48,15 @@ function getReagentClass(diff) {
 function getClassColor(diff) {
     const colors = ['f', 'd', 'c', 'b', 'a', 's'];
     return colors[diff-1] || 'f';
+}
+
+function showToast(message) {
+    if (toastTimeout) clearTimeout(toastTimeout);
+    toast.textContent = message;
+    toast.classList.remove('hidden');
+    toastTimeout = setTimeout(() => {
+        toast.classList.add('hidden');
+    }, 3000);
 }
 
 function saveGameState() {
@@ -90,9 +101,7 @@ function generateCardsForLevel() {
         message = `⚗️ Этап ${gameState.level}: Синтез сложных соединений (классы C и B)`;
     }
 
-    if (message) {
-        showToast(message);
-    }
+    if (message) showToast(message);
 
     if (filteredTasks.length < 3) {
         filteredTasks = gameState.availableTasks;
@@ -104,16 +113,6 @@ function generateCardsForLevel() {
         selected: false,
         completed: false
     }));
-}
-
-function showToast(message) {
-    const toast = document.getElementById('toast');
-    if (!toast) return;
-    toast.textContent = message;
-    toast.classList.remove('hidden');
-    setTimeout(() => {
-        toast.classList.add('hidden');
-    }, 3000);
 }
 
 socket.on('connect', () => {
@@ -186,34 +185,54 @@ function updatePoolStats() {
 function renderCards() {
     cardsContainer.innerHTML = '';
     if (gameState.selectedTaskId) {
-        // не показываем карточки
-        return;
+        const task = gameState.currentCards.find(t => t.id === gameState.selectedTaskId);
+        if (task) cardsContainer.appendChild(createCardElement(task, true));
+    } else {
+        gameState.currentCards.forEach(task => {
+            cardsContainer.appendChild(createCardElement(task, false));
+        });
     }
-    gameState.currentCards.forEach(task => {
-        cardsContainer.appendChild(createCardElement(task));
-    });
 }
 
-function createCardElement(task) {
+function createCardElement(task, isSelected) {
     const card = document.createElement('div');
-    card.className = `card ${task.completed ? 'completed' : ''}`;
+    card.className = `card ${task.selected ? 'selected' : ''} ${task.completed ? 'completed' : ''}`;
     card.dataset.id = task.id;
 
     const reagentClass = getReagentClass(task.difficulty);
     const classColor = getClassColor(task.difficulty);
-    card.innerHTML = `
-        <div class="reagent-class ${classColor}">${reagentClass}</div>
-        <div class="task-text">${task.description}</div>
-        <div class="card-actions">
-            <button class="select-btn">🧪 Выбрать</button>
-        </div>
-    `;
+    const reagentHTML = `<div class="reagent-class ${classColor}">${reagentClass}</div>`;
+    const taskText = `<div class="task-text">${task.description}</div>`;
 
-    card.querySelector('.select-btn').addEventListener('click', (e) => {
-        e.stopPropagation();
-        selectTask(task.id);
-    });
+    let buttons = '';
+    if (!task.selected && !task.completed && !gameState.selectedTaskId) {
+        buttons = `<button class="select-btn">🧪 Выбрать</button>`;
+    } else if (task.selected && !task.completed) {
+        buttons = `
+            <button class="complete-btn">✅ Успех</button>
+            <button class="penalty-btn">💥 Взрыв</button>
+        `;
+    } else if (task.completed) {
+        buttons = `<button disabled>✔ Выполнено</button>`;
+    }
 
+    card.innerHTML = reagentHTML + taskText + `<div class="card-actions">${buttons}</div>`;
+
+    if (!task.selected && !task.completed && !gameState.selectedTaskId) {
+        card.querySelector('.select-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectTask(task.id);
+        });
+    } else if (task.selected && !task.completed) {
+        card.querySelector('.complete-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            openTaskModal(task.id);
+        });
+        card.querySelector('.penalty-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            applyPenalty(task.id);
+        });
+    }
     return card;
 }
 
@@ -222,23 +241,19 @@ function selectTask(taskId) {
     if (!task) return;
 
     gameState.currentCards.forEach(t => {
-        if (t.id !== taskId) {
-            t.completed = true;
-        }
+        if (t.id !== taskId) t.completed = true;
     });
     renderCards();
 
     document.querySelectorAll('.card').forEach(c => {
-        if (c.dataset.id !== taskId) {
-            c.classList.add('burn');
-        }
+        if (c.dataset.id !== taskId) c.classList.add('burn');
     });
 
     isAnimating = true;
     setTimeout(() => {
-        gameState.currentCards = [];
-        gameState.selectedTaskId = taskId;
+        gameState.currentCards = [task];
         task.selected = true;
+        gameState.selectedTaskId = taskId;
         renderCards();
         isAnimating = false;
         if (pendingState) {
@@ -250,14 +265,13 @@ function selectTask(taskId) {
             updatePoolStats();
             pendingState = null;
         }
-        openTaskModal(taskId);
     }, 500);
 
     socket.emit('selectTask', taskId);
 }
 
 function openTaskModal(taskId) {
-    const task = gameState.availableTasks.find(t => t.id === taskId);
+    const task = gameState.currentCards.find(t => t.id === taskId);
     if (!task) return;
     gameState.currentTaskId = taskId;
     taskDesc.textContent = task.description;
@@ -280,6 +294,7 @@ function completeTask(success) {
         addHistoryEntry(`💥 Взрыв! Потеряно реактивов`);
     }
 
+    gameState.currentCards = gameState.currentCards.filter(t => t.id !== taskId);
     gameState.selectedTaskId = null;
     gameState.currentTaskId = null;
 
@@ -289,6 +304,10 @@ function completeTask(success) {
 
     taskModal.classList.add('hidden');
     updateUI();
+}
+
+function applyPenalty(taskId) {
+    openTaskModal(taskId);
 }
 
 function addHistoryEntry(text) {
@@ -354,17 +373,14 @@ resetBtn.addEventListener('click', () => {
 completeBtn.addEventListener('click', () => completeTask(true));
 failBtn.addEventListener('click', () => completeTask(false));
 
+// Кнопка "Неизвестная колба" показывает тост
 if (flaskGagBtn) {
     flaskGagBtn.addEventListener('click', () => {
-        const toast = document.getElementById('toast');
-        if (toast) {
-            toast.textContent = 'Накид брюнеточке, мяу';
-            toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), 3000);
-        }
+        showToast('Накид брюнеточке, мяу');
     });
 }
 
+// Кнопка "Новый эксперимент" сразу сбрасывает игру
 if (completionResetBtn) {
     completionResetBtn.addEventListener('click', () => {
         completionModal.classList.add('hidden');

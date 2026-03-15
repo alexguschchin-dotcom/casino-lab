@@ -178,6 +178,12 @@ body {
     box-shadow: 0 0 40px #0f0;
 }
 
+.card.selected {
+    border-color: #ff0;
+    box-shadow: 0 0 60px #ff0;
+    transform: scale(1.05);
+}
+
 .card .reagent-class {
     font-size: 2rem;
     font-weight: bold;
@@ -359,6 +365,7 @@ body {
     to { transform: translateX(0); opacity: 1; }
 }
 
+/* Блок кнопок в модалке завершения */
 .completion-buttons {
     display: flex;
     gap: 20px;
