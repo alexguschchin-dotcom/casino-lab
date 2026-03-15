@@ -32,10 +32,12 @@ const completionResetBtn = document.getElementById('completion-reset-btn');
 const rulesModal = document.getElementById('rules-modal');
 const dontShowCheckbox = document.getElementById('dont-show-rules');
 const startQuestBtn = document.getElementById('start-quest-btn');
+const toast = document.getElementById('toast');
 
 let selectedTaskInProgress = false;
 let isAnimating = false;
 let pendingState = null;
+let toastTimeout = null;
 
 // Функция для получения класса реагента по сложности
 function getReagentClass(diff) {
@@ -46,6 +48,16 @@ function getReagentClass(diff) {
 function getClassColor(diff) {
     const colors = ['f', 'd', 'c', 'b', 'a', 's'];
     return colors[diff-1] || 'f';
+}
+
+// ------------------- Уведомления -------------------
+function showToast(message) {
+    if (toastTimeout) clearTimeout(toastTimeout);
+    toast.textContent = message;
+    toast.classList.remove('hidden');
+    toastTimeout = setTimeout(() => {
+        toast.classList.add('hidden');
+    }, 3000);
 }
 
 // ------------------- Сохранение -------------------
@@ -84,7 +96,30 @@ function generateCardsForLevel() {
         gameState.currentCards = [];
         return;
     }
-    const shuffled = [...gameState.availableTasks].sort(() => 0.5 - Math.random());
+
+    let message = '';
+    let filteredTasks = gameState.availableTasks;
+
+    if (gameState.level % 10 === 0) {
+        // кратно 10: сложности B, A, S (difficulty >=4)
+        filteredTasks = gameState.availableTasks.filter(t => t.difficulty >= 4);
+        message = `🔥 Этап ${gameState.level}: Критические эксперименты (классы B, A, S)`;
+    } else if (gameState.level % 5 === 0) {
+        // кратно 5: сложности C и B (diff 3 и 4)
+        filteredTasks = gameState.availableTasks.filter(t => t.difficulty === 3 || t.difficulty === 4);
+        message = `⚗️ Этап ${gameState.level}: Синтез сложных соединений (классы C и B)`;
+    }
+
+    if (message) {
+        showToast(message);
+    }
+
+    // Если нужных заданий недостаточно, берём из всех доступных
+    if (filteredTasks.length < 3) {
+        filteredTasks = gameState.availableTasks;
+    }
+
+    const shuffled = [...filteredTasks].sort(() => 0.5 - Math.random());
     gameState.currentCards = shuffled.slice(0, 3).map(task => ({
         ...task,
         selected: false,
@@ -371,7 +406,7 @@ window.addEventListener('click', (e) => {
     }
 });
 
-// Анимация пузырьков (как в предыдущей версии)
+// Анимация пузырьков
 (function initBubbles() {
     const canvas = document.getElementById('bubbles-canvas');
     if (!canvas) return;
