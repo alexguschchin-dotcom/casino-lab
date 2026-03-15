@@ -365,7 +365,6 @@ body {
     to { transform: translateX(0); opacity: 1; }
 }
 
-/* Блок кнопок в модалке завершения */
 .completion-buttons {
     display: flex;
     gap: 20px;

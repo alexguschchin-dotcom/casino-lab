@@ -271,12 +271,18 @@ function selectTask(taskId) {
 }
 
 function openTaskModal(taskId) {
+    if (!taskModal.classList.contains('hidden')) return; // уже открыта
     const task = gameState.currentCards.find(t => t.id === taskId);
     if (!task) return;
     gameState.currentTaskId = taskId;
     taskDesc.textContent = task.description;
     newBalanceInput.value = gameState.currentBalance;
     taskModal.classList.remove('hidden');
+}
+
+function applyPenalty(taskId) {
+    if (!taskModal.classList.contains('hidden')) return; // защита от двойного открытия
+    openTaskModal(taskId);
 }
 
 function completeTask(success) {
@@ -304,10 +310,6 @@ function completeTask(success) {
 
     taskModal.classList.add('hidden');
     updateUI();
-}
-
-function applyPenalty(taskId) {
-    openTaskModal(taskId);
 }
 
 function addHistoryEntry(text) {
@@ -373,14 +375,12 @@ resetBtn.addEventListener('click', () => {
 completeBtn.addEventListener('click', () => completeTask(true));
 failBtn.addEventListener('click', () => completeTask(false));
 
-// Кнопка "Неизвестная колба" показывает тост
 if (flaskGagBtn) {
     flaskGagBtn.addEventListener('click', () => {
         showToast('Накид брюнеточке, мяу');
     });
 }
 
-// Кнопка "Новый эксперимент" сразу сбрасывает игру
 if (completionResetBtn) {
     completionResetBtn.addEventListener('click', () => {
         completionModal.classList.add('hidden');
