@@ -17,7 +17,6 @@ body {
     overflow-x: hidden;
 }
 
-/* Canvas для пузырьков */
 #bubbles-canvas {
     position: fixed;
     top: 0;
@@ -28,7 +27,6 @@ body {
     z-index: 0;
 }
 
-/* Фон с химической тематикой (статичный) */
 .lab-bg {
     position: fixed;
     top: 0;
@@ -56,7 +54,6 @@ body {
     z-index: 1;
 }
 
-/* Шапка */
 .header {
     display: flex;
     justify-content: space-between;
@@ -65,14 +62,19 @@ body {
     padding: 0 20px;
 }
 
-.level-title {
+.lab-title {
     font-family: 'Orbitron', sans-serif;
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 900;
     text-transform: uppercase;
     color: #0f0;
     text-shadow: 0 0 20px #0f0, 0 0 40px #0f0;
     letter-spacing: 4px;
+}
+
+.lab-title span {
+    color: #afa;
+    text-shadow: 0 0 10px #afa;
 }
 
 .balance-panel {
@@ -86,12 +88,12 @@ body {
     box-shadow: 0 0 20px rgba(0,255,0,0.5);
 }
 
-.balance-label {
+.balance-panel .label {
     font-size: 1.2rem;
     color: #afa;
 }
 
-.balance-value {
+.balance-panel .value {
     font-family: 'Orbitron', sans-serif;
     font-size: 2rem;
     font-weight: 700;
@@ -118,7 +120,6 @@ body {
     box-shadow: 0 0 30px #0f0;
 }
 
-/* Контейнер для карточек-пробирок */
 .cards-container {
     display: flex;
     justify-content: center;
@@ -127,12 +128,11 @@ body {
     flex-wrap: wrap;
 }
 
-/* Карточка в виде пробирки */
 .card {
     width: 200px;
     height: 300px;
     background: linear-gradient(145deg, #2a3a2a, #1a2a1a);
-    border: 3px solid #0f0;
+    border: 3px solid;
     border-radius: 60px 60px 30px 30px;
     display: flex;
     flex-direction: column;
@@ -176,21 +176,29 @@ body {
     transform: scale(1.05);
 }
 
-.card .difficulty {
-    font-size: 1.8rem;
+.card .reagent-class {
+    font-size: 2rem;
+    font-weight: bold;
     margin-bottom: 10px;
-    color: #0f0;
-    text-shadow: 0 0 10px #0f0;
+    text-shadow: 0 0 10px currentColor;
 }
 
+.card .reagent-class.f { color: #0f0; } /* зелёный */
+.card .reagent-class.d { color: #ff0; } /* жёлтый */
+.card .reagent-class.c { color: #ffa500; } /* оранжевый */
+.card .reagent-class.b { color: #f0f; } /* фиолетовый */
+.card .reagent-class.a { color: #f00; } /* красный */
+.card .reagent-class.s { color: #333; text-shadow: 0 0 10px #fff; } /* чёрный с белым свечением */
+
 .card .task-text {
-    font-size: 1.1rem;
+    font-size: 1rem;
     text-align: center;
     color: #afa;
     background: rgba(0,20,0,0.7);
     padding: 10px;
     border-radius: 20px;
     width: 100%;
+    font-family: 'Roboto', sans-serif;
 }
 
 .card-actions {
@@ -218,7 +226,6 @@ body {
     transform: scale(1.05);
 }
 
-/* Анимация сгорания */
 .card.burn {
     animation: burn 0.5s forwards;
     pointer-events: none;
@@ -229,7 +236,6 @@ body {
     100% { opacity: 0; transform: scale(0) rotate(10deg); filter: brightness(2); }
 }
 
-/* Панель статистики */
 .stats-panel {
     background: #1a2a1a;
     border: 2px solid #0f0;
@@ -245,11 +251,25 @@ body {
     flex-wrap: wrap;
 }
 
-.stats-panel span {
-    font-family: 'Orbitron', sans-serif;
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-/* Панель истории */
+.stat-item .reagent-class {
+    font-size: 1.5rem;
+    font-weight: bold;
+    width: 30px;
+    text-align: center;
+}
+.stat-item .reagent-class.f { color: #0f0; }
+.stat-item .reagent-class.d { color: #ff0; }
+.stat-item .reagent-class.c { color: #ffa500; }
+.stat-item .reagent-class.b { color: #f0f; }
+.stat-item .reagent-class.a { color: #f00; }
+.stat-item .reagent-class.s { color: #333; text-shadow: 0 0 5px #fff; }
+
 .history-panel {
     background: #1a2a1a;
     border: 2px solid #0f0;
@@ -282,7 +302,6 @@ body {
     color: #afa;
 }
 
-/* Кнопка сброса */
 .control-panel {
     display: flex;
     justify-content: center;
@@ -311,7 +330,6 @@ body {
     display: none !important;
 }
 
-/* Модальные окна */
 .modal {
     position: fixed;
     top: 0;

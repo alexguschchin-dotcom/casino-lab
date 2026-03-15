@@ -1,9 +1,7 @@
 const socket = io();
 
-// Ключ сохранения
 const SAVE_KEY = 'lab_save';
 
-// Состояние игры
 let gameState = {
     level: 1,
     currentBalance: 1500000,
@@ -15,7 +13,7 @@ let gameState = {
 };
 
 // DOM элементы
-const levelSpan = document.getElementById('current-level');
+const levelSpan = document.getElementById('current-level'); // не используется, но оставим для совместимости
 const balanceSpan = document.getElementById('current-balance');
 const cardsContainer = document.getElementById('cards-container');
 const historyDiv = document.getElementById('history-list');
@@ -39,7 +37,19 @@ let selectedTaskInProgress = false;
 let isAnimating = false;
 let pendingState = null;
 
-// ------------------- Функции сохранения -------------------
+// Функция для получения класса реагента по сложности
+function getReagentClass(diff) {
+    const classes = ['F', 'D', 'C', 'B', 'A', 'S'];
+    return classes[diff-1] || '?';
+}
+
+// Функция для получения цвета класса (используется в CSS)
+function getClassColor(diff) {
+    const colors = ['f', 'd', 'c', 'b', 'a', 's'];
+    return colors[diff-1] || 'f';
+}
+
+// ------------------- Сохранение -------------------
 function saveGameState() {
     try {
         const saveData = {
@@ -89,11 +99,9 @@ socket.on('state', (serverState) => {
     if (isAnimating) {
         pendingState = serverState;
     } else {
-        // Копируем пул заданий, историю, баланс
         gameState.currentBalance = serverState.currentBalance;
         gameState.balanceHistory = serverState.balanceHistory;
         gameState.availableTasks = serverState.availableTasks;
-        // Генерируем карточки для текущего уровня
         generateCardsForLevel();
         updateUI();
         updatePoolStats();
@@ -106,7 +114,6 @@ function generateCardsForLevel() {
         gameState.currentCards = [];
         return;
     }
-    // Берём 3 случайных задания из пула
     const shuffled = [...gameState.availableTasks].sort(() => 0.5 - Math.random());
     gameState.currentCards = shuffled.slice(0, 3).map(task => ({
         ...task,
@@ -116,11 +123,10 @@ function generateCardsForLevel() {
 }
 
 function updateUI() {
-    levelSpan.textContent = gameState.level;
+    balanceSpan.textContent = gameState.currentBalance;
     renderCards();
     renderHistory();
-    balanceSpan.textContent = gameState.currentBalance;
-    if (gameState.level >= 30) {
+    if (gameState.level >= 30) { // уровень теперь не отображается, но оставим для логики
         resetBtn.classList.remove('hidden');
     } else {
         resetBtn.classList.add('hidden');
@@ -128,25 +134,22 @@ function updateUI() {
 }
 
 function updatePoolStats() {
-    const counts = { '1★': 0, '2★': 0, '3★': 0, '4★': 0, '5★': 0, '6★': 0 };
+    const counts = { 'F': 0, 'D': 0, 'C': 0, 'B': 0, 'A': 0, 'S': 0 };
     gameState.availableTasks.forEach(task => {
-        const key = task.difficulty + '★';
-        counts[key] = (counts[key] || 0) + 1;
+        const cls = getReagentClass(task.difficulty);
+        counts[cls] = (counts[cls] || 0) + 1;
     });
-    poolStatsDiv.innerHTML = `
-        <span>🧪 1★: ${counts['1★']}</span>
-        <span>🧪 2★: ${counts['2★']}</span>
-        <span>🧪 3★: ${counts['3★']}</span>
-        <span>🧪 4★: ${counts['4★']}</span>
-        <span>🧪 5★: ${counts['5★']}</span>
-        <span>🧪 6★: ${counts['6★']}</span>
-    `;
+    poolStatsDiv.innerHTML = Object.entries(counts).map(([cls, num]) => `
+        <div class="stat-item">
+            <span class="reagent-class ${cls.toLowerCase()}">${cls}</span>
+            <span>${num}</span>
+        </div>
+    `).join('');
 }
 
 function renderCards() {
     cardsContainer.innerHTML = '';
     if (gameState.selectedTaskId) {
-        // Режим одной выбранной карточки (после выбора)
         const task = gameState.currentCards.find(t => t.id === gameState.selectedTaskId);
         if (task) {
             const card = createCardElement(task, true);
@@ -165,8 +168,9 @@ function createCardElement(task, isSelected) {
     card.className = `card ${task.selected ? 'selected' : ''} ${task.completed ? 'completed' : ''}`;
     card.dataset.id = task.id;
 
-    const stars = '★'.repeat(task.difficulty) + '☆'.repeat(6 - task.difficulty);
-    const difficultyHTML = `<div class="difficulty" style="color: ${getColorForDifficulty(task.difficulty)}">${stars}</div>`;
+    const reagentClass = getReagentClass(task.difficulty);
+    const classColor = getClassColor(task.difficulty);
+    const reagentHTML = `<div class="reagent-class ${classColor}">${reagentClass}</div>`;
     const taskText = `<div class="task-text">${task.description}</div>`;
 
     let buttons = '';
@@ -181,9 +185,8 @@ function createCardElement(task, isSelected) {
         buttons = `<button disabled>✔ Выполнено</button>`;
     }
 
-    card.innerHTML = difficultyHTML + taskText + `<div class="card-actions">${buttons}</div>`;
+    card.innerHTML = reagentHTML + taskText + `<div class="card-actions">${buttons}</div>`;
 
-    // Обработчики
     if (!task.selected && !task.completed && !gameState.selectedTaskId) {
         card.querySelector('.select-btn').addEventListener('click', (e) => {
             e.stopPropagation();
@@ -202,24 +205,17 @@ function createCardElement(task, isSelected) {
     return card;
 }
 
-function getColorForDifficulty(diff) {
-    const colors = ['#0f0', '#ff0', '#f90', '#f0f', '#0ff', '#f00'];
-    return colors[diff-1] || '#fff';
-}
-
 function selectTask(taskId) {
     const task = gameState.currentCards.find(t => t.id === taskId);
     if (!task) return;
 
-    // Помечаем выбранную карту, остальные сжигаем (анимация)
     gameState.currentCards.forEach(t => {
         if (t.id !== taskId) {
-            t.completed = true; // для анимации сгорания
+            t.completed = true;
         }
     });
     renderCards();
 
-    // Добавляем класс burn для невыбранных
     document.querySelectorAll('.card').forEach(c => {
         if (c.dataset.id !== taskId) {
             c.classList.add('burn');
@@ -228,7 +224,6 @@ function selectTask(taskId) {
 
     isAnimating = true;
     setTimeout(() => {
-        // После анимации оставляем только выбранную карту
         gameState.currentCards = [task];
         task.selected = true;
         gameState.selectedTaskId = taskId;
@@ -272,7 +267,6 @@ function completeTask(success) {
         addHistoryEntry(`💥 Взрыв! Потеряно реактивов`);
     }
 
-    // Обновляем карточку
     const task = gameState.currentCards.find(t => t.id === taskId);
     if (task) {
         task.completed = true;
@@ -281,12 +275,10 @@ function completeTask(success) {
     gameState.selectedTaskId = null;
     gameState.currentTaskId = null;
 
-    // Переход на следующий уровень
     if (gameState.level < 30) {
         gameState.level++;
         generateCardsForLevel();
     } else {
-        // Завершение игры
         gameState.gameCompleted = true;
         endGame();
     }
@@ -322,7 +314,7 @@ function renderHistory() {
 }
 
 function endGame() {
-    finalMessage.textContent = 'Эксперимент завершён!';
+    finalMessage.textContent = 'Все этапы эксперимента пройдены!';
     finalBalanceSpan.textContent = gameState.currentBalance;
     completionModal.classList.remove('hidden');
     clearSavedGame();
@@ -376,8 +368,6 @@ startQuestBtn.addEventListener('click', () => {
     if (dontShowCheckbox.checked) localStorage.setItem('quest_rules_hidden', 'true');
     rulesModal.classList.add('hidden');
 });
-// кнопка для правил добавится позже
-// пока можно через консоль открыть
 
 window.addEventListener('click', (e) => {
     if (e.target.classList.contains('modal')) {
@@ -385,23 +375,7 @@ window.addEventListener('click', (e) => {
     }
 });
 
-// Анимация сгорания
-(function addBurnAnimation() {
-    const style = document.createElement('style');
-    style.textContent = `
-        .card.burn {
-            animation: burn 0.5s forwards;
-            pointer-events: none;
-        }
-        @keyframes burn {
-            0% { opacity:1; transform:scale(1); filter:brightness(1); }
-            100% { opacity:0; transform:scale(0) rotate(10deg); filter:brightness(2); }
-        }
-    `;
-    document.head.appendChild(style);
-})();
-
-// ------------------- Анимация пузырьков на заднем фоне -------------------
+// Анимация пузырьков (как в предыдущей версии)
 (function initBubbles() {
     const canvas = document.getElementById('bubbles-canvas');
     if (!canvas) return;
@@ -449,4 +423,20 @@ window.addEventListener('click', (e) => {
         requestAnimationFrame(animate);
     }
     animate();
+})();
+
+// Анимация сгорания
+(function addBurnAnimation() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .card.burn {
+            animation: burn 0.5s forwards;
+            pointer-events: none;
+        }
+        @keyframes burn {
+            0% { opacity:1; transform:scale(1); filter:brightness(1); }
+            100% { opacity:0; transform:scale(0) rotate(10deg); filter:brightness(2); }
+        }
+    `;
+    document.head.appendChild(style);
 })();

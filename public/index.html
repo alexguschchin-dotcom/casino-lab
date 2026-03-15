@@ -6,37 +6,32 @@
     <title>Лаборатория безумного учёного</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <!-- Анимированные пузырьки на заднем фоне -->
+    <!-- Анимированные пузырьки -->
     <canvas id="bubbles-canvas"></canvas>
-    <!-- Статичный фон с колбами -->
     <div class="lab-bg"></div>
 
     <div class="game-container">
-        <!-- Шапка с уровнем и балансом -->
         <header class="header">
-            <h1 class="level-title">Эксперимент <span id="current-level">1</span>/30</h1>
+            <h1 class="lab-title">⚗️ Лаборатория <span>безумного учёного</span></h1>
             <div class="balance-panel">
-                <span class="balance-label">🔬 Очки науки</span>
-                <span class="balance-value" id="current-balance">0</span>
-                <button id="apply-start-balance" class="btn-neon">Изменить</button>
+                <span class="label">🔬 Очки науки</span>
+                <span class="value" id="current-balance">0</span>
+                <button id="apply-start-balance" class="btn-neon"><i class="fas fa-pen"></i></button>
             </div>
         </header>
 
-        <!-- Три пробирки с заданиями -->
         <div class="cards-container" id="cards-container"></div>
 
-        <!-- Панель статистики (осталось заданий) -->
         <div class="stats-panel" id="pool-stats"></div>
 
-        <!-- История экспериментов -->
         <div class="history-panel">
-            <h2>📋 Лабораторный журнал</h2>
+            <h2><i class="fas fa-scroll"></i> Журнал экспериментов</h2>
             <div id="history-list" class="history-list"></div>
         </div>
 
-        <!-- Кнопка сброса -->
         <div class="control-panel">
             <button id="reset-btn" class="btn-danger hidden">🔄 Новый эксперимент</button>
         </div>
@@ -45,7 +40,7 @@
     <!-- Модалка задания -->
     <div id="task-modal" class="modal hidden">
         <div class="modal-content">
-            <h2>🧪 Задание</h2>
+            <h2><i class="fas fa-flask"></i> Протокол испытания</h2>
             <p id="task-description"></p>
             <div class="balance-input">
                 <label>Новый баланс после опыта:</label>
@@ -58,7 +53,7 @@
         </div>
     </div>
 
-    <!-- Модалка завершения игры -->
+    <!-- Модалка завершения -->
     <div id="completion-modal" class="modal hidden">
         <div class="modal-content completion-content">
             <h2>🏆 Эксперимент завершён</h2>
@@ -68,11 +63,11 @@
         </div>
     </div>
 
-    <!-- Модалка правил (можно открыть по кнопке) -->
+    <!-- Модалка правил -->
     <div id="rules-modal" class="modal hidden">
         <div class="modal-content">
             <h2>📜 Правила</h2>
-            <p>Вы — учёный в лаборатории. Каждый уровень — три пробирки с реактивами (заданиями). Выберите одну, проведите опыт (выполните задание в казино) и введите новый баланс. При успехе вы получаете очки науки. При провале — взрыв, теряются лёгкие реактивы. 30 уровней безумия!</p>
+            <p>Вы — учёный в секретной лаборатории. Каждый этап эксперимента — три пробирки с реагентами разного класса опасности (F, D, C, B, A, S). Выберите одну, проведите опыт (выполните задание в казино) и введите новый баланс. При успехе вы получаете очки науки. При провале — взрыв, теряются лёгкие реагенты. 30 этапов безумия!</p>
             <label><input type="checkbox" id="dont-show-rules"> Больше не показывать</label>
             <button id="start-quest-btn" class="btn-neon">Понятно</button>
         </div>
