@@ -101,11 +101,9 @@ function generateCardsForLevel() {
     let filteredTasks = gameState.availableTasks;
 
     if (gameState.level % 10 === 0) {
-        // кратно 10: сложности B, A, S (difficulty >=4)
         filteredTasks = gameState.availableTasks.filter(t => t.difficulty >= 4);
         message = `🔥 Этап ${gameState.level}: Критические эксперименты (классы B, A, S)`;
     } else if (gameState.level % 5 === 0) {
-        // кратно 5: сложности C и B (diff 3 и 4)
         filteredTasks = gameState.availableTasks.filter(t => t.difficulty === 3 || t.difficulty === 4);
         message = `⚗️ Этап ${gameState.level}: Синтез сложных соединений (классы C и B)`;
     }
@@ -114,7 +112,6 @@ function generateCardsForLevel() {
         showToast(message);
     }
 
-    // Если нужных заданий недостаточно, берём из всех доступных
     if (filteredTasks.length < 3) {
         filteredTasks = gameState.availableTasks;
     }
@@ -147,6 +144,7 @@ socket.on('state', (serverState) => {
     if (isAnimating) {
         pendingState = serverState;
     } else {
+        const previousLevel = gameState.level;
         gameState.level = serverState.level;
         gameState.currentBalance = serverState.currentBalance;
         gameState.balanceHistory = serverState.balanceHistory;
@@ -160,6 +158,11 @@ socket.on('state', (serverState) => {
         updateUI();
         updatePoolStats();
         saveGameState();
+
+        // Проверка на завершение игры (уровень 30 и больше нет карточек)
+        if (gameState.level >= 30 && gameState.currentCards.length === 0 && !gameState.gameCompleted) {
+            endGame();
+        }
     }
 });
 
@@ -253,7 +256,7 @@ function selectTask(taskId) {
 
     gameState.currentCards.forEach(t => {
         if (t.id !== taskId) {
-            t.completed = true; // для анимации
+            t.completed = true;
         }
     });
     renderCards();
@@ -315,7 +318,6 @@ function completeTask(success) {
     gameState.currentTaskId = null;
 
     taskModal.classList.add('hidden');
-    // Не генерируем новые карточки, они появятся после получения нового state от сервера
     updateUI();
 }
 
@@ -343,9 +345,10 @@ function renderHistory() {
     });
 }
 
+// ------------------- Завершение игры -------------------
 function endGame() {
     gameState.gameCompleted = true;
-    finalMessage.textContent = 'Все этапы эксперимента пройдены!';
+    finalMessage.textContent = 'Поздравляем! Вы прошли все 30 этапов и одолели злого учёного! gg wp';
     finalBalanceSpan.textContent = gameState.currentBalance;
     completionModal.classList.remove('hidden');
     clearSavedGame();
