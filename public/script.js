@@ -131,6 +131,8 @@ socket.on('connect', () => {
 });
 
 socket.on('state', (serverState) => {
+    if (gameState.gameCompleted) return;
+
     if (isAnimating) {
         pendingState = serverState;
     } else {
@@ -139,15 +141,18 @@ socket.on('state', (serverState) => {
         gameState.balanceHistory = serverState.balanceHistory;
         gameState.availableTasks = serverState.availableTasks;
 
-        // Проверка на завершение игры
-        if (!gameState.gameCompleted && gameState.level >= 30 && gameState.currentCards.length === 0) {
-            endGame();
-            return;
-        }
-
-        // Генерация новых карточек, если нет выбранной и текущие пусты
+        // Если нет выбранной карточки и текущие карточки пусты
         if (!gameState.selectedTaskId && gameState.currentCards.length === 0) {
-            generateCardsForLevel();
+            if (gameState.level >= 30) {
+                if (gameState.availableTasks.length === 0) {
+                    endGame();
+                    return;
+                } else {
+                    generateCardsForLevel();
+                }
+            } else {
+                generateCardsForLevel();
+            }
         }
 
         updateUI();
@@ -293,6 +298,12 @@ function completeTask(success) {
     gameState.currentCards = gameState.currentCards.filter(t => t.id !== taskId);
     gameState.selectedTaskId = null;
     gameState.currentTaskId = null;
+
+    // Если это было последнее задание на 30 уровне, завершаем игру
+    if (gameState.level === 30 && gameState.currentCards.length === 0 && !gameState.gameCompleted) {
+        endGame();
+    }
+
     taskModal.classList.add('hidden');
     updateUI();
 }
@@ -322,6 +333,7 @@ function renderHistory() {
 }
 
 function endGame() {
+    if (gameState.gameCompleted) return;
     gameState.gameCompleted = true;
     finalMessage.innerHTML = '🎉 Поздравляем! Вы прошли все 30 этапов и одолели злого учёного!<br>' +
         'Но будьте начеку… он оставил в лаборатории несколько загадочных колб…<br>' +
