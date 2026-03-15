@@ -141,6 +141,7 @@ socket.on('state', (serverState) => {
         gameState.balanceHistory = serverState.balanceHistory;
         gameState.availableTasks = serverState.availableTasks;
 
+        // Если нет выбранной карточки и карточки пусты, генерируем новые
         if (!gameState.selectedTaskId && gameState.currentCards.length === 0) {
             if (gameState.level >= 30) {
                 if (gameState.availableTasks.length === 0) {
@@ -184,23 +185,16 @@ function updatePoolStats() {
 
 function renderCards() {
     cardsContainer.innerHTML = '';
-    if (gameState.selectedTaskId) {
-        // Режим одной выбранной карточки
-        const task = gameState.currentCards.find(t => t.id === gameState.selectedTaskId);
-        if (task) {
-            const card = createCardElement(task, true);
-            cardsContainer.appendChild(card);
-        }
-    } else {
-        // Три карточки для выбора
+    // Всегда рисуем только доступные карточки (если нет выбранной)
+    // Если есть выбранная, то карточки не рисуем, потому что открыто модальное окно
+    if (!gameState.selectedTaskId) {
         gameState.currentCards.forEach(task => {
-            const card = createCardElement(task, false);
-            cardsContainer.appendChild(card);
+            cardsContainer.appendChild(createCardElement(task));
         });
     }
 }
 
-function createCardElement(task, isSelected) {
+function createCardElement(task) {
     const card = document.createElement('div');
     card.className = `card ${task.selected ? 'selected' : ''} ${task.completed ? 'completed' : ''}`;
     card.dataset.id = task.id;
@@ -212,45 +206,22 @@ function createCardElement(task, isSelected) {
 
     let buttons = '';
     if (!task.selected && !task.completed && !gameState.selectedTaskId) {
-        // На карточках выбора
         buttons = `<button class="select-btn">🧪 Выбрать</button>`;
-    } else if (task.selected && !task.completed) {
-        // На выбранной карточке — кнопки управления
-        buttons = `
-            <button class="complete-btn">✅ Успех</button>
-            <button class="penalty-btn">💥 Взрыв</button>
-        `;
-    } else if (task.completed) {
-        buttons = `<button disabled>✔ Выполнено</button>`;
+    } else {
+        // карточки с completed не должны иметь кнопок
+        buttons = '';
     }
 
-    card.innerHTML = reagentHTML + taskText + `<div class="card-actions">${buttons}</div>`;
+    card.innerHTML = reagentHTML + taskText + (buttons ? `<div class="card-actions">${buttons}</div>` : '');
 
-    // Обработчики навешиваем один раз, используя делегирование или прямые listeners
-    if (!task.selected && !task.completed && !gameState.selectedTaskId) {
-        const selectBtn = card.querySelector('.select-btn');
-        if (selectBtn) {
-            selectBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                selectTask(task.id);
-            });
-        }
-    } else if (task.selected && !task.completed) {
-        const completeBtn = card.querySelector('.complete-btn');
-        const penaltyBtn = card.querySelector('.penalty-btn');
-        if (completeBtn) {
-            completeBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                openTaskModal(task.id);
-            });
-        }
-        if (penaltyBtn) {
-            penaltyBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                applyPenalty(task.id);
-            });
-        }
+    const selectBtn = card.querySelector('.select-btn');
+    if (selectBtn) {
+        selectBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectTask(task.id);
+        });
     }
+
     return card;
 }
 
@@ -274,11 +245,11 @@ function selectTask(taskId) {
 
     isAnimating = true;
     setTimeout(() => {
-        // После анимации оставляем только выбранную карточку
-        gameState.currentCards = [task];
-        task.selected = true;
+        // После анимации убираем все карточки, запоминаем выбранную и открываем модалку
+        gameState.currentCards = []; // очищаем, так как карточки не нужны
         gameState.selectedTaskId = taskId;
-        renderCards();
+        task.selected = true;
+        renderCards(); // теперь карточек нет
         isAnimating = false;
         if (pendingState) {
             gameState.level = pendingState.level;
@@ -289,25 +260,20 @@ function selectTask(taskId) {
             updatePoolStats();
             pendingState = null;
         }
+        // Открываем модалку для выбранного задания
+        openTaskModal(taskId);
     }, 500);
 
     socket.emit('selectTask', taskId);
 }
 
 function openTaskModal(taskId) {
-    // Защита от двойного открытия
-    if (!taskModal.classList.contains('hidden')) return;
-
-    const task = gameState.currentCards.find(t => t.id === taskId);
+    const task = gameState.availableTasks.find(t => t.id === taskId);
     if (!task) return;
     gameState.currentTaskId = taskId;
     taskDesc.textContent = task.description;
     newBalanceInput.value = gameState.currentBalance;
     taskModal.classList.remove('hidden');
-}
-
-function applyPenalty(taskId) {
-    openTaskModal(taskId);
 }
 
 function completeTask(success) {
@@ -325,17 +291,12 @@ function completeTask(success) {
         addHistoryEntry(`💥 Взрыв! Потеряно реактивов`);
     }
 
-    // Удаляем карточку из руки
-    gameState.currentCards = gameState.currentCards.filter(t => t.id !== taskId);
+    // Сбрасываем выбранное состояние
     gameState.selectedTaskId = null;
     gameState.currentTaskId = null;
 
-    if (gameState.level === 30 && gameState.currentCards.length === 0 && !gameState.gameCompleted) {
-        endGame();
-    }
-
     taskModal.classList.add('hidden');
-    updateUI();
+    // Карточки обновятся после получения нового state от сервера
 }
 
 function addHistoryEntry(text) {
