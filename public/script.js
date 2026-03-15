@@ -144,11 +144,20 @@ socket.on('state', (serverState) => {
     if (isAnimating) {
         pendingState = serverState;
     } else {
-        const previousLevel = gameState.level;
         gameState.level = serverState.level;
         gameState.currentBalance = serverState.currentBalance;
         gameState.balanceHistory = serverState.balanceHistory;
         gameState.availableTasks = serverState.availableTasks;
+
+        // Проверка на завершение игры до генерации новых карточек
+        if (gameState.level >= 30 && gameState.currentCards.length === 0 && !gameState.gameCompleted) {
+            endGame();
+            // После завершения не генерируем карточки
+            updateUI();
+            updatePoolStats();
+            saveGameState();
+            return;
+        }
 
         // Если нет выбранной карточки и карточки пусты, генерируем новые
         if (!gameState.selectedTaskId && gameState.currentCards.length === 0) {
@@ -158,11 +167,6 @@ socket.on('state', (serverState) => {
         updateUI();
         updatePoolStats();
         saveGameState();
-
-        // Проверка на завершение игры (уровень 30 и больше нет карточек)
-        if (gameState.level >= 30 && gameState.currentCards.length === 0 && !gameState.gameCompleted) {
-            endGame();
-        }
     }
 });
 
@@ -256,7 +260,7 @@ function selectTask(taskId) {
 
     gameState.currentCards.forEach(t => {
         if (t.id !== taskId) {
-            t.completed = true;
+            t.completed = true; // для анимации
         }
     });
     renderCards();
