@@ -9,7 +9,7 @@ const io = new Server(server);
 
 const MAX_LEVEL = 30;
 const DEFAULT_BALANCE = 1500000;
-const PENALTY_BURN_RANGE = [15, 20];
+const PENALTY_BURN_RANGE = [15, 20]; // сжигается от 15 до 20 лёгких заданий
 
 // ================== ПУЛ ЗАДАНИЙ (НАУЧНЫЙ СТИЛЬ) ==================
 const taskTemplates = [
@@ -168,7 +168,7 @@ const taskTemplates = [
 
 function createInitialPool() {
   const pool = [];
-  const counts = [42, 27, 28, 20, 10, 2]; // Количество заданий по сложностям
+  const counts = [100, 60, 30, 20, 10, 2]; // Исходные количества
   for (let star = 1; star <= 6; star++) {
     const template = taskTemplates.find(t => t.difficulty === star);
     if (!template) continue;
@@ -249,12 +249,7 @@ io.on('connection', (socket) => {
   console.log('Клиент подключён');
   socket.emit('state', questState);
 
-  socket.on('selectTask', (taskId) => {
-    // не используется, но оставим
-  });
-
   socket.on('completeTask', (taskId, change) => {
-    // Удаляем задание из пула
     const idx = questState.availableTasks.findIndex(t => t.id === taskId);
     if (idx !== -1) questState.availableTasks.splice(idx, 1);
 
@@ -263,15 +258,11 @@ io.on('connection', (socket) => {
 
     if (questState.level < MAX_LEVEL) {
       questState.level++;
-    } else {
-      // игра завершена, можно не повышать
     }
-
     io.emit('state', questState);
   });
 
   socket.on('penaltyWithBalance', (taskId, newBalance) => {
-    // Удаляем задание из пула
     const idx = questState.availableTasks.findIndex(t => t.id === taskId);
     if (idx !== -1) questState.availableTasks.splice(idx, 1);
 
@@ -285,7 +276,6 @@ io.on('connection', (socket) => {
     if (questState.level < MAX_LEVEL) {
       questState.level++;
     }
-
     io.emit('state', questState);
   });
 
