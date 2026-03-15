@@ -28,13 +28,16 @@ const failBtn = document.getElementById('fail-task');
 const completionModal = document.getElementById('completion-modal');
 const finalMessage = document.getElementById('final-message');
 const finalBalanceSpan = document.getElementById('final-balance');
+const flaskGagBtn = document.getElementById('flask-gag-btn');
 const completionResetBtn = document.getElementById('completion-reset-btn');
+const rulesModal = document.getElementById('rules-modal');
+const dontShowCheckbox = document.getElementById('dont-show-rules');
+const startQuestBtn = document.getElementById('start-quest-btn');
 
 let selectedTaskInProgress = false;
 let isAnimating = false;
 let pendingState = null;
 
-// Вспомогательные функции
 function getReagentClass(diff) {
     const classes = ['F', 'D', 'C', 'B', 'A', 'S'];
     return classes[diff-1] || '?';
@@ -76,7 +79,26 @@ function generateCardsForLevel() {
         return;
     }
 
-    const shuffled = [...gameState.availableTasks].sort(() => 0.5 - Math.random());
+    let message = '';
+    let filteredTasks = gameState.availableTasks;
+
+    if (gameState.level % 10 === 0) {
+        filteredTasks = gameState.availableTasks.filter(t => t.difficulty >= 4);
+        message = `🔥 Этап ${gameState.level}: Критические эксперименты (классы B, A, S)`;
+    } else if (gameState.level % 5 === 0) {
+        filteredTasks = gameState.availableTasks.filter(t => t.difficulty === 3 || t.difficulty === 4);
+        message = `⚗️ Этап ${gameState.level}: Синтез сложных соединений (классы C и B)`;
+    }
+
+    if (message) {
+        showToast(message);
+    }
+
+    if (filteredTasks.length < 3) {
+        filteredTasks = gameState.availableTasks;
+    }
+
+    const shuffled = [...filteredTasks].sort(() => 0.5 - Math.random());
     gameState.currentCards = shuffled.slice(0, 3).map(task => ({
         ...task,
         selected: false,
@@ -84,7 +106,16 @@ function generateCardsForLevel() {
     }));
 }
 
-// ------------------- Подключение к серверу -------------------
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.remove('hidden');
+    setTimeout(() => {
+        toast.classList.add('hidden');
+    }, 3000);
+}
+
 socket.on('connect', () => {
     const saved = loadGameState();
     if (saved && !saved.gameCompleted) {
@@ -101,6 +132,8 @@ socket.on('connect', () => {
 });
 
 socket.on('state', (serverState) => {
+    if (gameState.gameCompleted) return;
+
     if (isAnimating) {
         pendingState = serverState;
     } else {
@@ -114,9 +147,12 @@ socket.on('state', (serverState) => {
                 if (gameState.availableTasks.length === 0) {
                     endGame();
                     return;
+                } else {
+                    generateCardsForLevel();
                 }
+            } else {
+                generateCardsForLevel();
             }
-            generateCardsForLevel();
         }
 
         updateUI();
@@ -149,6 +185,10 @@ function updatePoolStats() {
 
 function renderCards() {
     cardsContainer.innerHTML = '';
+    if (gameState.selectedTaskId) {
+        // не показываем карточки
+        return;
+    }
     gameState.currentCards.forEach(task => {
         cardsContainer.appendChild(createCardElement(task));
     });
@@ -164,7 +204,9 @@ function createCardElement(task) {
     card.innerHTML = `
         <div class="reagent-class ${classColor}">${reagentClass}</div>
         <div class="task-text">${task.description}</div>
-        <button class="select-btn">🧪 Выбрать</button>
+        <div class="card-actions">
+            <button class="select-btn">🧪 Выбрать</button>
+        </div>
     `;
 
     card.querySelector('.select-btn').addEventListener('click', (e) => {
@@ -179,7 +221,6 @@ function selectTask(taskId) {
     const task = gameState.currentCards.find(t => t.id === taskId);
     if (!task) return;
 
-    // Анимация сгорания для невыбранных
     gameState.currentCards.forEach(t => {
         if (t.id !== taskId) {
             t.completed = true;
@@ -195,9 +236,9 @@ function selectTask(taskId) {
 
     isAnimating = true;
     setTimeout(() => {
-        // После анимации очищаем карточки и открываем модалку
         gameState.currentCards = [];
         gameState.selectedTaskId = taskId;
+        task.selected = true;
         renderCards();
         isAnimating = false;
         if (pendingState) {
@@ -209,7 +250,6 @@ function selectTask(taskId) {
             updatePoolStats();
             pendingState = null;
         }
-        // Открываем модалку с заданием
         openTaskModal(taskId);
     }, 500);
 
@@ -274,7 +314,8 @@ function renderHistory() {
 function endGame() {
     if (gameState.gameCompleted) return;
     gameState.gameCompleted = true;
-    finalMessage.textContent = '🎉 Поздравляем! Вы прошли все 30 этапов и одолели злого учёного! gg wp';
+    finalMessage.innerHTML = '🎉 Поздравляем! Вы прошли все 30 этапов и одолели злого учёного!<br>' +
+        'Но будьте начеку… кажется, он оставил одну странную колбу.';
     finalBalanceSpan.textContent = gameState.currentBalance;
     completionModal.classList.remove('hidden');
     clearSavedGame();
@@ -313,15 +354,86 @@ resetBtn.addEventListener('click', () => {
 completeBtn.addEventListener('click', () => completeTask(true));
 failBtn.addEventListener('click', () => completeTask(false));
 
-completionResetBtn.addEventListener('click', () => {
-    completionModal.classList.add('hidden');
-    resetGame();
+if (flaskGagBtn) {
+    flaskGagBtn.addEventListener('click', () => {
+        const toast = document.getElementById('toast');
+        if (toast) {
+            toast.textContent = 'Накид брюнеточке, мяу';
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+    });
+}
+
+if (completionResetBtn) {
+    completionResetBtn.addEventListener('click', () => {
+        completionModal.classList.add('hidden');
+        resetGame();
+    });
+}
+
+// Правила
+if (!localStorage.getItem('quest_rules_hidden')) {
+    setTimeout(() => rulesModal.classList.remove('hidden'), 500);
+}
+startQuestBtn.addEventListener('click', () => {
+    if (dontShowCheckbox.checked) localStorage.setItem('quest_rules_hidden', 'true');
+    rulesModal.classList.add('hidden');
 });
 
 window.addEventListener('click', (e) => {
-    if (e.target === taskModal) taskModal.classList.add('hidden');
-    if (e.target === completionModal) completionModal.classList.add('hidden');
+    if (e.target.classList.contains('modal')) e.target.classList.add('hidden');
 });
+
+// Анимация пузырьков
+(function initBubbles() {
+    const canvas = document.getElementById('bubbles-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    const bubbles = [];
+    const BUBBLE_COUNT = 50;
+
+    function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    for (let i = 0; i < BUBBLE_COUNT; i++) {
+        bubbles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            radius: Math.random() * 10 + 5,
+            speed: Math.random() * 0.5 + 0.2,
+            opacity: Math.random() * 0.5 + 0.3,
+            color: `rgba(100, 255, 100, ${Math.random()*0.3+0.2})`
+        });
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+        bubbles.forEach(b => {
+            b.y -= b.speed;
+            if (b.y + b.radius < 0) {
+                b.y = height + b.radius;
+                b.x = Math.random() * width;
+            }
+            ctx.beginPath();
+            ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+            ctx.fillStyle = b.color;
+            ctx.shadowColor = '#0f0';
+            ctx.shadowBlur = 15;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        });
+        requestAnimationFrame(animate);
+    }
+    animate();
+})();
 
 // Анимация сгорания
 (function addBurnAnimation() {
