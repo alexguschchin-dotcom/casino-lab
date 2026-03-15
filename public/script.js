@@ -335,9 +335,9 @@ function renderHistory() {
 function endGame() {
     if (gameState.gameCompleted) return;
     gameState.gameCompleted = true;
-    finalMessage.innerHTML = '🎉 Поздравляем! Вы прошли все 30 этапов и одолели злого учёного!<br>' +
+    finalMessage.innerHTML = '🎉 Поздравляем! Вы прошли все 30 этапов и одолели злого учёного gg wp!<br>' +
         'Но будьте начеку… он оставил в лаборатории несколько загадочных колб…<br>' +
-        '<span style="color:#0f0;">gg wp, герой! Теперь лаборатория принадлежит тебе.</span>';
+        '<span style="color:#0f0;">Теперь лаборатория принадлежит тебе.</span>';
     finalBalanceSpan.textContent = gameState.currentBalance;
     completionModal.classList.remove('hidden');
     clearSavedGame();
