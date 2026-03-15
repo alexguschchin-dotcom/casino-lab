@@ -43,7 +43,6 @@ function getReagentClass(diff) {
     return classes[diff-1] || '?';
 }
 
-// Функция для получения цвета класса (используется в CSS)
 function getClassColor(diff) {
     const colors = ['f', 'd', 'c', 'b', 'a', 's'];
     return colors[diff-1] || 'f';
@@ -113,13 +112,16 @@ socket.on('state', (serverState) => {
     if (isAnimating) {
         pendingState = serverState;
     } else {
+        gameState.level = serverState.level;
         gameState.currentBalance = serverState.currentBalance;
         gameState.balanceHistory = serverState.balanceHistory;
         gameState.availableTasks = serverState.availableTasks;
-        // Если руки пусты и нет выбранной карточки, генерируем новые
-        if (gameState.currentCards.length === 0 && !gameState.selectedTaskId) {
+
+        // Если нет выбранной карточки и карточки пусты, генерируем новые
+        if (!gameState.selectedTaskId && gameState.currentCards.length === 0) {
             generateCardsForLevel();
         }
+
         updateUI();
         updatePoolStats();
         saveGameState();
@@ -235,6 +237,7 @@ function selectTask(taskId) {
         renderCards();
         isAnimating = false;
         if (pendingState) {
+            gameState.level = pendingState.level;
             gameState.currentBalance = pendingState.currentBalance;
             gameState.balanceHistory = pendingState.balanceHistory;
             gameState.availableTasks = pendingState.availableTasks;
@@ -271,27 +274,14 @@ function completeTask(success) {
         addHistoryEntry(`💥 Взрыв! Потеряно реактивов`);
     }
 
-    // Удаляем текущую карточку из руки
-    const taskIndex = gameState.currentCards.findIndex(t => t.id === taskId);
-    if (taskIndex !== -1) {
-        gameState.currentCards.splice(taskIndex, 1);
-    }
+    // Очищаем текущую карточку и ждём ответа от сервера
+    gameState.currentCards = gameState.currentCards.filter(t => t.id !== taskId);
     gameState.selectedTaskId = null;
     gameState.currentTaskId = null;
 
-    // Увеличиваем уровень и генерируем новые карточки, если не последний уровень
-    if (gameState.level < 30) {
-        gameState.level++;
-        generateCardsForLevel();
-    } else {
-        gameState.gameCompleted = true;
-        endGame();
-    }
-
     taskModal.classList.add('hidden');
+    // Не генерируем новые карточки, они появятся после получения нового state от сервера
     updateUI();
-    updatePoolStats();
-    saveGameState();
 }
 
 function applyPenalty(taskId) {
@@ -319,6 +309,7 @@ function renderHistory() {
 }
 
 function endGame() {
+    gameState.gameCompleted = true;
     finalMessage.textContent = 'Все этапы эксперимента пройдены!';
     finalBalanceSpan.textContent = gameState.currentBalance;
     completionModal.classList.remove('hidden');
