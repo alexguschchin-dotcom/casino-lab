@@ -9,11 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <!-- Анимированные пузырьки -->
     <canvas id="bubbles-canvas"></canvas>
     <div class="lab-bg"></div>
-
-    <!-- Всплывающие уведомления -->
     <div id="toast" class="toast hidden"></div>
 
     <div class="game-container">
@@ -57,13 +54,16 @@
         </div>
     </div>
 
-    <!-- Модалка завершения -->
+    <!-- Модалка завершения (с двумя кнопками) -->
     <div id="completion-modal" class="modal hidden">
         <div class="modal-content completion-content">
             <h2>🏆 Эксперимент завершён</h2>
             <p id="final-message"></p>
             <p>Итоговый баланс: <span id="final-balance"></span> 🔬</p>
-            <button id="completion-reset-btn" class="btn-neon">🔄 Новый эксперимент</button>
+            <div style="display: flex; gap: 20px; justify-content: center; margin-top: 20px;">
+                <button id="flask-gag-btn" class="btn-neon">🧪 Неизвестная колба</button>
+                <button id="completion-reset-btn" class="btn-neon">🔄 Новый эксперимент</button>
+            </div>
         </div>
     </div>
 

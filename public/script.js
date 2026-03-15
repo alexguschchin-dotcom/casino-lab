@@ -28,6 +28,7 @@ const failBtn = document.getElementById('fail-task');
 const completionModal = document.getElementById('completion-modal');
 const finalMessage = document.getElementById('final-message');
 const finalBalanceSpan = document.getElementById('final-balance');
+const flaskGagBtn = document.getElementById('flask-gag-btn');
 const completionResetBtn = document.getElementById('completion-reset-btn');
 const rulesModal = document.getElementById('rules-modal');
 const dontShowCheckbox = document.getElementById('dont-show-rules');
@@ -114,7 +115,6 @@ function generateCardsForLevel() {
     }));
 }
 
-// ------------------- Подключение к серверу -------------------
 socket.on('connect', () => {
     const saved = loadGameState();
     if (saved && !saved.gameCompleted) {
@@ -141,7 +141,6 @@ socket.on('state', (serverState) => {
         gameState.balanceHistory = serverState.balanceHistory;
         gameState.availableTasks = serverState.availableTasks;
 
-        // Если нет выбранной карточки и текущие карточки пусты
         if (!gameState.selectedTaskId && gameState.currentCards.length === 0) {
             if (gameState.level >= 30) {
                 if (gameState.availableTasks.length === 0) {
@@ -162,7 +161,7 @@ socket.on('state', (serverState) => {
 });
 
 function updateUI() {
-    if (levelSpan) levelSpan.textContent = gameState.level;
+    levelSpan.textContent = gameState.level;
     balanceSpan.textContent = gameState.currentBalance;
     renderCards();
     renderHistory();
@@ -299,7 +298,6 @@ function completeTask(success) {
     gameState.selectedTaskId = null;
     gameState.currentTaskId = null;
 
-    // Если это было последнее задание на 30 уровне, завершаем игру
     if (gameState.level === 30 && gameState.currentCards.length === 0 && !gameState.gameCompleted) {
         endGame();
     }
@@ -336,8 +334,7 @@ function endGame() {
     if (gameState.gameCompleted) return;
     gameState.gameCompleted = true;
     finalMessage.innerHTML = '🎉 Поздравляем! Вы прошли все 30 этапов и одолели злого учёного gg wp!<br>' +
-        'Но будьте начеку… он оставил в лаборатории несколько загадочных колб…<br>' +
-        '<span style="color:#0f0;">Теперь лаборатория принадлежит тебе.</span>';
+        'Но будьте начеку… кажется, он оставил одну странную колбу.';
     finalBalanceSpan.textContent = gameState.currentBalance;
     completionModal.classList.remove('hidden');
     clearSavedGame();
@@ -376,11 +373,18 @@ resetBtn.addEventListener('click', () => {
 completeBtn.addEventListener('click', () => completeTask(true));
 failBtn.addEventListener('click', () => completeTask(false));
 
+// Кнопка "Неизвестная колба" показывает тост
+flaskGagBtn.addEventListener('click', () => {
+    showToast('Накид брюнеточке, мяу');
+});
+
+// Кнопка "Новый эксперимент" сразу сбрасывает игру
 completionResetBtn.addEventListener('click', () => {
     completionModal.classList.add('hidden');
     resetGame();
 });
 
+// Правила
 if (!localStorage.getItem('quest_rules_hidden')) {
     setTimeout(() => rulesModal.classList.remove('hidden'), 500);
 }
