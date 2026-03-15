@@ -333,7 +333,7 @@ function renderHistory() {
 function endGame() {
     if (gameState.gameCompleted) return;
     gameState.gameCompleted = true;
-    finalMessage.innerHTML = '🎉 Поздравляем! Вы прошли все 30 этапов и одолели злого учёного gg wp!<br>' +
+    finalMessage.innerHTML = '🎉 Поздравляем! Вы прошли все 30 этапов и одолели злого учёного!<br>' +
         'Но будьте начеку… кажется, он оставил одну странную колбу.';
     finalBalanceSpan.textContent = gameState.currentBalance;
     completionModal.classList.remove('hidden');
@@ -374,15 +374,19 @@ completeBtn.addEventListener('click', () => completeTask(true));
 failBtn.addEventListener('click', () => completeTask(false));
 
 // Кнопка "Неизвестная колба" показывает тост
-flaskGagBtn.addEventListener('click', () => {
-    showToast('Накид брюнеточке, мяу');
-});
+if (flaskGagBtn) {
+    flaskGagBtn.addEventListener('click', () => {
+        showToast('Накид брюнеточке, мяу');
+    });
+}
 
 // Кнопка "Новый эксперимент" сразу сбрасывает игру
-completionResetBtn.addEventListener('click', () => {
-    completionModal.classList.add('hidden');
-    resetGame();
-});
+if (completionResetBtn) {
+    completionResetBtn.addEventListener('click', () => {
+        completionModal.classList.add('hidden');
+        resetGame();
+    });
+}
 
 // Правила
 if (!localStorage.getItem('quest_rules_hidden')) {

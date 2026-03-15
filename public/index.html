@@ -60,7 +60,7 @@
             <h2>🏆 Эксперимент завершён</h2>
             <p id="final-message"></p>
             <p>Итоговый баланс: <span id="final-balance"></span> 🔬</p>
-            <div style="display: flex; gap: 20px; justify-content: center; margin-top: 20px;">
+            <div class="completion-buttons">
                 <button id="flask-gag-btn" class="btn-neon">🧪 Неизвестная колба</button>
                 <button id="completion-reset-btn" class="btn-neon">🔄 Новый эксперимент</button>
             </div>
@@ -71,7 +71,7 @@
     <div id="rules-modal" class="modal hidden">
         <div class="modal-content">
             <h2>📜 Правила</h2>
-            <p>Вы — учёный в секретной лаборатории. Каждый этап эксперимента — три пробирки с реагентами разного класса опасности (F, D, C, B, A, S). Выберите одну, проведите опыт (выполните задание в казино) и введите новый баланс. При успехе вы получаете очки науки. При провале — взрыв, теряются лёгкие реагенты. 30 этапов безумия!</p>
+            <p>Вы — учёный в секретной лаборатории. Каждый этап эксперимента — три пробирки с реагентами разного класса опасности (F, D, C, B, A, S). Выберите одну, проведите опыт и введите новый баланс. При провале взрыв! 30 этапов безумия!</p>
             <label><input type="checkbox" id="dont-show-rules"> Больше не показывать</label>
             <button id="start-quest-btn" class="btn-neon">Понятно</button>
         </div>

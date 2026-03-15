@@ -344,7 +344,6 @@ body {
     display: none !important;
 }
 
-/* Toast-уведомления */
 .toast {
     position: fixed;
     top: 20px;
@@ -364,6 +363,20 @@ body {
 @keyframes slideIn {
     from { transform: translateX(100%); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
+}
+
+/* Блок кнопок в модалке завершения */
+.completion-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.completion-buttons .btn-neon {
+    flex: 1;
+    min-width: 200px;
+    text-align: center;
 }
 
 .modal {
@@ -449,8 +462,4 @@ body {
 .completion-content p {
     font-size: 1.3rem;
     margin: 15px 0;
-}
-
-#completion-reset-btn {
-    margin-top: 20px;
 }
