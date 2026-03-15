@@ -352,7 +352,7 @@ function renderHistory() {
 // ------------------- Завершение игры -------------------
 function endGame() {
     gameState.gameCompleted = true;
-    finalMessage.textContent = 'Поздравляем! Вы прошли все 30 этапов и одолели злого учёного! gg wp';
+    finalMessage.textContent = 'Поздравляем! Вы прошли все 30 этапов и одолели злого учёного gg wp, это невероятное достижение которое удивит весь мир. Возрадуйтесь!';
     finalBalanceSpan.textContent = gameState.currentBalance;
     completionModal.classList.remove('hidden');
     clearSavedGame();
