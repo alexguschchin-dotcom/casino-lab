@@ -13,7 +13,7 @@ let gameState = {
 };
 
 // DOM элементы
-const levelSpan = document.getElementById('current-level'); // не используется, но оставим для совместимости
+const levelSpan = document.getElementById('current-level');
 const balanceSpan = document.getElementById('current-balance');
 const cardsContainer = document.getElementById('cards-container');
 const historyDiv = document.getElementById('history-list');
@@ -79,6 +79,20 @@ function clearSavedGame() {
     localStorage.removeItem(SAVE_KEY);
 }
 
+// ------------------- Генерация карточек -------------------
+function generateCardsForLevel() {
+    if (gameState.availableTasks.length === 0) {
+        gameState.currentCards = [];
+        return;
+    }
+    const shuffled = [...gameState.availableTasks].sort(() => 0.5 - Math.random());
+    gameState.currentCards = shuffled.slice(0, 3).map(task => ({
+        ...task,
+        selected: false,
+        completed: false
+    }));
+}
+
 // ------------------- Подключение к серверу -------------------
 socket.on('connect', () => {
     const saved = loadGameState();
@@ -102,31 +116,22 @@ socket.on('state', (serverState) => {
         gameState.currentBalance = serverState.currentBalance;
         gameState.balanceHistory = serverState.balanceHistory;
         gameState.availableTasks = serverState.availableTasks;
-        generateCardsForLevel();
+        // Если руки пусты и нет выбранной карточки, генерируем новые
+        if (gameState.currentCards.length === 0 && !gameState.selectedTaskId) {
+            generateCardsForLevel();
+        }
         updateUI();
         updatePoolStats();
         saveGameState();
     }
 });
 
-function generateCardsForLevel() {
-    if (gameState.availableTasks.length === 0) {
-        gameState.currentCards = [];
-        return;
-    }
-    const shuffled = [...gameState.availableTasks].sort(() => 0.5 - Math.random());
-    gameState.currentCards = shuffled.slice(0, 3).map(task => ({
-        ...task,
-        selected: false,
-        completed: false
-    }));
-}
-
 function updateUI() {
+    if (levelSpan) levelSpan.textContent = gameState.level;
     balanceSpan.textContent = gameState.currentBalance;
     renderCards();
     renderHistory();
-    if (gameState.level >= 30) { // уровень теперь не отображается, но оставим для логики
+    if (gameState.level >= 30) {
         resetBtn.classList.remove('hidden');
     } else {
         resetBtn.classList.add('hidden');
@@ -211,7 +216,7 @@ function selectTask(taskId) {
 
     gameState.currentCards.forEach(t => {
         if (t.id !== taskId) {
-            t.completed = true;
+            t.completed = true; // для анимации
         }
     });
     renderCards();
@@ -233,7 +238,6 @@ function selectTask(taskId) {
             gameState.currentBalance = pendingState.currentBalance;
             gameState.balanceHistory = pendingState.balanceHistory;
             gameState.availableTasks = pendingState.availableTasks;
-            generateCardsForLevel();
             updateUI();
             updatePoolStats();
             pendingState = null;
@@ -267,14 +271,15 @@ function completeTask(success) {
         addHistoryEntry(`💥 Взрыв! Потеряно реактивов`);
     }
 
-    const task = gameState.currentCards.find(t => t.id === taskId);
-    if (task) {
-        task.completed = true;
-        task.selected = false;
+    // Удаляем текущую карточку из руки
+    const taskIndex = gameState.currentCards.findIndex(t => t.id === taskId);
+    if (taskIndex !== -1) {
+        gameState.currentCards.splice(taskIndex, 1);
     }
     gameState.selectedTaskId = null;
     gameState.currentTaskId = null;
 
+    // Увеличиваем уровень и генерируем новые карточки, если не последний уровень
     if (gameState.level < 30) {
         gameState.level++;
         generateCardsForLevel();
