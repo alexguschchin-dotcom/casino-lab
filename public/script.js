@@ -39,7 +39,6 @@ let isAnimating = false;
 let pendingState = null;
 let toastTimeout = null;
 
-// Функция для получения класса реагента по сложности
 function getReagentClass(diff) {
     const classes = ['F', 'D', 'C', 'B', 'A', 'S'];
     return classes[diff-1] || '?';
@@ -50,7 +49,6 @@ function getClassColor(diff) {
     return colors[diff-1] || 'f';
 }
 
-// ------------------- Уведомления -------------------
 function showToast(message) {
     if (toastTimeout) clearTimeout(toastTimeout);
     toast.textContent = message;
@@ -60,13 +58,9 @@ function showToast(message) {
     }, 3000);
 }
 
-// ------------------- Сохранение -------------------
 function saveGameState() {
     try {
-        const saveData = {
-            ...gameState,
-            timestamp: Date.now()
-        };
+        const saveData = { ...gameState, timestamp: Date.now() };
         localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
     } catch (e) {}
 }
@@ -81,17 +75,15 @@ function loadGameState() {
             return null;
         }
         return data;
-    } catch (e) {
-        return null;
-    }
+    } catch (e) { return null; }
 }
 
 function clearSavedGame() {
     localStorage.removeItem(SAVE_KEY);
 }
 
-// ------------------- Генерация карточек -------------------
 function generateCardsForLevel() {
+    if (gameState.gameCompleted) return;
     if (gameState.availableTasks.length === 0) {
         gameState.currentCards = [];
         return;
@@ -108,9 +100,7 @@ function generateCardsForLevel() {
         message = `⚗️ Этап ${gameState.level}: Синтез сложных соединений (классы C и B)`;
     }
 
-    if (message) {
-        showToast(message);
-    }
+    if (message) showToast(message);
 
     if (filteredTasks.length < 3) {
         filteredTasks = gameState.availableTasks;
@@ -149,17 +139,13 @@ socket.on('state', (serverState) => {
         gameState.balanceHistory = serverState.balanceHistory;
         gameState.availableTasks = serverState.availableTasks;
 
-        // Проверка на завершение игры до генерации новых карточек
-        if (gameState.level >= 30 && gameState.currentCards.length === 0 && !gameState.gameCompleted) {
+        // Проверка на завершение игры
+        if (!gameState.gameCompleted && gameState.level >= 30 && gameState.currentCards.length === 0) {
             endGame();
-            // После завершения не генерируем карточки
-            updateUI();
-            updatePoolStats();
-            saveGameState();
             return;
         }
 
-        // Если нет выбранной карточки и карточки пусты, генерируем новые
+        // Генерация новых карточек, если нет выбранной и текущие пусты
         if (!gameState.selectedTaskId && gameState.currentCards.length === 0) {
             generateCardsForLevel();
         }
@@ -175,18 +161,14 @@ function updateUI() {
     balanceSpan.textContent = gameState.currentBalance;
     renderCards();
     renderHistory();
-    if (gameState.level >= 30) {
-        resetBtn.classList.remove('hidden');
-    } else {
-        resetBtn.classList.add('hidden');
-    }
+    resetBtn.classList.toggle('hidden', gameState.level < 30);
 }
 
 function updatePoolStats() {
-    const counts = { 'F': 0, 'D': 0, 'C': 0, 'B': 0, 'A': 0, 'S': 0 };
+    const counts = { F:0, D:0, C:0, B:0, A:0, S:0 };
     gameState.availableTasks.forEach(task => {
         const cls = getReagentClass(task.difficulty);
-        counts[cls] = (counts[cls] || 0) + 1;
+        counts[cls]++;
     });
     poolStatsDiv.innerHTML = Object.entries(counts).map(([cls, num]) => `
         <div class="stat-item">
@@ -200,14 +182,10 @@ function renderCards() {
     cardsContainer.innerHTML = '';
     if (gameState.selectedTaskId) {
         const task = gameState.currentCards.find(t => t.id === gameState.selectedTaskId);
-        if (task) {
-            const card = createCardElement(task, true);
-            cardsContainer.appendChild(card);
-        }
+        if (task) cardsContainer.appendChild(createCardElement(task, true));
     } else {
         gameState.currentCards.forEach(task => {
-            const card = createCardElement(task, false);
-            cardsContainer.appendChild(card);
+            cardsContainer.appendChild(createCardElement(task, false));
         });
     }
 }
@@ -259,16 +237,12 @@ function selectTask(taskId) {
     if (!task) return;
 
     gameState.currentCards.forEach(t => {
-        if (t.id !== taskId) {
-            t.completed = true; // для анимации
-        }
+        if (t.id !== taskId) t.completed = true;
     });
     renderCards();
 
     document.querySelectorAll('.card').forEach(c => {
-        if (c.dataset.id !== taskId) {
-            c.classList.add('burn');
-        }
+        if (c.dataset.id !== taskId) c.classList.add('burn');
     });
 
     isAnimating = true;
@@ -316,11 +290,9 @@ function completeTask(success) {
         addHistoryEntry(`💥 Взрыв! Потеряно реактивов`);
     }
 
-    // Очищаем текущую карточку и ждём ответа от сервера
     gameState.currentCards = gameState.currentCards.filter(t => t.id !== taskId);
     gameState.selectedTaskId = null;
     gameState.currentTaskId = null;
-
     taskModal.classList.add('hidden');
     updateUI();
 }
@@ -349,10 +321,11 @@ function renderHistory() {
     });
 }
 
-// ------------------- Завершение игры -------------------
 function endGame() {
     gameState.gameCompleted = true;
-    finalMessage.textContent = 'Поздравляем! Вы прошли все 30 этапов и одолели злого учёного gg wp, это невероятное достижение которое удивит весь мир. Возрадуйтесь!';
+    finalMessage.innerHTML = '🎉 Поздравляем! Вы прошли все 30 этапов и одолели злого учёного!<br>' +
+        'Но будьте начеку… он оставил в лаборатории несколько загадочных колб…<br>' +
+        '<span style="color:#0f0;">gg wp, герой! Теперь лаборатория принадлежит тебе.</span>';
     finalBalanceSpan.textContent = gameState.currentBalance;
     completionModal.classList.remove('hidden');
     clearSavedGame();
@@ -385,9 +358,7 @@ applyBalanceBtn.addEventListener('click', () => {
 });
 
 resetBtn.addEventListener('click', () => {
-    if (confirm('Начать новый эксперимент?')) {
-        resetGame();
-    }
+    if (confirm('Начать новый эксперимент?')) resetGame();
 });
 
 completeBtn.addEventListener('click', () => completeTask(true));
@@ -398,7 +369,6 @@ completionResetBtn.addEventListener('click', () => {
     resetGame();
 });
 
-// Правила
 if (!localStorage.getItem('quest_rules_hidden')) {
     setTimeout(() => rulesModal.classList.remove('hidden'), 500);
 }
@@ -408,9 +378,7 @@ startQuestBtn.addEventListener('click', () => {
 });
 
 window.addEventListener('click', (e) => {
-    if (e.target.classList.contains('modal')) {
-        e.target.classList.add('hidden');
-    }
+    if (e.target.classList.contains('modal')) e.target.classList.add('hidden');
 });
 
 // Анимация пузырьков
