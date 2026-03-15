@@ -185,11 +185,17 @@ function updatePoolStats() {
 function renderCards() {
     cardsContainer.innerHTML = '';
     if (gameState.selectedTaskId) {
+        // Режим одной выбранной карточки
         const task = gameState.currentCards.find(t => t.id === gameState.selectedTaskId);
-        if (task) cardsContainer.appendChild(createCardElement(task, true));
+        if (task) {
+            const card = createCardElement(task, true);
+            cardsContainer.appendChild(card);
+        }
     } else {
+        // Три карточки для выбора
         gameState.currentCards.forEach(task => {
-            cardsContainer.appendChild(createCardElement(task, false));
+            const card = createCardElement(task, false);
+            cardsContainer.appendChild(card);
         });
     }
 }
@@ -206,8 +212,10 @@ function createCardElement(task, isSelected) {
 
     let buttons = '';
     if (!task.selected && !task.completed && !gameState.selectedTaskId) {
+        // На карточках выбора
         buttons = `<button class="select-btn">🧪 Выбрать</button>`;
     } else if (task.selected && !task.completed) {
+        // На выбранной карточке — кнопки управления
         buttons = `
             <button class="complete-btn">✅ Успех</button>
             <button class="penalty-btn">💥 Взрыв</button>
@@ -218,20 +226,30 @@ function createCardElement(task, isSelected) {
 
     card.innerHTML = reagentHTML + taskText + `<div class="card-actions">${buttons}</div>`;
 
+    // Обработчики навешиваем один раз, используя делегирование или прямые listeners
     if (!task.selected && !task.completed && !gameState.selectedTaskId) {
-        card.querySelector('.select-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            selectTask(task.id);
-        });
+        const selectBtn = card.querySelector('.select-btn');
+        if (selectBtn) {
+            selectBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                selectTask(task.id);
+            });
+        }
     } else if (task.selected && !task.completed) {
-        card.querySelector('.complete-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            openTaskModal(task.id);
-        });
-        card.querySelector('.penalty-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            applyPenalty(task.id);
-        });
+        const completeBtn = card.querySelector('.complete-btn');
+        const penaltyBtn = card.querySelector('.penalty-btn');
+        if (completeBtn) {
+            completeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openTaskModal(task.id);
+            });
+        }
+        if (penaltyBtn) {
+            penaltyBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                applyPenalty(task.id);
+            });
+        }
     }
     return card;
 }
@@ -240,17 +258,23 @@ function selectTask(taskId) {
     const task = gameState.currentCards.find(t => t.id === taskId);
     if (!task) return;
 
+    // Анимация сгорания для невыбранных
     gameState.currentCards.forEach(t => {
-        if (t.id !== taskId) t.completed = true;
+        if (t.id !== taskId) {
+            t.completed = true;
+        }
     });
     renderCards();
 
     document.querySelectorAll('.card').forEach(c => {
-        if (c.dataset.id !== taskId) c.classList.add('burn');
+        if (c.dataset.id !== taskId) {
+            c.classList.add('burn');
+        }
     });
 
     isAnimating = true;
     setTimeout(() => {
+        // После анимации оставляем только выбранную карточку
         gameState.currentCards = [task];
         task.selected = true;
         gameState.selectedTaskId = taskId;
@@ -271,7 +295,9 @@ function selectTask(taskId) {
 }
 
 function openTaskModal(taskId) {
-    if (!taskModal.classList.contains('hidden')) return; // уже открыта
+    // Защита от двойного открытия
+    if (!taskModal.classList.contains('hidden')) return;
+
     const task = gameState.currentCards.find(t => t.id === taskId);
     if (!task) return;
     gameState.currentTaskId = taskId;
@@ -281,7 +307,6 @@ function openTaskModal(taskId) {
 }
 
 function applyPenalty(taskId) {
-    if (!taskModal.classList.contains('hidden')) return; // защита от двойного открытия
     openTaskModal(taskId);
 }
 
@@ -300,6 +325,7 @@ function completeTask(success) {
         addHistoryEntry(`💥 Взрыв! Потеряно реактивов`);
     }
 
+    // Удаляем карточку из руки
     gameState.currentCards = gameState.currentCards.filter(t => t.id !== taskId);
     gameState.selectedTaskId = null;
     gameState.currentTaskId = null;
