@@ -86,7 +86,6 @@ function clearSavedGame() {
 function generateCardsForLevel() {
     if (gameState.gameCompleted) return;
 
-    // Если заданий и штрафов больше нет — завершаем игру (но уровень может быть ещё не 30)
     if (gameState.availableTasks.length === 0 && gameState.penaltyPool.length === 0) {
         gameState.currentCards = [];
         return;
@@ -105,23 +104,19 @@ function generateCardsForLevel() {
 
     if (message) showToast(message);
 
-    // Если после фильтрации осталось меньше 2 заданий, берём из общего пула
     if (filteredTasks.length < 2) {
         filteredTasks = gameState.availableTasks;
     }
 
-    // Выбираем до двух случайных заданий (не удаляем из пула)
     const shuffledTasks = [...filteredTasks].sort(() => 0.5 - Math.random());
     const tasks = shuffledTasks.slice(0, 2).map(task => ({ ...task, selected: false, completed: false }));
 
-    // Выбираем один случайный штраф из penaltyPool (не удаляем)
     let penaltyCard = null;
     if (gameState.penaltyPool.length > 0) {
         const randomPenalty = gameState.penaltyPool[Math.floor(Math.random() * gameState.penaltyPool.length)];
         penaltyCard = { ...randomPenalty, selected: false, completed: false };
     }
 
-    // Формируем итоговый набор карточек
     let cards = [...tasks];
     if (penaltyCard) cards.push(penaltyCard);
     gameState.currentCards = cards.sort(() => 0.5 - Math.random());
@@ -156,7 +151,6 @@ socket.on('state', (serverState) => {
 
         if (!gameState.selectedTaskId && gameState.currentCards.length === 0) {
             if (gameState.level >= 30) {
-                // Если достигнут 30 уровень и заданий больше нет — завершаем
                 if (gameState.availableTasks.length === 0 && gameState.penaltyPool.length === 0) {
                     endGame();
                     return;
@@ -183,7 +177,6 @@ function updateUI() {
 }
 
 function updatePoolStats() {
-    // Статистика заданий
     const counts = { F:0, D:0, C:0, B:0, A:0, S:0 };
     gameState.availableTasks.forEach(task => {
         const cls = getReagentClass(task.difficulty);
@@ -196,7 +189,6 @@ function updatePoolStats() {
         </div>
     `).join('');
 
-    // Статистика штрафов
     html += `
         <div class="stat-item">
             <span class="reagent-class penalty">⚠️</span>
@@ -318,7 +310,6 @@ function openTaskModal(taskId) {
     taskDesc.textContent = task.description;
     newBalanceInput.value = gameState.currentBalance;
 
-    // Настраиваем кнопки
     if (task.isPenalty) {
         completeBtn.classList.add('hidden');
         failBtn.textContent = '❌ Провал';
@@ -339,18 +330,15 @@ function completeTask(success) {
     const task = gameState.currentCards.find(t => t.id === taskId);
 
     if (success) {
-        // Успех — только для заданий
         socket.emit('completeTask', taskId, change);
-        addHistoryEntry(`✅ Эксперимент успешен: ${change>0?'+'+change:change} 🔬`);
+        addHistoryEntry(`✅ Задание выполнено: ${change>0?'+'+change:change} 🔬`);
     } else {
         if (task && task.isPenalty) {
-            // Штраф
             socket.emit('applyPenaltyTask', taskId, newBalance);
             addHistoryEntry(`⚠️ Штраф выполнен: ${change>0?'+'+change:change} 🔬`);
         } else {
-            // Провал задания
             socket.emit('penaltyWithBalance', taskId, newBalance);
-            addHistoryEntry(`❌ Эксперимент провален: ${change>0?'+'+change:change} 🔬`);
+            addHistoryEntry(`❌ Задание провалено: ${change>0?'+'+change:change} 🔬`);
         }
     }
 
@@ -430,14 +418,12 @@ resetBtn.addEventListener('click', () => {
 completeBtn.addEventListener('click', () => completeTask(true));
 failBtn.addEventListener('click', () => completeTask(false));
 
-// Кнопка "Неизвестная колба"
 if (flaskGagBtn) {
     flaskGagBtn.addEventListener('click', () => {
         showToast('Накид брюнеточке, мяу');
     });
 }
 
-// Кнопка "Новый эксперимент"
 if (completionResetBtn) {
     completionResetBtn.addEventListener('click', () => {
         completionModal.classList.add('hidden');
@@ -445,7 +431,6 @@ if (completionResetBtn) {
     });
 }
 
-// Правила
 if (!localStorage.getItem('quest_rules_hidden')) {
     setTimeout(() => rulesModal.classList.remove('hidden'), 500);
 }
