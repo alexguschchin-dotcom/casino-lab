@@ -232,7 +232,7 @@ function createCardElement(task, isSelected) {
         buttons = `<button class="select-btn">🧪 Выбрать</button>`;
     } else if (task.selected && !task.completed) {
         if (task.isPenalty) {
-            buttons = `<button class="penalty-apply-btn">❌ Провал</button>`;
+            buttons = `<button class="penalty-apply-btn">✅ Успех</button>`;
         } else {
             buttons = `
                 <button class="complete-btn">✅ Успех</button>
@@ -312,10 +312,10 @@ function openTaskModal(taskId) {
 
     if (task.isPenalty) {
         completeBtn.classList.add('hidden');
-        failBtn.textContent = '❌ Провал';
+        failBtn.textContent = '✅ Успех';
     } else {
         completeBtn.classList.remove('hidden');
-        failBtn.textContent = '❌ Провал';
+        failBtn.textContent = '✅ Успех';
     }
 
     taskModal.classList.remove('hidden');
