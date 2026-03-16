@@ -90,7 +90,7 @@ function generateCardsForLevel() {
         return;
     }
 
-    // Определяем сообщение для особых уровней (как раньше)
+    // Определяем сообщение для особых уровней
     let message = '';
     let filteredTasks = gameState.availableTasks;
 
@@ -109,7 +109,7 @@ function generateCardsForLevel() {
         filteredTasks = gameState.availableTasks;
     }
 
-    // Перемешиваем и берём первые два как задания
+    // Перемешиваем и берём до двух заданий (может быть 1, если в пуле всего 1 задание)
     const shuffled = [...filteredTasks].sort(() => 0.5 - Math.random());
     const tasks = shuffled.slice(0, 2).map(task => ({ ...task, selected: false, completed: false }));
 
@@ -123,8 +123,9 @@ function generateCardsForLevel() {
         completed: false
     };
 
-    // Объединяем и перемешиваем три карточки
-    gameState.currentCards = [tasks[0], tasks[1], penaltyTask].sort(() => 0.5 - Math.random());
+    // Собираем все карточки (от 2 до 3 штук) и перемешиваем
+    let cards = [...tasks, penaltyTask];
+    gameState.currentCards = cards.sort(() => 0.5 - Math.random());
 }
 
 socket.on('connect', () => {
@@ -250,7 +251,7 @@ function createCardElement(task, isSelected) {
         if (task.isPenalty) {
             card.querySelector('.penalty-apply-btn').addEventListener('click', (e) => {
                 e.stopPropagation();
-                openTaskModal(task.id); // откроем ту же модалку, она адаптируется
+                openTaskModal(task.id);
             });
         } else {
             card.querySelector('.complete-btn').addEventListener('click', (e) => {
@@ -259,7 +260,7 @@ function createCardElement(task, isSelected) {
             });
             card.querySelector('.penalty-btn').addEventListener('click', (e) => {
                 e.stopPropagation();
-                openTaskModal(task.id); // для взрыва тоже открываем модалку (там две кнопки)
+                openTaskModal(task.id);
             });
         }
     }
@@ -326,16 +327,13 @@ function completeTask(success) {
     const task = gameState.currentCards.find(t => t.id === taskId);
 
     if (success) {
-        // Для обычного задания
         socket.emit('completeTask', taskId, change);
         addHistoryEntry(`✅ Эксперимент успешен: ${change>0?'+'+change:change} 🔬`);
     } else {
-        // Для взрыва или штрафа
         socket.emit('penaltyWithBalance', taskId, newBalance);
         addHistoryEntry(task && task.isPenalty ? `⚠️ Штраф применён` : `💥 Взрыв! Потеряно реактивов`);
     }
 
-    // Очищаем текущие карточки и выбор
     gameState.currentCards = gameState.currentCards.filter(t => t.id !== taskId);
     gameState.selectedTaskId = null;
     gameState.currentTaskId = null;
@@ -346,11 +344,6 @@ function completeTask(success) {
 
     taskModal.classList.add('hidden');
     updateUI();
-}
-
-function applyPenalty(taskId) {
-    // Для совместимости (раньше вызывалась из penalty-btn)
-    openTaskModal(taskId);
 }
 
 function addHistoryEntry(text) {
@@ -493,5 +486,3 @@ window.addEventListener('click', (e) => {
     }
     animate();
 })();
-
-// Анимация сгорания (уже есть в CSS)
