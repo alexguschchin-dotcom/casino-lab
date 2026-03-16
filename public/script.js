@@ -116,7 +116,7 @@ function generateCardsForLevel() {
     // Создаём карточку штрафа
     const penaltyTask = {
         id: 'penalty_' + Date.now() + '_' + Math.random(),
-        description: 'Штраф: сжечь лёгкие задания',
+        description: 'Штраф: сделать 5 приседаний', // пример штрафа
         difficulty: 0,
         isPenalty: true,
         selected: false,
@@ -229,11 +229,11 @@ function createCardElement(task, isSelected) {
         buttons = `<button class="select-btn">🧪 Выбрать</button>`;
     } else if (task.selected && !task.completed) {
         if (task.isPenalty) {
-            buttons = `<button class="penalty-apply-btn">⚠️ Применить штраф</button>`;
+            buttons = `<button class="penalty-apply-btn">❌ Провал</button>`;
         } else {
             buttons = `
                 <button class="complete-btn">✅ Успех</button>
-                <button class="penalty-btn">💥 Взрыв</button>
+                <button class="penalty-btn">❌ Провал</button>
             `;
         }
     } else if (task.completed) {
@@ -309,10 +309,10 @@ function openTaskModal(taskId) {
     // Настраиваем кнопки в зависимости от типа задачи
     if (task.isPenalty) {
         completeBtn.classList.add('hidden');
-        failBtn.textContent = '⚠️ Применить штраф';
+        failBtn.textContent = '❌ Провал';
     } else {
         completeBtn.classList.remove('hidden');
-        failBtn.textContent = '💥 Взрыв';
+        failBtn.textContent = '❌ Провал';
     }
 
     taskModal.classList.remove('hidden');
@@ -331,7 +331,11 @@ function completeTask(success) {
         addHistoryEntry(`✅ Эксперимент успешен: ${change>0?'+'+change:change} 🔬`);
     } else {
         socket.emit('penaltyWithBalance', taskId, newBalance);
-        addHistoryEntry(task && task.isPenalty ? `⚠️ Штраф применён` : `💥 Взрыв! Потеряно реактивов`);
+        if (task && task.isPenalty) {
+            addHistoryEntry(`⚠️ Штраф выполнен: ${change>0?'+'+change:change} 🔬`);
+        } else {
+            addHistoryEntry(`❌ Эксперимент провален: ${change>0?'+'+change:change} 🔬`);
+        }
     }
 
     gameState.currentCards = gameState.currentCards.filter(t => t.id !== taskId);
