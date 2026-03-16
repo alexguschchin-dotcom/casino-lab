@@ -7,6 +7,7 @@ let gameState = {
     currentBalance: 1500000,
     balanceHistory: [],
     availableTasks: [],
+    penaltyPool: [],
     currentCards: [],
     selectedTaskId: null,
     gameCompleted: false
@@ -35,7 +36,6 @@ const dontShowCheckbox = document.getElementById('dont-show-rules');
 const startQuestBtn = document.getElementById('start-quest-btn');
 const toast = document.getElementById('toast');
 
-let selectedTaskInProgress = false;
 let isAnimating = false;
 let pendingState = null;
 let toastTimeout = null;
@@ -85,12 +85,14 @@ function clearSavedGame() {
 
 function generateCardsForLevel() {
     if (gameState.gameCompleted) return;
-    if (gameState.availableTasks.length === 0) {
+
+    // Если заданий и штрафов больше нет — завершаем игру (но уровень может быть ещё не 30)
+    if (gameState.availableTasks.length === 0 && gameState.penaltyPool.length === 0) {
+        // Можно либо завершить игру досрочно, либо просто не показывать карточки
         gameState.currentCards = [];
         return;
     }
 
-    // Определяем сообщение для особых уровней
     let message = '';
     let filteredTasks = gameState.availableTasks;
 
@@ -109,22 +111,24 @@ function generateCardsForLevel() {
         filteredTasks = gameState.availableTasks;
     }
 
-    // Перемешиваем и берём до двух заданий (может быть 1, если в пуле всего 1 задание)
-    const shuffled = [...filteredTasks].sort(() => 0.5 - Math.random());
-    const tasks = shuffled.slice(0, 2).map(task => ({ ...task, selected: false, completed: false }));
+    // Выбираем до двух случайных заданий (не удаляем из пула)
+    const shuffledTasks = [...filteredTasks].sort(() => 0.5 - Math.random());
+    const tasks = shuffledTasks.slice(0, 2).map(task => ({ ...task, selected: false, completed: false }));
 
-    // Создаём карточку штрафа
-    const penaltyTask = {
-        id: 'penalty_' + Date.now() + '_' + Math.random(),
-        description: 'Штраф: сделать 5 приседаний', // пример штрафа
-        difficulty: 0,
-        isPenalty: true,
-        selected: false,
-        completed: false
-    };
+    // Выбираем один случайный штраф из penaltyPool (не удаляем)
+    let penaltyCard = null;
+    if (gameState.penaltyPool.length > 0) {
+        const randomPenalty = gameState.penaltyPool[Math.floor(Math.random() * gameState.penaltyPool.length)];
+        penaltyCard = { ...randomPenalty, selected: false, completed: false };
+    } else {
+        // Если штрафов нет, можно не показывать карточку штрафа
+        // или показать заглушку (но тогда её нельзя будет выбрать, т.к. нет id в пуле)
+        // Лучше не показывать
+    }
 
-    // Собираем все карточки (от 2 до 3 штук) и перемешиваем
-    let cards = [...tasks, penaltyTask];
+    // Формируем итоговый набор карточек
+    let cards = [...tasks];
+    if (penaltyCard) cards.push(penaltyCard);
     gameState.currentCards = cards.sort(() => 0.5 - Math.random());
 }
 
@@ -153,10 +157,12 @@ socket.on('state', (serverState) => {
         gameState.currentBalance = serverState.currentBalance;
         gameState.balanceHistory = serverState.balanceHistory;
         gameState.availableTasks = serverState.availableTasks;
+        gameState.penaltyPool = serverState.penaltyPool;
 
         if (!gameState.selectedTaskId && gameState.currentCards.length === 0) {
             if (gameState.level >= 30) {
-                if (gameState.availableTasks.length === 0) {
+                // Если достигнут 30 уровень и заданий больше нет — завершаем
+                if (gameState.availableTasks.length === 0 && gameState.penaltyPool.length === 0) {
                     endGame();
                     return;
                 } else {
@@ -182,17 +188,27 @@ function updateUI() {
 }
 
 function updatePoolStats() {
+    // Статистика заданий
     const counts = { F:0, D:0, C:0, B:0, A:0, S:0 };
     gameState.availableTasks.forEach(task => {
         const cls = getReagentClass(task.difficulty);
         counts[cls]++;
     });
-    poolStatsDiv.innerHTML = Object.entries(counts).map(([cls, num]) => `
+    let html = Object.entries(counts).map(([cls, num]) => `
         <div class="stat-item">
             <span class="reagent-class ${cls.toLowerCase()}">${cls}</span>
             <span>${num}</span>
         </div>
     `).join('');
+
+    // Статистика штрафов
+    html += `
+        <div class="stat-item">
+            <span class="reagent-class penalty">⚠️</span>
+            <span>${gameState.penaltyPool.length}</span>
+        </div>
+    `;
+    poolStatsDiv.innerHTML = html;
 }
 
 function renderCards() {
@@ -292,6 +308,7 @@ function selectTask(taskId) {
             gameState.currentBalance = pendingState.currentBalance;
             gameState.balanceHistory = pendingState.balanceHistory;
             gameState.availableTasks = pendingState.availableTasks;
+            gameState.penaltyPool = pendingState.penaltyPool;
             updateUI();
             updatePoolStats();
             pendingState = null;
@@ -306,7 +323,7 @@ function openTaskModal(taskId) {
     taskDesc.textContent = task.description;
     newBalanceInput.value = gameState.currentBalance;
 
-    // Настраиваем кнопки в зависимости от типа задачи
+    // Настраиваем кнопки
     if (task.isPenalty) {
         completeBtn.classList.add('hidden');
         failBtn.textContent = '❌ Провал';
@@ -327,13 +344,17 @@ function completeTask(success) {
     const task = gameState.currentCards.find(t => t.id === taskId);
 
     if (success) {
+        // Успех — только для заданий
         socket.emit('completeTask', taskId, change);
         addHistoryEntry(`✅ Эксперимент успешен: ${change>0?'+'+change:change} 🔬`);
     } else {
-        socket.emit('penaltyWithBalance', taskId, newBalance);
         if (task && task.isPenalty) {
+            // Штраф
+            socket.emit('applyPenaltyTask', taskId, newBalance);
             addHistoryEntry(`⚠️ Штраф выполнен: ${change>0?'+'+change:change} 🔬`);
         } else {
+            // Провал задания
+            socket.emit('penaltyWithBalance', taskId, newBalance);
             addHistoryEntry(`❌ Эксперимент провален: ${change>0?'+'+change:change} 🔬`);
         }
     }
@@ -386,6 +407,7 @@ function resetGame() {
         currentBalance: 1500000,
         balanceHistory: [],
         availableTasks: [],
+        penaltyPool: [],
         currentCards: [],
         selectedTaskId: null,
         gameCompleted: false
@@ -413,14 +435,14 @@ resetBtn.addEventListener('click', () => {
 completeBtn.addEventListener('click', () => completeTask(true));
 failBtn.addEventListener('click', () => completeTask(false));
 
-// Кнопка "Неизвестная колба" показывает тост
+// Кнопка "Неизвестная колба"
 if (flaskGagBtn) {
     flaskGagBtn.addEventListener('click', () => {
         showToast('Накид брюнеточке, мяу');
     });
 }
 
-// Кнопка "Новый эксперимент" сразу сбрасывает игру
+// Кнопка "Новый эксперимент"
 if (completionResetBtn) {
     completionResetBtn.addEventListener('click', () => {
         completionModal.classList.add('hidden');
@@ -441,7 +463,7 @@ window.addEventListener('click', (e) => {
     if (e.target.classList.contains('modal')) e.target.classList.add('hidden');
 });
 
-// Анимация пузырьков
+// Анимация пузырьков (без изменений)
 (function initBubbles() {
     const canvas = document.getElementById('bubbles-canvas');
     if (!canvas) return;

@@ -284,6 +284,11 @@ body {
 .stat-item .reagent-class.b { color: #f0f; }
 .stat-item .reagent-class.a { color: #f00; }
 .stat-item .reagent-class.s { color: #333; text-shadow: 0 0 5px #fff; }
+.stat-item .reagent-class.penalty {
+    color: #ff4444;
+    font-size: 1.5rem;
+    text-shadow: 0 0 5px #ff0000;
+}
 
 .history-panel {
     background: #1a2a1a;
