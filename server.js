@@ -1,3 +1,5 @@
+
+
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -9,9 +11,8 @@ const io = new Server(server);
 
 const MAX_LEVEL = 30;
 const DEFAULT_BALANCE = 1500000;
-const PENALTY_BURN_RANGE = [15, 20]; // больше не используется, но оставлено для совместимости
 
-// ================== ПУЛ ЗАДАНИЙ (НАУЧНЫЙ СТИЛЬ) ==================
+// ================== ПУЛ ЗАДАНИЙ ==================
 const taskTemplates = [
   // ⭐ 1 звезда (класс F) — 42 задания
   { difficulty: 1, texts: [
@@ -166,22 +167,54 @@ const taskTemplates = [
   ]}
 ];
 
+// ================== ПУЛ ШТРАФОВ ==================
+const penaltyTemplates = [
+  'Штраф: сделать 5 приседаний',
+  'Штраф: отжаться 10 раз',
+  'Штраф: спеть любую песню в течение 30 секунд',
+  'Штраф: прочитать скороговорку',
+  'Штраф: показать любое животное',
+  'Штраф: рассказать анекдот',
+  'Штраф: написать комплимент каждому зрителю в чате',
+  'Штраф: станцевать 1 минуту',
+  'Штраф: сделать 10 прыжков',
+  'Штраф: простоять в позе стула 1 минуту',
+  'Штраф: издать звук любого животного',
+  'Штраф: надеть смешной головной убор',
+  'Штраф: показать пантомиму',
+  'Штраф: приседать, пока не закончится таймер (30 секунд)',
+  'Штраф: сделать комплимент самому себе',
+  'Штраф: рассказать стихотворение',
+  'Штраф: нарисовать что-то на камеру',
+  'Штраф: показать 5 различных эмоций',
+  'Штраф: сделать массаж лицу',
+  'Штраф: поморгать 30 раз подряд'
+];
+
 function createInitialPool() {
-  const pool = [];
+  // Задания
+  const tasks = [];
   const counts = [100, 60, 30, 20, 10, 2];
   for (let star = 1; star <= 6; star++) {
     const template = taskTemplates.find(t => t.difficulty === star);
     if (!template) continue;
     for (let i = 0; i < counts[star-1]; i++) {
       const text = template.texts[i % template.texts.length];
-      pool.push({
+      tasks.push({
         id: `task_${Date.now()}_${Math.random()}`,
         description: text,
         difficulty: star
       });
     }
   }
-  return shuffle(pool);
+  // Штрафы
+  const penalties = penaltyTemplates.map((text, index) => ({
+    id: `penalty_${Date.now()}_${Math.random()}_${index}`,
+    description: text,
+    difficulty: 0,
+    isPenalty: true
+  }));
+  return { tasks: shuffle(tasks), penalties: shuffle(penalties) };
 }
 
 function shuffle(array) {
@@ -192,18 +225,18 @@ function shuffle(array) {
   return array;
 }
 
-// Функция больше не используется, но оставлена для совместимости
-function applyPenalty(pool) {
-  return 0;
-}
-
 let questState = {
   level: 1,
-  availableTasks: createInitialPool(),
+  availableTasks: [],
+  penaltyPool: [],
   currentBalance: DEFAULT_BALANCE,
-  balanceHistory: [{ timestamp: Date.now(), desc: 'Стартовый баланс', change: DEFAULT_BALANCE, balance: DEFAULT_BALANCE }],
-  penaltiesLog: []
+  balanceHistory: [{ timestamp: Date.now(), desc: 'Стартовый баланс', change: DEFAULT_BALANCE, balance: DEFAULT_BALANCE }]
 };
+
+// Инициализация
+const initial = createInitialPool();
+questState.availableTasks = initial.tasks;
+questState.penaltyPool = initial.penalties;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -211,6 +244,7 @@ io.on('connection', (socket) => {
   console.log('Клиент подключён');
   socket.emit('state', questState);
 
+  // Успешное выполнение задания
   socket.on('completeTask', (taskId, change) => {
     const idx = questState.availableTasks.findIndex(t => t.id === taskId);
     if (idx !== -1) questState.availableTasks.splice(idx, 1);
@@ -224,15 +258,17 @@ io.on('connection', (socket) => {
     io.emit('state', questState);
   });
 
+  // Провал задания (или выполнение штрафа)
   socket.on('penaltyWithBalance', (taskId, newBalance) => {
-    const idx = questState.availableTasks.findIndex(t => t.id === taskId);
-    if (idx !== -1) questState.availableTasks.splice(idx, 1);
+    // Для задания: удаляем из availableTasks
+    const taskIdx = questState.availableTasks.findIndex(t => t.id === taskId);
+    if (taskIdx !== -1) {
+      questState.availableTasks.splice(taskIdx, 1);
+    }
 
     const change = newBalance - questState.currentBalance;
     questState.currentBalance = newBalance;
     questState.balanceHistory.push({ timestamp: Date.now(), desc: 'Эксперимент провален', change, balance: questState.currentBalance });
-
-    // Больше не вызываем applyPenalty — легкие задания не сгорают
 
     if (questState.level < MAX_LEVEL) {
       questState.level++;
@@ -240,8 +276,20 @@ io.on('connection', (socket) => {
     io.emit('state', questState);
   });
 
-  socket.on('applyPenalty', () => {
-    // Этот обработчик больше не нужен, но оставим заглушку
+  // Специальный обработчик для штрафа (удаляет из penaltyPool)
+  socket.on('applyPenaltyTask', (taskId, newBalance) => {
+    const penaltyIdx = questState.penaltyPool.findIndex(p => p.id === taskId);
+    if (penaltyIdx !== -1) {
+      questState.penaltyPool.splice(penaltyIdx, 1);
+    }
+
+    const change = newBalance - questState.currentBalance;
+    questState.currentBalance = newBalance;
+    questState.balanceHistory.push({ timestamp: Date.now(), desc: 'Штраф выполнен', change, balance: questState.currentBalance });
+
+    if (questState.level < MAX_LEVEL) {
+      questState.level++;
+    }
     io.emit('state', questState);
   });
 
@@ -253,12 +301,13 @@ io.on('connection', (socket) => {
 
   socket.on('reset', (newBalance) => {
     const start = (newBalance !== undefined && !isNaN(newBalance)) ? newBalance : DEFAULT_BALANCE;
+    const initial = createInitialPool();
     questState = {
       level: 1,
-      availableTasks: createInitialPool(),
+      availableTasks: initial.tasks,
+      penaltyPool: initial.penalties,
       currentBalance: start,
-      balanceHistory: [{ timestamp: Date.now(), desc: 'Стартовый баланс', change: start, balance: start }],
-      penaltiesLog: []
+      balanceHistory: [{ timestamp: Date.now(), desc: 'Стартовый баланс', change: start, balance: start }]
     };
     io.emit('state', questState);
   });
@@ -266,10 +315,10 @@ io.on('connection', (socket) => {
   socket.on('loadSavedGame', (savedState) => {
     questState = {
       level: savedState.level || 1,
-      availableTasks: savedState.availableTasks || createInitialPool(),
+      availableTasks: savedState.availableTasks || createInitialPool().tasks,
+      penaltyPool: savedState.penaltyPool || createInitialPool().penalties,
       currentBalance: savedState.currentBalance,
-      balanceHistory: savedState.balanceHistory,
-      penaltiesLog: savedState.penaltiesLog || []
+      balanceHistory: savedState.balanceHistory || []
     };
     io.emit('state', questState);
     console.log('Загружено сохранение с уровня', questState.level);
