@@ -9,7 +9,7 @@ const io = new Server(server);
 
 const MAX_LEVEL = 30;
 const DEFAULT_BALANCE = 1500000;
-const PENALTY_BURN_RANGE = [15, 20];
+const PENALTY_BURN_RANGE = [15, 20]; // больше не используется, но оставлено для совместимости
 
 // ================== ПУЛ ЗАДАНИЙ (НАУЧНЫЙ СТИЛЬ) ==================
 const taskTemplates = [
@@ -192,47 +192,9 @@ function shuffle(array) {
   return array;
 }
 
+// Функция больше не используется, но оставлена для совместимости
 function applyPenalty(pool) {
-  const lightTasks = pool.filter(t => t.difficulty >= 1 && t.difficulty <= 3);
-  if (lightTasks.length === 0) return 0;
-
-  const burnCount = Math.floor(Math.random() * (PENALTY_BURN_RANGE[1] - PENALTY_BURN_RANGE[0] + 1)) + PENALTY_BURN_RANGE[0];
-  const actualBurn = Math.min(burnCount, lightTasks.length);
-
-  const weights = { 1: 5, 2: 3, 3: 2 };
-  const totalWeight = 10;
-
-  let remainingLight = [...lightTasks];
-
-  for (let i = 0; i < actualBurn; i++) {
-    if (remainingLight.length === 0) break;
-
-    const rand = Math.random() * totalWeight;
-    let chosenStar = 1;
-    if (rand < 5) chosenStar = 1;
-    else if (rand < 8) chosenStar = 2;
-    else chosenStar = 3;
-
-    const candidates = remainingLight.filter(t => t.difficulty === chosenStar);
-    if (candidates.length > 0) {
-      const idx = Math.floor(Math.random() * candidates.length);
-      const taskToBurn = candidates[idx];
-      
-      const poolIndex = pool.findIndex(t => t.id === taskToBurn.id);
-      if (poolIndex !== -1) pool.splice(poolIndex, 1);
-      
-      const lightIndex = remainingLight.findIndex(t => t.id === taskToBurn.id);
-      if (lightIndex !== -1) remainingLight.splice(lightIndex, 1);
-    } else {
-      const anyTask = remainingLight[Math.floor(Math.random() * remainingLight.length)];
-      const poolIndex = pool.findIndex(t => t.id === anyTask.id);
-      if (poolIndex !== -1) pool.splice(poolIndex, 1);
-      const lightIndex = remainingLight.findIndex(t => t.id === anyTask.id);
-      if (lightIndex !== -1) remainingLight.splice(lightIndex, 1);
-    }
-  }
-
-  return actualBurn;
+  return 0;
 }
 
 let questState = {
@@ -249,13 +211,12 @@ io.on('connection', (socket) => {
   console.log('Клиент подключён');
   socket.emit('state', questState);
 
-  // Успешное выполнение задания
   socket.on('completeTask', (taskId, change) => {
     const idx = questState.availableTasks.findIndex(t => t.id === taskId);
     if (idx !== -1) questState.availableTasks.splice(idx, 1);
 
     questState.currentBalance += change;
-    questState.balanceHistory.push({ timestamp: Date.now(), desc: '✅ Эксперимент успешен', change, balance: questState.currentBalance });
+    questState.balanceHistory.push({ timestamp: Date.now(), desc: 'Задание выполнено', change, balance: questState.currentBalance });
 
     if (questState.level < MAX_LEVEL) {
       questState.level++;
@@ -263,32 +224,15 @@ io.on('connection', (socket) => {
     io.emit('state', questState);
   });
 
-  // Провал задания (без штрафа)
-  socket.on('failTask', (taskId, newBalance) => {
-    const idx = questState.availableTasks.findIndex(t => t.id === taskId);
-    if (idx !== -1) questState.availableTasks.splice(idx, 1);
-
-    const change = newBalance - questState.currentBalance;
-    questState.currentBalance = newBalance;
-    questState.balanceHistory.push({ timestamp: Date.now(), desc: '❌ Эксперимент провален', change, balance: questState.currentBalance });
-
-    if (questState.level < MAX_LEVEL) {
-      questState.level++;
-    }
-    io.emit('state', questState);
-  });
-
-  // Штраф (при выборе карточки штрафа)
   socket.on('penaltyWithBalance', (taskId, newBalance) => {
     const idx = questState.availableTasks.findIndex(t => t.id === taskId);
     if (idx !== -1) questState.availableTasks.splice(idx, 1);
 
     const change = newBalance - questState.currentBalance;
     questState.currentBalance = newBalance;
-    questState.balanceHistory.push({ timestamp: Date.now(), desc: '⚠️ Штраф применён', change, balance: questState.currentBalance });
+    questState.balanceHistory.push({ timestamp: Date.now(), desc: 'Эксперимент провален', change, balance: questState.currentBalance });
 
-    const burned = applyPenalty(questState.availableTasks);
-    questState.balanceHistory.push({ timestamp: Date.now(), desc: `🔥 Сгорело ${burned} лёгких заданий`, change: 0, balance: questState.currentBalance });
+    // Больше не вызываем applyPenalty — легкие задания не сгорают
 
     if (questState.level < MAX_LEVEL) {
       questState.level++;
@@ -296,14 +240,17 @@ io.on('connection', (socket) => {
     io.emit('state', questState);
   });
 
-  // Ручное добавление баланса (для отладки)
+  socket.on('applyPenalty', () => {
+    // Этот обработчик больше не нужен, но оставим заглушку
+    io.emit('state', questState);
+  });
+
   socket.on('addBalance', (description, amount) => {
     questState.currentBalance += amount;
     questState.balanceHistory.push({ timestamp: Date.now(), desc: description, change: amount, balance: questState.currentBalance });
     io.emit('state', questState);
   });
 
-  // Сброс игры
   socket.on('reset', (newBalance) => {
     const start = (newBalance !== undefined && !isNaN(newBalance)) ? newBalance : DEFAULT_BALANCE;
     questState = {
@@ -316,7 +263,6 @@ io.on('connection', (socket) => {
     io.emit('state', questState);
   });
 
-  // Загрузка сохранения
   socket.on('loadSavedGame', (savedState) => {
     questState = {
       level: savedState.level || 1,
