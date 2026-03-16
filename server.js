@@ -165,9 +165,10 @@ const taskTemplates = [
     'Секретный протокол S2: поймать три десятки подряд в Crazy Time.'
   ]}
 ];
+
 function createInitialPool() {
   const pool = [];
-  const counts = [100, 60, 30, 20, 10, 2]; // исходные количества
+  const counts = [100, 60, 30, 20, 10, 2];
   for (let star = 1; star <= 6; star++) {
     const template = taskTemplates.find(t => t.difficulty === star);
     if (!template) continue;
