@@ -90,6 +90,7 @@ function generateCardsForLevel() {
         return;
     }
 
+    // Определяем сообщение для особых уровней (как раньше)
     let message = '';
     let filteredTasks = gameState.availableTasks;
 
@@ -103,16 +104,27 @@ function generateCardsForLevel() {
 
     if (message) showToast(message);
 
-    if (filteredTasks.length < 3) {
+    // Если после фильтрации осталось меньше 2 заданий, берём из общего пула
+    if (filteredTasks.length < 2) {
         filteredTasks = gameState.availableTasks;
     }
 
+    // Перемешиваем и берём первые два как задания
     const shuffled = [...filteredTasks].sort(() => 0.5 - Math.random());
-    gameState.currentCards = shuffled.slice(0, 3).map(task => ({
-        ...task,
+    const tasks = shuffled.slice(0, 2).map(task => ({ ...task, selected: false, completed: false }));
+
+    // Создаём карточку штрафа
+    const penaltyTask = {
+        id: 'penalty_' + Date.now() + '_' + Math.random(),
+        description: 'Штраф: сжечь лёгкие задания',
+        difficulty: 0,
+        isPenalty: true,
         selected: false,
         completed: false
-    }));
+    };
+
+    // Объединяем и перемешиваем три карточки
+    gameState.currentCards = [tasks[0], tasks[1], penaltyTask].sort(() => 0.5 - Math.random());
 }
 
 socket.on('connect', () => {
@@ -199,8 +211,15 @@ function createCardElement(task, isSelected) {
     card.className = `card ${task.selected ? 'selected' : ''} ${task.completed ? 'completed' : ''}`;
     card.dataset.id = task.id;
 
-    const reagentClass = getReagentClass(task.difficulty);
-    const classColor = getClassColor(task.difficulty);
+    let reagentClass, classColor;
+    if (task.isPenalty) {
+        reagentClass = '⚠️';
+        classColor = 'penalty';
+    } else {
+        reagentClass = getReagentClass(task.difficulty);
+        classColor = getClassColor(task.difficulty);
+    }
+
     const reagentHTML = `<div class="reagent-class ${classColor}">${reagentClass}</div>`;
     const taskText = `<div class="task-text">${task.description}</div>`;
 
@@ -208,10 +227,14 @@ function createCardElement(task, isSelected) {
     if (!task.selected && !task.completed && !gameState.selectedTaskId) {
         buttons = `<button class="select-btn">🧪 Выбрать</button>`;
     } else if (task.selected && !task.completed) {
-        buttons = `
-            <button class="complete-btn">✅ Успех</button>
-            <button class="penalty-btn">💥 Взрыв</button>
-        `;
+        if (task.isPenalty) {
+            buttons = `<button class="penalty-apply-btn">⚠️ Применить штраф</button>`;
+        } else {
+            buttons = `
+                <button class="complete-btn">✅ Успех</button>
+                <button class="penalty-btn">💥 Взрыв</button>
+            `;
+        }
     } else if (task.completed) {
         buttons = `<button disabled>✔ Выполнено</button>`;
     }
@@ -224,14 +247,21 @@ function createCardElement(task, isSelected) {
             selectTask(task.id);
         });
     } else if (task.selected && !task.completed) {
-        card.querySelector('.complete-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            openTaskModal(task.id);
-        });
-        card.querySelector('.penalty-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            applyPenalty(task.id);
-        });
+        if (task.isPenalty) {
+            card.querySelector('.penalty-apply-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                openTaskModal(task.id); // откроем ту же модалку, она адаптируется
+            });
+        } else {
+            card.querySelector('.complete-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                openTaskModal(task.id);
+            });
+            card.querySelector('.penalty-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                openTaskModal(task.id); // для взрыва тоже открываем модалку (там две кнопки)
+            });
+        }
     }
     return card;
 }
@@ -266,8 +296,6 @@ function selectTask(taskId) {
             pendingState = null;
         }
     }, 500);
-
-    socket.emit('selectTask', taskId);
 }
 
 function openTaskModal(taskId) {
@@ -276,6 +304,16 @@ function openTaskModal(taskId) {
     gameState.currentTaskId = taskId;
     taskDesc.textContent = task.description;
     newBalanceInput.value = gameState.currentBalance;
+
+    // Настраиваем кнопки в зависимости от типа задачи
+    if (task.isPenalty) {
+        completeBtn.classList.add('hidden');
+        failBtn.textContent = '⚠️ Применить штраф';
+    } else {
+        completeBtn.classList.remove('hidden');
+        failBtn.textContent = '💥 Взрыв';
+    }
+
     taskModal.classList.remove('hidden');
 }
 
@@ -285,15 +323,19 @@ function completeTask(success) {
 
     const change = newBalance - gameState.currentBalance;
     const taskId = gameState.currentTaskId;
+    const task = gameState.currentCards.find(t => t.id === taskId);
 
     if (success) {
+        // Для обычного задания
         socket.emit('completeTask', taskId, change);
         addHistoryEntry(`✅ Эксперимент успешен: ${change>0?'+'+change:change} 🔬`);
     } else {
+        // Для взрыва или штрафа
         socket.emit('penaltyWithBalance', taskId, newBalance);
-        addHistoryEntry(`💥 Взрыв! Потеряно реактивов`);
+        addHistoryEntry(task && task.isPenalty ? `⚠️ Штраф применён` : `💥 Взрыв! Потеряно реактивов`);
     }
 
+    // Очищаем текущие карточки и выбор
     gameState.currentCards = gameState.currentCards.filter(t => t.id !== taskId);
     gameState.selectedTaskId = null;
     gameState.currentTaskId = null;
@@ -307,6 +349,7 @@ function completeTask(success) {
 }
 
 function applyPenalty(taskId) {
+    // Для совместимости (раньше вызывалась из penalty-btn)
     openTaskModal(taskId);
 }
 
@@ -451,18 +494,4 @@ window.addEventListener('click', (e) => {
     animate();
 })();
 
-// Анимация сгорания
-(function addBurnAnimation() {
-    const style = document.createElement('style');
-    style.textContent = `
-        .card.burn {
-            animation: burn 0.5s forwards;
-            pointer-events: none;
-        }
-        @keyframes burn {
-            0% { opacity:1; transform:scale(1); filter:brightness(1); }
-            100% { opacity:0; transform:scale(0) rotate(10deg); filter:brightness(2); }
-        }
-    `;
-    document.head.appendChild(style);
-})();
+// Анимация сгорания (уже есть в CSS)

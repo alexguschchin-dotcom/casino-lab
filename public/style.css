@@ -198,6 +198,7 @@ body {
 .card .reagent-class.b { color: #f0f; }
 .card .reagent-class.a { color: #f00; }
 .card .reagent-class.s { color: #333; text-shadow: 0 0 10px #fff; }
+.card .reagent-class.penalty { color: #ff4444; text-shadow: 0 0 10px #ff0000; }
 
 .card .task-text {
     font-size: 1rem;
@@ -355,7 +356,7 @@ body {
     color: #0f0;
     font-family: 'Orbitron', sans-serif;
     font-size: 1.2rem;
-    z-index: 3000; /* Исправлено: теперь тост поверх модального окна */
+    z-index: 3000;
     box-shadow: 0 0 30px #0f0;
     animation: slideIn 0.3s ease-out;
 }
