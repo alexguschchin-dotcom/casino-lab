@@ -312,7 +312,7 @@ function openTaskModal(taskId) {
 
     if (task.isPenalty) {
         completeBtn.classList.add('hidden');
-        failBtn.textContent = '✅ Успех';
+        failBtn.textContent = '❌ Провал';
     } else {
         completeBtn.classList.remove('hidden');
         failBtn.textContent = '✅ Успех';
