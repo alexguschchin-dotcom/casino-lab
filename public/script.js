@@ -88,7 +88,6 @@ function generateCardsForLevel() {
 
     // Если заданий и штрафов больше нет — завершаем игру (но уровень может быть ещё не 30)
     if (gameState.availableTasks.length === 0 && gameState.penaltyPool.length === 0) {
-        // Можно либо завершить игру досрочно, либо просто не показывать карточки
         gameState.currentCards = [];
         return;
     }
@@ -120,10 +119,6 @@ function generateCardsForLevel() {
     if (gameState.penaltyPool.length > 0) {
         const randomPenalty = gameState.penaltyPool[Math.floor(Math.random() * gameState.penaltyPool.length)];
         penaltyCard = { ...randomPenalty, selected: false, completed: false };
-    } else {
-        // Если штрафов нет, можно не показывать карточку штрафа
-        // или показать заглушку (но тогда её нельзя будет выбрать, т.к. нет id в пуле)
-        // Лучше не показывать
     }
 
     // Формируем итоговый набор карточек
@@ -463,7 +458,7 @@ window.addEventListener('click', (e) => {
     if (e.target.classList.contains('modal')) e.target.classList.add('hidden');
 });
 
-// Анимация пузырьков (без изменений)
+// Анимация пузырьков
 (function initBubbles() {
     const canvas = document.getElementById('bubbles-canvas');
     if (!canvas) return;
