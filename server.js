@@ -189,7 +189,6 @@ const penaltyTemplates = [
   'Штраф: поморгать 30 раз подряд'
 ];
 
-
 function createInitialPool() {
   const tasks = [];
   const counts = [100, 60, 30, 20, 10, 2];
@@ -227,7 +226,10 @@ let questState = {
   availableTasks: [],
   penaltyPool: [],
   currentBalance: DEFAULT_BALANCE,
-  balanceHistory: [{ timestamp: Date.now(), desc: 'Стартовый баланс', change: DEFAULT_BALANCE, balance: DEFAULT_BALANCE }]
+  balanceHistory: [{ timestamp: Date.now(), desc: 'Стартовый баланс', change: DEFAULT_BALANCE, balance: DEFAULT_BALANCE }],
+  successCount: 0,
+  failCount: 0,
+  penaltyCount: 0
 };
 
 const initial = createInitialPool();
@@ -246,6 +248,7 @@ io.on('connection', (socket) => {
 
     questState.currentBalance += change;
     questState.balanceHistory.push({ timestamp: Date.now(), desc: 'Задание выполнено', change, balance: questState.currentBalance });
+    questState.successCount++;
 
     if (questState.level < MAX_LEVEL) questState.level++;
     io.emit('state', questState);
@@ -258,8 +261,9 @@ io.on('connection', (socket) => {
     const change = newBalance - questState.currentBalance;
     questState.currentBalance = newBalance;
     questState.balanceHistory.push({ timestamp: Date.now(), desc: 'Задание провалено', change, balance: questState.currentBalance });
+    questState.failCount++;
 
-    if (questState.level < MAX_LEVEL) questState.level++;
+    // Уровень не увеличиваем
     io.emit('state', questState);
   });
 
@@ -270,8 +274,9 @@ io.on('connection', (socket) => {
     const change = newBalance - questState.currentBalance;
     questState.currentBalance = newBalance;
     questState.balanceHistory.push({ timestamp: Date.now(), desc: 'Штраф выполнен', change, balance: questState.currentBalance });
+    questState.penaltyCount++;
 
-    if (questState.level < MAX_LEVEL) questState.level++;
+    // Уровень не увеличиваем
     io.emit('state', questState);
   });
 
@@ -289,7 +294,10 @@ io.on('connection', (socket) => {
       availableTasks: initial.tasks,
       penaltyPool: initial.penalties,
       currentBalance: start,
-      balanceHistory: [{ timestamp: Date.now(), desc: 'Стартовый баланс', change: start, balance: start }]
+      balanceHistory: [{ timestamp: Date.now(), desc: 'Стартовый баланс', change: start, balance: start }],
+      successCount: 0,
+      failCount: 0,
+      penaltyCount: 0
     };
     io.emit('state', questState);
   });
@@ -300,7 +308,10 @@ io.on('connection', (socket) => {
       availableTasks: savedState.availableTasks || createInitialPool().tasks,
       penaltyPool: savedState.penaltyPool || createInitialPool().penalties,
       currentBalance: savedState.currentBalance,
-      balanceHistory: savedState.balanceHistory || []
+      balanceHistory: savedState.balanceHistory || [],
+      successCount: savedState.successCount || 0,
+      failCount: savedState.failCount || 0,
+      penaltyCount: savedState.penaltyCount || 0
     };
     io.emit('state', questState);
   });
