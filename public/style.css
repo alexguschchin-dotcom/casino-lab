@@ -42,35 +42,6 @@ body {
 }
 
 /* Множество плавающих клубничек на фоне */
-.lab-bg::before {
-    content: "🍓";
-    position: absolute;
-    top: 10%;
-    left: 5%;
-    font-size: 3rem;
-    opacity: 0.1;
-    animation: floatStrawberry 15s infinite linear;
-    pointer-events: none;
-}
-
-.lab-bg::after {
-    content: "🍓";
-    position: absolute;
-    bottom: 15%;
-    right: 8%;
-    font-size: 4rem;
-    opacity: 0.1;
-    animation: floatStrawberry 20s infinite reverse linear;
-    pointer-events: none;
-}
-
-/* Дополнительные клубнички через кастомные свойства (псевдоэлементов больше нет, поэтому используем несколько вложенных элементов) */
-/* Но мы можем добавить их через дополнительные блоки в HTML или через дополнительные псевдоэлементы на других контейнерах.
-   Для простоты добавим несколько спан-элементов через JS или создадим их в CSS с помощью счетчиков? Лучше добавить в HTML пару скрытых элементов.
-   Однако, чтобы не усложнять, просто увеличим количество через multiple box-shadow или несколько псевдоэлементов на разных уровнях.
-   Решение: используем несколько псевдоэлементов на .lab-bg и на body.
-*/
-
 body::before {
     content: "🍓";
     position: absolute;
@@ -93,6 +64,28 @@ body::after {
     animation: floatStrawberry 22s infinite alternate-reverse;
     pointer-events: none;
     z-index: -1;
+}
+
+.lab-bg::before {
+    content: "🍓";
+    position: absolute;
+    top: 10%;
+    left: 5%;
+    font-size: 3rem;
+    opacity: 0.1;
+    animation: floatStrawberry 15s infinite linear;
+    pointer-events: none;
+}
+
+.lab-bg::after {
+    content: "🍓";
+    position: absolute;
+    bottom: 15%;
+    right: 8%;
+    font-size: 4rem;
+    opacity: 0.1;
+    animation: floatStrawberry 20s infinite reverse linear;
+    pointer-events: none;
 }
 
 .game-container::before {
@@ -388,6 +381,7 @@ body::after {
     content: "🍓";
     font-size: 1rem;
     margin-left: 5px;
+    margin-right: 3px; /* добавлен отступ справа, чтобы клубничка не прилипала к цифре */
     opacity: 0.5;
     transition: opacity 0.3s;
     display: inline-block;
