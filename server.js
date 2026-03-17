@@ -242,6 +242,7 @@ io.on('connection', (socket) => {
   console.log('Клиент подключён');
   socket.emit('state', questState);
 
+  // Успешное выполнение задания
   socket.on('completeTask', (taskId, change) => {
     const idx = questState.availableTasks.findIndex(t => t.id === taskId);
     if (idx !== -1) questState.availableTasks.splice(idx, 1);
@@ -254,6 +255,7 @@ io.on('connection', (socket) => {
     io.emit('state', questState);
   });
 
+  // Провал задания (сам штраф ещё не выполнен)
   socket.on('penaltyWithBalance', (taskId, newBalance) => {
     const idx = questState.availableTasks.findIndex(t => t.id === taskId);
     if (idx !== -1) questState.availableTasks.splice(idx, 1);
@@ -263,10 +265,11 @@ io.on('connection', (socket) => {
     questState.balanceHistory.push({ timestamp: Date.now(), desc: 'Задание провалено', change, balance: questState.currentBalance });
     questState.failCount++;
 
-    // Уровень не увеличиваем
+    // Уровень НЕ повышаем, потому что предстоит штраф
     io.emit('state', questState);
   });
 
+  // Выполнение штрафа (прямого или после провала)
   socket.on('applyPenaltyTask', (taskId, newBalance) => {
     const idx = questState.penaltyPool.findIndex(p => p.id === taskId);
     if (idx !== -1) questState.penaltyPool.splice(idx, 1);
@@ -276,7 +279,8 @@ io.on('connection', (socket) => {
     questState.balanceHistory.push({ timestamp: Date.now(), desc: 'Штраф выполнен', change, balance: questState.currentBalance });
     questState.penaltyCount++;
 
-    // Уровень не увеличиваем
+    // Повышаем уровень, так как штраф отработан и уровень завершён
+    if (questState.level < MAX_LEVEL) questState.level++;
     io.emit('state', questState);
   });
 
