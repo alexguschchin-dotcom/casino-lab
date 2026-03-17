@@ -177,23 +177,24 @@ socket.on('state', (serverState) => {
         gameState.failCount = serverState.failCount;
         gameState.penaltyCount = serverState.penaltyCount;
 
-        // Сначала генерируем карточки, если нужно (обычные или штрафные)
+        // Генерация карточек для обычного режима
         if (!gameState.penaltyMode && !gameState.selectedTaskId && gameState.currentCards.length === 0) {
-            generateCardsForLevel();
-        }
-
-        if (gameState.penaltyMode && gameState.currentCards.length === 0) {
-            generatePenaltyCard();
-        }
-
-        // Проверяем завершение игры только после генерации и если не в штрафном режиме
-        if (gameState.level >= 30 && !gameState.selectedTaskId && gameState.currentCards.length === 0 && !gameState.penaltyMode) {
-            if (level30CardsGenerated) {
-                endGame();
-                return;
+            if (gameState.level >= 30) {
+                if (level30CardsGenerated) {
+                    // Уже были карточки на 30 уровне и сейчас они закончились -> завершаем игру
+                    endGame();
+                    return;
+                } else {
+                    generateCardsForLevel();
+                }
             } else {
                 generateCardsForLevel();
             }
+        }
+
+        // Генерация штрафной карточки, если в штрафном режиме
+        if (gameState.penaltyMode && gameState.currentCards.length === 0) {
+            generatePenaltyCard();
         }
 
         updateUI();
@@ -382,6 +383,11 @@ function completeTask(success) {
     gameState.currentCards = gameState.currentCards.filter(t => t.id !== taskId);
     gameState.selectedTaskId = null;
     gameState.currentTaskId = null;
+
+    // Если после удаления карточки на 30 уровне карточки закончились и не в штрафном режиме -> завершаем игру
+    if (gameState.level >= 30 && gameState.currentCards.length === 0 && !gameState.penaltyMode) {
+        endGame();
+    }
 
     taskModal.classList.add('hidden');
     updateUI();
