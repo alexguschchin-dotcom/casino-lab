@@ -10,7 +10,11 @@ let gameState = {
     penaltyPool: [],
     currentCards: [],
     selectedTaskId: null,
-    gameCompleted: false
+    gameCompleted: false,
+    successCount: 0,
+    failCount: 0,
+    penaltyCount: 0,
+    penaltyMode: false
 };
 
 // DOM элементы
@@ -29,6 +33,9 @@ const failBtn = document.getElementById('fail-task');
 const completionModal = document.getElementById('completion-modal');
 const finalMessage = document.getElementById('final-message');
 const finalBalanceSpan = document.getElementById('final-balance');
+const finalSuccess = document.getElementById('final-success');
+const finalFail = document.getElementById('final-fail');
+const finalPenalty = document.getElementById('final-penalty');
 const flaskGagBtn = document.getElementById('flask-gag-btn');
 const completionResetBtn = document.getElementById('completion-reset-btn');
 const rulesModal = document.getElementById('rules-modal');
@@ -85,7 +92,6 @@ function clearSavedGame() {
 
 function generateCardsForLevel() {
     if (gameState.gameCompleted) return;
-
     if (gameState.availableTasks.length === 0 && gameState.penaltyPool.length === 0) {
         gameState.currentCards = [];
         return;
@@ -122,6 +128,17 @@ function generateCardsForLevel() {
     gameState.currentCards = cards.sort(() => 0.5 - Math.random());
 }
 
+function generatePenaltyCard() {
+    if (gameState.penaltyPool.length === 0) {
+        gameState.penaltyMode = false;
+        generateCardsForLevel();
+        return;
+    }
+    const randomPenalty = gameState.penaltyPool[Math.floor(Math.random() * gameState.penaltyPool.length)];
+    const penaltyCard = { ...randomPenalty, selected: false, completed: false };
+    gameState.currentCards = [penaltyCard];
+}
+
 socket.on('connect', () => {
     const saved = loadGameState();
     if (saved && !saved.gameCompleted) {
@@ -148,8 +165,11 @@ socket.on('state', (serverState) => {
         gameState.balanceHistory = serverState.balanceHistory;
         gameState.availableTasks = serverState.availableTasks;
         gameState.penaltyPool = serverState.penaltyPool;
+        gameState.successCount = serverState.successCount;
+        gameState.failCount = serverState.failCount;
+        gameState.penaltyCount = serverState.penaltyCount;
 
-        if (!gameState.selectedTaskId && gameState.currentCards.length === 0) {
+        if (!gameState.penaltyMode && !gameState.selectedTaskId && gameState.currentCards.length === 0) {
             if (gameState.level >= 30) {
                 if (gameState.availableTasks.length === 0 && gameState.penaltyPool.length === 0) {
                     endGame();
@@ -160,6 +180,10 @@ socket.on('state', (serverState) => {
             } else {
                 generateCardsForLevel();
             }
+        }
+
+        if (gameState.penaltyMode && gameState.currentCards.length === 0) {
+            generatePenaltyCard();
         }
 
         updateUI();
@@ -232,7 +256,7 @@ function createCardElement(task, isSelected) {
         buttons = `<button class="select-btn">🧪 Выбрать</button>`;
     } else if (task.selected && !task.completed) {
         if (task.isPenalty) {
-            buttons = `<button class="penalty-apply-btn">✅ Выполненно</button>`;
+            buttons = `<button class="penalty-apply-btn">✅ Выполнено</button>`;
         } else {
             buttons = `
                 <button class="complete-btn">✅ Успех</button>
@@ -312,7 +336,7 @@ function openTaskModal(taskId) {
 
     if (task.isPenalty) {
         completeBtn.classList.add('hidden');
-        failBtn.textContent = '✅ Успех';
+        failBtn.textContent = '✅ Выполнено';
     } else {
         completeBtn.classList.remove('hidden');
         failBtn.textContent = '❌ Провал';
@@ -332,23 +356,22 @@ function completeTask(success) {
     if (success) {
         socket.emit('completeTask', taskId, change);
         addHistoryEntry(`✅ Задание выполнено: ${change>0?'+'+change:change} 🔬`);
+        gameState.penaltyMode = false;
     } else {
         if (task && task.isPenalty) {
             socket.emit('applyPenaltyTask', taskId, newBalance);
             addHistoryEntry(`⚠️ Штраф выполнен: ${change>0?'+'+change:change} 🔬`);
+            gameState.penaltyMode = false;
         } else {
             socket.emit('penaltyWithBalance', taskId, newBalance);
             addHistoryEntry(`❌ Задание провалено: ${change>0?'+'+change:change} 🔬`);
+            gameState.penaltyMode = true;
         }
     }
 
     gameState.currentCards = gameState.currentCards.filter(t => t.id !== taskId);
     gameState.selectedTaskId = null;
     gameState.currentTaskId = null;
-
-    if (gameState.level === 30 && gameState.currentCards.length === 0 && !gameState.gameCompleted) {
-        endGame();
-    }
 
     taskModal.classList.add('hidden');
     updateUI();
@@ -380,6 +403,9 @@ function endGame() {
     finalMessage.innerHTML = '🎉 Поздравляем! Вы прошли все 30 этапов и одолели злого учёного!<br>' +
         'Но будьте начеку… кажется, он оставил одну странную колбу.';
     finalBalanceSpan.textContent = gameState.currentBalance;
+    finalSuccess.textContent = gameState.successCount;
+    finalFail.textContent = gameState.failCount;
+    finalPenalty.textContent = gameState.penaltyCount;
     completionModal.classList.remove('hidden');
     clearSavedGame();
 }
@@ -393,7 +419,11 @@ function resetGame() {
         penaltyPool: [],
         currentCards: [],
         selectedTaskId: null,
-        gameCompleted: false
+        gameCompleted: false,
+        successCount: 0,
+        failCount: 0,
+        penaltyCount: 0,
+        penaltyMode: false
     };
     socket.emit('reset', 1500000);
     clearSavedGame();
