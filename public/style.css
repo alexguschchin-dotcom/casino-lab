@@ -280,7 +280,12 @@ body {
     font-weight: bold;
     width: 30px;
     text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
 }
+
 .stat-item .reagent-class.f { color: #0f0; }
 .stat-item .reagent-class.d { color: #ff0; }
 .stat-item .reagent-class.c { color: #ffa500; }
@@ -291,6 +296,21 @@ body {
     color: #ff4444;
     font-size: 1.5rem;
     text-shadow: 0 0 5px #ff0000;
+}
+
+/* Клубнички в статистике */
+.stat-item .reagent-class::after {
+    content: "🍓";
+    font-size: 1rem;
+    margin-left: 5px;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.stat-item:hover .reagent-class::after {
+    opacity: 1;
 }
 
 .history-panel {
@@ -374,7 +394,6 @@ body {
     to { transform: translateX(0%); opacity: 1; }
 }
 
-/* Блок кнопок в модалке завершения */
 .completion-buttons {
     display: flex;
     gap: 20px;
@@ -497,7 +516,7 @@ body {
     margin: 15px 0;
 }
 
-/* ========== ДОБАВЛЕННЫЕ СТИЛИ ДЛЯ КЛУБНИЧЕК ========== */
+/* ========== КЛУБНИЧКИ ========== */
 
 /* Иконки клубники */
 .strawberry-icon {
@@ -519,19 +538,6 @@ body {
 @keyframes strawberryGlow {
     0% { text-shadow: 0 0 5px #ff4d4d, 0 0 10px #4dff4d; }
     100% { text-shadow: 0 0 15px #ff4d4d, 0 0 25px #4dff4d; }
-}
-
-/* Клубнички в статистике */
-.stat-item .reagent-class::after {
-    content: "🍓";
-    font-size: 1rem;
-    margin-left: 5px;
-    opacity: 0.5;
-    transition: opacity 0.3s;
-}
-
-.stat-item:hover .reagent-class::after {
-    opacity: 1;
 }
 
 /* Клубнички на карточках при наведении */
