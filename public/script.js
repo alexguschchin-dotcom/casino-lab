@@ -177,24 +177,23 @@ socket.on('state', (serverState) => {
         gameState.failCount = serverState.failCount;
         gameState.penaltyCount = serverState.penaltyCount;
 
-        // Если уровень 30, карточки пусты и нет выбранной карточки
-        if (gameState.level >= 30 && !gameState.selectedTaskId && gameState.currentCards.length === 0) {
-            if (level30CardsGenerated) {
-                // Карточки для 30 уровня уже были сгенерированы и выполнены → завершаем игру
-                endGame();
-                return;
-            } else {
-                // Достигнут 30 уровень, но карточки ещё не генерировались → генерируем их
-                generateCardsForLevel();
-            }
-        }
-
+        // Сначала генерируем карточки, если нужно (обычные или штрафные)
         if (!gameState.penaltyMode && !gameState.selectedTaskId && gameState.currentCards.length === 0) {
             generateCardsForLevel();
         }
 
         if (gameState.penaltyMode && gameState.currentCards.length === 0) {
             generatePenaltyCard();
+        }
+
+        // Проверяем завершение игры только после генерации и если не в штрафном режиме
+        if (gameState.level >= 30 && !gameState.selectedTaskId && gameState.currentCards.length === 0 && !gameState.penaltyMode) {
+            if (level30CardsGenerated) {
+                endGame();
+                return;
+            } else {
+                generateCardsForLevel();
+            }
         }
 
         updateUI();
@@ -436,7 +435,7 @@ function resetGame() {
         penaltyCount: 0,
         penaltyMode: false
     };
-    level30CardsGenerated = false; // Сбрасываем флаг
+    level30CardsGenerated = false;
     socket.emit('reset', 1500000);
     clearSavedGame();
     updateUI();

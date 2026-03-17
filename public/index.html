@@ -15,7 +15,11 @@
 
     <div class="game-container">
         <header class="header">
-            <h1 class="lab-title">⚗️ Лаборатория <span>безумного учёного</span></h1>
+            <h1 class="lab-title">
+                <i class="fas fa-strawberry strawberry-icon"></i> 
+                Лаборатория <span>Клубнички</span>
+                <i class="fas fa-strawberry strawberry-icon"></i>
+            </h1>
             <div class="level-indicator">Этап <span id="current-level">1</span>/30</div>
             <div class="balance-panel">
                 <span class="label">🔬 Очки науки</span>
@@ -41,7 +45,7 @@
     <!-- Модалка задания -->
     <div id="task-modal" class="modal hidden">
         <div class="modal-content">
-            <h2><i class="fas fa-flask"></i> Протокол испытания</h2>
+            <h2><i class="fas fa-flask"></i> Протокол испытания <i class="fas fa-strawberry strawberry-icon-small"></i></h2>
             <p id="task-description"></p>
             <div class="balance-input">
                 <label>Новый баланс после опыта:</label>
@@ -57,7 +61,7 @@
     <!-- Модалка завершения -->
     <div id="completion-modal" class="modal hidden">
         <div class="modal-content completion-content">
-            <h2>🏆 Эксперимент завершён</h2>
+            <h2>🏆 Эксперимент завершён <i class="fas fa-strawberry strawberry-icon-small"></i></h2>
             <p id="final-message"></p>
             <div class="completion-stats">
                 <p>✅ Успешно выполнено: <span id="final-success">0</span></p>
@@ -75,8 +79,8 @@
     <!-- Модалка правил -->
     <div id="rules-modal" class="modal hidden">
         <div class="modal-content">
-            <h2>📜 Правила</h2>
-            <p>Вы — учёный в секретной лаборатории. Каждый этап эксперимента предлагает три пробирки: два задания разного класса опасности (F, D, C, B, A, S) и один штраф. Выберите одну пробирку, проведите опыт (выполните задание в казино или штрафное действие) и введите новый баланс. При успешном выполнении задания вы получаете очки науки. При провале задания открывается штрафной уровень, где нужно выполнить одно штрафное действие. После этого игра продолжится с того же этапа. 30 этапов безумия!</p>
+            <h2>📜 Правила <i class="fas fa-strawberry strawberry-icon-small"></i></h2>
+            <p>Вы — учёный в секретной лаборатории. Каждый этап эксперимента предлагает три пробирки: два задания разного класса опасности (F, D, C, B, A, S) и один штраф. Выберите одну пробирку, проведите опыт (выполните задание в казино или штрафное действие) и введите новый баланс. При провале задания открывается штрафной уровень, где нужно выполнить одно штрафное действие. После этого игра продолжится с того же этапа. 30 этапов безумия!</p>
             <label><input type="checkbox" id="dont-show-rules"> Больше не показывать</label>
             <button id="start-quest-btn" class="btn-neon">Понятно</button>
         </div>
