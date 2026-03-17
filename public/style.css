@@ -41,6 +41,92 @@ body {
     z-index: -1;
 }
 
+/* Множество плавающих клубничек на фоне */
+.lab-bg::before {
+    content: "🍓";
+    position: absolute;
+    top: 10%;
+    left: 5%;
+    font-size: 3rem;
+    opacity: 0.1;
+    animation: floatStrawberry 15s infinite linear;
+    pointer-events: none;
+}
+
+.lab-bg::after {
+    content: "🍓";
+    position: absolute;
+    bottom: 15%;
+    right: 8%;
+    font-size: 4rem;
+    opacity: 0.1;
+    animation: floatStrawberry 20s infinite reverse linear;
+    pointer-events: none;
+}
+
+/* Дополнительные клубнички через кастомные свойства (псевдоэлементов больше нет, поэтому используем несколько вложенных элементов) */
+/* Но мы можем добавить их через дополнительные блоки в HTML или через дополнительные псевдоэлементы на других контейнерах.
+   Для простоты добавим несколько спан-элементов через JS или создадим их в CSS с помощью счетчиков? Лучше добавить в HTML пару скрытых элементов.
+   Однако, чтобы не усложнять, просто увеличим количество через multiple box-shadow или несколько псевдоэлементов на разных уровнях.
+   Решение: используем несколько псевдоэлементов на .lab-bg и на body.
+*/
+
+body::before {
+    content: "🍓";
+    position: absolute;
+    top: 20%;
+    right: 15%;
+    font-size: 2.5rem;
+    opacity: 0.1;
+    animation: floatStrawberry 18s infinite alternate;
+    pointer-events: none;
+    z-index: -1;
+}
+
+body::after {
+    content: "🍓";
+    position: absolute;
+    bottom: 25%;
+    left: 10%;
+    font-size: 3.5rem;
+    opacity: 0.1;
+    animation: floatStrawberry 22s infinite alternate-reverse;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.game-container::before {
+    content: "🍓";
+    position: absolute;
+    top: 5%;
+    left: 20%;
+    font-size: 2rem;
+    opacity: 0.1;
+    animation: floatStrawberry 12s infinite linear;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.game-container::after {
+    content: "🍓";
+    position: absolute;
+    bottom: 10%;
+    right: 20%;
+    font-size: 3rem;
+    opacity: 0.1;
+    animation: floatStrawberry 25s infinite reverse;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes floatStrawberry {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(10px, 15px) rotate(10deg); }
+    50% { transform: translate(-5px, 20px) rotate(-5deg); }
+    75% { transform: translate(15px, 5px) rotate(8deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+}
+
 .game-container {
     max-width: 1300px;
     width: 100%;
@@ -298,7 +384,6 @@ body {
     text-shadow: 0 0 5px #ff0000;
 }
 
-/* Клубнички в статистике */
 .stat-item .reagent-class::after {
     content: "🍓";
     font-size: 1rem;
@@ -518,7 +603,6 @@ body {
 
 /* ========== КЛУБНИЧКИ ========== */
 
-/* Иконки клубники */
 .strawberry-icon {
     color: #ff4d4d;
     text-shadow: 0 0 10px #ff4d4d, 0 0 20px #4dff4d;
@@ -540,7 +624,6 @@ body {
     100% { text-shadow: 0 0 15px #ff4d4d, 0 0 25px #4dff4d; }
 }
 
-/* Клубнички на карточках при наведении */
 .card:hover::after {
     content: "🍓";
     position: absolute;
@@ -556,35 +639,4 @@ body {
 @keyframes bounce {
     from { transform: translateY(0); }
     to { transform: translateY(-5px); }
-}
-
-/* Плавающие клубнички на фоне */
-.lab-bg::before {
-    content: "🍓";
-    position: absolute;
-    top: 10%;
-    left: 5%;
-    font-size: 3rem;
-    opacity: 0.1;
-    animation: floatStrawberry 15s infinite linear;
-    pointer-events: none;
-}
-
-.lab-bg::after {
-    content: "🍓";
-    position: absolute;
-    bottom: 15%;
-    right: 8%;
-    font-size: 4rem;
-    opacity: 0.1;
-    animation: floatStrawberry 20s infinite reverse linear;
-    pointer-events: none;
-}
-
-@keyframes floatStrawberry {
-    0% { transform: translate(0, 0) rotate(0deg); }
-    25% { transform: translate(10px, 15px) rotate(10deg); }
-    50% { transform: translate(-5px, 20px) rotate(-5deg); }
-    75% { transform: translate(15px, 5px) rotate(8deg); }
-    100% { transform: translate(0, 0) rotate(0deg); }
 }

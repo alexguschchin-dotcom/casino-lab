@@ -4,7 +4,7 @@ const SAVE_KEY = 'lab_save';
 
 let gameState = {
     level: 1,
-    currentBalance: 1500000,
+    currentBalance: 200000, // Начальное значение, будет обновлено сервером
     balanceHistory: [],
     availableTasks: [],
     penaltyPool: [],
@@ -17,7 +17,6 @@ let gameState = {
     penaltyMode: false
 };
 
-// Флаг, указывающий, что карточки для 30 уровня уже были сгенерированы
 let level30CardsGenerated = false;
 
 // DOM элементы
@@ -100,7 +99,6 @@ function generateCardsForLevel() {
         return;
     }
 
-    // Если достигнут 30 уровень, устанавливаем флаг
     if (gameState.level === 30) {
         level30CardsGenerated = true;
     }
@@ -159,7 +157,7 @@ socket.on('connect', () => {
             clearSavedGame();
         }
     }
-    socket.emit('reset', 1500000);
+    socket.emit('reset', 200000);
 });
 
 socket.on('state', (serverState) => {
@@ -177,11 +175,9 @@ socket.on('state', (serverState) => {
         gameState.failCount = serverState.failCount;
         gameState.penaltyCount = serverState.penaltyCount;
 
-        // Генерация карточек для обычного режима
         if (!gameState.penaltyMode && !gameState.selectedTaskId && gameState.currentCards.length === 0) {
             if (gameState.level >= 30) {
                 if (level30CardsGenerated) {
-                    // Уже были карточки на 30 уровне и сейчас они закончились -> завершаем игру
                     endGame();
                     return;
                 } else {
@@ -192,7 +188,6 @@ socket.on('state', (serverState) => {
             }
         }
 
-        // Генерация штрафной карточки, если в штрафном режиме
         if (gameState.penaltyMode && gameState.currentCards.length === 0) {
             generatePenaltyCard();
         }
@@ -384,7 +379,6 @@ function completeTask(success) {
     gameState.selectedTaskId = null;
     gameState.currentTaskId = null;
 
-    // Если после удаления карточки на 30 уровне карточки закончились и не в штрафном режиме -> завершаем игру
     if (gameState.level >= 30 && gameState.currentCards.length === 0 && !gameState.penaltyMode) {
         endGame();
     }
@@ -429,7 +423,7 @@ function endGame() {
 function resetGame() {
     gameState = {
         level: 1,
-        currentBalance: 1500000,
+        currentBalance: 200000,
         balanceHistory: [],
         availableTasks: [],
         penaltyPool: [],
@@ -442,7 +436,7 @@ function resetGame() {
         penaltyMode: false
     };
     level30CardsGenerated = false;
-    socket.emit('reset', 1500000);
+    socket.emit('reset', 200000);
     clearSavedGame();
     updateUI();
     updatePoolStats();
@@ -453,9 +447,7 @@ applyBalanceBtn.addEventListener('click', () => {
     const newBal = prompt('Введите новый начальный баланс:', gameState.currentBalance);
     if (newBal && !isNaN(newBal)) {
         const newBalance = parseFloat(newBal);
-        // Отправляем на сервер новый баланс
         socket.emit('setBalance', newBalance);
-        // Локально тоже обновляем, но сервер пришлёт подтверждение
         gameState.currentBalance = newBalance;
         balanceSpan.textContent = newBalance;
     }
