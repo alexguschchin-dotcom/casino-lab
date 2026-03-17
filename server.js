@@ -8,7 +8,8 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 const MAX_LEVEL = 30;
-const DEFAULT_BALANCE = 200000;
+const DEFAULT_BALANCE = 200000; 
+
 
 // ================== ПУЛ ЗАДАНИЙ ==================
 const taskTemplates = [
@@ -189,6 +190,7 @@ const penaltyTemplates = [
   'Штраф: поморгать 30 раз подряд'
 ];
 
+
 function createInitialPool() {
   const tasks = [];
   const counts = [100, 60, 30, 20, 10, 2];
@@ -284,10 +286,20 @@ io.on('connection', (socket) => {
     io.emit('state', questState);
   });
 
+  // Добавление произвольной суммы (больше не используется для изменения баланса вручную, но оставим)
   socket.on('addBalance', (description, amount) => {
     questState.currentBalance += amount;
     questState.balanceHistory.push({ timestamp: Date.now(), desc: description, change: amount, balance: questState.currentBalance });
     io.emit('state', questState);
+  });
+
+  // Установка нового баланса вручную
+  socket.on('setBalance', (newBalance) => {
+    if (!isNaN(newBalance) && newBalance >= 0) {
+      questState.currentBalance = newBalance;
+      questState.balanceHistory.push({ timestamp: Date.now(), desc: 'Баланс изменён вручную', change: 0, balance: newBalance });
+      io.emit('state', questState);
+    }
   });
 
   socket.on('reset', (newBalance) => {
