@@ -368,10 +368,9 @@ body {
 
 @keyframes slideIn {
     from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(0%); opacity: 1; }
 }
 
-/* Блок кнопок в модалке завершения */
 .completion-buttons {
     display: flex;
     gap: 20px;
@@ -463,6 +462,26 @@ body {
 .btn-success:hover {
     background: #afa;
     transform: scale(1.05);
+}
+
+.completion-stats {
+    margin: 20px 0;
+    text-align: left;
+    background: #0a1a0a;
+    padding: 15px;
+    border-radius: 30px;
+    border: 1px solid #0f0;
+}
+
+.completion-stats p {
+    margin: 5px 0;
+    font-size: 1.2rem;
+}
+
+.completion-stats span {
+    font-weight: bold;
+    color: #0f0;
+    float: right;
 }
 
 .completion-content p {
