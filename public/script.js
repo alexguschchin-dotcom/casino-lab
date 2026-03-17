@@ -169,8 +169,8 @@ socket.on('state', (serverState) => {
         gameState.failCount = serverState.failCount;
         gameState.penaltyCount = serverState.penaltyCount;
 
-        // Если достигнут 30 уровень — завершаем игру немедленно
-        if (gameState.level >= 30 && !gameState.gameCompleted) {
+        // Если уровень 30 и нет выбранной карточки (текущий этап завершён) — завершаем игру
+        if (gameState.level >= 30 && !gameState.selectedTaskId && gameState.currentCards.length === 0 && !gameState.gameCompleted) {
             endGame();
             return;
         }
