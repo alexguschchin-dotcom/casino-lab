@@ -452,9 +452,12 @@ function resetGame() {
 applyBalanceBtn.addEventListener('click', () => {
     const newBal = prompt('Введите новый начальный баланс:', gameState.currentBalance);
     if (newBal && !isNaN(newBal)) {
-        gameState.currentBalance = parseFloat(newBal);
-        balanceSpan.textContent = gameState.currentBalance;
-        socket.emit('addBalance', 'Изменение баланса', 0);
+        const newBalance = parseFloat(newBal);
+        // Отправляем на сервер новый баланс
+        socket.emit('setBalance', newBalance);
+        // Локально тоже обновляем, но сервер пришлёт подтверждение
+        gameState.currentBalance = newBalance;
+        balanceSpan.textContent = newBalance;
     }
 });
 
