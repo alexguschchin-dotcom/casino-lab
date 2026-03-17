@@ -169,17 +169,14 @@ socket.on('state', (serverState) => {
         gameState.failCount = serverState.failCount;
         gameState.penaltyCount = serverState.penaltyCount;
 
+        // Если достигнут 30 уровень — завершаем игру немедленно
+        if (gameState.level >= 30 && !gameState.gameCompleted) {
+            endGame();
+            return;
+        }
+
         if (!gameState.penaltyMode && !gameState.selectedTaskId && gameState.currentCards.length === 0) {
-            if (gameState.level >= 30) {
-                if (gameState.availableTasks.length === 0 && gameState.penaltyPool.length === 0) {
-                    endGame();
-                    return;
-                } else {
-                    generateCardsForLevel();
-                }
-            } else {
-                generateCardsForLevel();
-            }
+            generateCardsForLevel();
         }
 
         if (gameState.penaltyMode && gameState.currentCards.length === 0) {
