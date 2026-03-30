@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: #1f1a0e;
+    background: #1a120b;
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -24,10 +24,16 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" opacity="0.1"><path d="M100,100 L900,100 L800,900 L200,900 Z" fill="%23b8860b"/><circle cx="300" cy="400" r="40" fill="%23ffd700"/><circle cx="700" cy="600" r="60" fill="%23ffd700"/><path d="M400,300 L500,200 L600,300 Z" fill="%23b8860b"/></svg>') repeat;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" opacity="0.15"><path d="M100,100 L900,100 L800,900 L200,900 Z" fill="%23b8860b"/><circle cx="300" cy="400" r="40" fill="%23ffd700"/><circle cx="700" cy="600" r="60" fill="%23ffd700"/><path d="M400,300 L500,200 L600,300 Z" fill="%23b8860b"/></svg>') repeat;
     background-size: 200px;
     pointer-events: none;
     z-index: -2;
+    animation: subtlePulse 10s infinite;
+}
+@keyframes subtlePulse {
+    0% { opacity: 0.2; }
+    50% { opacity: 0.4; }
+    100% { opacity: 0.2; }
 }
 
 /* Облака */
@@ -37,17 +43,15 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><path fill="rgba(255,255,200,0.1)" d="M200,200 L300,150 L400,200 L450,300 L400,400 L250,400 L200,300 Z"/></svg>') repeat;
-    background-size: 300px;
-    animation: moveClouds 60s linear infinite;
+    background: radial-gradient(circle at 20% 30%, rgba(255,235,190,0.1) 0%, transparent 50%);
+    background-size: 300px 300px;
+    animation: moveClouds 40s linear infinite;
     pointer-events: none;
     z-index: -1;
-    opacity: 0.3;
 }
-
 @keyframes moveClouds {
     from { background-position: 0 0; }
-    to { background-position: 1000px 0; }
+    to { background-position: 500px 0; }
 }
 
 /* Золотые искры */
@@ -57,17 +61,16 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle at 20% 40%, rgba(255,215,0,0.1) 0%, transparent 1%);
-    background-size: 50px 50px;
-    animation: sparkle 3s infinite;
+    background: radial-gradient(circle at 30% 50%, rgba(255,215,0,0.08) 0%, transparent 2%);
+    background-size: 100px 100px;
+    animation: sparkle 4s infinite;
     pointer-events: none;
     z-index: -1;
 }
-
 @keyframes sparkle {
-    0% { opacity: 0.2; }
-    50% { opacity: 0.6; }
-    100% { opacity: 0.2; }
+    0% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+    100% { opacity: 0.3; }
 }
 
 /* Основной контейнер */
@@ -75,11 +78,24 @@ body {
     max-width: 1400px;
     width: 100%;
     background: rgba(30, 20, 10, 0.85);
-    backdrop-filter: blur(8px);
-    border-radius: 60px;
-    padding: 25px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,215,0,0.2);
-    border: 1px solid #b8860b;
+    backdrop-filter: blur(12px);
+    border-radius: 70px;
+    padding: 30px;
+    box-shadow: 0 25px 45px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,215,0,0.3);
+    border: 1px solid #d4af37;
+    position: relative;
+    z-index: 1;
+}
+
+.compass-decoration {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 3rem;
+    color: #d4af37;
+    opacity: 0.2;
+    transform: rotate(-15deg);
+    pointer-events: none;
 }
 
 /* Шапка */
@@ -90,17 +106,19 @@ body {
     margin-bottom: 30px;
     flex-wrap: wrap;
     gap: 15px;
+    position: relative;
+    z-index: 2;
 }
 
 .title {
     font-family: 'Playfair Display', serif;
-    font-size: 2.2rem;
+    font-size: 2.5rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #f4e3b2, #d4af37);
+    background: linear-gradient(135deg, #f4e3b2, #d4af37, #b8860b);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    text-shadow: 0 2px 5px rgba(0,0,0,0.4);
     display: flex;
     align-items: center;
     gap: 15px;
@@ -108,16 +126,17 @@ body {
 
 .level-indicator {
     font-size: 1.2rem;
-    background: #2c1a0e;
+    background: #2c1a0ecc;
     padding: 8px 18px;
     border-radius: 40px;
     color: #ffd966;
     border: 1px solid #b8860b;
     box-shadow: inset 0 0 5px #000, 0 2px 5px rgba(0,0,0,0.3);
+    backdrop-filter: blur(4px);
 }
 
 .sound-btn {
-    background: #2c1a0e;
+    background: #2c1a0ecc;
     border: none;
     color: #ffd966;
     font-size: 1.5rem;
@@ -125,30 +144,34 @@ body {
     padding: 8px 12px;
     border-radius: 50%;
     transition: all 0.2s;
+    backdrop-filter: blur(4px);
 }
 .sound-btn:hover {
     background: #b8860b;
     color: #fff;
-    transform: scale(1.05);
+    transform: scale(1.05) rotate(5deg);
 }
 
-/* Карта-прогресс с маркерами */
+/* Карта-прогресс */
 .journey-map {
-    margin-bottom: 30px;
-    background: #2c2418;
+    margin-bottom: 35px;
+    background: #2c2418cc;
     border-radius: 50px;
-    padding: 15px;
-    box-shadow: inset 0 0 5px #000, 0 5px 10px rgba(0,0,0,0.3);
+    padding: 20px;
+    box-shadow: inset 0 0 5px #000, 0 5px 15px rgba(0,0,0,0.4);
+    backdrop-filter: blur(4px);
+    border: 1px solid #b8860b;
 }
 
 .map-markers {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     position: relative;
     z-index: 2;
+    flex-wrap: nowrap;
+    gap: 2px;
 }
-
 .marker {
     width: 12px;
     height: 12px;
@@ -157,6 +180,7 @@ body {
     transition: all 0.3s;
     cursor: pointer;
     position: relative;
+    flex-shrink: 0;
 }
 .marker.completed {
     background: #ffd700;
@@ -164,12 +188,13 @@ body {
 }
 .marker.active {
     background: #ff6600;
-    transform: scale(1.3);
+    transform: scale(1.4);
+    box-shadow: 0 0 12px orange;
 }
 .marker:hover::after {
     content: attr(data-num);
     position: absolute;
-    bottom: 20px;
+    bottom: 18px;
     left: 50%;
     transform: translateX(-50%);
     background: #000;
@@ -179,12 +204,11 @@ body {
     font-size: 10px;
     white-space: nowrap;
 }
-
 .map-progress-bar {
     background: #3a2a1a;
     border-radius: 30px;
     padding: 3px;
-    margin-top: 5px;
+    margin-top: 8px;
 }
 .map-track {
     background: linear-gradient(90deg, #b8860b, #ffd700);
@@ -193,57 +217,65 @@ body {
     width: 0%;
     transition: width 0.5s ease;
 }
+.map-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 0.7rem;
+    color: #ffd966;
+    padding: 0 5px;
+}
 
-/* Карточка вопроса с анимацией свитка */
+/* Карточка вопроса */
 .question-card {
     background: #fff8e7;
-    border-radius: 60px;
-    padding: 30px;
+    border-radius: 70px;
+    padding: 35px;
     margin-bottom: 30px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,200,0.5);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,200,0.6);
     border: 1px solid #d4af37;
     transition: transform 0.3s, opacity 0.3s;
-}
-.scroll-animation {
-    animation: scrollReveal 0.5s ease-out;
+    animation: scrollReveal 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1);
 }
 @keyframes scrollReveal {
-    0% { opacity: 0; transform: translateY(20px) rotateX(10deg); }
+    0% { opacity: 0; transform: translateY(30px) rotateX(15deg); }
     100% { opacity: 1; transform: translateY(0) rotateX(0); }
 }
 
 .question-text {
-    font-size: 1.8rem;
-    font-weight: 600;
+    font-size: 1.9rem;
+    font-weight: 700;
     color: #4a2a0a;
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 35px;
     font-family: 'Playfair Display', serif;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.05);
 }
 
 .options {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    gap: 18px;
 }
 .option-btn {
     background: #e8dbb5;
     border: 2px solid #b8860b;
-    padding: 15px;
+    padding: 16px;
     font-size: 1.1rem;
-    border-radius: 50px;
+    border-radius: 60px;
     cursor: pointer;
     transition: all 0.2s;
     color: #2c1a0e;
-    font-weight: 500;
+    font-weight: 600;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 .option-btn:hover {
     background: #b8860b;
     color: white;
     transform: scale(1.02);
-    box-shadow: 0 0 8px gold;
+    box-shadow: 0 0 12px gold;
 }
 .option-btn:active {
     transform: scale(0.98);
@@ -257,98 +289,107 @@ body {
 /* Таблица лидеров */
 .leaderboard {
     background: #2c1a0ecc;
-    border-radius: 40px;
-    padding: 15px 20px;
+    border-radius: 50px;
+    padding: 18px 25px;
     margin-bottom: 30px;
     text-align: center;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(6px);
     border: 1px solid #b8860b;
 }
 .leaderboard h3 {
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     color: #ffd966;
+    font-size: 1.3rem;
 }
 #leaderboard-list {
     display: flex;
     justify-content: space-around;
-    gap: 15px;
+    gap: 20px;
     flex-wrap: wrap;
 }
 .leader-entry {
     background: #1e140a;
-    padding: 5px 15px;
-    border-radius: 30px;
+    padding: 6px 20px;
+    border-radius: 40px;
     font-weight: bold;
+    color: #ffd966;
+    font-size: 1rem;
 }
 
 /* Карточки игроков */
 .scoreboard {
     display: flex;
     justify-content: space-between;
-    gap: 20px;
+    gap: 25px;
     margin-bottom: 30px;
     flex-wrap: wrap;
 }
 .player-card {
     background: #2a1e12;
-    border-radius: 50px;
-    padding: 20px 15px;
+    border-radius: 60px;
+    padding: 22px 18px;
     flex: 1;
     text-align: center;
     color: #ffd966;
     border: 1px solid #b8860b;
-    transition: all 0.2s;
-    box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.4);
     position: relative;
+    backdrop-filter: blur(4px);
 }
 .player-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 25px rgba(0,0,0,0.5);
+    border-color: #ffd700;
 }
 .avatar {
-    font-size: 2.5rem;
-    margin-bottom: 5px;
+    font-size: 2.8rem;
+    margin-bottom: 8px;
+    color: #ffd966;
 }
 .player-name {
     font-weight: bold;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
 }
 .streak-indicator {
-    font-size: 0.9rem;
+    font-size: 1rem;
     background: #4a2a1a;
     display: inline-block;
-    padding: 2px 12px;
-    border-radius: 30px;
-    margin: 5px 0;
-    color: #ff8800;
+    padding: 3px 14px;
+    border-radius: 40px;
+    margin: 8px 0;
+    color: #ffaa33;
+    font-weight: bold;
 }
 .player-score {
-    font-size: 1.8rem;
+    font-size: 2rem;
     font-weight: bold;
     color: #ffd700;
     display: block;
+    text-shadow: 0 0 5px rgba(0,0,0,0.5);
 }
 .player-coins {
     font-size: 1.1rem;
     background: #1e140a;
     display: inline-block;
-    padding: 4px 12px;
-    border-radius: 30px;
+    padding: 5px 15px;
+    border-radius: 40px;
     margin: 8px 0;
+    font-weight: bold;
 }
 .bonus-buttons {
     display: flex;
     justify-content: center;
-    gap: 8px;
-    margin: 8px 0;
+    gap: 10px;
+    margin: 10px 0;
 }
 .bonus-btn {
     background: #4a2a1a;
     border: none;
     color: #ffd966;
-    padding: 5px 10px;
-    border-radius: 30px;
-    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 40px;
+    font-size: 0.85rem;
     cursor: pointer;
     transition: 0.2s;
 }
@@ -364,20 +405,21 @@ body {
 .answer-btn {
     background: #b8860b;
     border: none;
-    padding: 10px 20px;
-    border-radius: 40px;
+    padding: 12px 25px;
+    border-radius: 50px;
     color: white;
     font-weight: bold;
     cursor: pointer;
     transition: 0.2s;
     font-size: 1rem;
-    margin-top: 8px;
+    margin-top: 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 .answer-btn:hover {
     background: #ffd700;
     color: black;
     transform: scale(1.02);
-    box-shadow: 0 0 10px gold;
+    box-shadow: 0 0 12px gold;
 }
 
 /* Кнопка сброса */
@@ -389,16 +431,18 @@ body {
 .btn-reset {
     background: #8b4513;
     border: none;
-    padding: 12px 30px;
-    border-radius: 50px;
+    padding: 14px 35px;
+    border-radius: 60px;
     color: white;
     font-size: 1.2rem;
     cursor: pointer;
     transition: 0.2s;
+    font-weight: bold;
 }
 .btn-reset:hover {
     background: #b8860b;
     transform: scale(1.02);
+    box-shadow: 0 0 12px orange;
 }
 
 /* Модалки */
@@ -408,7 +452,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.85);
+    background: rgba(0,0,0,0.9);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -416,39 +460,42 @@ body {
 }
 .modal-content {
     background: #fff8e7;
-    border-radius: 50px;
-    padding: 30px;
-    max-width: 400px;
+    border-radius: 70px;
+    padding: 35px;
+    max-width: 450px;
     width: 90%;
     text-align: center;
-    box-shadow: 0 0 30px #b8860b;
+    box-shadow: 0 0 40px #b8860b;
     color: #2c1a0e;
+    border: 1px solid #d4af37;
 }
 .modal-content button {
-    margin-top: 20px;
-    padding: 10px 25px;
+    margin-top: 25px;
+    padding: 12px 30px;
     background: #b8860b;
     border: none;
-    border-radius: 40px;
+    border-radius: 50px;
     cursor: pointer;
     font-size: 1rem;
+    font-weight: bold;
 }
 .hidden {
     display: none !important;
 }
 .toast {
     position: fixed;
-    bottom: 20px;
+    bottom: 25px;
     left: 50%;
     transform: translateX(-50%);
     background: #2c1a0e;
     border: 2px solid #b8860b;
-    border-radius: 40px;
-    padding: 12px 24px;
+    border-radius: 50px;
+    padding: 12px 28px;
     color: #ffd966;
     z-index: 3000;
     white-space: nowrap;
     font-weight: bold;
+    backdrop-filter: blur(8px);
 }
 .flash-overlay {
     position: fixed;
@@ -463,7 +510,7 @@ body {
     transition: opacity 0.2s;
 }
 .flash-overlay.active {
-    opacity: 0.4;
+    opacity: 0.5;
     animation: flashFade 0.5s ease-out;
 }
 @keyframes flashFade {
@@ -483,22 +530,24 @@ body {
 }
 .coin {
     position: absolute;
-    background: gold;
+    background: radial-gradient(circle at 30% 30%, gold, #b8860b);
     border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    box-shadow: 0 0 5px orange;
+    width: 24px;
+    height: 24px;
+    box-shadow: 0 0 8px orange;
     animation: fall linear forwards;
 }
 @keyframes fall {
     0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
 }
 
 /* Адаптивность */
-@media (max-width: 768px) {
+@media (max-width: 800px) {
     .options { grid-template-columns: 1fr; }
     .scoreboard { flex-direction: column; }
     .leaderboard-list { flex-direction: column; }
-    .title { font-size: 1.6rem; }
+    .title { font-size: 1.8rem; }
+    .game-container { padding: 20px; }
+    .question-text { font-size: 1.4rem; }
 }

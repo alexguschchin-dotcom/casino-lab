@@ -53,37 +53,100 @@ const soundToggle = document.getElementById('sound-toggle');
 const flashOverlay = document.getElementById('flash-overlay');
 const leaderboardList = document.getElementById('leaderboard-list');
 
-// Звуки
+// Звуки через Web Audio API (гарантированно работают)
+let audioCtx = null;
 let soundsEnabled = true;
-const sounds = {
-    bg: document.getElementById('sound-bg'),
-    scroll: document.getElementById('sound-scroll'),
-    click: document.getElementById('sound-click'),
-    correct: document.getElementById('sound-correct'),
-    wrong: document.getElementById('sound-wrong'),
-    bonus: document.getElementById('sound-bonus'),
-    transition: document.getElementById('sound-transition')
-};
+let bgOscillator = null;
+let bgGain = null;
 
-function playSound(name) {
-    if (soundsEnabled && sounds[name]) {
-        sounds[name].currentTime = 0;
-        sounds[name].play().catch(e => console.log('Audio play failed', e));
+function initAudio() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
 }
 
-// Переключение звука
+function playTone(frequency, duration, type = 'sine', volume = 0.3) {
+    if (!soundsEnabled) return;
+    if (!audioCtx) initAudio();
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.value = frequency;
+    gain.gain.setValueAtTime(volume, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(now + duration);
+}
+
+function playCorrect() {
+    playTone(880, 0.3, 'sine', 0.4);
+    playTone(1100, 0.4, 'sine', 0.3);
+}
+function playWrong() {
+    playTone(440, 0.4, 'sawtooth', 0.3);
+    playTone(330, 0.5, 'sawtooth', 0.3);
+}
+function playBonus() {
+    playTone(1318, 0.2, 'sine', 0.2);
+    playTone(1568, 0.2, 'sine', 0.2);
+    playTone(1760, 0.3, 'sine', 0.2);
+}
+function playClick() {
+    playTone(800, 0.05, 'triangle', 0.1);
+}
+function playScroll() {
+    playTone(400, 0.1, 'sine', 0.1);
+    playTone(300, 0.15, 'sine', 0.1);
+}
+function playTransition() {
+    playTone(600, 0.2, 'sine', 0.15);
+    playTone(500, 0.2, 'sine', 0.15);
+}
+function startBackgroundMusic() {
+    if (!soundsEnabled) return;
+    if (!audioCtx) initAudio();
+    if (bgOscillator) {
+        bgOscillator.stop();
+        bgGain.disconnect();
+    }
+    bgOscillator = audioCtx.createOscillator();
+    bgGain = audioCtx.createGain();
+    bgOscillator.type = 'sine';
+    bgOscillator.frequency.value = 110;
+    bgGain.gain.value = 0.08;
+    bgOscillator.connect(bgGain);
+    bgGain.connect(audioCtx.destination);
+    bgOscillator.start();
+    // Медленное изменение частоты для атмосферы
+    setInterval(() => {
+        if (bgOscillator && soundsEnabled) {
+            const freq = 100 + Math.sin(Date.now() * 0.001) * 10;
+            bgOscillator.frequency.value = freq;
+        }
+    }, 2000);
+}
+function stopBackgroundMusic() {
+    if (bgOscillator) {
+        bgOscillator.stop();
+        bgOscillator = null;
+    }
+}
 soundToggle.addEventListener('click', () => {
     soundsEnabled = !soundsEnabled;
     soundToggle.innerHTML = soundsEnabled ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
-    if (soundsEnabled && sounds.bg) {
-        sounds.bg.play().catch(e => console.log);
-    } else if (!soundsEnabled && sounds.bg) {
-        sounds.bg.pause();
+    if (soundsEnabled) {
+        if (!audioCtx) initAudio();
+        audioCtx.resume();
+        startBackgroundMusic();
+    } else {
+        stopBackgroundMusic();
     }
 });
 
-// Инициализация карты-прогресса с маркерами
+// Инициализация карты-прогресса
 function initMapMarkers() {
     mapMarkers.innerHTML = '';
     for (let i = 0; i < totalQuestions; i++) {
@@ -92,11 +155,9 @@ function initMapMarkers() {
         if (i < gameState.currentQuestion) marker.classList.add('completed');
         if (i === gameState.currentQuestion) marker.classList.add('active');
         marker.setAttribute('data-num', i+1);
-        marker.style.left = `${(i / (totalQuestions-1)) * 100}%`;
         mapMarkers.appendChild(marker);
     }
 }
-
 function updateMapMarkers() {
     const markers = document.querySelectorAll('.marker');
     markers.forEach((marker, idx) => {
@@ -108,7 +169,7 @@ function updateMapMarkers() {
     mapTrack.style.width = `${progress}%`;
 }
 
-// Обновление UI (очки, монеты, серии, бонусы, лидерборд)
+// Обновление UI
 function updateUI() {
     for (let p of gameState.players) {
         scoreElements[p].textContent = gameState.scores[p];
@@ -121,7 +182,6 @@ function updateUI() {
     }
     updateLeaderboard();
 }
-
 function updateLeaderboard() {
     const sorted = [...gameState.players].sort((a,b) => gameState.scores[b] - gameState.scores[a]);
     leaderboardList.innerHTML = sorted.map(p => {
@@ -130,30 +190,33 @@ function updateLeaderboard() {
     }).join('');
 }
 
-// Анимация падающих монет
+// Анимация монет
 function startCoinRain() {
     const container = document.createElement('div');
     container.className = 'coin-rain';
     document.body.appendChild(container);
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 60; i++) {
         const coin = document.createElement('div');
         coin.className = 'coin';
         coin.style.left = Math.random() * 100 + '%';
-        coin.style.animationDuration = 1 + Math.random() * 2 + 's';
-        coin.style.animationDelay = Math.random() * 0.5 + 's';
+        coin.style.animationDuration = 1 + Math.random() * 2.5 + 's';
+        coin.style.animationDelay = Math.random() * 0.8 + 's';
         container.appendChild(coin);
     }
     setTimeout(() => container.remove(), 3000);
 }
-
-// Эффект штрафа
 function flashRed() {
     flashOverlay.classList.add('active');
     setTimeout(() => flashOverlay.classList.remove('active'), 500);
 }
 
-// Отображение вопроса с анимацией свитка
+// Отображение вопроса
 function renderQuestion(question) {
+    if (!question) {
+        console.error('Нет данных вопроса');
+        questionTextEl.textContent = 'Ошибка загрузки вопроса';
+        return;
+    }
     questionTextEl.textContent = question.text;
     optionsEl.innerHTML = '';
     question.options.forEach((opt, idx) => {
@@ -170,7 +233,7 @@ function renderQuestion(question) {
                 showToast('Сначала нажмите кнопку "Ответить" под своим именем!');
                 return;
             }
-            playSound('click');
+            playClick();
             socket.emit('answer', pendingPlayer, idx);
             pendingPlayer = null;
             gameState.answered = true;
@@ -188,9 +251,8 @@ function renderQuestion(question) {
     card.classList.remove('scroll-animation');
     void card.offsetWidth;
     card.classList.add('scroll-animation');
-    playSound('scroll');
+    playScroll();
 }
-
 function showToast(message) {
     const toast = document.getElementById('toast');
     toast.textContent = message;
@@ -198,7 +260,7 @@ function showToast(message) {
     setTimeout(() => toast.classList.add('hidden'), 3000);
 }
 
-// Обработчики сокетов
+// Сокеты
 socket.on('init', (data) => {
     gameState = data.state;
     currentQuestion = data.question;
@@ -211,9 +273,12 @@ socket.on('init', (data) => {
     gameState.answered = data.state.answered;
     gameState.gameCompleted = data.state.gameCompleted;
     pendingPlayer = null;
-    if (soundsEnabled && sounds.bg) sounds.bg.play().catch(e=>console.log);
+    if (soundsEnabled) {
+        initAudio();
+        audioCtx.resume();
+        startBackgroundMusic();
+    }
 });
-
 socket.on('nextQuestion', (data) => {
     gameState.scores = data.scores;
     gameState.coins = data.coins;
@@ -228,9 +293,8 @@ socket.on('nextQuestion', (data) => {
     updateMapMarkers();
     renderQuestion(currentQuestion);
     pendingPlayer = null;
-    playSound('transition');
+    playTransition();
 });
-
 socket.on('result', (data) => {
     const playerName = { Alex: 'Алексей', Vika: 'Вика', Batya: 'Батя' }[data.player];
     const message = data.isCorrect
@@ -240,10 +304,10 @@ socket.on('result', (data) => {
     resultMessage.textContent = message;
     resultModal.classList.remove('hidden');
     if (data.isCorrect) {
-        playSound('correct');
+        playCorrect();
         startCoinRain();
     } else {
-        playSound('wrong');
+        playWrong();
         flashRed();
     }
     gameState.scores = data.scores;
@@ -251,7 +315,6 @@ socket.on('result', (data) => {
     gameState.streak[data.player] = data.streak;
     updateUI();
 });
-
 socket.on('gameOver', (data) => {
     gameState.gameCompleted = true;
     finalScoresDiv.innerHTML = '';
@@ -262,30 +325,27 @@ socket.on('gameOver', (data) => {
         finalScoresDiv.innerHTML += `<p>${name}: ${score} очков (💰 ${coins.toLocaleString()} монет)</p>`;
     });
     gameoverModal.classList.remove('hidden');
-    if (sounds.bg) sounds.bg.pause();
+    stopBackgroundMusic();
 });
-
 socket.on('chatHint', (data) => {
     hintText.textContent = `📢 Чат считает, что правильный ответ: "${data.hint}"`;
     hintModal.classList.remove('hidden');
-    playSound('bonus');
+    playBonus();
 });
-
 socket.on('skipBroadcast', (data) => {
     const playerName = { Alex: 'Алексей', Vika: 'Вика', Batya: 'Батя' }[data.player];
     showToast(`${playerName} использовал пропуск вопроса!`);
-    playSound('bonus');
+    playBonus();
 });
-
 socket.on('bonusUpdate', (data) => {
     gameState.bonuses = data.bonuses;
     updateUI();
 });
-
 socket.on('bonusError', (msg) => {
     showToast(msg);
 });
 
+// Обработчики модалок и кнопок
 closeModalBtn.addEventListener('click', () => {
     resultModal.classList.add('hidden');
 });
@@ -301,7 +361,6 @@ resetBtn.addEventListener('click', () => {
         socket.emit('reset');
     }
 });
-
 answerBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         const player = btn.dataset.player;
@@ -317,7 +376,6 @@ answerBtns.forEach(btn => {
         showToast(`Игрок ${player}, выберите вариант ответа!`);
     });
 });
-
 document.querySelectorAll('.bonus-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         const player = btn.dataset.player;
@@ -330,6 +388,6 @@ document.querySelectorAll('.bonus-btn').forEach(btn => {
     });
 });
 
-// Инициализация
+// Инициализация UI и аудио
 updateUI();
 initMapMarkers();
