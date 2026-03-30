@@ -3,86 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Лаборатория безумного учёного</title>
+    <title>Империя знаний — викторина</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <canvas id="bubbles-canvas"></canvas>
-    <div class="lab-bg"></div>
+    <div class="map-bg"></div>
     <div id="toast" class="toast hidden"></div>
 
     <div class="game-container">
         <header class="header">
-            <h1 class="lab-title">
-                <i class="fas fa-strawberry strawberry-icon"></i> 
-                Лаборатория <span>Клубнички</span>
-                <i class="fas fa-strawberry strawberry-icon"></i>
+            <h1 class="title">
+                <i class="fas fa-globe-americas"></i> 
+                Империя знаний
+                <i class="fas fa-compass"></i>
             </h1>
-            <div class="level-indicator">Этап <span id="current-level">1</span>/30</div>
-            <div class="balance-panel">
-                <span class="label">🔬 Очки науки</span>
-                <span class="value" id="current-balance">0</span>
-                <button id="apply-start-balance" class="btn-neon"><i class="fas fa-pen"></i></button>
-            </div>
+            <div class="level-indicator">Вопрос <span id="current-q">1</span>/<span id="total-q">20</span></div>
         </header>
 
-        <div class="cards-container" id="cards-container"></div>
+        <!-- Карта сокровищ (прогресс) -->
+        <div class="map-progress">
+            <div class="map-track" id="map-track"></div>
+        </div>
 
-        <div class="stats-panel" id="pool-stats"></div>
+        <!-- Карточка вопроса -->
+        <div class="question-card">
+            <div class="question-text" id="question-text">Загрузка...</div>
+            <div class="options" id="options"></div>
+        </div>
 
-        <div class="history-panel">
-            <h2><i class="fas fa-scroll"></i> Журнал экспериментов</h2>
-            <div id="history-list" class="history-list"></div>
+        <!-- Табло игроков -->
+        <div class="scoreboard">
+            <div class="player-card" data-player="Alex">
+                <i class="fas fa-user-astronaut"></i>
+                <span class="player-name">Алексей</span>
+                <span class="player-score" id="score-Alex">0</span>
+                <button class="answer-btn" data-player="Alex">Ответить</button>
+            </div>
+            <div class="player-card" data-player="Vika">
+                <i class="fas fa-user-ninja"></i>
+                <span class="player-name">Вика</span>
+                <span class="player-score" id="score-Vika">0</span>
+                <button class="answer-btn" data-player="Vika">Ответить</button>
+            </div>
+            <div class="player-card" data-player="Batya">
+                <i class="fas fa-user-tie"></i>
+                <span class="player-name">Батя</span>
+                <span class="player-score" id="score-Batya">0</span>
+                <button class="answer-btn" data-player="Batya">Ответить</button>
+            </div>
         </div>
 
         <div class="control-panel">
-            <button id="reset-btn" class="btn-danger hidden">🔄 Новый эксперимент</button>
+            <button id="reset-btn" class="btn-reset">🔄 Новая игра</button>
         </div>
     </div>
 
-    <!-- Модалка задания -->
-    <div id="task-modal" class="modal hidden">
+    <!-- Модалка результата -->
+    <div id="result-modal" class="modal hidden">
         <div class="modal-content">
-            <h2><i class="fas fa-flask"></i> Протокол испытания <i class="fas fa-strawberry strawberry-icon-small"></i></h2>
-            <p id="task-description"></p>
-            <div class="balance-input">
-                <label>Новый баланс после опыта:</label>
-                <input type="number" id="new-balance" step="100">
-            </div>
-            <div class="modal-buttons">
-                <button id="complete-task" class="btn-success">✅ Успех</button>
-                <button id="fail-task" class="btn-danger">❌ Провал</button>
-            </div>
+            <h2 id="result-title"></h2>
+            <p id="result-message"></p>
+            <button id="close-modal" class="btn-close">Продолжить</button>
         </div>
     </div>
 
-    <!-- Модалка завершения -->
-    <div id="completion-modal" class="modal hidden">
-        <div class="modal-content completion-content">
-            <h2>🏆 Эксперимент завершён <i class="fas fa-strawberry strawberry-icon-small"></i></h2>
-            <p id="final-message"></p>
-            <div class="completion-stats">
-                <p>✅ Успешно выполнено: <span id="final-success">0</span></p>
-                <p>❌ Провалено: <span id="final-fail">0</span></p>
-                <p>⚠️ Штрафов взято: <span id="final-penalty">0</span></p>
-            </div>
-            <p>Итоговый баланс: <span id="final-balance"></span> 🔬</p>
-            <div class="completion-buttons">
-                <button id="flask-gag-btn" class="btn-neon">🧪 Неизвестная колба</button>
-                <button id="completion-reset-btn" class="btn-neon">🔄 Новый эксперимент</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модалка правил -->
-    <div id="rules-modal" class="modal hidden">
+    <!-- Модалка окончания игры -->
+    <div id="gameover-modal" class="modal hidden">
         <div class="modal-content">
-            <h2>📜 Правила <i class="fas fa-strawberry strawberry-icon-small"></i></h2>
-            <p>Вы — учёный в секретной лаборатории. Каждый этап эксперимента предлагает три пробирки: два задания разного класса опасности (F, D, C, B, A, S) и один штраф. Выберите одну пробирку, проведите опыт (выполните задание в казино или штрафное действие) и введите новый баланс. При успешном выполнении задания вы получаете очки науки. При провале задания открывается штрафной уровень, где нужно выполнить одно штрафное действие. После этого игра продолжится. 30 этапов безумия!</p>
-            <label><input type="checkbox" id="dont-show-rules"> Больше не показывать</label>
-            <button id="start-quest-btn" class="btn-neon">Понятно</button>
+            <h2>🏆 Игра окончена</h2>
+            <div id="final-scores"></div>
+            <button id="new-game-btn" class="btn-neon">Новая игра</button>
         </div>
     </div>
 
