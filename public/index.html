@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Империя знаний — Соревновательная викторина</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
@@ -10,7 +10,10 @@
 </head>
 <body>
     <div class="map-bg"></div>
+    <div class="clouds"></div>
+    <div class="sparkles"></div>
     <div id="toast" class="toast hidden"></div>
+    <div id="flash-overlay" class="flash-overlay hidden"></div>
 
     <div class="game-container">
         <header class="header">
@@ -23,19 +26,32 @@
             <button id="sound-toggle" class="sound-btn"><i class="fas fa-volume-up"></i></button>
         </header>
 
-        <div class="map-progress">
-            <div class="map-track" id="map-track"></div>
+        <!-- Прогресс в виде карты с маркерами -->
+        <div class="journey-map">
+            <div class="map-markers" id="map-markers"></div>
+            <div class="map-progress-bar">
+                <div class="map-track" id="map-track"></div>
+            </div>
         </div>
 
-        <div class="question-card">
+        <!-- Карточка вопроса с анимацией свитка -->
+        <div class="question-card scroll-animation" id="question-card">
             <div class="question-text" id="question-text">Загрузка...</div>
             <div class="options" id="options"></div>
         </div>
 
+        <!-- Таблица лидеров в реальном времени -->
+        <div class="leaderboard">
+            <h3><i class="fas fa-trophy"></i> Таблица лидеров</h3>
+            <div id="leaderboard-list"></div>
+        </div>
+
+        <!-- Карточки игроков -->
         <div class="scoreboard">
             <div class="player-card" data-player="Alex">
-                <i class="fas fa-user-astronaut"></i>
+                <i class="fas fa-user-astronaut avatar"></i>
                 <span class="player-name">Алексей</span>
+                <div class="streak-indicator" id="streak-Alex">🔥 0</div>
                 <span class="player-score" id="score-Alex">0</span>
                 <span class="player-coins" id="coins-Alex">💰 0</span>
                 <div class="bonus-buttons">
@@ -45,8 +61,9 @@
                 <button class="answer-btn" data-player="Alex">Ответить</button>
             </div>
             <div class="player-card" data-player="Vika">
-                <i class="fas fa-user-ninja"></i>
+                <i class="fas fa-user-ninja avatar"></i>
                 <span class="player-name">Вика</span>
+                <div class="streak-indicator" id="streak-Vika">🔥 0</div>
                 <span class="player-score" id="score-Vika">0</span>
                 <span class="player-coins" id="coins-Vika">💰 0</span>
                 <div class="bonus-buttons">
@@ -56,8 +73,9 @@
                 <button class="answer-btn" data-player="Vika">Ответить</button>
             </div>
             <div class="player-card" data-player="Batya">
-                <i class="fas fa-user-tie"></i>
+                <i class="fas fa-user-tie avatar"></i>
                 <span class="player-name">Батя</span>
+                <div class="streak-indicator" id="streak-Batya">🔥 0</div>
                 <span class="player-score" id="score-Batya">0</span>
                 <span class="player-coins" id="coins-Batya">💰 0</span>
                 <div class="bonus-buttons">
@@ -73,6 +91,7 @@
         </div>
     </div>
 
+    <!-- Модалки -->
     <div id="result-modal" class="modal hidden">
         <div class="modal-content">
             <h2 id="result-title"></h2>
@@ -97,10 +116,28 @@
         </div>
     </div>
 
-    <audio id="sound-correct" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_7c3c9c1c1c.mp3?filename=correct-6033.mp3" preload="auto"></audio>
-    <audio id="sound-wrong" src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_1c6b9b6c1c.mp3?filename=wrong-47985.mp3" preload="auto"></audio>
-    <audio id="sound-bonus" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_3f3f3f3f3f.mp3?filename=bonus-101191.mp3" preload="auto"></audio>
-    <audio id="sound-ambient" src="https://cdn.pixabay.com/download/audio/2022/06/24/audio_6f6f6f6f6f.mp3?filename=ambient-forest-112191.mp3" loop preload="auto"></audio>
+    <!-- Аудио элементы -->
+    <audio id="sound-bg" loop preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_1c6b9b6c1c.mp3?filename=epic-adventure-112191.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sound-scroll" preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_7c3c9c1c1c.mp3?filename=scroll-112192.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sound-click" preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_1c6b9b6c1c.mp3?filename=click-112193.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sound-correct" preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_7c3c9c1c1c.mp3?filename=correct-6033.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sound-wrong" preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_1c6b9b6c1c.mp3?filename=wrong-47985.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sound-bonus" preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_3f3f3f3f3f.mp3?filename=bonus-101191.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sound-transition" preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/06/24/audio_6f6f6f6f6f.mp3?filename=footsteps-112194.mp3" type="audio/mpeg">
+    </audio>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
