@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// ========== 39 вопросов (география, история, культура, азартные игры) ==========
+// 39 вопросов (как ранее, но убедимся, что все корректны)
 const questions = [
   { text: 'В какой стране находится знаменитое казино Монте-Карло?', options: ['Монако', 'Франция', 'Италия', 'Испания'], correct: 0 },
   { text: 'Какой слот считается самым популярным в мире?', options: ['Book of Dead', 'Starburst', 'Sweet Bonanza', 'Gates of Olympus'], correct: 1 },
@@ -29,11 +29,10 @@ const questions = [
   { text: 'Какая ставка в рулетке самая рискованная?', options: ['На одно число', 'На красное', 'На чёрное', 'На чётное'], correct: 0 },
   { text: 'Кто из этих писателей был азартным игроком?', options: ['Достоевский', 'Пушкин', 'Лермонтов', 'Тургенев'], correct: 0 },
   { text: 'Какой символ в слотах заменяет другие?', options: ['Wild', 'Scatter', 'Bonus', 'Multiplier'], correct: 0 },
-  // Новые вопросы (география, история, культура)
   { text: 'Какая река является самой длинной в мире?', options: ['Амазонка', 'Нил', 'Янцзы', 'Миссисипи'], correct: 1 },
   { text: 'Кто открыл Америку?', options: ['Колумб', 'Магеллан', 'Васко да Гама', 'Кук'], correct: 0 },
   { text: 'В каком году произошла Октябрьская революция?', options: ['1917', '1905', '1918', '1921'], correct: 0 },
-  { text: 'Как называется самая высокая гора мира?', options: ['К2', 'Эверест', 'Канченджанга', 'Лхоцзе'], correct: 1 },
+  { text: 'Как называется самая высокая гора мира?', options: ['К2', 'Эверест', 'Канченджанга', 'Лхоцце'], correct: 1 },
   { text: 'Кто написал «Войну и мир»?', options: ['Достоевский', 'Толстой', 'Чехов', 'Пушкин'], correct: 1 },
   { text: 'Столица Австралии?', options: ['Сидней', 'Мельбурн', 'Канберра', 'Перт'], correct: 2 },
   { text: 'Кто изобрёл радио?', options: ['Попов', 'Маркони', 'Тесла', 'Эдисон'], correct: 0 },
@@ -51,12 +50,11 @@ const questions = [
   { text: 'Кто написал картину «Мона Лиза»?', options: ['Ван Гог', 'Пикассо', 'Леонардо да Винчи', 'Рафаэль'], correct: 2 }
 ];
 
-const MAX_LEVEL = questions.length; // 39
-const CORRECT_REWARD = 100000;   // монеты за правильный ответ
-const WRONG_PENALTY = 300000;    // штраф за неправильный
-const STREAK_BONUS_THRESHOLD = 3; // бонус за каждые 3 правильных подряд
+const MAX_LEVEL = questions.length;
+const CORRECT_REWARD = 100000;
+const WRONG_PENALTY = 300000;
+const STREAK_BONUS_THRESHOLD = 3;
 
-// Состояние игры
 let gameState = {
   currentQuestion: 0,
   scores: { Alex: 0, Vika: 0, Batya: 0 },
@@ -70,20 +68,17 @@ let gameState = {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Добавление бонуса игроку
 function addBonus(player, bonusName) {
   if (!gameState.bonuses[player].includes(bonusName)) {
     gameState.bonuses[player].push(bonusName);
   }
 }
 
-// Удаление бонуса
 function removeBonus(player, bonusName) {
   const index = gameState.bonuses[player].indexOf(bonusName);
   if (index !== -1) gameState.bonuses[player].splice(index, 1);
 }
 
-// Переход к следующему вопросу или завершение
 function nextQuestionOrGameOver(io) {
   if (gameState.currentQuestion + 1 < MAX_LEVEL) {
     gameState.currentQuestion++;
@@ -119,7 +114,6 @@ io.on('connection', (socket) => {
     question: questions[gameState.currentQuestion]
   });
 
-  // Ответ игрока
   socket.on('answer', (player, answerIndex) => {
     if (gameState.answered || gameState.gameCompleted) return;
 
@@ -127,23 +121,15 @@ io.on('connection', (socket) => {
     const currentQ = questions[gameState.currentQuestion];
     const correctAnswerText = currentQ.options[currentQ.correct];
 
-    // Логика начисления / штрафа
     if (isCorrect) {
-      // + монеты
       gameState.coins[player] += CORRECT_REWARD;
-      // + очки (правильные ответы)
       gameState.scores[player] += 1;
-      // увеличиваем серию
       gameState.streak[player] += 1;
-      // проверяем, не пора ли дать бонус
       if (gameState.streak[player] % STREAK_BONUS_THRESHOLD === 0) {
         addBonus(player, 'askChat');
-        // можно также дать второй бонус "skip" за каждые 6, но для разнообразия оставим askChat
       }
     } else {
-      // штраф монетами (не ниже 0)
       gameState.coins[player] = Math.max(0, gameState.coins[player] - WRONG_PENALTY);
-      // сбрасываем серию
       gameState.streak[player] = 0;
     }
 
@@ -157,7 +143,6 @@ io.on('connection', (socket) => {
       streak: gameState.streak[player]
     });
 
-    // Через 2 секунды следующий вопрос
     setTimeout(() => {
       if (!gameState.gameCompleted) {
         nextQuestionOrGameOver(io);
@@ -165,7 +150,6 @@ io.on('connection', (socket) => {
     }, 2000);
   });
 
-  // Использование бонуса
   socket.on('useBonus', (player, bonusType) => {
     if (gameState.answered || gameState.gameCompleted) {
       socket.emit('bonusError', 'Сейчас нельзя использовать бонус');
@@ -177,7 +161,6 @@ io.on('connection', (socket) => {
     }
 
     if (bonusType === 'askChat') {
-      // Генерируем подсказку "чат": с вероятностью 70% показывает правильный ответ, иначе случайный неправильный
       const currentQ = questions[gameState.currentQuestion];
       const correctIdx = currentQ.correct;
       let hint;
@@ -185,20 +168,17 @@ io.on('connection', (socket) => {
       if (rnd < 0.7) {
         hint = currentQ.options[correctIdx];
       } else {
-        // случайный неверный вариант
         let wrongIdx;
         do { wrongIdx = Math.floor(Math.random() * currentQ.options.length); } while (wrongIdx === correctIdx);
         hint = currentQ.options[wrongIdx];
       }
       socket.emit('chatHint', { hint, player });
       removeBonus(player, 'askChat');
-      // обновляем UI бонусов у всех
       io.emit('bonusUpdate', { bonuses: gameState.bonuses });
     }
     else if (bonusType === 'skipQuestion') {
-      // Пропуск вопроса: переходим к следующему без начисления и штрафа, но с сохранением серии
       if (!gameState.answered) {
-        gameState.answered = true; // блокируем ответы
+        gameState.answered = true;
         io.emit('skipBroadcast', { player });
         setTimeout(() => {
           if (!gameState.gameCompleted) {
@@ -213,7 +193,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Сброс игры
   socket.on('reset', () => {
     gameState = {
       currentQuestion: 0,
