@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: #1e2a2e; /* тёмный фон для контраста */
+    background: #2c2418;
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -22,21 +22,21 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" opacity="0.05"><path d="M100,100 L900,100 L800,900 L200,900 Z" fill="%23b8860b"/><circle cx="300" cy="400" r="40" fill="%23ffd700"/><circle cx="700" cy="600" r="60" fill="%23ffd700"/><path d="M400,300 L500,200 L600,300 Z" fill="%23b8860b"/></svg>') repeat;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" opacity="0.1"><path d="M100,100 L900,100 L800,900 L200,900 Z" fill="%23b8860b"/><circle cx="300" cy="400" r="40" fill="%23ffd700"/><circle cx="700" cy="600" r="60" fill="%23ffd700"/><path d="M400,300 L500,200 L600,300 Z" fill="%23b8860b"/></svg>') repeat;
     background-size: 200px;
     pointer-events: none;
     z-index: -1;
 }
 
 .game-container {
-    max-width: 1200px;
+    max-width: 1300px;
     width: 100%;
-    background: rgba(30, 20, 10, 0.85);
+    background: rgba(30, 20, 10, 0.9);
     backdrop-filter: blur(5px);
-    border-radius: 40px;
+    border-radius: 60px;
     padding: 25px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-    border: 1px solid rgba(184, 134, 11, 0.5);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,215,0,0.2);
+    border: 1px solid #b8860b;
 }
 
 .header {
@@ -68,7 +68,21 @@ body {
     border: 1px solid #b8860b;
 }
 
-/* Прогресс-карта */
+.sound-btn {
+    background: #2c1a0e;
+    border: none;
+    color: #ffd966;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 50%;
+    transition: 0.2s;
+}
+.sound-btn:hover {
+    background: #b8860b;
+    color: #fff;
+}
+
 .map-progress {
     background: #3a2a1a;
     border-radius: 30px;
@@ -85,7 +99,6 @@ body {
     transition: width 0.5s ease;
 }
 
-/* Карточка вопроса */
 .question-card {
     background: #fff8e7;
     border-radius: 60px;
@@ -121,14 +134,17 @@ body {
     color: #2c1a0e;
     font-weight: 500;
 }
-
 .option-btn:hover {
     background: #b8860b;
     color: white;
     transform: scale(1.02);
 }
+.option-btn.disabled, .option-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
 
-/* Табло игроков */
 .scoreboard {
     display: flex;
     justify-content: space-between;
@@ -140,43 +156,70 @@ body {
 .player-card {
     background: #2a1e12;
     border-radius: 50px;
-    padding: 15px 20px;
+    padding: 20px 15px;
     flex: 1;
     text-align: center;
     color: #ffd966;
     border: 1px solid #b8860b;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    transition: 0.2s;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.3);
 }
-
 .player-card i {
     font-size: 2rem;
 }
-
 .player-name {
     font-weight: bold;
     font-size: 1.3rem;
 }
-
 .player-score {
     font-size: 1.8rem;
     font-weight: bold;
     color: #ffd700;
 }
-
+.player-coins {
+    font-size: 1.1rem;
+    background: #1e140a;
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 30px;
+    margin: 8px 0;
+}
+.bonus-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 8px 0;
+}
+.bonus-btn {
+    background: #4a2a1a;
+    border: none;
+    color: #ffd966;
+    padding: 5px 10px;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.bonus-btn:hover:not(:disabled) {
+    background: #b8860b;
+    color: white;
+}
+.bonus-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
 .answer-btn {
     background: #b8860b;
     border: none;
-    padding: 8px 15px;
+    padding: 10px 20px;
     border-radius: 40px;
     color: white;
     font-weight: bold;
     cursor: pointer;
     transition: 0.2s;
     font-size: 1rem;
+    margin-top: 8px;
 }
-
 .answer-btn:hover {
     background: #ffd700;
     color: black;
@@ -187,7 +230,6 @@ body {
     justify-content: center;
     margin-top: 20px;
 }
-
 .btn-reset {
     background: #8b4513;
     border: none;
@@ -198,25 +240,22 @@ body {
     cursor: pointer;
     transition: 0.2s;
 }
-
 .btn-reset:hover {
     background: #b8860b;
 }
 
-/* Модалки */
 .modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0,0,0,0.8);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 2000;
 }
-
 .modal-content {
     background: #fff8e7;
     border-radius: 50px;
@@ -227,11 +266,9 @@ body {
     box-shadow: 0 0 30px #b8860b;
     color: #2c1a0e;
 }
-
 .modal-content h2 {
     margin-bottom: 15px;
 }
-
 .modal-content button {
     margin-top: 20px;
     padding: 10px 25px;
@@ -241,11 +278,9 @@ body {
     cursor: pointer;
     font-size: 1rem;
 }
-
 .hidden {
     display: none !important;
 }
-
 .toast {
     position: fixed;
     bottom: 20px;

@@ -3,14 +3,18 @@ const socket = io();
 let gameState = {
     currentQuestion: 0,
     scores: { Alex: 0, Vika: 0, Batya: 0 },
+    coins: { Alex: 0, Vika: 0, Batya: 0 },
+    streak: { Alex: 0, Vika: 0, Batya: 0 },
+    bonuses: { Alex: [], Vika: [], Batya: [] },
     answered: false,
     gameCompleted: false,
     players: ['Alex', 'Vika', 'Batya']
 };
 
 let currentQuestion = null;
+let totalQuestions = 39; // обновлено
+let pendingPlayer = null; // кто сейчас нажал "Ответить"
 
-const totalQuestions = 20; // должно совпадать с количеством вопросов в server.js
 const questionTextEl = document.getElementById('question-text');
 const optionsEl = document.getElementById('options');
 const currentQSpan = document.getElementById('current-q');
@@ -19,6 +23,11 @@ const scoreElements = {
     Alex: document.getElementById('score-Alex'),
     Vika: document.getElementById('score-Vika'),
     Batya: document.getElementById('score-Batya')
+};
+const coinsElements = {
+    Alex: document.getElementById('coins-Alex'),
+    Vika: document.getElementById('coins-Vika'),
+    Batya: document.getElementById('coins-Batya')
 };
 const answerBtns = document.querySelectorAll('.answer-btn');
 const resetBtn = document.getElementById('reset-btn');
@@ -30,14 +39,52 @@ const closeModalBtn = document.getElementById('close-modal');
 const gameoverModal = document.getElementById('gameover-modal');
 const finalScoresDiv = document.getElementById('final-scores');
 const newGameBtn = document.getElementById('new-game-btn');
+const hintModal = document.getElementById('hint-modal');
+const hintText = document.getElementById('hint-text');
+const closeHintBtn = document.getElementById('close-hint');
+const soundToggle = document.getElementById('sound-toggle');
+let soundsEnabled = true;
+const sounds = {
+    correct: document.getElementById('sound-correct'),
+    wrong: document.getElementById('sound-wrong'),
+    bonus: document.getElementById('sound-bonus'),
+    ambient: document.getElementById('sound-ambient')
+};
 
-// Рендер прогресса на карте (проценты)
+function playSound(name) {
+    if (soundsEnabled && sounds[name]) {
+        sounds[name].currentTime = 0;
+        sounds[name].play().catch(e => console.log('Audio play failed', e));
+    }
+}
+
+soundToggle.addEventListener('click', () => {
+    soundsEnabled = !soundsEnabled;
+    soundToggle.innerHTML = soundsEnabled ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+    if (soundsEnabled && sounds.ambient) {
+        sounds.ambient.play().catch(e => console.log);
+    } else if (!soundsEnabled && sounds.ambient) {
+        sounds.ambient.pause();
+    }
+});
+
 function updateMapProgress() {
     const progress = (gameState.currentQuestion / totalQuestions) * 100;
     mapTrack.style.width = `${progress}%`;
 }
 
-// Отображение вопроса и вариантов
+function updateScoresUI() {
+    for (let p of gameState.players) {
+        scoreElements[p].textContent = gameState.scores[p];
+        coinsElements[p].textContent = `💰 ${gameState.coins[p].toLocaleString()}`;
+        // Обновляем кнопки бонусов
+        const askBtn = document.querySelector(`.bonus-btn.ask-chat[data-player="${p}"]`);
+        const skipBtn = document.querySelector(`.bonus-btn.skip[data-player="${p}"]`);
+        if (askBtn) askBtn.disabled = !gameState.bonuses[p].includes('askChat');
+        if (skipBtn) skipBtn.disabled = !gameState.bonuses[p].includes('skipQuestion');
+    }
+}
+
 function renderQuestion(question) {
     questionTextEl.textContent = question.text;
     optionsEl.innerHTML = '';
@@ -47,24 +94,28 @@ function renderQuestion(question) {
         btn.textContent = opt;
         btn.dataset.index = idx;
         btn.addEventListener('click', () => {
-            // Если кто-то уже ответил, блокируем
             if (gameState.answered || gameState.gameCompleted) {
                 showToast('На этот вопрос уже ответили!');
                 return;
             }
-            // Выбираем игрока, который сейчас ответит — для простоты, показываем окно выбора игрока
-            // В реальности можно сделать отдельную кнопку для каждого игрока.
-            // У нас уже есть кнопки "Ответить" под именами, поэтому здесь просто показываем подсказку
-            showToast('Нажмите кнопку "Ответить" под своим именем!');
+            if (!pendingPlayer) {
+                showToast('Сначала нажмите кнопку "Ответить" под своим именем!');
+                return;
+            }
+            // Отправляем ответ
+            socket.emit('answer', pendingPlayer, idx);
+            pendingPlayer = null;
+            gameState.answered = true;
+            document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
         });
         optionsEl.appendChild(btn);
     });
-}
-
-function updateScoresUI() {
-    scoreElements.Alex.textContent = gameState.scores.Alex;
-    scoreElements.Vika.textContent = gameState.scores.Vika;
-    scoreElements.Batya.textContent = gameState.scores.Batya;
+    // Если вопрос активен, включаем варианты
+    if (!gameState.answered && !gameState.gameCompleted) {
+        document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = false);
+    } else {
+        document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
+    }
 }
 
 function showToast(message) {
@@ -77,35 +128,49 @@ function showToast(message) {
 socket.on('init', (data) => {
     gameState = data.state;
     currentQuestion = data.question;
-    renderQuestion(currentQuestion);
-    currentQSpan.textContent = gameState.currentQuestion + 1;
     totalQSpan.textContent = totalQuestions;
+    currentQSpan.textContent = gameState.currentQuestion + 1;
     updateScoresUI();
     updateMapProgress();
-    gameState.answered = false;
-    gameState.gameCompleted = false;
+    renderQuestion(currentQuestion);
+    gameState.answered = data.state.answered;
+    gameState.gameCompleted = data.state.gameCompleted;
+    pendingPlayer = null;
+    if (gameState.gameCompleted) {
+        // возможно, уже конец
+    }
+    if (soundsEnabled && sounds.ambient) sounds.ambient.play().catch(e=>console.log);
 });
 
 socket.on('nextQuestion', (data) => {
     gameState.scores = data.scores;
+    gameState.coins = data.coins;
+    gameState.bonuses = data.bonuses;
+    gameState.streak = data.streak;
     gameState.currentQuestion++;
+    gameState.answered = false;
+    gameState.gameCompleted = false;
     currentQuestion = data.question;
-    renderQuestion(currentQuestion);
     currentQSpan.textContent = gameState.currentQuestion + 1;
     updateScoresUI();
     updateMapProgress();
-    gameState.answered = false;
-    gameState.gameCompleted = false;
+    renderQuestion(currentQuestion);
+    pendingPlayer = null;
 });
 
 socket.on('result', (data) => {
     const playerName = { Alex: 'Алексей', Vika: 'Вика', Batya: 'Батя' }[data.player];
     const message = data.isCorrect
-        ? `${playerName} ответил(а) верно!`
-        : `${playerName} ошибся(лась). Правильный ответ: ${data.correctAnswer}`;
+        ? `${playerName} ответил(а) верно! +100 000 монет.`
+        : `${playerName} ошибся(лась). Штраф 300 000 монет. Правильный ответ: ${data.correctAnswer}`;
     resultTitle.textContent = data.isCorrect ? '✅ Верно!' : '❌ Неверно';
     resultMessage.textContent = message;
     resultModal.classList.remove('hidden');
+    playSound(data.isCorrect ? 'correct' : 'wrong');
+    gameState.scores = data.scores;
+    gameState.coins[data.player] = data.coins;
+    gameState.streak[data.player] = data.streak;
+    updateScoresUI();
 });
 
 socket.on('gameOver', (data) => {
@@ -114,27 +179,49 @@ socket.on('gameOver', (data) => {
     const sorted = Object.entries(data.scores).sort((a,b) => b[1] - a[1]);
     sorted.forEach(([player, score]) => {
         const name = { Alex: 'Алексей', Vika: 'Вика', Batya: 'Батя' }[player];
-        finalScoresDiv.innerHTML += `<p>${name}: ${score} баллов</p>`;
+        const coins = data.coins[player];
+        finalScoresDiv.innerHTML += `<p>${name}: ${score} очков (💰 ${coins.toLocaleString()} монет)</p>`;
     });
     gameoverModal.classList.remove('hidden');
+    if (sounds.ambient) sounds.ambient.pause();
+});
+
+socket.on('chatHint', (data) => {
+    hintText.textContent = `📢 Чат считает, что правильный ответ: "${data.hint}"`;
+    hintModal.classList.remove('hidden');
+});
+
+socket.on('skipBroadcast', (data) => {
+    const playerName = { Alex: 'Алексей', Vika: 'Вика', Batya: 'Батя' }[data.player];
+    showToast(`${playerName} использовал пропуск вопроса!`);
+    playSound('bonus');
+});
+
+socket.on('bonusUpdate', (data) => {
+    gameState.bonuses = data.bonuses;
+    updateScoresUI();
+});
+
+socket.on('bonusError', (msg) => {
+    showToast(msg);
 });
 
 closeModalBtn.addEventListener('click', () => {
     resultModal.classList.add('hidden');
 });
-
+closeHintBtn.addEventListener('click', () => {
+    hintModal.classList.add('hidden');
+});
 newGameBtn.addEventListener('click', () => {
     socket.emit('reset');
     gameoverModal.classList.add('hidden');
 });
-
 resetBtn.addEventListener('click', () => {
     if (confirm('Начать новую игру?')) {
         socket.emit('reset');
     }
 });
 
-// Обработка ответа игрока
 answerBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         const player = btn.dataset.player;
@@ -142,35 +229,26 @@ answerBtns.forEach(btn => {
             showToast('На этот вопрос уже ответили!');
             return;
         }
-        // Показываем всплывающее окно с вариантами? Нет, игрок должен выбрать вариант ответа.
-        // Мы сделаем проще: при клике на "Ответить" активируем выбор варианта.
-        // Но вариант уже может быть выбран. В нашем UI нет выделения варианта. 
-        // Упростим: после клика на кнопку "Ответить" игроку нужно кликнуть на один из вариантов.
-        // Для этого сохраним выбранного игрока и вариант.
-        if (!gameState.pendingPlayer) {
-            gameState.pendingPlayer = player;
-            showToast(`Игрок ${player}, выберите вариант ответа!`);
-        } else {
-            showToast(`Сейчас отвечает другой игрок`);
+        if (pendingPlayer) {
+            showToast(`Сейчас отвечает другой игрок!`);
+            return;
         }
+        pendingPlayer = player;
+        showToast(`Игрок ${player}, выберите вариант ответа!`);
     });
 });
 
-// Логика выбора варианта после нажатия "Ответить"
-optionsEl.addEventListener('click', (e) => {
-    const optionBtn = e.target.closest('.option-btn');
-    if (!optionBtn) return;
-    if (!gameState.pendingPlayer) {
-        showToast('Сначала нажмите кнопку "Ответить" под своим именем!');
-        return;
-    }
-    const player = gameState.pendingPlayer;
-    const answerIndex = parseInt(optionBtn.dataset.index);
-    socket.emit('answer', player, answerIndex);
-    gameState.pendingPlayer = null;
-    gameState.answered = true;
-    // Блокируем варианты
-    document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
+// Бонусные кнопки
+document.querySelectorAll('.bonus-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const player = btn.dataset.player;
+        const bonusType = btn.dataset.bonus;
+        if (gameState.answered || gameState.gameCompleted) {
+            showToast('Сейчас нельзя использовать бонус');
+            return;
+        }
+        socket.emit('useBonus', player, bonusType);
+    });
 });
 
 // Инициализация

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Империя знаний — викторина</title>
+    <title>Империя знаний — Соревновательная викторина</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -19,38 +19,51 @@
                 Империя знаний
                 <i class="fas fa-compass"></i>
             </h1>
-            <div class="level-indicator">Вопрос <span id="current-q">1</span>/<span id="total-q">20</span></div>
+            <div class="level-indicator">Вопрос <span id="current-q">1</span>/<span id="total-q">39</span></div>
+            <button id="sound-toggle" class="sound-btn"><i class="fas fa-volume-up"></i></button>
         </header>
 
-        <!-- Карта сокровищ (прогресс) -->
         <div class="map-progress">
             <div class="map-track" id="map-track"></div>
         </div>
 
-        <!-- Карточка вопроса -->
         <div class="question-card">
             <div class="question-text" id="question-text">Загрузка...</div>
             <div class="options" id="options"></div>
         </div>
 
-        <!-- Табло игроков -->
         <div class="scoreboard">
             <div class="player-card" data-player="Alex">
                 <i class="fas fa-user-astronaut"></i>
                 <span class="player-name">Алексей</span>
                 <span class="player-score" id="score-Alex">0</span>
+                <span class="player-coins" id="coins-Alex">💰 0</span>
+                <div class="bonus-buttons">
+                    <button class="bonus-btn ask-chat" data-player="Alex" data-bonus="askChat" disabled>💬 Спросить чат</button>
+                    <button class="bonus-btn skip" data-player="Alex" data-bonus="skipQuestion" disabled>⏭️ Пропустить</button>
+                </div>
                 <button class="answer-btn" data-player="Alex">Ответить</button>
             </div>
             <div class="player-card" data-player="Vika">
                 <i class="fas fa-user-ninja"></i>
                 <span class="player-name">Вика</span>
                 <span class="player-score" id="score-Vika">0</span>
+                <span class="player-coins" id="coins-Vika">💰 0</span>
+                <div class="bonus-buttons">
+                    <button class="bonus-btn ask-chat" data-player="Vika" data-bonus="askChat" disabled>💬 Спросить чат</button>
+                    <button class="bonus-btn skip" data-player="Vika" data-bonus="skipQuestion" disabled>⏭️ Пропустить</button>
+                </div>
                 <button class="answer-btn" data-player="Vika">Ответить</button>
             </div>
             <div class="player-card" data-player="Batya">
                 <i class="fas fa-user-tie"></i>
                 <span class="player-name">Батя</span>
                 <span class="player-score" id="score-Batya">0</span>
+                <span class="player-coins" id="coins-Batya">💰 0</span>
+                <div class="bonus-buttons">
+                    <button class="bonus-btn ask-chat" data-player="Batya" data-bonus="askChat" disabled>💬 Спросить чат</button>
+                    <button class="bonus-btn skip" data-player="Batya" data-bonus="skipQuestion" disabled>⏭️ Пропустить</button>
+                </div>
                 <button class="answer-btn" data-player="Batya">Ответить</button>
             </div>
         </div>
@@ -60,7 +73,6 @@
         </div>
     </div>
 
-    <!-- Модалка результата -->
     <div id="result-modal" class="modal hidden">
         <div class="modal-content">
             <h2 id="result-title"></h2>
@@ -69,7 +81,14 @@
         </div>
     </div>
 
-    <!-- Модалка окончания игры -->
+    <div id="hint-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>💡 Подсказка чата</h2>
+            <p id="hint-text"></p>
+            <button id="close-hint" class="btn-close">Понятно</button>
+        </div>
+    </div>
+
     <div id="gameover-modal" class="modal hidden">
         <div class="modal-content">
             <h2>🏆 Игра окончена</h2>
@@ -77,6 +96,11 @@
             <button id="new-game-btn" class="btn-neon">Новая игра</button>
         </div>
     </div>
+
+    <audio id="sound-correct" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_7c3c9c1c1c.mp3?filename=correct-6033.mp3" preload="auto"></audio>
+    <audio id="sound-wrong" src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_1c6b9b6c1c.mp3?filename=wrong-47985.mp3" preload="auto"></audio>
+    <audio id="sound-bonus" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_3f3f3f3f3f.mp3?filename=bonus-101191.mp3" preload="auto"></audio>
+    <audio id="sound-ambient" src="https://cdn.pixabay.com/download/audio/2022/06/24/audio_6f6f6f6f6f.mp3?filename=ambient-forest-112191.mp3" loop preload="auto"></audio>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
