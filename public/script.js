@@ -14,7 +14,6 @@ let gameState = {
 let currentQuestion = null;
 let totalQuestions = 39;
 let pendingPlayer = null;
-let initReceived = false;
 
 // DOM элементы
 const questionTextEl = document.getElementById('question-text');
@@ -54,11 +53,12 @@ const soundToggle = document.getElementById('sound-toggle');
 const flashOverlay = document.getElementById('flash-overlay');
 const leaderboardList = document.getElementById('leaderboard-list');
 
-// Звуки через Web Audio API
+// ========== Звуки через Web Audio ==========
 let audioCtx = null;
 let soundsEnabled = true;
 let bgOscillator = null;
 let bgGain = null;
+let bgInterval = null;
 
 function initAudio() {
     if (!audioCtx) {
@@ -66,10 +66,10 @@ function initAudio() {
     }
 }
 
-function playTone(frequency, duration, type = 'sine', volume = 0.3) {
+function playTone(frequency, duration, type = 'sine', volume = 0.3, delay = 0) {
     if (!soundsEnabled) return;
     if (!audioCtx) initAudio();
-    const now = audioCtx.currentTime;
+    const now = audioCtx.currentTime + delay;
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = type;
@@ -78,48 +78,71 @@ function playTone(frequency, duration, type = 'sine', volume = 0.3) {
     gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
     osc.connect(gain);
     gain.connect(audioCtx.destination);
-    osc.start();
+    osc.start(now);
     osc.stop(now + duration);
 }
 
-function playCorrect() { playTone(880, 0.3, 'sine', 0.4); playTone(1100, 0.4, 'sine', 0.3); }
-function playWrong() { playTone(440, 0.4, 'sawtooth', 0.3); playTone(330, 0.5, 'sawtooth', 0.3); }
-function playBonus() { playTone(1318, 0.2, 'sine', 0.2); playTone(1568, 0.2, 'sine', 0.2); playTone(1760, 0.3, 'sine', 0.2); }
-function playClick() { playTone(800, 0.05, 'triangle', 0.1); }
-function playScroll() { playTone(400, 0.1, 'sine', 0.1); playTone(300, 0.15, 'sine', 0.1); }
-function playTransition() { playTone(600, 0.2, 'sine', 0.15); playTone(500, 0.2, 'sine', 0.15); }
+function playCorrect() {
+    playTone(880, 0.2, 'sine', 0.4);
+    playTone(1100, 0.3, 'sine', 0.3);
+    playTone(1320, 0.4, 'sine', 0.2);
+}
+function playWrong() {
+    playTone(440, 0.3, 'sawtooth', 0.3);
+    playTone(330, 0.4, 'sawtooth', 0.3);
+}
+function playBonus() {
+    playTone(1318, 0.15, 'sine', 0.2);
+    playTone(1568, 0.15, 'sine', 0.2);
+    playTone(1760, 0.2, 'sine', 0.2);
+    playTone(2093, 0.3, 'sine', 0.2);
+}
+function playClick() {
+    playTone(800, 0.05, 'triangle', 0.1);
+}
+function playScroll() {
+    playTone(400, 0.1, 'sine', 0.1);
+    playTone(300, 0.15, 'sine', 0.1);
+}
+function playTransition() {
+    playTone(600, 0.2, 'sine', 0.15);
+    playTone(500, 0.2, 'sine', 0.15);
+}
 function startBackgroundMusic() {
     if (!soundsEnabled) return;
     if (!audioCtx) initAudio();
     if (bgOscillator) {
         bgOscillator.stop();
-        bgGain.disconnect();
+        if (bgInterval) clearInterval(bgInterval);
     }
     bgOscillator = audioCtx.createOscillator();
     bgGain = audioCtx.createGain();
     bgOscillator.type = 'sine';
     bgOscillator.frequency.value = 110;
-    bgGain.gain.value = 0.08;
+    bgGain.gain.value = 0.06;
     bgOscillator.connect(bgGain);
     bgGain.connect(audioCtx.destination);
     bgOscillator.start();
-    // Медленное изменение частоты для атмосферы
-    setInterval(() => {
+    bgInterval = setInterval(() => {
         if (bgOscillator && soundsEnabled) {
-            const freq = 100 + Math.sin(Date.now() * 0.001) * 10;
+            const freq = 100 + Math.sin(Date.now() * 0.0008) * 8;
             bgOscillator.frequency.value = freq;
         }
-    }, 2000);
+    }, 500);
 }
 function stopBackgroundMusic() {
     if (bgOscillator) {
         bgOscillator.stop();
         bgOscillator = null;
     }
+    if (bgInterval) {
+        clearInterval(bgInterval);
+        bgInterval = null;
+    }
 }
 soundToggle.addEventListener('click', () => {
     soundsEnabled = !soundsEnabled;
-    soundToggle.innerHTML = soundsEnabled ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+    soundToggle.innerHTML = soundsEnabled ? '<i class="fas fa-music"></i>' : '<i class="fas fa-volume-mute"></i>';
     if (soundsEnabled) {
         if (!audioCtx) initAudio();
         audioCtx.resume();
@@ -129,9 +152,60 @@ soundToggle.addEventListener('click', () => {
     }
 });
 
-// Инициализация карты-прогресса
+// ========== Частицы ==========
+const canvas = document.getElementById('particle-canvas');
+let ctx = canvas.getContext('2d');
+let particles = [];
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+class Particle {
+    constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 3 + 1;
+        this.speedX = (Math.random() - 0.5) * 0.5;
+        this.speedY = (Math.random() - 0.5) * 0.5 + 0.2;
+        this.color = `rgba(212, 175, 55, ${Math.random() * 0.5})`;
+    }
+    update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.y > canvas.height) this.y = 0;
+        if (this.x < 0) this.x = canvas.width;
+        if (this.x > canvas.width) this.x = 0;
+    }
+    draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+    }
+}
+function initParticles() {
+    particles = [];
+    for (let i = 0; i < 100; i++) {
+        particles.push(new Particle());
+    }
+}
+function animateParticles() {
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+        p.update();
+        p.draw();
+    });
+    requestAnimationFrame(animateParticles);
+}
+initParticles();
+animateParticles();
+
+// ========== Прогресс и UI ==========
 function initMapMarkers() {
-    if (!mapMarkers) return;
     mapMarkers.innerHTML = '';
     for (let i = 0; i < totalQuestions; i++) {
         const marker = document.createElement('div');
@@ -150,15 +224,13 @@ function updateMapMarkers() {
         if (idx === gameState.currentQuestion) marker.classList.add('active');
     });
     const progress = (gameState.currentQuestion / totalQuestions) * 100;
-    if (mapTrack) mapTrack.style.width = `${progress}%`;
+    mapTrack.style.width = `${progress}%`;
 }
-
-// Обновление UI
 function updateUI() {
     for (let p of gameState.players) {
-        if (scoreElements[p]) scoreElements[p].textContent = gameState.scores[p];
-        if (coinsElements[p]) coinsElements[p].textContent = `💰 ${gameState.coins[p].toLocaleString()}`;
-        if (streakElements[p]) streakElements[p].textContent = `🔥 ${gameState.streak[p]}`;
+        scoreElements[p].textContent = gameState.scores[p];
+        coinsElements[p].textContent = `💰 ${gameState.coins[p].toLocaleString()}`;
+        streakElements[p].textContent = `🔥 ${gameState.streak[p]}`;
         const askBtn = document.querySelector(`.bonus-btn.ask-chat[data-player="${p}"]`);
         const skipBtn = document.querySelector(`.bonus-btn.skip[data-player="${p}"]`);
         if (askBtn) askBtn.disabled = !gameState.bonuses[p].includes('askChat');
@@ -167,20 +239,17 @@ function updateUI() {
     updateLeaderboard();
 }
 function updateLeaderboard() {
-    if (!leaderboardList) return;
     const sorted = [...gameState.players].sort((a,b) => gameState.scores[b] - gameState.scores[a]);
     leaderboardList.innerHTML = sorted.map(p => {
         const name = { Alex: 'Алексей', Vika: 'Вика', Batya: 'Батя' }[p];
         return `<div class="leader-entry">${name}: ${gameState.scores[p]} очков (💰 ${gameState.coins[p].toLocaleString()})</div>`;
     }).join('');
 }
-
-// Анимация монет
 function startCoinRain() {
     const container = document.createElement('div');
     container.className = 'coin-rain';
     document.body.appendChild(container);
-    for (let i = 0; i < 60; i++) {
+    for (let i = 0; i < 70; i++) {
         const coin = document.createElement('div');
         coin.className = 'coin';
         coin.style.left = Math.random() * 100 + '%';
@@ -191,17 +260,13 @@ function startCoinRain() {
     setTimeout(() => container.remove(), 3000);
 }
 function flashRed() {
-    if (flashOverlay) {
-        flashOverlay.classList.add('active');
-        setTimeout(() => flashOverlay.classList.remove('active'), 500);
-    }
+    flashOverlay.classList.add('active');
+    setTimeout(() => flashOverlay.classList.remove('active'), 500);
 }
-
-// Отображение вопроса
 function renderQuestion(question) {
     if (!question) {
         console.error('Нет данных вопроса');
-        questionTextEl.textContent = 'Ошибка загрузки вопроса. Попробуйте обновить страницу.';
+        questionTextEl.textContent = 'Ошибка загрузки вопроса. Перезагрузите страницу.';
         return;
     }
     questionTextEl.textContent = question.text;
@@ -235,37 +300,21 @@ function renderQuestion(question) {
     }
     // Анимация свитка
     const card = document.getElementById('question-card');
-    if (card) {
-        card.classList.remove('scroll-animation');
-        void card.offsetWidth;
-        card.classList.add('scroll-animation');
-    }
+    card.style.animation = 'none';
+    card.offsetHeight;
+    card.style.animation = 'scrollReveal 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
     playScroll();
 }
 function showToast(message) {
     const toast = document.getElementById('toast');
-    if (!toast) return;
     toast.textContent = message;
     toast.classList.remove('hidden');
     setTimeout(() => toast.classList.add('hidden'), 3000);
 }
 
-// Сокеты с диагностикой
-socket.on('connect', () => {
-    console.log('Socket connected');
-    showToast('Подключение к серверу установлено');
-});
-socket.on('disconnect', () => {
-    console.log('Socket disconnected');
-    showToast('Потеряно соединение с сервером');
-});
+// ========== Сокеты ==========
 socket.on('init', (data) => {
     console.log('Init received', data);
-    if (!data || !data.state || !data.question) {
-        console.error('Invalid init data', data);
-        showToast('Ошибка загрузки данных игры');
-        return;
-    }
     gameState = data.state;
     currentQuestion = data.question;
     totalQSpan.textContent = totalQuestions;
@@ -277,7 +326,6 @@ socket.on('init', (data) => {
     gameState.answered = data.state.answered;
     gameState.gameCompleted = data.state.gameCompleted;
     pendingPlayer = null;
-    initReceived = true;
     if (soundsEnabled) {
         initAudio();
         audioCtx.resume();
@@ -285,8 +333,6 @@ socket.on('init', (data) => {
     }
 });
 socket.on('nextQuestion', (data) => {
-    console.log('Next question', data);
-    if (!data || !data.question) return;
     gameState.scores = data.scores;
     gameState.coins = data.coins;
     gameState.bonuses = data.bonuses;
@@ -395,14 +441,16 @@ document.querySelectorAll('.bonus-btn').forEach(btn => {
     });
 });
 
-// Инициализация UI и проверка, что init получен
+// Инициализация UI
 updateUI();
 initMapMarkers();
 
-// Fallback: если через 3 секунды не пришёл init, показать сообщение и перезапросить? 
-setTimeout(() => {
-    if (!initReceived) {
-        showToast('Не удалось загрузить данные. Проверьте соединение и перезагрузите страницу.');
-        console.warn('Init not received after 3 seconds');
+// Добавляем анимацию для карточки
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes scrollReveal {
+        0% { opacity: 0; transform: translateY(30px) rotateX(15deg); }
+        100% { opacity: 1; transform: translateY(0) rotateX(0); }
     }
-}, 3000);
+`;
+document.head.appendChild(style);
