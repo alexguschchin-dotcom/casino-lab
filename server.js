@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// 39 вопросов (такой же список)
+// 39 вопросов
 const questions = [
   { text: 'В какой стране находится знаменитое казино Монте-Карло?', options: ['Монако', 'Франция', 'Италия', 'Испания'], correct: 0 },
   { text: 'Какой слот считается самым популярным в мире?', options: ['Book of Dead', 'Starburst', 'Sweet Bonanza', 'Gates of Olympus'], correct: 1 },
@@ -54,6 +54,7 @@ const MAX_LEVEL = questions.length;
 const CORRECT_REWARD = 100000;
 const WRONG_PENALTY = 300000;
 const STREAK_BONUS_THRESHOLD = 3;
+const QUESTION_TIME = 90; // 90 секунд на вопрос
 
 let gameState = {
   currentQuestion: 0,
@@ -65,6 +66,8 @@ let gameState = {
   gameCompleted: false,
   players: ['Alex', 'Vika', 'Batya']
 };
+
+let questionTimers = new Map(); // таймеры для каждого вопроса
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -88,20 +91,67 @@ function nextQuestionOrGameOver(io) {
       scores: gameState.scores,
       coins: gameState.coins,
       bonuses: gameState.bonuses,
-      streak: gameState.streak
+      streak: gameState.streak,
+      currentQuestion: gameState.currentQuestion
     });
+    // Запускаем таймер для нового вопроса
+    startQuestionTimer(io);
   } else {
     gameState.gameCompleted = true;
     io.emit('gameOver', {
       scores: gameState.scores,
       coins: gameState.coins
     });
+    // Очищаем все таймеры
+    questionTimers.forEach(timer => clearInterval(timer));
+    questionTimers.clear();
   }
+}
+
+function startQuestionTimer(io) {
+  // Очищаем старый таймер
+  if (questionTimers.has('current')) {
+    clearInterval(questionTimers.get('current'));
+  }
+  
+  let timeLeft = QUESTION_TIME;
+  const timer = setInterval(() => {
+    if (gameState.answered || gameState.gameCompleted) {
+      clearInterval(timer);
+      questionTimers.delete('current');
+      return;
+    }
+    
+    timeLeft--;
+    io.emit('timerUpdate', { timeLeft });
+    
+    // Музыкальные оповещения
+    if (timeLeft === 60) {
+      io.emit('playMusic', 'warning');
+    } else if (timeLeft === 30) {
+      io.emit('playMusic', 'urgent');
+    } else if (timeLeft === 0) {
+      clearInterval(timer);
+      if (!gameState.answered && !gameState.gameCompleted) {
+        // Время вышло - никто не ответил
+        gameState.answered = true;
+        io.emit('timeout', {});
+        setTimeout(() => {
+          if (!gameState.gameCompleted) {
+            nextQuestionOrGameOver(io);
+          }
+        }, 2000);
+      }
+      questionTimers.delete('current');
+    }
+  }, 1000);
+  
+  questionTimers.set('current', timer);
 }
 
 io.on('connection', (socket) => {
   console.log('Участник подключён');
-  // Отправляем текущее состояние и вопрос
+  
   socket.emit('init', {
     state: {
       currentQuestion: gameState.currentQuestion,
@@ -114,9 +164,17 @@ io.on('connection', (socket) => {
     },
     question: questions[gameState.currentQuestion]
   });
+  
+  // Запускаем таймер если вопрос ещё не отвечен
+  if (!gameState.answered && !gameState.gameCompleted) {
+    startQuestionTimer(io);
+  }
 
   socket.on('answer', (player, answerIndex) => {
-    if (gameState.answered || gameState.gameCompleted) return;
+    if (gameState.answered || gameState.gameCompleted) {
+      socket.emit('error', 'На этот вопрос уже ответили');
+      return;
+    }
 
     const isCorrect = (answerIndex === questions[gameState.currentQuestion].correct);
     const currentQ = questions[gameState.currentQuestion];
@@ -135,6 +193,13 @@ io.on('connection', (socket) => {
     }
 
     gameState.answered = true;
+    
+    // Останавливаем таймер
+    if (questionTimers.has('current')) {
+      clearInterval(questionTimers.get('current'));
+      questionTimers.delete('current');
+    }
+    
     io.emit('result', {
       player,
       isCorrect,
@@ -143,12 +208,14 @@ io.on('connection', (socket) => {
       scores: gameState.scores,
       streak: gameState.streak[player]
     });
+    
+    io.emit('stopMusic', {});
 
     setTimeout(() => {
       if (!gameState.gameCompleted) {
         nextQuestionOrGameOver(io);
       }
-    }, 2000);
+    }, 2500);
   });
 
   socket.on('useBonus', (player, bonusType) => {
@@ -177,21 +244,6 @@ io.on('connection', (socket) => {
       removeBonus(player, 'askChat');
       io.emit('bonusUpdate', { bonuses: gameState.bonuses });
     }
-    else if (bonusType === 'skipQuestion') {
-      if (!gameState.answered) {
-        gameState.answered = true;
-        io.emit('skipBroadcast', { player });
-        setTimeout(() => {
-          if (!gameState.gameCompleted) {
-            nextQuestionOrGameOver(io);
-          }
-        }, 1500);
-        removeBonus(player, 'skipQuestion');
-        io.emit('bonusUpdate', { bonuses: gameState.bonuses });
-      } else {
-        socket.emit('bonusError', 'Вопрос уже завершён');
-      }
-    }
   });
 
   socket.on('reset', () => {
@@ -205,7 +257,12 @@ io.on('connection', (socket) => {
       gameCompleted: false,
       players: ['Alex', 'Vika', 'Batya']
     };
-    io.emit('init', {
+    
+    // Очищаем таймеры
+    questionTimers.forEach(timer => clearInterval(timer));
+    questionTimers.clear();
+    
+    io.emit('resetGame', {
       state: {
         currentQuestion: 0,
         scores: gameState.scores,
@@ -217,6 +274,8 @@ io.on('connection', (socket) => {
       },
       question: questions[0]
     });
+    
+    startQuestionTimer(io);
   });
 
   socket.on('disconnect', () => console.log('Участник отключён'));
