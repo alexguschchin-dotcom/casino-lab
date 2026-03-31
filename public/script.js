@@ -53,21 +53,25 @@ const soundToggle = document.getElementById('sound-toggle');
 const flashOverlay = document.getElementById('flash-overlay');
 const leaderboardList = document.getElementById('leaderboard-list');
 
-// ========== Звуки через Web Audio (улучшенная фоновая музыка) ==========
+// ========== Звуки через Web Audio (более приятная фоновая музыка) ==========
 let audioCtx = null;
 let soundsEnabled = true;
-let bgGain = null;
 let bgInterval = null;
-let currentMelodyIndex = 0;
+let currentNoteIndex = 0;
+// Простая, но приятная мелодия (отрывок из "В пещере горного короля" в упрощённом виде)
 const melody = [
-    { freq: 262, duration: 0.5 }, // C4
-    { freq: 294, duration: 0.5 }, // D4
-    { freq: 330, duration: 0.5 }, // E4
-    { freq: 349, duration: 0.5 }, // F4
-    { freq: 392, duration: 0.5 }, // G4
-    { freq: 440, duration: 0.5 }, // A4
-    { freq: 494, duration: 0.5 }, // B4
-    { freq: 523, duration: 1.0 }  // C5
+    { freq: 392, duration: 0.3 }, // G4
+    { freq: 392, duration: 0.3 },
+    { freq: 392, duration: 0.3 },
+    { freq: 349, duration: 0.3 }, // F4
+    { freq: 440, duration: 0.3 }, // A4
+    { freq: 440, duration: 0.3 },
+    { freq: 440, duration: 0.3 },
+    { freq: 392, duration: 0.3 }, // G4
+    { freq: 349, duration: 0.4 }, // F4
+    { freq: 330, duration: 0.4 }, // E4
+    { freq: 294, duration: 0.4 }, // D4
+    { freq: 262, duration: 0.6 }  // C4
 ];
 
 function initAudio() {
@@ -76,7 +80,7 @@ function initAudio() {
     }
 }
 
-function playTone(frequency, duration, type = 'sine', volume = 0.3, delay = 0) {
+function playTone(frequency, duration, type = 'sine', volume = 0.2, delay = 0) {
     if (!soundsEnabled) return;
     if (!audioCtx) initAudio();
     const now = audioCtx.currentTime + delay;
@@ -119,21 +123,21 @@ function playTransition() {
     playTone(500, 0.2, 'sine', 0.15);
 }
 
-// Фоновая мелодия (эпическая)
-function playNextNote() {
+// Зацикленная фоновая мелодия
+function playNextMelodyNote() {
     if (!soundsEnabled || !audioCtx) return;
-    const note = melody[currentMelodyIndex % melody.length];
-    playTone(note.freq, note.duration, 'sine', 0.08);
-    currentMelodyIndex++;
+    const note = melody[currentNoteIndex % melody.length];
+    playTone(note.freq, note.duration, 'sine', 0.12);
+    currentNoteIndex++;
     if (bgInterval) clearTimeout(bgInterval);
-    bgInterval = setTimeout(playNextNote, note.duration * 1000 + 200);
+    bgInterval = setTimeout(playNextMelodyNote, note.duration * 1000 + 100);
 }
 function startBackgroundMusic() {
     if (!soundsEnabled) return;
     if (!audioCtx) initAudio();
     if (bgInterval) clearTimeout(bgInterval);
-    currentMelodyIndex = 0;
-    playNextNote();
+    currentNoteIndex = 0;
+    playNextMelodyNote();
 }
 function stopBackgroundMusic() {
     if (bgInterval) {
@@ -229,9 +233,9 @@ function updateMapMarkers() {
 }
 function updateUI() {
     for (let p of gameState.players) {
-        scoreElements[p].textContent = gameState.scores[p];
-        coinsElements[p].textContent = `💰 ${gameState.coins[p].toLocaleString()}`;
-        streakElements[p].textContent = `🔥 ${gameState.streak[p]}`;
+        if (scoreElements[p]) scoreElements[p].textContent = gameState.scores[p];
+        if (coinsElements[p]) coinsElements[p].textContent = `💰 ${gameState.coins[p].toLocaleString()}`;
+        if (streakElements[p]) streakElements[p].textContent = `🔥 ${gameState.streak[p]}`;
         const askBtn = document.querySelector(`.bonus-btn.ask-chat[data-player="${p}"]`);
         const skipBtn = document.querySelector(`.bonus-btn.skip[data-player="${p}"]`);
         if (askBtn) askBtn.disabled = !gameState.bonuses[p].includes('askChat');
@@ -241,10 +245,12 @@ function updateUI() {
 }
 function updateLeaderboard() {
     const sorted = [...gameState.players].sort((a,b) => gameState.scores[b] - gameState.scores[a]);
-    leaderboardList.innerHTML = sorted.map(p => {
-        const name = { Alex: 'Алексей', Vika: 'Вика', Batya: 'Батя' }[p];
-        return `<div class="leader-entry">${name}: ${gameState.scores[p]} очков (💰 ${gameState.coins[p].toLocaleString()})</div>`;
-    }).join('');
+    if (leaderboardList) {
+        leaderboardList.innerHTML = sorted.map(p => {
+            const name = { Alex: 'Алексей', Vika: 'Вика', Batya: 'Батя' }[p];
+            return `<div class="leader-entry">${name}: ${gameState.scores[p]} очков (💰 ${gameState.coins[p].toLocaleString()})</div>`;
+        }).join('');
+    }
 }
 function startCoinRain() {
     const container = document.createElement('div');
@@ -261,17 +267,19 @@ function startCoinRain() {
     setTimeout(() => container.remove(), 3000);
 }
 function flashRed() {
-    flashOverlay.classList.add('active');
-    setTimeout(() => flashOverlay.classList.remove('active'), 500);
+    if (flashOverlay) {
+        flashOverlay.classList.add('active');
+        setTimeout(() => flashOverlay.classList.remove('active'), 500);
+    }
 }
 function renderQuestion(question) {
     if (!question) {
         console.error('Нет данных вопроса');
-        questionTextEl.textContent = 'Ошибка загрузки вопроса. Перезагрузите страницу.';
+        if (questionTextEl) questionTextEl.textContent = 'Ошибка загрузки вопроса. Перезагрузите страницу.';
         return;
     }
-    questionTextEl.textContent = question.text;
-    optionsEl.innerHTML = '';
+    if (questionTextEl) questionTextEl.textContent = question.text;
+    if (optionsEl) optionsEl.innerHTML = '';
     question.options.forEach((opt, idx) => {
         const btn = document.createElement('button');
         btn.className = 'option-btn';
@@ -292,39 +300,48 @@ function renderQuestion(question) {
             gameState.answered = true;
             document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
         });
-        optionsEl.appendChild(btn);
+        if (optionsEl) optionsEl.appendChild(btn);
     });
     if (!gameState.answered && !gameState.gameCompleted) {
         document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = false);
     } else {
         document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
     }
-    // Анимация свитка
     const card = document.getElementById('question-card');
-    card.style.animation = 'none';
-    card.offsetHeight;
-    card.style.animation = 'scrollReveal 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
+    if (card) {
+        card.style.animation = 'none';
+        card.offsetHeight;
+        card.style.animation = 'scrollReveal 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
+    }
     playScroll();
 }
 function showToast(message) {
     const toast = document.getElementById('toast');
+    if (!toast) return;
     toast.textContent = message;
     toast.classList.remove('hidden');
     setTimeout(() => toast.classList.add('hidden'), 3000);
 }
 
-// ========== Сокеты ==========
+// ========== Сокеты с диагностикой ==========
+socket.on('connect', () => {
+    console.log('✅ Подключено к серверу');
+});
+socket.on('connect_error', (err) => {
+    console.error('❌ Ошибка подключения:', err);
+    if (questionTextEl) questionTextEl.textContent = 'Не удалось подключиться к серверу. Проверьте, запущен ли сервер.';
+});
 socket.on('init', (data) => {
-    console.log('Init received', data);
+    console.log('📦 Init received', data);
     if (!data || !data.state || !data.question) {
-        console.error('Ошибка: неполные данные инициализации');
-        questionTextEl.textContent = 'Ошибка подключения к серверу. Обновите страницу.';
+        console.error('❌ Неполные данные инициализации', data);
+        if (questionTextEl) questionTextEl.textContent = 'Ошибка данных от сервера. Обновите страницу.';
         return;
     }
     gameState = data.state;
     currentQuestion = data.question;
-    totalQSpan.textContent = totalQuestions;
-    currentQSpan.textContent = gameState.currentQuestion + 1;
+    if (totalQSpan) totalQSpan.textContent = totalQuestions;
+    if (currentQSpan) currentQSpan.textContent = gameState.currentQuestion + 1;
     updateUI();
     initMapMarkers();
     updateMapMarkers();
@@ -347,7 +364,7 @@ socket.on('nextQuestion', (data) => {
     gameState.answered = false;
     gameState.gameCompleted = false;
     currentQuestion = data.question;
-    currentQSpan.textContent = gameState.currentQuestion + 1;
+    if (currentQSpan) currentQSpan.textContent = gameState.currentQuestion + 1;
     updateUI();
     updateMapMarkers();
     renderQuestion(currentQuestion);
@@ -359,9 +376,9 @@ socket.on('result', (data) => {
     const message = data.isCorrect
         ? `${playerName} ответил(а) верно! +100 000 монет.`
         : `${playerName} ошибся(лась). Штраф 300 000 монет. Правильный ответ: ${data.correctAnswer}`;
-    resultTitle.textContent = data.isCorrect ? '✅ Верно!' : '❌ Неверно';
-    resultMessage.textContent = message;
-    resultModal.classList.remove('hidden');
+    if (resultTitle) resultTitle.textContent = data.isCorrect ? '✅ Верно!' : '❌ Неверно';
+    if (resultMessage) resultMessage.textContent = message;
+    if (resultModal) resultModal.classList.remove('hidden');
     if (data.isCorrect) {
         playCorrect();
         startCoinRain();
@@ -376,19 +393,19 @@ socket.on('result', (data) => {
 });
 socket.on('gameOver', (data) => {
     gameState.gameCompleted = true;
-    finalScoresDiv.innerHTML = '';
+    if (finalScoresDiv) finalScoresDiv.innerHTML = '';
     const sorted = Object.entries(data.scores).sort((a,b) => b[1] - a[1]);
     sorted.forEach(([player, score]) => {
         const name = { Alex: 'Алексей', Vika: 'Вика', Batya: 'Батя' }[player];
         const coins = data.coins[player];
-        finalScoresDiv.innerHTML += `<p>${name}: ${score} очков (💰 ${coins.toLocaleString()} монет)</p>`;
+        if (finalScoresDiv) finalScoresDiv.innerHTML += `<p>${name}: ${score} очков (💰 ${coins.toLocaleString()} монет)</p>`;
     });
-    gameoverModal.classList.remove('hidden');
+    if (gameoverModal) gameoverModal.classList.remove('hidden');
     stopBackgroundMusic();
 });
 socket.on('chatHint', (data) => {
-    hintText.textContent = `📢 Чат считает, что правильный ответ: "${data.hint}"`;
-    hintModal.classList.remove('hidden');
+    if (hintText) hintText.textContent = `📢 Чат считает, что правильный ответ: "${data.hint}"`;
+    if (hintModal) hintModal.classList.remove('hidden');
     playBonus();
 });
 socket.on('skipBroadcast', (data) => {
@@ -405,22 +422,22 @@ socket.on('bonusError', (msg) => {
 });
 
 // Обработчики модалок и кнопок
-closeModalBtn.addEventListener('click', () => {
-    resultModal.classList.add('hidden');
+if (closeModalBtn) closeModalBtn.addEventListener('click', () => {
+    if (resultModal) resultModal.classList.add('hidden');
 });
-closeHintBtn.addEventListener('click', () => {
-    hintModal.classList.add('hidden');
+if (closeHintBtn) closeHintBtn.addEventListener('click', () => {
+    if (hintModal) hintModal.classList.add('hidden');
 });
-newGameBtn.addEventListener('click', () => {
+if (newGameBtn) newGameBtn.addEventListener('click', () => {
     socket.emit('reset');
-    gameoverModal.classList.add('hidden');
+    if (gameoverModal) gameoverModal.classList.add('hidden');
 });
-resetBtn.addEventListener('click', () => {
+if (resetBtn) resetBtn.addEventListener('click', () => {
     if (confirm('Начать новую игру?')) {
         socket.emit('reset');
     }
 });
-answerBtns.forEach(btn => {
+if (answerBtns) answerBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         const player = btn.dataset.player;
         if (gameState.answered || gameState.gameCompleted) {
@@ -433,7 +450,6 @@ answerBtns.forEach(btn => {
         }
         pendingPlayer = player;
         showToast(`Игрок ${player}, выберите вариант ответа!`);
-        // Принудительно возобновляем аудио контекст при первом клике
         if (audioCtx && audioCtx.state === 'suspended') {
             audioCtx.resume().then(() => {
                 if (soundsEnabled && !bgInterval) startBackgroundMusic();
@@ -441,7 +457,7 @@ answerBtns.forEach(btn => {
         }
     });
 });
-document.querySelectorAll('.bonus-btn').forEach(btn => {
+if (document.querySelectorAll('.bonus-btn')) document.querySelectorAll('.bonus-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         const player = btn.dataset.player;
         const bonusType = btn.dataset.bonus;
