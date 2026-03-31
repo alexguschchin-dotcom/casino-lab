@@ -1,5 +1,50 @@
 const socket = io();
 
+// ========== ВОПРОСЫ (полная копия из server.js) ==========
+const questions = [
+  { text: 'В какой стране находится знаменитое казино Монте-Карло?', options: ['Монако', 'Франция', 'Италия', 'Испания'], correct: 0 },
+  { text: 'Какой слот считается самым популярным в мире?', options: ['Book of Dead', 'Starburst', 'Sweet Bonanza', 'Gates of Olympus'], correct: 1 },
+  { text: 'Кто написал роман «Игрок»?', options: ['Толстой', 'Достоевский', 'Чехов', 'Гоголь'], correct: 1 },
+  { text: 'Что такое RTP в казино?', options: ['Return to Player', 'Real Time Play', 'Random Table Payout', 'Реальный шанс выигрыша'], correct: 0 },
+  { text: 'Какой город называют «мировой столицей азартных игр»?', options: ['Макао', 'Лас-Вегас', 'Атлантик-Сити', 'Монте-Карло'], correct: 1 },
+  { text: 'В каком году было открыто первое казино в Лас-Вегасе?', options: ['1905', '1931', '1941', '1955'], correct: 2 },
+  { text: 'Какой бонус в слотах активируется выпадением 3+ скаттеров?', options: ['Фриспины', 'Множитель', 'Джекпот', 'Респин'], correct: 0 },
+  { text: 'Сколько чисел в европейской рулетке?', options: ['36', '37', '38', '39'], correct: 1 },
+  { text: 'Какой фильм о казино считается классикой?', options: ['Казино', 'Одиннадцать друзей Оушена', 'С широко закрытыми глазами', 'Игры разума'], correct: 0 },
+  { text: 'Что означает термин «all-in»?', options: ['Ставка на всё', 'Проигрыш', 'Выигрыш', 'Ничья'], correct: 0 },
+  { text: 'Какая игра имеет наибольшее преимущество казино?', options: ['Блэкджек', 'Кено', 'Рулетка', 'Слоты'], correct: 1 },
+  { text: 'Кто придумал игру «блэкджек»?', options: ['Французы', 'Американцы', 'Итальянцы', 'Испанцы'], correct: 0 },
+  { text: 'Как называется крупная ставка на одного игрока в покере?', options: ['Анте', 'Блайнд', 'Рейз', 'Колл'], correct: 2 },
+  { text: 'В каком городе находится самое большое казино в мире?', options: ['Макао', 'Лас-Вегас', 'Сингапур', 'Мельбурн'], correct: 0 },
+  { text: 'Какой слот от Pragmatic Play имеет функцию «Ante Bet»?', options: ['Sweet Bonanza', 'Gates of Olympus', 'The Dog House', 'Big Bass Bonanza'], correct: 1 },
+  { text: 'Сколько очков в блэкджеке даёт туз?', options: ['1 или 11', '10', '11', '1'], correct: 0 },
+  { text: 'Как называется «зеркальный» режим в онлайн-казино?', options: ['Демо', 'Live', 'Бонус', 'Турнир'], correct: 0 },
+  { text: 'Какая ставка в рулетке самая рискованная?', options: ['На одно число', 'На красное', 'На чёрное', 'На чётное'], correct: 0 },
+  { text: 'Кто из этих писателей был азартным игроком?', options: ['Достоевский', 'Пушкин', 'Лермонтов', 'Тургенев'], correct: 0 },
+  { text: 'Какой символ в слотах заменяет другие?', options: ['Wild', 'Scatter', 'Bonus', 'Multiplier'], correct: 0 },
+  { text: 'Какая река является самой длинной в мире?', options: ['Амазонка', 'Нил', 'Янцзы', 'Миссисипи'], correct: 1 },
+  { text: 'Кто открыл Америку?', options: ['Колумб', 'Магеллан', 'Васко да Гама', 'Кук'], correct: 0 },
+  { text: 'В каком году произошла Октябрьская революция?', options: ['1917', '1905', '1918', '1921'], correct: 0 },
+  { text: 'Как называется самая высокая гора мира?', options: ['К2', 'Эверест', 'Канченджанга', 'Лхоцце'], correct: 1 },
+  { text: 'Кто написал «Войну и мир»?', options: ['Достоевский', 'Толстой', 'Чехов', 'Пушкин'], correct: 1 },
+  { text: 'Столица Австралии?', options: ['Сидней', 'Мельбурн', 'Канберра', 'Перт'], correct: 2 },
+  { text: 'Кто изобрёл радио?', options: ['Попов', 'Маркони', 'Тесла', 'Эдисон'], correct: 0 },
+  { text: 'Какой химический элемент обозначается символом O?', options: ['Осмий', 'Кислород', 'Олово', 'Золото'], correct: 1 },
+  { text: 'Самый большой океан на Земле?', options: ['Атлантический', 'Индийский', 'Северный Ледовитый', 'Тихий'], correct: 3 },
+  { text: 'Кто был первым человеком в космосе?', options: ['Гагарин', 'Титов', 'Армстронг', 'Леонов'], correct: 0 },
+  { text: 'В какой стране изобрели бумагу?', options: ['Египет', 'Китай', 'Индия', 'Греция'], correct: 1 },
+  { text: 'Как звали древнегреческого бога морей?', options: ['Зевс', 'Аполлон', 'Посейдон', 'Арес'], correct: 2 },
+  { text: 'Сколько цветов в радуге?', options: ['6', '7', '8', '5'], correct: 1 },
+  { text: 'Какой материк самый маленький?', options: ['Австралия', 'Антарктида', 'Европа', 'Южная Америка'], correct: 0 },
+  { text: 'Кто написал «Ромео и Джульетта»?', options: ['Диккенс', 'Шекспир', 'Гюго', 'Пушкин'], correct: 1 },
+  { text: 'Столица Японии?', options: ['Пекин', 'Сеул', 'Токио', 'Осака'], correct: 2 },
+  { text: 'Как называется национальный инструмент шотландцев?', options: ['Арфа', 'Волынка', 'Гитара', 'Скрипка'], correct: 1 },
+  { text: 'Какое животное является символом Австралии?', options: ['Кенгуру', 'Коала', 'Утконос', 'Ехидна'], correct: 0 },
+  { text: 'Кто написал картину «Мона Лиза»?', options: ['Ван Гог', 'Пикассо', 'Леонардо да Винчи', 'Рафаэль'], correct: 2 }
+];
+
+const totalQuestions = questions.length;
+
 let gameState = {
     currentQuestion: 0,
     scores: { Alex: 0, Vika: 0, Batya: 0 },
@@ -11,9 +56,8 @@ let gameState = {
     players: ['Alex', 'Vika', 'Batya']
 };
 
-let currentQuestion = null;
-let totalQuestions = 39;
 let pendingPlayer = null;
+let isWaitingForNext = false; // блокировка кликов на время перехода
 
 // DOM элементы
 const questionTextEl = document.getElementById('question-text');
@@ -53,26 +97,9 @@ const soundToggle = document.getElementById('sound-toggle');
 const flashOverlay = document.getElementById('flash-overlay');
 const leaderboardList = document.getElementById('leaderboard-list');
 
-// ========== Звуки через Web Audio (более приятная фоновая музыка) ==========
+// ========== Звуки через Web Audio (короткие эффекты) ==========
 let audioCtx = null;
 let soundsEnabled = true;
-let bgInterval = null;
-let currentNoteIndex = 0;
-// Простая, но приятная мелодия (отрывок из "В пещере горного короля" в упрощённом виде)
-const melody = [
-    { freq: 392, duration: 0.3 }, // G4
-    { freq: 392, duration: 0.3 },
-    { freq: 392, duration: 0.3 },
-    { freq: 349, duration: 0.3 }, // F4
-    { freq: 440, duration: 0.3 }, // A4
-    { freq: 440, duration: 0.3 },
-    { freq: 440, duration: 0.3 },
-    { freq: 392, duration: 0.3 }, // G4
-    { freq: 349, duration: 0.4 }, // F4
-    { freq: 330, duration: 0.4 }, // E4
-    { freq: 294, duration: 0.4 }, // D4
-    { freq: 262, duration: 0.6 }  // C4
-];
 
 function initAudio() {
     if (!audioCtx) {
@@ -80,10 +107,10 @@ function initAudio() {
     }
 }
 
-function playTone(frequency, duration, type = 'sine', volume = 0.2, delay = 0) {
+function playTone(frequency, duration, type = 'sine', volume = 0.3) {
     if (!soundsEnabled) return;
     if (!audioCtx) initAudio();
-    const now = audioCtx.currentTime + delay;
+    const now = audioCtx.currentTime;
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = type;
@@ -92,7 +119,7 @@ function playTone(frequency, duration, type = 'sine', volume = 0.2, delay = 0) {
     gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
     osc.connect(gain);
     gain.connect(audioCtx.destination);
-    osc.start(now);
+    osc.start();
     osc.stop(now + duration);
 }
 
@@ -109,7 +136,6 @@ function playBonus() {
     playTone(1318, 0.15, 'sine', 0.2);
     playTone(1568, 0.15, 'sine', 0.2);
     playTone(1760, 0.2, 'sine', 0.2);
-    playTone(2093, 0.3, 'sine', 0.2);
 }
 function playClick() {
     playTone(800, 0.05, 'triangle', 0.1);
@@ -123,41 +149,23 @@ function playTransition() {
     playTone(500, 0.2, 'sine', 0.15);
 }
 
-// Зацикленная фоновая мелодия
-function playNextMelodyNote() {
-    if (!soundsEnabled || !audioCtx) return;
-    const note = melody[currentNoteIndex % melody.length];
-    playTone(note.freq, note.duration, 'sine', 0.12);
-    currentNoteIndex++;
-    if (bgInterval) clearTimeout(bgInterval);
-    bgInterval = setTimeout(playNextMelodyNote, note.duration * 1000 + 100);
-}
-function startBackgroundMusic() {
-    if (!soundsEnabled) return;
-    if (!audioCtx) initAudio();
-    if (bgInterval) clearTimeout(bgInterval);
-    currentNoteIndex = 0;
-    playNextMelodyNote();
-}
-function stopBackgroundMusic() {
-    if (bgInterval) {
-        clearTimeout(bgInterval);
-        bgInterval = null;
-    }
-}
+// Фоновая музыка (из элемента audio)
+const bgMusic = document.getElementById('bg-music');
+bgMusic.volume = 0.3;
+bgMusic.loop = true;
+
 soundToggle.addEventListener('click', () => {
     soundsEnabled = !soundsEnabled;
     soundToggle.innerHTML = soundsEnabled ? '<i class="fas fa-music"></i>' : '<i class="fas fa-volume-mute"></i>';
     if (soundsEnabled) {
-        if (!audioCtx) initAudio();
-        audioCtx.resume();
-        startBackgroundMusic();
+        bgMusic.play().catch(e => console.log('Autoplay blocked'));
+        if (audioCtx) audioCtx.resume();
     } else {
-        stopBackgroundMusic();
+        bgMusic.pause();
     }
 });
 
-// ========== Частицы ==========
+// ========== Частицы (упрощённые) ==========
 const canvas = document.getElementById('particle-canvas');
 let ctx = canvas.getContext('2d');
 let particles = [];
@@ -172,17 +180,13 @@ class Particle {
     constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 3 + 1;
-        this.speedX = (Math.random() - 0.5) * 0.5;
-        this.speedY = (Math.random() - 0.5) * 0.5 + 0.2;
-        this.color = `rgba(212, 175, 55, ${Math.random() * 0.5})`;
+        this.size = Math.random() * 2 + 1;
+        this.speedY = Math.random() * 0.5 + 0.1;
+        this.color = `rgba(212, 175, 55, ${Math.random() * 0.4})`;
     }
     update() {
-        this.x += this.speedX;
         this.y += this.speedY;
         if (this.y > canvas.height) this.y = 0;
-        if (this.x < 0) this.x = canvas.width;
-        if (this.x > canvas.width) this.x = 0;
     }
     draw() {
         ctx.beginPath();
@@ -193,17 +197,12 @@ class Particle {
 }
 function initParticles() {
     particles = [];
-    for (let i = 0; i < 100; i++) {
-        particles.push(new Particle());
-    }
+    for (let i = 0; i < 80; i++) particles.push(new Particle());
 }
 function animateParticles() {
     if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    particles.forEach(p => {
-        p.update();
-        p.draw();
-    });
+    particles.forEach(p => { p.update(); p.draw(); });
     requestAnimationFrame(animateParticles);
 }
 initParticles();
@@ -233,9 +232,9 @@ function updateMapMarkers() {
 }
 function updateUI() {
     for (let p of gameState.players) {
-        if (scoreElements[p]) scoreElements[p].textContent = gameState.scores[p];
-        if (coinsElements[p]) coinsElements[p].textContent = `💰 ${gameState.coins[p].toLocaleString()}`;
-        if (streakElements[p]) streakElements[p].textContent = `🔥 ${gameState.streak[p]}`;
+        scoreElements[p].textContent = gameState.scores[p];
+        coinsElements[p].textContent = `💰 ${gameState.coins[p].toLocaleString()}`;
+        streakElements[p].textContent = `🔥 ${gameState.streak[p]}`;
         const askBtn = document.querySelector(`.bonus-btn.ask-chat[data-player="${p}"]`);
         const skipBtn = document.querySelector(`.bonus-btn.skip[data-player="${p}"]`);
         if (askBtn) askBtn.disabled = !gameState.bonuses[p].includes('askChat');
@@ -245,49 +244,44 @@ function updateUI() {
 }
 function updateLeaderboard() {
     const sorted = [...gameState.players].sort((a,b) => gameState.scores[b] - gameState.scores[a]);
-    if (leaderboardList) {
-        leaderboardList.innerHTML = sorted.map(p => {
-            const name = { Alex: 'Алексей', Vika: 'Вика', Batya: 'Батя' }[p];
-            return `<div class="leader-entry">${name}: ${gameState.scores[p]} очков (💰 ${gameState.coins[p].toLocaleString()})</div>`;
-        }).join('');
-    }
+    leaderboardList.innerHTML = sorted.map(p => {
+        const name = { Alex: 'Алексей', Vika: 'Вика', Batya: 'Батя' }[p];
+        return `<div class="leader-entry">${name}: ${gameState.scores[p]} очков (💰 ${gameState.coins[p].toLocaleString()})</div>`;
+    }).join('');
 }
 function startCoinRain() {
     const container = document.createElement('div');
     container.className = 'coin-rain';
     document.body.appendChild(container);
-    for (let i = 0; i < 70; i++) {
+    for (let i = 0; i < 60; i++) {
         const coin = document.createElement('div');
         coin.className = 'coin';
         coin.style.left = Math.random() * 100 + '%';
-        coin.style.animationDuration = 1 + Math.random() * 2.5 + 's';
+        coin.style.animationDuration = 1 + Math.random() * 2 + 's';
         coin.style.animationDelay = Math.random() * 0.8 + 's';
         container.appendChild(coin);
     }
     setTimeout(() => container.remove(), 3000);
 }
 function flashRed() {
-    if (flashOverlay) {
-        flashOverlay.classList.add('active');
-        setTimeout(() => flashOverlay.classList.remove('active'), 500);
-    }
+    flashOverlay.classList.add('active');
+    setTimeout(() => flashOverlay.classList.remove('active'), 500);
 }
-function renderQuestion(question) {
+function renderQuestion(question, questionIndex) {
     if (!question) {
-        console.error('Нет данных вопроса');
-        if (questionTextEl) questionTextEl.textContent = 'Ошибка загрузки вопроса. Перезагрузите страницу.';
+        questionTextEl.textContent = 'Ошибка загрузки вопроса';
         return;
     }
-    if (questionTextEl) questionTextEl.textContent = question.text;
-    if (optionsEl) optionsEl.innerHTML = '';
+    questionTextEl.textContent = question.text;
+    optionsEl.innerHTML = '';
     question.options.forEach((opt, idx) => {
         const btn = document.createElement('button');
         btn.className = 'option-btn';
         btn.textContent = opt;
         btn.dataset.index = idx;
         btn.addEventListener('click', () => {
-            if (gameState.answered || gameState.gameCompleted) {
-                showToast('На этот вопрос уже ответили!');
+            if (isWaitingForNext || gameState.answered || gameState.gameCompleted) {
+                showToast('На этот вопрос уже ответили или идёт загрузка!');
                 return;
             }
             if (!pendingPlayer) {
@@ -298,77 +292,76 @@ function renderQuestion(question) {
             socket.emit('answer', pendingPlayer, idx);
             pendingPlayer = null;
             gameState.answered = true;
+            isWaitingForNext = true;
             document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
         });
-        if (optionsEl) optionsEl.appendChild(btn);
+        optionsEl.appendChild(btn);
     });
-    if (!gameState.answered && !gameState.gameCompleted) {
+    if (!gameState.answered && !gameState.gameCompleted && !isWaitingForNext) {
         document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = false);
     } else {
         document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
     }
+    // Анимация свитка
     const card = document.getElementById('question-card');
-    if (card) {
-        card.style.animation = 'none';
-        card.offsetHeight;
-        card.style.animation = 'scrollReveal 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
-    }
+    card.style.animation = 'none';
+    card.offsetHeight;
+    card.style.animation = 'scrollReveal 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
     playScroll();
 }
 function showToast(message) {
     const toast = document.getElementById('toast');
-    if (!toast) return;
     toast.textContent = message;
     toast.classList.remove('hidden');
     setTimeout(() => toast.classList.add('hidden'), 3000);
 }
 
-// ========== Сокеты с диагностикой ==========
-socket.on('connect', () => {
-    console.log('✅ Подключено к серверу');
-});
-socket.on('connect_error', (err) => {
-    console.error('❌ Ошибка подключения:', err);
-    if (questionTextEl) questionTextEl.textContent = 'Не удалось подключиться к серверу. Проверьте, запущен ли сервер.';
-});
-socket.on('init', (data) => {
-    console.log('📦 Init received', data);
-    if (!data || !data.state || !data.question) {
-        console.error('❌ Неполные данные инициализации', data);
-        if (questionTextEl) questionTextEl.textContent = 'Ошибка данных от сервера. Обновите страницу.';
-        return;
-    }
-    gameState = data.state;
-    currentQuestion = data.question;
-    if (totalQSpan) totalQSpan.textContent = totalQuestions;
-    if (currentQSpan) currentQSpan.textContent = gameState.currentQuestion + 1;
+// ========== Инициализация: показываем первый вопрос ==========
+function initGameFromLocal() {
+    totalQSpan.textContent = totalQuestions;
+    currentQSpan.textContent = gameState.currentQuestion + 1;
+    renderQuestion(questions[gameState.currentQuestion], gameState.currentQuestion);
     updateUI();
     initMapMarkers();
     updateMapMarkers();
-    renderQuestion(currentQuestion);
-    gameState.answered = data.state.answered;
-    gameState.gameCompleted = data.state.gameCompleted;
-    pendingPlayer = null;
+}
+initGameFromLocal();
+
+// ========== Сокеты ==========
+socket.on('init', (data) => {
+    // Принимаем данные с сервера для синхронизации счёта, монет, бонусов
+    if (data && data.state) {
+        gameState.scores = data.state.scores;
+        gameState.coins = data.state.coins;
+        gameState.bonuses = data.state.bonuses;
+        gameState.streak = data.state.streak;
+        gameState.currentQuestion = data.state.currentQuestion;
+        gameState.answered = data.state.answered;
+        gameState.gameCompleted = data.state.gameCompleted;
+        currentQSpan.textContent = gameState.currentQuestion + 1;
+        renderQuestion(questions[gameState.currentQuestion], gameState.currentQuestion);
+        updateUI();
+        updateMapMarkers();
+    }
     if (soundsEnabled) {
-        initAudio();
-        audioCtx.resume().catch(e => console.log('AudioContext resume failed', e));
-        startBackgroundMusic();
+        bgMusic.play().catch(e => console.log('Autoplay blocked, click anywhere to start music'));
+        if (audioCtx) audioCtx.resume();
     }
 });
 socket.on('nextQuestion', (data) => {
+    // Сервер подтвердил переход к следующему вопросу
     gameState.scores = data.scores;
     gameState.coins = data.coins;
     gameState.bonuses = data.bonuses;
     gameState.streak = data.streak;
     gameState.currentQuestion++;
     gameState.answered = false;
+    isWaitingForNext = false;
     gameState.gameCompleted = false;
-    currentQuestion = data.question;
-    if (currentQSpan) currentQSpan.textContent = gameState.currentQuestion + 1;
+    currentQSpan.textContent = gameState.currentQuestion + 1;
+    renderQuestion(questions[gameState.currentQuestion], gameState.currentQuestion);
     updateUI();
     updateMapMarkers();
-    renderQuestion(currentQuestion);
-    pendingPlayer = null;
     playTransition();
 });
 socket.on('result', (data) => {
@@ -376,9 +369,9 @@ socket.on('result', (data) => {
     const message = data.isCorrect
         ? `${playerName} ответил(а) верно! +100 000 монет.`
         : `${playerName} ошибся(лась). Штраф 300 000 монет. Правильный ответ: ${data.correctAnswer}`;
-    if (resultTitle) resultTitle.textContent = data.isCorrect ? '✅ Верно!' : '❌ Неверно';
-    if (resultMessage) resultMessage.textContent = message;
-    if (resultModal) resultModal.classList.remove('hidden');
+    resultTitle.textContent = data.isCorrect ? '✅ Верно!' : '❌ Неверно';
+    resultMessage.textContent = message;
+    resultModal.classList.remove('hidden');
     if (data.isCorrect) {
         playCorrect();
         startCoinRain();
@@ -390,22 +383,26 @@ socket.on('result', (data) => {
     gameState.coins[data.player] = data.coins;
     gameState.streak[data.player] = data.streak;
     updateUI();
+    // Через 2 секунды модалка закроется сама (уже есть таймер на сервере, но и здесь закроем)
+    setTimeout(() => {
+        resultModal.classList.add('hidden');
+    }, 2000);
 });
 socket.on('gameOver', (data) => {
     gameState.gameCompleted = true;
-    if (finalScoresDiv) finalScoresDiv.innerHTML = '';
+    finalScoresDiv.innerHTML = '';
     const sorted = Object.entries(data.scores).sort((a,b) => b[1] - a[1]);
     sorted.forEach(([player, score]) => {
         const name = { Alex: 'Алексей', Vika: 'Вика', Batya: 'Батя' }[player];
         const coins = data.coins[player];
-        if (finalScoresDiv) finalScoresDiv.innerHTML += `<p>${name}: ${score} очков (💰 ${coins.toLocaleString()} монет)</p>`;
+        finalScoresDiv.innerHTML += `<p>${name}: ${score} очков (💰 ${coins.toLocaleString()} монет)</p>`;
     });
-    if (gameoverModal) gameoverModal.classList.remove('hidden');
-    stopBackgroundMusic();
+    gameoverModal.classList.remove('hidden');
+    bgMusic.pause();
 });
 socket.on('chatHint', (data) => {
-    if (hintText) hintText.textContent = `📢 Чат считает, что правильный ответ: "${data.hint}"`;
-    if (hintModal) hintModal.classList.remove('hidden');
+    hintText.textContent = `📢 Чат считает, что правильный ответ: "${data.hint}"`;
+    hintModal.classList.remove('hidden');
     playBonus();
 });
 socket.on('skipBroadcast', (data) => {
@@ -421,27 +418,27 @@ socket.on('bonusError', (msg) => {
     showToast(msg);
 });
 
-// Обработчики модалок и кнопок
-if (closeModalBtn) closeModalBtn.addEventListener('click', () => {
-    if (resultModal) resultModal.classList.add('hidden');
+// Обработчики кнопок
+closeModalBtn.addEventListener('click', () => {
+    resultModal.classList.add('hidden');
 });
-if (closeHintBtn) closeHintBtn.addEventListener('click', () => {
-    if (hintModal) hintModal.classList.add('hidden');
+closeHintBtn.addEventListener('click', () => {
+    hintModal.classList.add('hidden');
 });
-if (newGameBtn) newGameBtn.addEventListener('click', () => {
+newGameBtn.addEventListener('click', () => {
     socket.emit('reset');
-    if (gameoverModal) gameoverModal.classList.add('hidden');
+    gameoverModal.classList.add('hidden');
 });
-if (resetBtn) resetBtn.addEventListener('click', () => {
+resetBtn.addEventListener('click', () => {
     if (confirm('Начать новую игру?')) {
         socket.emit('reset');
     }
 });
-if (answerBtns) answerBtns.forEach(btn => {
+answerBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         const player = btn.dataset.player;
-        if (gameState.answered || gameState.gameCompleted) {
-            showToast('На этот вопрос уже ответили!');
+        if (isWaitingForNext || gameState.answered || gameState.gameCompleted) {
+            showToast('На этот вопрос уже ответили или идёт загрузка!');
             return;
         }
         if (pendingPlayer) {
@@ -450,18 +447,19 @@ if (answerBtns) answerBtns.forEach(btn => {
         }
         pendingPlayer = player;
         showToast(`Игрок ${player}, выберите вариант ответа!`);
-        if (audioCtx && audioCtx.state === 'suspended') {
-            audioCtx.resume().then(() => {
-                if (soundsEnabled && !bgInterval) startBackgroundMusic();
-            });
+        // Разблокируем варианты, если они были заблокированы (на случай повторного клика)
+        document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = false);
+        // Пытаемся запустить музыку, если ещё не запущена
+        if (soundsEnabled && bgMusic.paused) {
+            bgMusic.play().catch(e => console.log);
         }
     });
 });
-if (document.querySelectorAll('.bonus-btn')) document.querySelectorAll('.bonus-btn').forEach(btn => {
+document.querySelectorAll('.bonus-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         const player = btn.dataset.player;
         const bonusType = btn.dataset.bonus;
-        if (gameState.answered || gameState.gameCompleted) {
+        if (gameState.answered || gameState.gameCompleted || isWaitingForNext) {
             showToast('Сейчас нельзя использовать бонус');
             return;
         }
@@ -469,11 +467,7 @@ if (document.querySelectorAll('.bonus-btn')) document.querySelectorAll('.bonus-b
     });
 });
 
-// Инициализация UI
-updateUI();
-initMapMarkers();
-
-// Добавляем анимацию для карточки
+// Добавляем стиль анимации
 const style = document.createElement('style');
 style.textContent = `
     @keyframes scrollReveal {
