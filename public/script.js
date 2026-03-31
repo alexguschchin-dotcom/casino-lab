@@ -53,12 +53,22 @@ const soundToggle = document.getElementById('sound-toggle');
 const flashOverlay = document.getElementById('flash-overlay');
 const leaderboardList = document.getElementById('leaderboard-list');
 
-// ========== Звуки через Web Audio ==========
+// ========== Звуки через Web Audio (улучшенная фоновая музыка) ==========
 let audioCtx = null;
 let soundsEnabled = true;
-let bgOscillator = null;
 let bgGain = null;
 let bgInterval = null;
+let currentMelodyIndex = 0;
+const melody = [
+    { freq: 262, duration: 0.5 }, // C4
+    { freq: 294, duration: 0.5 }, // D4
+    { freq: 330, duration: 0.5 }, // E4
+    { freq: 349, duration: 0.5 }, // F4
+    { freq: 392, duration: 0.5 }, // G4
+    { freq: 440, duration: 0.5 }, // A4
+    { freq: 494, duration: 0.5 }, // B4
+    { freq: 523, duration: 1.0 }  // C5
+];
 
 function initAudio() {
     if (!audioCtx) {
@@ -108,35 +118,26 @@ function playTransition() {
     playTone(600, 0.2, 'sine', 0.15);
     playTone(500, 0.2, 'sine', 0.15);
 }
+
+// Фоновая мелодия (эпическая)
+function playNextNote() {
+    if (!soundsEnabled || !audioCtx) return;
+    const note = melody[currentMelodyIndex % melody.length];
+    playTone(note.freq, note.duration, 'sine', 0.08);
+    currentMelodyIndex++;
+    if (bgInterval) clearTimeout(bgInterval);
+    bgInterval = setTimeout(playNextNote, note.duration * 1000 + 200);
+}
 function startBackgroundMusic() {
     if (!soundsEnabled) return;
     if (!audioCtx) initAudio();
-    if (bgOscillator) {
-        bgOscillator.stop();
-        if (bgInterval) clearInterval(bgInterval);
-    }
-    bgOscillator = audioCtx.createOscillator();
-    bgGain = audioCtx.createGain();
-    bgOscillator.type = 'sine';
-    bgOscillator.frequency.value = 110;
-    bgGain.gain.value = 0.06;
-    bgOscillator.connect(bgGain);
-    bgGain.connect(audioCtx.destination);
-    bgOscillator.start();
-    bgInterval = setInterval(() => {
-        if (bgOscillator && soundsEnabled) {
-            const freq = 100 + Math.sin(Date.now() * 0.0008) * 8;
-            bgOscillator.frequency.value = freq;
-        }
-    }, 500);
+    if (bgInterval) clearTimeout(bgInterval);
+    currentMelodyIndex = 0;
+    playNextNote();
 }
 function stopBackgroundMusic() {
-    if (bgOscillator) {
-        bgOscillator.stop();
-        bgOscillator = null;
-    }
     if (bgInterval) {
-        clearInterval(bgInterval);
+        clearTimeout(bgInterval);
         bgInterval = null;
     }
 }
@@ -315,6 +316,11 @@ function showToast(message) {
 // ========== Сокеты ==========
 socket.on('init', (data) => {
     console.log('Init received', data);
+    if (!data || !data.state || !data.question) {
+        console.error('Ошибка: неполные данные инициализации');
+        questionTextEl.textContent = 'Ошибка подключения к серверу. Обновите страницу.';
+        return;
+    }
     gameState = data.state;
     currentQuestion = data.question;
     totalQSpan.textContent = totalQuestions;
@@ -328,7 +334,7 @@ socket.on('init', (data) => {
     pendingPlayer = null;
     if (soundsEnabled) {
         initAudio();
-        audioCtx.resume();
+        audioCtx.resume().catch(e => console.log('AudioContext resume failed', e));
         startBackgroundMusic();
     }
 });
@@ -427,6 +433,12 @@ answerBtns.forEach(btn => {
         }
         pendingPlayer = player;
         showToast(`Игрок ${player}, выберите вариант ответа!`);
+        // Принудительно возобновляем аудио контекст при первом клике
+        if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume().then(() => {
+                if (soundsEnabled && !bgInterval) startBackgroundMusic();
+            });
+        }
     });
 });
 document.querySelectorAll('.bonus-btn').forEach(btn => {
