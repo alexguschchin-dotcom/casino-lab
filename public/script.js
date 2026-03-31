@@ -14,6 +14,7 @@ let gameState = {
 let currentQuestion = null;
 let totalQuestions = 39;
 let pendingPlayer = null;
+let initReceived = false;
 
 // DOM элементы
 const questionTextEl = document.getElementById('question-text');
@@ -53,7 +54,7 @@ const soundToggle = document.getElementById('sound-toggle');
 const flashOverlay = document.getElementById('flash-overlay');
 const leaderboardList = document.getElementById('leaderboard-list');
 
-// Звуки через Web Audio API (гарантированно работают)
+// Звуки через Web Audio API
 let audioCtx = null;
 let soundsEnabled = true;
 let bgOscillator = null;
@@ -81,30 +82,12 @@ function playTone(frequency, duration, type = 'sine', volume = 0.3) {
     osc.stop(now + duration);
 }
 
-function playCorrect() {
-    playTone(880, 0.3, 'sine', 0.4);
-    playTone(1100, 0.4, 'sine', 0.3);
-}
-function playWrong() {
-    playTone(440, 0.4, 'sawtooth', 0.3);
-    playTone(330, 0.5, 'sawtooth', 0.3);
-}
-function playBonus() {
-    playTone(1318, 0.2, 'sine', 0.2);
-    playTone(1568, 0.2, 'sine', 0.2);
-    playTone(1760, 0.3, 'sine', 0.2);
-}
-function playClick() {
-    playTone(800, 0.05, 'triangle', 0.1);
-}
-function playScroll() {
-    playTone(400, 0.1, 'sine', 0.1);
-    playTone(300, 0.15, 'sine', 0.1);
-}
-function playTransition() {
-    playTone(600, 0.2, 'sine', 0.15);
-    playTone(500, 0.2, 'sine', 0.15);
-}
+function playCorrect() { playTone(880, 0.3, 'sine', 0.4); playTone(1100, 0.4, 'sine', 0.3); }
+function playWrong() { playTone(440, 0.4, 'sawtooth', 0.3); playTone(330, 0.5, 'sawtooth', 0.3); }
+function playBonus() { playTone(1318, 0.2, 'sine', 0.2); playTone(1568, 0.2, 'sine', 0.2); playTone(1760, 0.3, 'sine', 0.2); }
+function playClick() { playTone(800, 0.05, 'triangle', 0.1); }
+function playScroll() { playTone(400, 0.1, 'sine', 0.1); playTone(300, 0.15, 'sine', 0.1); }
+function playTransition() { playTone(600, 0.2, 'sine', 0.15); playTone(500, 0.2, 'sine', 0.15); }
 function startBackgroundMusic() {
     if (!soundsEnabled) return;
     if (!audioCtx) initAudio();
@@ -148,6 +131,7 @@ soundToggle.addEventListener('click', () => {
 
 // Инициализация карты-прогресса
 function initMapMarkers() {
+    if (!mapMarkers) return;
     mapMarkers.innerHTML = '';
     for (let i = 0; i < totalQuestions; i++) {
         const marker = document.createElement('div');
@@ -166,15 +150,15 @@ function updateMapMarkers() {
         if (idx === gameState.currentQuestion) marker.classList.add('active');
     });
     const progress = (gameState.currentQuestion / totalQuestions) * 100;
-    mapTrack.style.width = `${progress}%`;
+    if (mapTrack) mapTrack.style.width = `${progress}%`;
 }
 
 // Обновление UI
 function updateUI() {
     for (let p of gameState.players) {
-        scoreElements[p].textContent = gameState.scores[p];
-        coinsElements[p].textContent = `💰 ${gameState.coins[p].toLocaleString()}`;
-        streakElements[p].textContent = `🔥 ${gameState.streak[p]}`;
+        if (scoreElements[p]) scoreElements[p].textContent = gameState.scores[p];
+        if (coinsElements[p]) coinsElements[p].textContent = `💰 ${gameState.coins[p].toLocaleString()}`;
+        if (streakElements[p]) streakElements[p].textContent = `🔥 ${gameState.streak[p]}`;
         const askBtn = document.querySelector(`.bonus-btn.ask-chat[data-player="${p}"]`);
         const skipBtn = document.querySelector(`.bonus-btn.skip[data-player="${p}"]`);
         if (askBtn) askBtn.disabled = !gameState.bonuses[p].includes('askChat');
@@ -183,6 +167,7 @@ function updateUI() {
     updateLeaderboard();
 }
 function updateLeaderboard() {
+    if (!leaderboardList) return;
     const sorted = [...gameState.players].sort((a,b) => gameState.scores[b] - gameState.scores[a]);
     leaderboardList.innerHTML = sorted.map(p => {
         const name = { Alex: 'Алексей', Vika: 'Вика', Batya: 'Батя' }[p];
@@ -206,15 +191,17 @@ function startCoinRain() {
     setTimeout(() => container.remove(), 3000);
 }
 function flashRed() {
-    flashOverlay.classList.add('active');
-    setTimeout(() => flashOverlay.classList.remove('active'), 500);
+    if (flashOverlay) {
+        flashOverlay.classList.add('active');
+        setTimeout(() => flashOverlay.classList.remove('active'), 500);
+    }
 }
 
 // Отображение вопроса
 function renderQuestion(question) {
     if (!question) {
         console.error('Нет данных вопроса');
-        questionTextEl.textContent = 'Ошибка загрузки вопроса';
+        questionTextEl.textContent = 'Ошибка загрузки вопроса. Попробуйте обновить страницу.';
         return;
     }
     questionTextEl.textContent = question.text;
@@ -248,20 +235,37 @@ function renderQuestion(question) {
     }
     // Анимация свитка
     const card = document.getElementById('question-card');
-    card.classList.remove('scroll-animation');
-    void card.offsetWidth;
-    card.classList.add('scroll-animation');
+    if (card) {
+        card.classList.remove('scroll-animation');
+        void card.offsetWidth;
+        card.classList.add('scroll-animation');
+    }
     playScroll();
 }
 function showToast(message) {
     const toast = document.getElementById('toast');
+    if (!toast) return;
     toast.textContent = message;
     toast.classList.remove('hidden');
     setTimeout(() => toast.classList.add('hidden'), 3000);
 }
 
-// Сокеты
+// Сокеты с диагностикой
+socket.on('connect', () => {
+    console.log('Socket connected');
+    showToast('Подключение к серверу установлено');
+});
+socket.on('disconnect', () => {
+    console.log('Socket disconnected');
+    showToast('Потеряно соединение с сервером');
+});
 socket.on('init', (data) => {
+    console.log('Init received', data);
+    if (!data || !data.state || !data.question) {
+        console.error('Invalid init data', data);
+        showToast('Ошибка загрузки данных игры');
+        return;
+    }
     gameState = data.state;
     currentQuestion = data.question;
     totalQSpan.textContent = totalQuestions;
@@ -273,6 +277,7 @@ socket.on('init', (data) => {
     gameState.answered = data.state.answered;
     gameState.gameCompleted = data.state.gameCompleted;
     pendingPlayer = null;
+    initReceived = true;
     if (soundsEnabled) {
         initAudio();
         audioCtx.resume();
@@ -280,6 +285,8 @@ socket.on('init', (data) => {
     }
 });
 socket.on('nextQuestion', (data) => {
+    console.log('Next question', data);
+    if (!data || !data.question) return;
     gameState.scores = data.scores;
     gameState.coins = data.coins;
     gameState.bonuses = data.bonuses;
@@ -388,6 +395,14 @@ document.querySelectorAll('.bonus-btn').forEach(btn => {
     });
 });
 
-// Инициализация UI и аудио
+// Инициализация UI и проверка, что init получен
 updateUI();
 initMapMarkers();
+
+// Fallback: если через 3 секунды не пришёл init, показать сообщение и перезапросить? 
+setTimeout(() => {
+    if (!initReceived) {
+        showToast('Не удалось загрузить данные. Проверьте соединение и перезагрузите страницу.');
+        console.warn('Init not received after 3 seconds');
+    }
+}, 3000);
