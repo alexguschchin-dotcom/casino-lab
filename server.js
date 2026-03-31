@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// 39 вопросов (как ранее, но убедимся, что все корректны)
+// 39 вопросов (такой же список)
 const questions = [
   { text: 'В какой стране находится знаменитое казино Монте-Карло?', options: ['Монако', 'Франция', 'Италия', 'Испания'], correct: 0 },
   { text: 'Какой слот считается самым популярным в мире?', options: ['Book of Dead', 'Starburst', 'Sweet Bonanza', 'Gates of Olympus'], correct: 1 },
@@ -101,6 +101,7 @@ function nextQuestionOrGameOver(io) {
 
 io.on('connection', (socket) => {
   console.log('Участник подключён');
+  // Отправляем текущее состояние и вопрос
   socket.emit('init', {
     state: {
       currentQuestion: gameState.currentQuestion,
