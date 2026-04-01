@@ -22,6 +22,10 @@
                 <h1 class="title">Империя знаний</h1>
                 <i class="fas fa-crown"></i>
             </div>
+            <div class="timer-display" id="timer-display">
+                <i class="fas fa-hourglass-half"></i>
+                <span id="timer-text">01:30</span>
+            </div>
             <div class="level-indicator">
                 <i class="fas fa-scroll"></i> 
                 <span id="current-q">1</span>/<span id="total-q">39</span>
@@ -29,7 +33,6 @@
             <button id="sound-toggle" class="sound-btn"><i class="fas fa-music"></i></button>
         </header>
 
-        <!-- Прогресс в виде 3D-ленты -->
         <div class="journey-map">
             <div class="map-markers" id="map-markers"></div>
             <div class="map-progress-bar">
@@ -41,20 +44,17 @@
             </div>
         </div>
 
-        <!-- Вопрос с эффектом голограммы -->
         <div class="question-card" id="question-card">
             <div class="question-glow"></div>
             <div class="question-text" id="question-text">Загрузка...</div>
             <div class="options" id="options"></div>
         </div>
 
-        <!-- Таблица лидеров с анимацией -->
         <div class="leaderboard">
             <h3><i class="fas fa-chart-line"></i> Таблица лидеров</h3>
             <div id="leaderboard-list"></div>
         </div>
 
-        <!-- Карточки игроков с 3D-эффектом -->
         <div class="scoreboard">
             <div class="player-card" data-player="Alex">
                 <div class="card-glow"></div>
@@ -67,7 +67,6 @@
                 </div>
                 <div class="bonus-buttons">
                     <button class="bonus-btn ask-chat" data-player="Alex" data-bonus="askChat" disabled>💬 Спросить чат</button>
-                    <button class="bonus-btn skip" data-player="Alex" data-bonus="skipQuestion" disabled>⏭️ Пропустить</button>
                 </div>
                 <button class="answer-btn" data-player="Alex">⚔️ Ответить</button>
             </div>
@@ -82,7 +81,6 @@
                 </div>
                 <div class="bonus-buttons">
                     <button class="bonus-btn ask-chat" data-player="Vika" data-bonus="askChat" disabled>💬 Спросить чат</button>
-                    <button class="bonus-btn skip" data-player="Vika" data-bonus="skipQuestion" disabled>⏭️ Пропустить</button>
                 </div>
                 <button class="answer-btn" data-player="Vika">⚔️ Ответить</button>
             </div>
@@ -97,7 +95,6 @@
                 </div>
                 <div class="bonus-buttons">
                     <button class="bonus-btn ask-chat" data-player="Batya" data-bonus="askChat" disabled>💬 Спросить чат</button>
-                    <button class="bonus-btn skip" data-player="Batya" data-bonus="skipQuestion" disabled>⏭️ Пропустить</button>
                 </div>
                 <button class="answer-btn" data-player="Batya">⚔️ Ответить</button>
             </div>
@@ -108,7 +105,6 @@
         </div>
     </div>
 
-    <!-- Модалки -->
     <div id="result-modal" class="modal hidden">
         <div class="modal-content">
             <h2 id="result-title"></h2>
@@ -132,6 +128,26 @@
             <button id="new-game-btn" class="btn-neon">Новая игра</button>
         </div>
     </div>
+
+    <!-- Аудио элементы -->
+    <audio id="music-main" loop preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_7c3c9c1c1c.mp3?filename=epic-adventure-112191.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="music-question" loop preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_1c6b9b6c1c.mp3?filename=mysterious-112192.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="music-warning" preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/06/24/audio_6f6f6f6f6f.mp3?filename=warning-112193.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="music-urgent" preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_1c6b9b6c1c.mp3?filename=urgent-112194.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sound-correct" preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_7c3c9c1c1c.mp3?filename=correct-6033.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sound-wrong" preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_1c6b9b6c1c.mp3?filename=wrong-47985.mp3" type="audio/mpeg">
+    </audio>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
