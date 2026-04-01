@@ -64,7 +64,7 @@ const players = [
     { id: 'batya', name: 'Батя', icon: 'fas fa-user-tie', score: 0 }
 ];
 
-let currentScore = 0; // общий счёт стримера
+let currentScore = 0; // общий счёт (баланс казино) — изменяется только вручную
 let selectedTheme = null;
 let selectedQuestion = null;
 let currentHelpMultiplier = 1;
@@ -204,7 +204,6 @@ function openQuestion(index) {
     answerInput.value = '';
     feedbackDiv.innerHTML = '';
     currentHelpMultiplier = 1;
-    // Сброс выбора игрока на Алексея (по умолчанию)
     answeringPlayerSelect.value = 'alex';
     questionModal.classList.remove('hidden');
 }
@@ -255,14 +254,11 @@ function checkAnswer() {
     const questionLevel = selectedQuestion.data.value; // 1..5
     const basePoints = questionLevel * 1000;
     let message = '';
-    let pointsEarned = 0;
     const selectedPlayerId = answeringPlayerSelect.value;
 
     if (isCorrect) {
-        pointsEarned = basePoints;
-        currentScore += pointsEarned;
-        updateTotalScoreUI();
-        message = `✅ Правильно! Вы заработали ${pointsEarned} очков.`;
+        // НЕ меняем currentScore (баланс казино) — оставляем для ручного редактирования
+        message = `✅ Правильно!`;
         let casinoTask = selectedQuestion.data.casinoTask;
         if (currentHelpMultiplier > 1) {
             casinoTask = `${casinoTask} (усложнено на ${Math.round((currentHelpMultiplier-1)*100)}%)`;
@@ -388,14 +384,13 @@ function createSakuraPetals() {
     function createPetal() {
         const petal = document.createElement('div');
         petal.classList.add('sakura-petal');
-        const size = Math.random() * 18 + 10; // 10-28px
+        const size = Math.random() * 18 + 10;
         petal.style.width = `${size}px`;
         petal.style.height = `${size}px`;
         petal.style.left = `${Math.random() * 100}%`;
-        const duration = Math.random() * 3 + 2; // 2-5 секунд (быстро)
+        const duration = Math.random() * 3 + 2;
         petal.style.animationDuration = `${duration}s`;
         petal.style.animationDelay = `${Math.random() * 5}s`;
-        // Случайный оттенок розового
         const pink = 180 + Math.random() * 75;
         petal.style.background = `radial-gradient(circle at 30% 30%, #ffc0cb, #ff${Math.floor(pink).toString(16)}aa)`;
         container.appendChild(petal);
