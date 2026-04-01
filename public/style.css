@@ -40,6 +40,9 @@ body {
     padding: 2rem;
     position: relative;
     z-index: 2;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 header {
@@ -136,11 +139,104 @@ header {
     opacity: 0.7;
 }
 
-footer {
-    text-align: center;
-    opacity: 0.6;
-    font-size: 0.8rem;
-    margin-top: 2rem;
+/* Нижняя часть */
+.game-footer {
+    margin-top: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255,215,0,0.2);
+}
+
+.leaderboard-section, .active-player-section {
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(8px);
+    border-radius: 24px;
+    padding: 1.2rem;
+    border: 1px solid rgba(255,215,0,0.2);
+}
+
+.leaderboard-section h3, .active-player-section h3 {
+    color: #FFD700;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.leaderboard {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.leader-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.05);
+    padding: 0.6rem 1rem;
+    border-radius: 12px;
+}
+
+.player-name {
+    font-weight: 600;
+}
+
+.player-score {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #FFD700;
+}
+
+.balance-control {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+#balance-input-container {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+#balance-amount {
+    flex: 1;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid #FFD700;
+    border-radius: 40px;
+    padding: 0.5rem 1rem;
+    color: #fff;
+}
+
+.player-selector {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 0.5rem;
+}
+
+.player-select-btn {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid #FFD700;
+    border-radius: 40px;
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+    transition: 0.2s;
+    color: #FFD700;
+}
+
+.player-select-btn.active {
+    background: #FFD700;
+    color: #000;
+}
+
+.player-select-btn:hover {
+    background: #FFA500;
+    color: #000;
 }
 
 /* Модальные окна */
@@ -156,7 +252,6 @@ footer {
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    transition: all 0.3s;
 }
 
 .modal-content, .question-card {
@@ -217,9 +312,10 @@ footer {
     cursor: pointer;
     transition: 0.2s;
     border: 1px solid rgba(255,215,0,0.3);
+    position: relative;
 }
 
-.question-cell:hover {
+.question-cell:hover:not(.disabled) {
     background: rgba(255,215,0,0.2);
     transform: scale(1.02);
 }
@@ -228,6 +324,24 @@ footer {
     opacity: 0.4;
     cursor: not-allowed;
     pointer-events: none;
+    text-decoration: line-through;
+}
+
+.question-cell.disabled::after {
+    content: "✗";
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ff4444;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
 }
 
 /* Карточка вопроса */
@@ -290,7 +404,7 @@ footer {
     background: rgba(255,255,255,0.2);
     border: 1px solid #FFD700;
     color: #FFD700;
-    padding: 0.8rem 1.8rem;
+    padding: 0.6rem 1.2rem;
     border-radius: 60px;
     cursor: pointer;
 }
@@ -353,79 +467,7 @@ footer {
     .question-text {
         font-size: 1.2rem;
     }
-}
-/* Информационная панель внизу */
-.info-panel {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-    margin-top: 3rem;
-    margin-bottom: 1.5rem;
-    background: rgba(0,0,0,0.4);
-    border-radius: 24px;
-    padding: 1.5rem;
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,215,0,0.2);
-}
-
-.leaderboard, .last-events, .casino-tip {
-    background: rgba(0,0,0,0.3);
-    border-radius: 20px;
-    padding: 1rem;
-}
-
-.leaderboard h3, .last-events h3 {
-    color: #FFD700;
-    margin-bottom: 0.8rem;
-    font-size: 1.1rem;
-}
-
-.leader-entry {
-    padding: 0.3rem 0;
-    border-bottom: 1px solid rgba(255,215,0,0.2);
-    font-size: 0.9rem;
-}
-
-.event {
-    padding: 0.3rem 0;
-    font-size: 0.85rem;
-    opacity: 0.8;
-}
-
-.casino-tip {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    justify-content: center;
-    text-align: center;
-}
-
-.casino-tip i {
-    font-size: 2rem;
-    color: #FFD700;
-}
-
-.casino-tip p {
-    font-size: 0.9rem;
-}
-
-/* Крестик на отвеченных вопросах */
-.question-cell.answered {
-    background: rgba(0,0,0,0.6);
-    text-decoration: line-through;
-    color: #888;
-    position: relative;
-}
-
-.checkmark {
-    margin-left: 0.3rem;
-    font-size: 0.8rem;
-    color: #ff4444;
-}
-
-@media (max-width: 768px) {
-    .info-panel {
+    .game-footer {
         grid-template-columns: 1fr;
-        gap: 1rem;
     }
 }

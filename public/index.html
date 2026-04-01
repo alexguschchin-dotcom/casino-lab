@@ -24,31 +24,41 @@
 
         <div class="themes-grid" id="themes-grid"></div>
 
-        <!-- Новый блок внизу -->
-        <div class="info-panel">
-            <div class="leaderboard">
+        <!-- Блок для лидерборда и выбора отвечающего -->
+        <div class="game-footer">
+            <div class="leaderboard-section">
                 <h3><i class="fas fa-trophy"></i> Таблица лидеров</h3>
-                <div id="leaderboard-list">
-                    <div class="leader-entry">Алексей: 0</div>
-                    <div class="leader-entry">Вика: 0</div>
-                    <div class="leader-entry">Батя: 0</div>
+                <div class="leaderboard" id="leaderboard">
+                    <div class="leader-entry" data-player="Alex">
+                        <span class="player-name">Алексей</span>
+                        <span class="player-score" id="leader-score-Alex">0</span>
+                    </div>
+                    <div class="leader-entry" data-player="Vika">
+                        <span class="player-name">Вика</span>
+                        <span class="player-score" id="leader-score-Vika">0</span>
+                    </div>
+                    <div class="leader-entry" data-player="Batya">
+                        <span class="player-name">Батя</span>
+                        <span class="player-score" id="leader-score-Batya">0</span>
+                    </div>
+                </div>
+                <div class="balance-control">
+                    <button id="change-balance" class="btn-secondary">Изменить баланс</button>
+                    <div id="balance-input-container" class="hidden">
+                        <input type="number" id="balance-amount" placeholder="Сумма">
+                        <button id="apply-balance" class="btn-primary">Применить</button>
+                    </div>
                 </div>
             </div>
-            <div class="last-events">
-                <h3><i class="fas fa-history"></i> Последние события</h3>
-                <div id="events-list">
-                    <div class="event">✨ Выберите тему и начните игру!</div>
+            <div class="active-player-section">
+                <h3><i class="fas fa-user-check"></i> Кто отвечает?</h3>
+                <div class="player-selector">
+                    <button class="player-select-btn active" data-select="Alex">Алексей</button>
+                    <button class="player-select-btn" data-select="Vika">Вика</button>
+                    <button class="player-select-btn" data-select="Batya">Батя</button>
                 </div>
-            </div>
-            <div class="casino-tip">
-                <i class="fas fa-dice-d6"></i>
-                <p>Самый умный получает бонус в казино!</p>
             </div>
         </div>
-
-        <footer>
-            <p>Выберите тему, затем вопрос — и докажите, что вы — самый умный!</p>
-        </footer>
     </div>
 
     <!-- Модальное окно с вопросами темы -->
@@ -106,14 +116,12 @@
         </div>
     </div>
 
-    <!-- Окно поздравления -->
+    <!-- Финальное поздравление -->
     <div id="congrats-modal" class="modal hidden">
-        <div class="modal-content glass">
-            <h2><i class="fas fa-crown"></i> Поздравляем!</h2>
-            <p>Вы ответили на все вопросы!</p>
-            <p>Ваш итоговый счёт: <span id="final-score">0</span> очков.</p>
-            <p>Вы — настоящий знаток!</p>
-            <button id="close-congrats" class="btn-primary">Закрыть</button>
+        <div class="modal-content glass small">
+            <h3>🏆 Поздравляем! 🏆</h3>
+            <p>Вы ответили на все вопросы! Вы — настоящий знаток!</p>
+            <button id="close-congrats" class="btn-primary">Отлично!</button>
         </div>
     </div>
 

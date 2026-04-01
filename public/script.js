@@ -63,16 +63,21 @@ let selectedQuestion = null;
 let currentHelpMultiplier = 1;
 let waitingForViewer = false;
 let viewerName = '';
+let answeredQuestions = {}; // хранение отвеченных вопросов { themeKey: [indices] }
+let currentActivePlayer = 'Alex'; // кто сейчас отвечает
+let leaderboard = {
+    Alex: 0,
+    Vika: 0,
+    Batya: 0
+};
 
-// Отслеживание отвеченных вопросов
-let answeredQuestions = {}; // ключ: `${themeKey}-${index}`
-
+// DOM элементы
 const themeGrid = document.getElementById('themes-grid');
 const themeModal = document.getElementById('theme-modal');
 const questionModal = document.getElementById('question-modal');
 const viewerModal = document.getElementById('viewer-modal');
 const resultModal = document.getElementById('result-modal');
-const congratsModal = document.getElementById('congrats-modal'); // новое окно
+const congratsModal = document.getElementById('congrats-modal');
 
 const themeNameSpan = document.getElementById('theme-name');
 const questionsGrid = document.getElementById('questions-grid');
@@ -91,61 +96,59 @@ const cancelViewer = document.getElementById('cancel-viewer');
 const closeThemeModal = document.getElementById('close-theme-modal');
 const closeQuestionModal = document.getElementById('close-question-modal');
 const closeResultBtn = document.getElementById('close-result');
-const closeCongratsBtn = document.getElementById('close-congrats');
+const closeCongrats = document.getElementById('close-congrats');
+const totalScoreSpan = document.getElementById('total-score');
+const leaderScoreAlex = document.getElementById('leader-score-Alex');
+const leaderScoreVika = document.getElementById('leader-score-Vika');
+const leaderScoreBatya = document.getElementById('leader-score-Batya');
+const playerSelectBtns = document.querySelectorAll('.player-select-btn');
+const changeBalanceBtn = document.getElementById('change-balance');
+const balanceInputContainer = document.getElementById('balance-input-container');
+const balanceAmountInput = document.getElementById('balance-amount');
+const applyBalanceBtn = document.getElementById('apply-balance');
 
+// Обновление счёта на экране
 function updateScoreDisplay() {
-    document.getElementById('total-score').innerText = currentScore;
+    totalScoreSpan.innerText = currentScore;
+}
+
+// Обновление таблицы лидеров
+function updateLeaderboard() {
+    leaderScoreAlex.innerText = leaderboard.Alex;
+    leaderScoreVika.innerText = leaderboard.Vika;
+    leaderScoreBatya.innerText = leaderboard.Batya;
+}
+
+// Изменение счёта игрока
+function changePlayerScore(player, delta) {
+    leaderboard[player] += delta;
+    updateLeaderboard();
+}
+
+// Установка активного игрока
+function setActivePlayer(player) {
+    currentActivePlayer = player;
+    playerSelectBtns.forEach(btn => {
+        if (btn.dataset.select === player) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
 }
 
 // Проверка, все ли вопросы отвечены
 function checkAllQuestionsAnswered() {
     let totalQuestions = 0;
-    let answeredCount = 0;
-    for (const themeKey in themesData) {
+    let answeredTotal = 0;
+    for (let themeKey in themesData) {
         const theme = themesData[themeKey];
-        for (let i = 0; i < theme.questions.length; i++) {
-            totalQuestions++;
-            if (answeredQuestions[`${themeKey}-${i}`]) answeredCount++;
-        }
+        totalQuestions += theme.questions.length;
+        const answered = answeredQuestions[themeKey] ? answeredQuestions[themeKey].length : 0;
+        answeredTotal += answered;
     }
-    if (totalQuestions === answeredCount && totalQuestions > 0) {
-        // Показать окно поздравлений
+    if (answeredTotal === totalQuestions && totalQuestions > 0) {
         congratsModal.classList.remove('hidden');
-    }
-}
-
-// Отметить вопрос как отвеченный
-function markQuestionAnswered(themeKey, index) {
-    const key = `${themeKey}-${index}`;
-    if (!answeredQuestions[key]) {
-        answeredQuestions[key] = true;
-    }
-    // Обновляем сетку вопросов, если открыта
-    if (selectedTheme === themeKey && !themeModal.classList.contains('hidden')) {
-        refreshQuestionsGrid(themeKey);
-    }
-    // Проверяем, все ли вопросы отвечены
-    checkAllQuestionsAnswered();
-}
-
-// Обновить сетку вопросов (добавить крестики на отвеченные)
-function refreshQuestionsGrid(themeKey) {
-    const theme = themesData[themeKey];
-    const cells = document.querySelectorAll('.question-cell');
-    for (let i = 0; i < theme.questions.length; i++) {
-        const key = `${themeKey}-${i}`;
-        const cell = cells[i];
-        if (answeredQuestions[key]) {
-            cell.classList.add('answered');
-            // Добавляем крестик, если ещё нет
-            if (!cell.querySelector('.checkmark')) {
-                const check = document.createElement('i');
-                check.className = 'fas fa-times checkmark';
-                check.style.marginLeft = '5px';
-                cell.appendChild(check);
-            }
-            cell.style.pointerEvents = 'none';
-        }
     }
 }
 
@@ -159,31 +162,29 @@ function renderThemes() {
         card.innerHTML = `
             <div class="theme-icon"><i class="${theme.icon}"></i></div>
             <div class="theme-name">${theme.name}</div>
-            <div class="theme-desc">5 вопросов</div>
+            <div class="theme-desc">${theme.questions.length} вопросов</div>
         `;
         card.addEventListener('click', () => openTheme(key));
         themeGrid.appendChild(card);
     }
 }
 
+// Открыть модалку с вопросами темы
 function openTheme(themeKey) {
     selectedTheme = themeKey;
     const theme = themesData[themeKey];
     themeNameSpan.innerText = theme.name;
     questionsGrid.innerHTML = '';
+    const answered = answeredQuestions[themeKey] || [];
     for (let i = 0; i < theme.questions.length; i++) {
         const q = theme.questions[i];
         const cell = document.createElement('div');
         cell.className = 'question-cell';
+        if (answered.includes(i)) {
+            cell.classList.add('disabled');
+        }
         cell.innerText = q.value;
-        const key = `${themeKey}-${i}`;
-        if (answeredQuestions[key]) {
-            cell.classList.add('answered');
-            cell.style.pointerEvents = 'none';
-            const check = document.createElement('i');
-            check.className = 'fas fa-times checkmark';
-            cell.appendChild(check);
-        } else {
+        if (!answered.includes(i)) {
             cell.addEventListener('click', () => openQuestion(i));
         }
         questionsGrid.appendChild(cell);
@@ -191,6 +192,7 @@ function openTheme(themeKey) {
     themeModal.classList.remove('hidden');
 }
 
+// Открыть конкретный вопрос
 function openQuestion(index) {
     const theme = themesData[selectedTheme];
     const q = theme.questions[index];
@@ -204,6 +206,7 @@ function openQuestion(index) {
     questionModal.classList.remove('hidden');
 }
 
+// Проверка ответа
 function checkAnswer() {
     const userAnswer = answerInput.value.trim().toLowerCase();
     const correctAnswer = selectedQuestion.data.answer.toLowerCase();
@@ -211,24 +214,58 @@ function checkAnswer() {
     let message = '';
 
     if (isCorrect) {
+        // Начисляем очки стримеру
         const points = selectedQuestion.data.value * 1000;
         currentScore += points;
         updateScoreDisplay();
-        message = `✅ Правильно! Вы заработали ${points} очков.`;
+        // Начисляем +1 в лидерборд активному игроку
+        changePlayerScore(currentActivePlayer, 1);
+        message = `✅ Правильно! Вы заработали ${points} очков. +1 балл ${currentActivePlayer === 'Alex' ? 'Алексею' : currentActivePlayer === 'Vika' ? 'Вике' : 'Бате'}.`;
+        // Задание казино
         let casinoTask = selectedQuestion.data.casinoTask;
         if (currentHelpMultiplier > 1) {
             casinoTask = `${casinoTask} (усложнено на ${(currentHelpMultiplier-1)*100}%)`;
         }
         message += `<br>🎰 Задание казино: ${casinoTask}`;
-        // Отмечаем вопрос как отвеченный
-        markQuestionAnswered(selectedQuestion.theme, selectedQuestion.index);
+        // Блокируем вопрос
+        if (!answeredQuestions[selectedQuestion.theme]) {
+            answeredQuestions[selectedQuestion.theme] = [];
+        }
+        answeredQuestions[selectedQuestion.theme].push(selectedQuestion.index);
+        // Обновляем сетку вопросов
+        refreshQuestionsGrid();
+        // Проверяем, все ли вопросы отвечены
+        checkAllQuestionsAnswered();
     } else {
-        const multipliedTask = `⚠️ Задание усложнено в 2 раза: ${selectedQuestion.data.casinoTask} (необходимо выполнить дважды)`;
-        message = `❌ Неправильно. Правильный ответ: ${correctAnswer}.<br>🎰 ${multipliedTask}`;
+        // Неправильный ответ: -1 в лидерборд активному игроку
+        changePlayerScore(currentActivePlayer, -1);
+        message = `❌ Неправильно. Правильный ответ: ${correctAnswer}. -1 балл ${currentActivePlayer === 'Alex' ? 'Алексею' : currentActivePlayer === 'Vika' ? 'Вике' : 'Бате'}.<br>🎰 Задание казино усложнено в 2 раза: ${selectedQuestion.data.casinoTask} (необходимо выполнить дважды)`;
     }
 
     showResultMessage(isCorrect ? 'Верно!' : 'Неверно', message);
     questionModal.classList.add('hidden');
+}
+
+function refreshQuestionsGrid() {
+    if (!themeModal.classList.contains('hidden') && selectedTheme) {
+        const answered = answeredQuestions[selectedTheme] || [];
+        const cells = questionsGrid.querySelectorAll('.question-cell');
+        cells.forEach((cell, idx) => {
+            if (answered.includes(idx)) {
+                cell.classList.add('disabled');
+                // Удаляем обработчик
+                const newCell = cell.cloneNode(true);
+                cell.parentNode.replaceChild(newCell, cell);
+            } else {
+                // если не отвечен, добавляем обработчик, если его нет
+                if (!cell.hasClickListener) {
+                    const newCell = cell.cloneNode(true);
+                    newCell.addEventListener('click', () => openQuestion(idx));
+                    cell.parentNode.replaceChild(newCell, cell);
+                }
+            }
+        });
+    }
 }
 
 function showResultMessage(title, message) {
@@ -237,19 +274,24 @@ function showResultMessage(title, message) {
     resultModal.classList.remove('hidden');
 }
 
+// Помощь
 function useHelp(type) {
     if (waitingForViewer) return;
+    let multiplier = 1;
+    let helper = '';
     if (type === 'chat') {
         waitingForViewer = true;
         viewerModal.classList.remove('hidden');
         return;
     } else if (type === 'vika') {
-        currentHelpMultiplier = 1.3;
-        feedbackDiv.innerHTML = `🤝 Вы спросили у Вики. Сложность задания увеличена на 30%.`;
+        multiplier = 1.3;
+        helper = 'Вика';
     } else if (type === 'batya') {
-        currentHelpMultiplier = 1.3;
-        feedbackDiv.innerHTML = `🤝 Вы спросили у Бати. Сложность задания увеличена на 30%.`;
+        multiplier = 1.3;
+        helper = 'Батя';
     }
+    currentHelpMultiplier = multiplier;
+    feedbackDiv.innerHTML = `🤝 Вы спросили у ${helper}. Сложность задания увеличена на ${(multiplier-1)*100}%.`;
 }
 
 confirmViewer.addEventListener('click', () => {
@@ -272,20 +314,48 @@ cancelViewer.addEventListener('click', () => {
     viewerNameInput.value = '';
 });
 
+// Закрытие модалок
 closeThemeModal.addEventListener('click', () => themeModal.classList.add('hidden'));
 closeQuestionModal.addEventListener('click', () => questionModal.classList.add('hidden'));
 closeResultBtn.addEventListener('click', () => resultModal.classList.add('hidden'));
-closeCongratsBtn.addEventListener('click', () => congratsModal.classList.add('hidden'));
+closeCongrats.addEventListener('click', () => congratsModal.classList.add('hidden'));
 
 submitAnswer.addEventListener('click', checkAnswer);
 helpChat.addEventListener('click', () => useHelp('chat'));
 helpVika.addEventListener('click', () => useHelp('vika'));
 helpBatya.addEventListener('click', () => useHelp('batya'));
 
+// Выбор активного игрока
+playerSelectBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const player = btn.dataset.select;
+        setActivePlayer(player);
+    });
+});
+
+// Изменение баланса (добавляем монеты)
+changeBalanceBtn.addEventListener('click', () => {
+    balanceInputContainer.classList.toggle('hidden');
+});
+applyBalanceBtn.addEventListener('click', () => {
+    const amount = parseInt(balanceAmountInput.value);
+    if (!isNaN(amount)) {
+        currentScore += amount;
+        updateScoreDisplay();
+        balanceAmountInput.value = '';
+        balanceInputContainer.classList.add('hidden');
+    } else {
+        alert('Введите число');
+    }
+});
+
 // Инициализация
 renderThemes();
 updateScoreDisplay();
+updateLeaderboard();
+setActivePlayer('Alex');
 
+// Закрытие модалок по клику вне
 window.addEventListener('click', (e) => {
     if (e.target === themeModal) themeModal.classList.add('hidden');
     if (e.target === questionModal) questionModal.classList.add('hidden');
