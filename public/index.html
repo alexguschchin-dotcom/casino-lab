@@ -13,6 +13,7 @@
         <div class="petals"></div>
         <div class="sun-rays"></div>
     </div>
+    <div id="sakura-container"></div>
 
     <div class="game-wrapper">
         <header class="game-header">
@@ -33,25 +34,20 @@
             </div>
         </header>
 
-        <!-- Основная сетка тем -->
         <div class="themes-grid" id="themes-grid"></div>
 
-        <!-- Таблица лидеров с игроками -->
         <div class="leaderboard-section">
             <div class="leaderboard-header">
                 <i class="fas fa-trophy"></i>
                 <h2>Таблица лидеров</h2>
                 <i class="fas fa-chart-line"></i>
             </div>
-            <div class="leaderboard-players" id="leaderboard-players">
-                <!-- динамически -->
-            </div>
+            <div class="leaderboard-players" id="leaderboard-players"></div>
             <div class="leaderboard-controls">
                 <button id="reset-scores" class="reset-scores-btn"><i class="fas fa-redo-alt"></i> Сбросить очки</button>
             </div>
         </div>
 
-        <!-- Декоративный футер -->
         <footer class="game-footer">
             <div class="footer-decoration">
                 <span>🌸</span> Весенняя викторина <span>🌸</span>
@@ -82,6 +78,17 @@
                 <button class="close-modal" id="close-question-modal"><i class="fas fa-times"></i></button>
             </div>
             <div class="question-text" id="question-text">Текст вопроса</div>
+            
+            <!-- Выбор игрока, который отвечает -->
+            <div class="player-selector">
+                <label>Кто отвечает?</label>
+                <select id="answering-player">
+                    <option value="alex">Алексей</option>
+                    <option value="vika">Вика</option>
+                    <option value="batya">Батя</option>
+                </select>
+            </div>
+
             <div class="answer-area">
                 <input type="text" id="answer-input" placeholder="Введите ваш ответ..." autocomplete="off">
                 <button id="submit-answer" class="btn-primary">Ответить</button>
@@ -129,7 +136,7 @@
         </div>
     </div>
 
-    <!-- Модалка завершения игры (все вопросы отвечены) -->
+    <!-- Модалка завершения игры -->
     <div id="congrats-modal" class="modal hidden">
         <div class="modal-content glass small congrats">
             <i class="fas fa-crown"></i>

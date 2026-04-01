@@ -64,14 +64,12 @@ const players = [
     { id: 'batya', name: 'Батя', icon: 'fas fa-user-tie', score: 0 }
 ];
 
-let currentScore = 0; // общий счёт стримера (баллы за правильные ответы)
+let currentScore = 0; // общий счёт стримера
 let selectedTheme = null;
 let selectedQuestion = null;
 let currentHelpMultiplier = 1;
 let waitingForViewer = false;
 let viewerName = '';
-
-// Состояние отвеченных вопросов (чтобы закрывать)
 let answeredQuestions = {}; // { themeKey: [index1, index2] }
 
 // DOM элементы
@@ -107,6 +105,7 @@ const cancelBalanceBtn = document.getElementById('cancel-balance');
 const newBalanceInput = document.getElementById('new-balance');
 const resetScoresBtn = document.getElementById('reset-scores');
 const restartGameBtn = document.getElementById('restart-game');
+const answeringPlayerSelect = document.getElementById('answering-player');
 
 // Обновление таблицы лидеров
 function renderLeaderboard() {
@@ -126,7 +125,6 @@ function renderLeaderboard() {
         `;
         container.appendChild(card);
     });
-    // Добавляем обработчики
     document.querySelectorAll('.inc-score').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const id = btn.dataset.id;
@@ -154,12 +152,10 @@ function updateLeaderScoreUI(id, score) {
     if (span) span.innerText = score;
 }
 
-// Общий счёт
 function updateTotalScoreUI() {
     totalScoreSpan.innerText = currentScore;
 }
 
-// Генерация тем
 function renderThemes() {
     themeGrid.innerHTML = '';
     for (const [key, theme] of Object.entries(themesData)) {
@@ -176,7 +172,6 @@ function renderThemes() {
     }
 }
 
-// Открыть модалку с вопросами темы
 function openTheme(themeKey) {
     selectedTheme = themeKey;
     const theme = themesData[themeKey];
@@ -187,7 +182,6 @@ function openTheme(themeKey) {
         const cell = document.createElement('div');
         cell.className = 'question-cell';
         cell.innerText = q.value;
-        // Проверяем, отвечен ли вопрос
         const answered = answeredQuestions[themeKey] && answeredQuestions[themeKey].includes(i);
         if (answered) {
             cell.classList.add('disabled');
@@ -199,21 +193,22 @@ function openTheme(themeKey) {
     themeModal.classList.remove('hidden');
 }
 
-// Открыть вопрос
 function openQuestion(index) {
     const theme = themesData[selectedTheme];
     const q = theme.questions[index];
     selectedQuestion = { theme: selectedTheme, index, data: q };
     questionCategory.innerText = theme.name;
-    questionValueSpan.innerText = `💰 ${q.value} очков`;
+    const pointsForCorrect = q.value * 1000;
+    questionValueSpan.innerText = `💰 ${q.value} очков (${pointsForCorrect} баллов)`;
     questionTextEl.innerText = q.text;
     answerInput.value = '';
     feedbackDiv.innerHTML = '';
     currentHelpMultiplier = 1;
+    // Сброс выбора игрока на Алексея (по умолчанию)
+    answeringPlayerSelect.value = 'alex';
     questionModal.classList.remove('hidden');
 }
 
-// Закрыть вопрос (после ответа)
 function closeQuestionAndMark() {
     if (!selectedQuestion) return;
     const themeKey = selectedQuestion.theme;
@@ -224,11 +219,9 @@ function closeQuestionAndMark() {
     }
     selectedQuestion = null;
     questionModal.classList.add('hidden');
-    // Обновляем сетку вопросов в открытой модалке, если она открыта
     if (!themeModal.classList.contains('hidden') && selectedTheme === themeKey) {
-        openTheme(themeKey); // перерисовка
+        openTheme(themeKey);
     }
-    // Проверка, все ли вопросы отвечены
     checkAllQuestionsAnswered();
 }
 
@@ -246,41 +239,6 @@ function checkAllQuestionsAnswered() {
     }
 }
 
-// Проверка ответа
-function checkAnswer() {
-    if (!selectedQuestion) return;
-    const userAnswer = answerInput.value.trim().toLowerCase();
-    const correctAnswer = selectedQuestion.data.answer.toLowerCase();
-    const isCorrect = userAnswer === correctAnswer;
-    let message = '';
-    let pointsEarned = 0;
-
-    if (isCorrect) {
-        pointsEarned = selectedQuestion.data.value * 1000;
-        currentScore += pointsEarned;
-        updateTotalScoreUI();
-        message = `✅ Правильно! Вы заработали ${pointsEarned} очков.`;
-        let casinoTask = selectedQuestion.data.casinoTask;
-        if (currentHelpMultiplier > 1) {
-            casinoTask = `${casinoTask} (усложнено на ${Math.round((currentHelpMultiplier-1)*100)}%)`;
-        }
-        message += `<br>🎰 Задание казино: ${casinoTask}`;
-        // Добавляем +1 балл к выбранному игроку (кто отвечал? По умолчанию Алексей, но можно сделать выбор)
-        // Для простоты: при правильном ответе даём +1 игроку, который выбран (выбор будет реализован через кнопки +1/-1 в таблице)
-        // Можно также дать возможность выбрать, кто отвечал, через дополнительное окно, но по ТЗ: при правильном +1 балл в таблицу, при неправильном -1.
-        // Здесь мы просто даём +1 первому игроку (Алексей) для примера, но лучше вынести выбор.
-        // Реализуем через модалку выбора игрока? Упростим: добавим кнопки в карточку вопроса.
-        // Добавим ниже.
-        addPlayerScore('alex', 1); // временно для теста, потом можно сделать выбор
-    } else {
-        message = `❌ Неправильно. Правильный ответ: ${correctAnswer}.<br>🎰 Задание казино: ${selectedQuestion.data.casinoTask} (необходимо выполнить дважды, так как вы ошиблись)`;
-        addPlayerScore('alex', -1); // штраф
-    }
-
-    showResultMessage(isCorrect ? 'Верно!' : 'Неверно', message);
-    closeQuestionAndMark(); // закрываем вопрос и помечаем отвеченным
-}
-
 function addPlayerScore(playerId, delta) {
     const player = players.find(p => p.id === playerId);
     if (player) {
@@ -289,13 +247,45 @@ function addPlayerScore(playerId, delta) {
     }
 }
 
+function checkAnswer() {
+    if (!selectedQuestion) return;
+    const userAnswer = answerInput.value.trim().toLowerCase();
+    const correctAnswer = selectedQuestion.data.answer.toLowerCase();
+    const isCorrect = userAnswer === correctAnswer;
+    const questionLevel = selectedQuestion.data.value; // 1..5
+    const basePoints = questionLevel * 1000;
+    let message = '';
+    let pointsEarned = 0;
+    const selectedPlayerId = answeringPlayerSelect.value;
+
+    if (isCorrect) {
+        pointsEarned = basePoints;
+        currentScore += pointsEarned;
+        updateTotalScoreUI();
+        message = `✅ Правильно! Вы заработали ${pointsEarned} очков.`;
+        let casinoTask = selectedQuestion.data.casinoTask;
+        if (currentHelpMultiplier > 1) {
+            casinoTask = `${casinoTask} (усложнено на ${Math.round((currentHelpMultiplier-1)*100)}%)`;
+        }
+        message += `<br>🎰 Задание казино: ${casinoTask}`;
+        // Начисляем игроку +questionLevel баллов (за уровень)
+        addPlayerScore(selectedPlayerId, questionLevel);
+    } else {
+        message = `❌ Неправильно. Правильный ответ: ${correctAnswer}.<br>🎰 Задание казино: ${selectedQuestion.data.casinoTask} (необходимо выполнить дважды, так как вы ошиблись)`;
+        // Штрафуем игрока на questionLevel баллов
+        addPlayerScore(selectedPlayerId, -questionLevel);
+    }
+
+    showResultMessage(isCorrect ? 'Верно!' : 'Неверно', message);
+    closeQuestionAndMark();
+}
+
 function showResultMessage(title, message) {
     document.getElementById('result-title').innerText = title;
     document.getElementById('result-message').innerHTML = message;
     resultModal.classList.remove('hidden');
 }
 
-// Помощь
 function useHelp(type) {
     if (waitingForViewer) return;
     if (type === 'chat') {
@@ -311,7 +301,6 @@ function useHelp(type) {
     }
 }
 
-// Обработка подтверждения зрителя
 confirmViewer.addEventListener('click', () => {
     const viewer = viewerNameInput.value.trim();
     if (!viewer) {
@@ -332,7 +321,6 @@ cancelViewer.addEventListener('click', () => {
     viewerNameInput.value = '';
 });
 
-// Изменение баланса
 editBalanceBtn.addEventListener('click', () => {
     newBalanceInput.value = currentScore;
     balanceModal.classList.remove('hidden');
@@ -349,15 +337,12 @@ cancelBalanceBtn.addEventListener('click', () => {
     balanceModal.classList.add('hidden');
 });
 
-// Сброс очков игроков
 resetScoresBtn.addEventListener('click', () => {
     players.forEach(p => p.score = 0);
     renderLeaderboard();
 });
 
-// Перезапуск игры (после поздравления)
 restartGameBtn.addEventListener('click', () => {
-    // Сброс всех данных
     currentScore = 0;
     updateTotalScoreUI();
     players.forEach(p => p.score = 0);
@@ -366,13 +351,11 @@ restartGameBtn.addEventListener('click', () => {
     selectedTheme = null;
     selectedQuestion = null;
     congratsModal.classList.add('hidden');
-    renderThemes(); // перерисовка тем
-    // Закрыть все модалки
+    renderThemes();
     themeModal.classList.add('hidden');
     questionModal.classList.add('hidden');
 });
 
-// Закрытие модалок
 closeThemeModal.addEventListener('click', () => themeModal.classList.add('hidden'));
 closeQuestionModal.addEventListener('click', () => {
     questionModal.classList.add('hidden');
@@ -385,12 +368,6 @@ helpChat.addEventListener('click', () => useHelp('chat'));
 helpVika.addEventListener('click', () => useHelp('vika'));
 helpBatya.addEventListener('click', () => useHelp('batya'));
 
-// Инициализация
-renderThemes();
-renderLeaderboard();
-updateTotalScoreUI();
-
-// Закрытие модалок по клику вне контента
 window.addEventListener('click', (e) => {
     if (e.target === themeModal) themeModal.classList.add('hidden');
     if (e.target === questionModal) {
@@ -401,7 +378,7 @@ window.addEventListener('click', (e) => {
     if (e.target === resultModal) resultModal.classList.add('hidden');
     if (e.target === balanceModal) balanceModal.classList.add('hidden');
     if (e.target === congratsModal) congratsModal.classList.add('hidden');
-	// В самом конце файла (перед закрывающим тегом или после инициализации) добавляем:
+});
 
 // Генерация падающих лепестков сакуры
 function createSakuraPetals() {
@@ -411,39 +388,32 @@ function createSakuraPetals() {
     function createPetal() {
         const petal = document.createElement('div');
         petal.classList.add('sakura-petal');
-        const size = Math.random() * 15 + 8; // 8-23px
+        const size = Math.random() * 18 + 10; // 10-28px
         petal.style.width = `${size}px`;
         petal.style.height = `${size}px`;
         petal.style.left = `${Math.random() * 100}%`;
-        petal.style.animationDuration = `${Math.random() * 5 + 4}s`; // 4-9 секунд
-        petal.style.animationDelay = `${Math.random() * 15}s`;
-        // случайный оттенок розового
+        const duration = Math.random() * 3 + 2; // 2-5 секунд (быстро)
+        petal.style.animationDuration = `${duration}s`;
+        petal.style.animationDelay = `${Math.random() * 5}s`;
+        // Случайный оттенок розового
         const pink = 180 + Math.random() * 75;
-        petal.style.background = `rgba(255, ${pink}, 200, 0.8)`;
+        petal.style.background = `radial-gradient(circle at 30% 30%, #ffc0cb, #ff${Math.floor(pink).toString(16)}aa)`;
         container.appendChild(petal);
-        
-        // удаляем после анимации
         petal.addEventListener('animationend', () => petal.remove());
     }
 
-    // Создаём начальные лепестки
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 60; i++) {
         setTimeout(() => createPetal(), Math.random() * 2000);
     }
 
-    // Постоянно добавляем новые
     setInterval(() => {
-        if (container.children.length < 100) {
+        if (container.children.length < 120) {
             createPetal();
         }
-    }, 800);
+    }, 400);
 }
 
-// Запускаем после загрузки страницы
+renderThemes();
+renderLeaderboard();
+updateTotalScoreUI();
 window.addEventListener('load', createSakuraPetals);
-});
-
-// Добавляем возможность выбора игрока при правильном/неправильном ответе (дополнительно)
-// Упрощённо: при ответе добавляем/убираем очки для Алексея. Но можно сделать выбор через кнопки в карточке.
-// Для более полного UX добавим выбор игрока в модалке вопроса.
-// В реальном проекте можно добавить селект, но для простоты оставим как есть.
