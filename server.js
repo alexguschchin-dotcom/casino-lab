@@ -7,279 +7,216 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// 39 вопросов
-const questions = [
-  { text: 'В какой стране находится знаменитое казино Монте-Карло?', options: ['Монако', 'Франция', 'Италия', 'Испания'], correct: 0 },
-  { text: 'Какой слот считается самым популярным в мире?', options: ['Book of Dead', 'Starburst', 'Sweet Bonanza', 'Gates of Olympus'], correct: 1 },
-  { text: 'Кто написал роман «Игрок»?', options: ['Толстой', 'Достоевский', 'Чехов', 'Гоголь'], correct: 1 },
-  { text: 'Что такое RTP в казино?', options: ['Return to Player', 'Real Time Play', 'Random Table Payout', 'Реальный шанс выигрыша'], correct: 0 },
-  { text: 'Какой город называют «мировой столицей азартных игр»?', options: ['Макао', 'Лас-Вегас', 'Атлантик-Сити', 'Монте-Карло'], correct: 1 },
-  { text: 'В каком году было открыто первое казино в Лас-Вегасе?', options: ['1905', '1931', '1941', '1955'], correct: 2 },
-  { text: 'Какой бонус в слотах активируется выпадением 3+ скаттеров?', options: ['Фриспины', 'Множитель', 'Джекпот', 'Респин'], correct: 0 },
-  { text: 'Сколько чисел в европейской рулетке?', options: ['36', '37', '38', '39'], correct: 1 },
-  { text: 'Какой фильм о казино считается классикой?', options: ['Казино', 'Одиннадцать друзей Оушена', 'С широко закрытыми глазами', 'Игры разума'], correct: 0 },
-  { text: 'Что означает термин «all-in»?', options: ['Ставка на всё', 'Проигрыш', 'Выигрыш', 'Ничья'], correct: 0 },
-  { text: 'Какая игра имеет наибольшее преимущество казино?', options: ['Блэкджек', 'Кено', 'Рулетка', 'Слоты'], correct: 1 },
-  { text: 'Кто придумал игру «блэкджек»?', options: ['Французы', 'Американцы', 'Итальянцы', 'Испанцы'], correct: 0 },
-  { text: 'Как называется крупная ставка на одного игрока в покере?', options: ['Анте', 'Блайнд', 'Рейз', 'Колл'], correct: 2 },
-  { text: 'В каком городе находится самое большое казино в мире?', options: ['Макао', 'Лас-Вегас', 'Сингапур', 'Мельбурн'], correct: 0 },
-  { text: 'Какой слот от Pragmatic Play имеет функцию «Ante Bet»?', options: ['Sweet Bonanza', 'Gates of Olympus', 'The Dog House', 'Big Bass Bonanza'], correct: 1 },
-  { text: 'Сколько очков в блэкджеке даёт туз?', options: ['1 или 11', '10', '11', '1'], correct: 0 },
-  { text: 'Как называется «зеркальный» режим в онлайн-казино?', options: ['Демо', 'Live', 'Бонус', 'Турнир'], correct: 0 },
-  { text: 'Какая ставка в рулетке самая рискованная?', options: ['На одно число', 'На красное', 'На чёрное', 'На чётное'], correct: 0 },
-  { text: 'Кто из этих писателей был азартным игроком?', options: ['Достоевский', 'Пушкин', 'Лермонтов', 'Тургенев'], correct: 0 },
-  { text: 'Какой символ в слотах заменяет другие?', options: ['Wild', 'Scatter', 'Bonus', 'Multiplier'], correct: 0 },
-  { text: 'Какая река является самой длинной в мире?', options: ['Амазонка', 'Нил', 'Янцзы', 'Миссисипи'], correct: 1 },
-  { text: 'Кто открыл Америку?', options: ['Колумб', 'Магеллан', 'Васко да Гама', 'Кук'], correct: 0 },
-  { text: 'В каком году произошла Октябрьская революция?', options: ['1917', '1905', '1918', '1921'], correct: 0 },
-  { text: 'Как называется самая высокая гора мира?', options: ['К2', 'Эверест', 'Канченджанга', 'Лхоцце'], correct: 1 },
-  { text: 'Кто написал «Войну и мир»?', options: ['Достоевский', 'Толстой', 'Чехов', 'Пушкин'], correct: 1 },
-  { text: 'Столица Австралии?', options: ['Сидней', 'Мельбурн', 'Канберра', 'Перт'], correct: 2 },
-  { text: 'Кто изобрёл радио?', options: ['Попов', 'Маркони', 'Тесла', 'Эдисон'], correct: 0 },
-  { text: 'Какой химический элемент обозначается символом O?', options: ['Осмий', 'Кислород', 'Олово', 'Золото'], correct: 1 },
-  { text: 'Самый большой океан на Земле?', options: ['Атлантический', 'Индийский', 'Северный Ледовитый', 'Тихий'], correct: 3 },
-  { text: 'Кто был первым человеком в космосе?', options: ['Гагарин', 'Титов', 'Армстронг', 'Леонов'], correct: 0 },
-  { text: 'В какой стране изобрели бумагу?', options: ['Египет', 'Китай', 'Индия', 'Греция'], correct: 1 },
-  { text: 'Как звали древнегреческого бога морей?', options: ['Зевс', 'Аполлон', 'Посейдон', 'Арес'], correct: 2 },
-  { text: 'Сколько цветов в радуге?', options: ['6', '7', '8', '5'], correct: 1 },
-  { text: 'Какой материк самый маленький?', options: ['Австралия', 'Антарктида', 'Европа', 'Южная Америка'], correct: 0 },
-  { text: 'Кто написал «Ромео и Джульетта»?', options: ['Диккенс', 'Шекспир', 'Гюго', 'Пушкин'], correct: 1 },
-  { text: 'Столица Японии?', options: ['Пекин', 'Сеул', 'Токио', 'Осака'], correct: 2 },
-  { text: 'Как называется национальный инструмент шотландцев?', options: ['Арфа', 'Волынка', 'Гитара', 'Скрипка'], correct: 1 },
-  { text: 'Какое животное является символом Австралии?', options: ['Кенгуру', 'Коала', 'Утконос', 'Ехидна'], correct: 0 },
-  { text: 'Кто написал картину «Мона Лиза»?', options: ['Ван Гог', 'Пикассо', 'Леонардо да Винчи', 'Рафаэль'], correct: 2 }
-];
-
-const MAX_LEVEL = questions.length;
-const CORRECT_REWARD = 100000;
-const WRONG_PENALTY = 300000;
-const STREAK_BONUS_THRESHOLD = 3;
-const QUESTION_TIME = 90; // 90 секунд на вопрос
-
-let gameState = {
-  currentQuestion: 0,
-  scores: { Alex: 0, Vika: 0, Batya: 0 },
-  coins: { Alex: 0, Vika: 0, Batya: 0 },
-  streak: { Alex: 0, Vika: 0, Batya: 0 },
-  bonuses: { Alex: [], Vika: [], Batya: [] },
-  answered: false,
-  gameCompleted: false,
-  players: ['Alex', 'Vika', 'Batya']
+// ========== ДАННЫЕ ИГРЫ ==========
+// Темы и вопросы (вопрос + правильный ответ)
+const topics = {
+  'История': [
+    { question: 'В каком году началась Вторая мировая война?', answer: '1939', difficulty: 1 },
+    { question: 'Кто был первым президентом США?', answer: 'Вашингтон', difficulty: 2 },
+    { question: 'Какое событие произошло 12 апреля 1961 года?', answer: 'Полет Гагарина', difficulty: 3 },
+    { question: 'Назовите имя древнегреческого философа, учителя Александра Македонского.', answer: 'Аристотель', difficulty: 4 },
+    { question: 'В каком году была подписана Декларация независимости США?', answer: '1776', difficulty: 5 }
+  ],
+  'География': [
+    { question: 'Самая длинная река в мире?', answer: 'Нил', difficulty: 1 },
+    { question: 'Столица Австралии?', answer: 'Канберра', difficulty: 2 },
+    { question: 'Самый высокий водопад в мире?', answer: 'Анхель', difficulty: 3 },
+    { question: 'Как называется пустыня в Южной Америке?', answer: 'Атакама', difficulty: 4 },
+    { question: 'Самое глубокое озеро в мире?', answer: 'Байкал', difficulty: 5 }
+  ],
+  'Кино': [
+    { question: 'Кто сыграл Джека Воробья в "Пиратах Карибского моря"?', answer: 'Депп', difficulty: 1 },
+    { question: 'Назовите режиссёра фильма "Титаник".', answer: 'Кэмерон', difficulty: 2 },
+    { question: 'В каком фильме звучит фраза "Я вернусь"?', answer: 'Терминатор', difficulty: 3 },
+    { question: 'Кто сыграл главную роль в фильме "Бегущий по лезвию"?', answer: 'Форд', difficulty: 4 },
+    { question: 'Какой фильм получил "Оскар" как лучший фильм в 2020 году?', answer: 'Паразиты', difficulty: 5 }
+  ],
+  'Наука': [
+    { question: 'Формула воды?', answer: 'H2O', difficulty: 1 },
+    { question: 'Кто изобрёл радио?', answer: 'Попов', difficulty: 2 },
+    { question: 'Самая близкая звезда к Земле (кроме Солнца)?', answer: 'Проксима Центавра', difficulty: 3 },
+    { question: 'Кто открыл закон всемирного тяготения?', answer: 'Ньютон', difficulty: 4 },
+    { question: 'Как называется теория, описывающая происхождение Вселенной?', answer: 'Большой взрыв', difficulty: 5 }
+  ],
+  'Казино': [
+    { question: 'Как называется карточная игра с дилером, где нужно набрать 21 очко?', answer: 'Блэкджек', difficulty: 1 },
+    { question: 'Какой символ в слотах заменяет другие?', answer: 'Wild', difficulty: 2 },
+    { question: 'Что означает RTP?', answer: 'Return to Player', difficulty: 3 },
+    { question: 'Сколько чисел в европейской рулетке?', answer: '37', difficulty: 4 },
+    { question: 'Назовите самый известный покерный турнир в мире.', answer: 'WSOP', difficulty: 5 }
+  ]
 };
 
-let questionTimers = new Map(); // таймеры для каждого вопроса
+// Задания казино (разной сложности)
+const casinoTasks = {
+  1: 'Сделать ставку 100₽ на красное в рулетке',
+  2: 'Сделать ставку 500₽ на число 7',
+  3: 'Сыграть 10 спинов в слот с бонусной игрой',
+  4: 'Сделать ставку 2000₽ на точный счёт в футболе',
+  5: 'Поставить все накопленные монеты на одно число в рулетке'
+};
+
+let gameState = {
+  selectedTopic: null,
+  selectedDifficulty: null,
+  currentQuestion: null,
+  currentTask: null,
+  asked: false,
+  answerGiven: false,
+  lastAnswer: null,
+  helpUsed: false,
+  helpType: null, // 'chat', 'vika', 'batya'
+  score: 0,
+  answeredQuestions: [] // { topic, difficulty, correct }
+};
+
+const helpMultipliers = {
+  chat: 1.6,   // сложность бонуса +60%
+  vika: 1.3,   // +30%
+  batya: 1.3
+};
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-function addBonus(player, bonusName) {
-  if (!gameState.bonuses[player].includes(bonusName)) {
-    gameState.bonuses[player].push(bonusName);
-  }
-}
-
-function removeBonus(player, bonusName) {
-  const index = gameState.bonuses[player].indexOf(bonusName);
-  if (index !== -1) gameState.bonuses[player].splice(index, 1);
-}
-
-function nextQuestionOrGameOver(io) {
-  if (gameState.currentQuestion + 1 < MAX_LEVEL) {
-    gameState.currentQuestion++;
-    gameState.answered = false;
-    io.emit('nextQuestion', {
-      question: questions[gameState.currentQuestion],
-      scores: gameState.scores,
-      coins: gameState.coins,
-      bonuses: gameState.bonuses,
-      streak: gameState.streak,
-      currentQuestion: gameState.currentQuestion
-    });
-    // Запускаем таймер для нового вопроса
-    startQuestionTimer(io);
-  } else {
-    gameState.gameCompleted = true;
-    io.emit('gameOver', {
-      scores: gameState.scores,
-      coins: gameState.coins
-    });
-    // Очищаем все таймеры
-    questionTimers.forEach(timer => clearInterval(timer));
-    questionTimers.clear();
-  }
-}
-
-function startQuestionTimer(io) {
-  // Очищаем старый таймер
-  if (questionTimers.has('current')) {
-    clearInterval(questionTimers.get('current'));
-  }
-  
-  let timeLeft = QUESTION_TIME;
-  const timer = setInterval(() => {
-    if (gameState.answered || gameState.gameCompleted) {
-      clearInterval(timer);
-      questionTimers.delete('current');
-      return;
-    }
-    
-    timeLeft--;
-    io.emit('timerUpdate', { timeLeft });
-    
-    // Музыкальные оповещения
-    if (timeLeft === 60) {
-      io.emit('playMusic', 'warning');
-    } else if (timeLeft === 30) {
-      io.emit('playMusic', 'urgent');
-    } else if (timeLeft === 0) {
-      clearInterval(timer);
-      if (!gameState.answered && !gameState.gameCompleted) {
-        // Время вышло - никто не ответил
-        gameState.answered = true;
-        io.emit('timeout', {});
-        setTimeout(() => {
-          if (!gameState.gameCompleted) {
-            nextQuestionOrGameOver(io);
-          }
-        }, 2000);
-      }
-      questionTimers.delete('current');
-    }
-  }, 1000);
-  
-  questionTimers.set('current', timer);
-}
-
 io.on('connection', (socket) => {
-  console.log('Участник подключён');
-  
-  socket.emit('init', {
-    state: {
-      currentQuestion: gameState.currentQuestion,
-      scores: gameState.scores,
-      coins: gameState.coins,
-      bonuses: gameState.bonuses,
-      streak: gameState.streak,
-      answered: gameState.answered,
-      gameCompleted: gameState.gameCompleted
-    },
-    question: questions[gameState.currentQuestion]
-  });
-  
-  // Запускаем таймер если вопрос ещё не отвечен
-  if (!gameState.answered && !gameState.gameCompleted) {
-    startQuestionTimer(io);
-  }
+  console.log('Стример подключился');
+  socket.emit('init', { topics: Object.keys(topics), gameState });
 
-  socket.on('answer', (player, answerIndex) => {
-    if (gameState.answered || gameState.gameCompleted) {
-      socket.emit('error', 'На этот вопрос уже ответили');
+  // Выбор темы и сложности
+  socket.on('selectCell', (topic, difficulty) => {
+    if (gameState.asked) {
+      socket.emit('error', 'Уже выбран вопрос');
+      return;
+    }
+    const questionObj = topics[topic][difficulty-1];
+    gameState.selectedTopic = topic;
+    gameState.selectedDifficulty = difficulty;
+    gameState.currentQuestion = questionObj;
+    gameState.currentTask = casinoTasks[difficulty];
+    gameState.asked = true;
+    gameState.answerGiven = false;
+    gameState.helpUsed = false;
+    gameState.helpType = null;
+
+    socket.emit('questionSelected', {
+      topic,
+      difficulty,
+      question: questionObj.question,
+      task: gameState.currentTask
+    });
+  });
+
+  // Ответ игрока
+  socket.on('answer', (userAnswer) => {
+    if (!gameState.asked || gameState.answerGiven) {
+      socket.emit('error', 'Невозможно ответить сейчас');
       return;
     }
 
-    const isCorrect = (answerIndex === questions[gameState.currentQuestion].correct);
-    const currentQ = questions[gameState.currentQuestion];
-    const correctAnswerText = currentQ.options[currentQ.correct];
+    const correctAnswer = gameState.currentQuestion.answer.toLowerCase().trim();
+    const userAnswerNorm = userAnswer.toLowerCase().trim();
+    const isCorrect = (userAnswerNorm === correctAnswer);
+
+    gameState.answerGiven = true;
+
+    let bonusMultiplier = 1;
+    if (gameState.helpUsed) {
+      bonusMultiplier = helpMultipliers[gameState.helpType];
+    }
+
+    let resultMessage = '';
+    let taskModifier = '';
+    let points = 0;
 
     if (isCorrect) {
-      gameState.coins[player] += CORRECT_REWARD;
-      gameState.scores[player] += 1;
-      gameState.streak[player] += 1;
-      if (gameState.streak[player] % STREAK_BONUS_THRESHOLD === 0) {
-        addBonus(player, 'askChat');
-      }
+      points = gameState.selectedDifficulty * 100 * bonusMultiplier;
+      gameState.score += points;
+      resultMessage = `✅ Верно! +${points} очков.`;
+      taskModifier = `Ваше задание: ${gameState.currentTask}`;
+      // Сохраняем что вопрос отвечен
+      gameState.answeredQuestions.push({
+        topic: gameState.selectedTopic,
+        difficulty: gameState.selectedDifficulty,
+        correct: true
+      });
     } else {
-      gameState.coins[player] = Math.max(0, gameState.coins[player] - WRONG_PENALTY);
-      gameState.streak[player] = 0;
+      // Неправильный ответ: сложность задания увеличивается на 100%
+      const newTaskDifficulty = Math.min(5, gameState.selectedDifficulty + 1);
+      const newTask = casinoTasks[newTaskDifficulty];
+      resultMessage = `❌ Неправильно. Правильный ответ: ${gameState.currentQuestion.answer}. Сложность задания увеличена!`;
+      taskModifier = `Ваше новое задание: ${newTask}`;
+      // Не добавляем очки, но записываем неправильный ответ
+      gameState.answeredQuestions.push({
+        topic: gameState.selectedTopic,
+        difficulty: gameState.selectedDifficulty,
+        correct: false
+      });
     }
 
-    gameState.answered = true;
-    
-    // Останавливаем таймер
-    if (questionTimers.has('current')) {
-      clearInterval(questionTimers.get('current'));
-      questionTimers.delete('current');
-    }
-    
-    io.emit('result', {
-      player,
+    socket.emit('answerResult', {
       isCorrect,
-      correctAnswer: correctAnswerText,
-      coins: gameState.coins[player],
-      scores: gameState.scores,
-      streak: gameState.streak[player]
+      resultMessage,
+      taskModifier,
+      points: isCorrect ? points : 0,
+      score: gameState.score
     });
-    
-    io.emit('stopMusic', {});
 
-    setTimeout(() => {
-      if (!gameState.gameCompleted) {
-        nextQuestionOrGameOver(io);
-      }
-    }, 2500);
+    // Сбрасываем состояние для следующего вопроса
+    gameState.asked = false;
+    gameState.answerGiven = false;
+    gameState.helpUsed = false;
+    gameState.helpType = null;
+    gameState.selectedTopic = null;
+    gameState.selectedDifficulty = null;
+    gameState.currentQuestion = null;
   });
 
-  socket.on('useBonus', (player, bonusType) => {
-    if (gameState.answered || gameState.gameCompleted) {
-      socket.emit('bonusError', 'Сейчас нельзя использовать бонус');
+  // Использование помощи
+  socket.on('useHelp', (type) => {
+    if (!gameState.asked || gameState.answerGiven) {
+      socket.emit('error', 'Сейчас нельзя использовать помощь');
       return;
     }
-    if (!gameState.bonuses[player].includes(bonusType)) {
-      socket.emit('bonusError', 'У вас нет такого бонуса');
+    if (gameState.helpUsed) {
+      socket.emit('error', 'Помощь уже использована');
       return;
     }
-
-    if (bonusType === 'askChat') {
-      const currentQ = questions[gameState.currentQuestion];
-      const correctIdx = currentQ.correct;
-      let hint;
-      const rnd = Math.random();
-      if (rnd < 0.7) {
-        hint = currentQ.options[correctIdx];
-      } else {
-        let wrongIdx;
-        do { wrongIdx = Math.floor(Math.random() * currentQ.options.length); } while (wrongIdx === correctIdx);
-        hint = currentQ.options[wrongIdx];
-      }
-      socket.emit('chatHint', { hint, player });
-      removeBonus(player, 'askChat');
-      io.emit('bonusUpdate', { bonuses: gameState.bonuses });
+    gameState.helpUsed = true;
+    gameState.helpType = type;
+    let helpText = '';
+    switch(type) {
+      case 'chat':
+        helpText = 'Чат подсказывает: возможно, ответ начинается с буквы "' + gameState.currentQuestion.answer[0] + '"';
+        break;
+      case 'vika':
+        helpText = 'Вика считает, что правильный ответ: ' + gameState.currentQuestion.answer;
+        break;
+      case 'batya':
+        helpText = 'Батя уверен: ответ — ' + gameState.currentQuestion.answer;
+        break;
     }
+    socket.emit('helpResult', { type, helpText });
   });
 
   socket.on('reset', () => {
     gameState = {
-      currentQuestion: 0,
-      scores: { Alex: 0, Vika: 0, Batya: 0 },
-      coins: { Alex: 0, Vika: 0, Batya: 0 },
-      streak: { Alex: 0, Vika: 0, Batya: 0 },
-      bonuses: { Alex: [], Vika: [], Batya: [] },
-      answered: false,
-      gameCompleted: false,
-      players: ['Alex', 'Vika', 'Batya']
+      selectedTopic: null,
+      selectedDifficulty: null,
+      currentQuestion: null,
+      currentTask: null,
+      asked: false,
+      answerGiven: false,
+      lastAnswer: null,
+      helpUsed: false,
+      helpType: null,
+      score: 0,
+      answeredQuestions: []
     };
-    
-    // Очищаем таймеры
-    questionTimers.forEach(timer => clearInterval(timer));
-    questionTimers.clear();
-    
-    io.emit('resetGame', {
-      state: {
-        currentQuestion: 0,
-        scores: gameState.scores,
-        coins: gameState.coins,
-        bonuses: gameState.bonuses,
-        streak: gameState.streak,
-        answered: false,
-        gameCompleted: false
-      },
-      question: questions[0]
-    });
-    
-    startQuestionTimer(io);
+    socket.emit('resetComplete');
   });
 
-  socket.on('disconnect', () => console.log('Участник отключён'));
+  socket.on('disconnect', () => console.log('Стример отключился'));
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Викторина запущена на порту ${PORT}`));
+server.listen(PORT, () => console.log(`Своя игра запущена на порту ${PORT}`));
