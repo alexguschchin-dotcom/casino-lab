@@ -401,6 +401,46 @@ window.addEventListener('click', (e) => {
     if (e.target === resultModal) resultModal.classList.add('hidden');
     if (e.target === balanceModal) balanceModal.classList.add('hidden');
     if (e.target === congratsModal) congratsModal.classList.add('hidden');
+	// В самом конце файла (перед закрывающим тегом или после инициализации) добавляем:
+
+// Генерация падающих лепестков сакуры
+function createSakuraPetals() {
+    const container = document.getElementById('sakura-container');
+    if (!container) return;
+
+    function createPetal() {
+        const petal = document.createElement('div');
+        petal.classList.add('sakura-petal');
+        const size = Math.random() * 15 + 8; // 8-23px
+        petal.style.width = `${size}px`;
+        petal.style.height = `${size}px`;
+        petal.style.left = `${Math.random() * 100}%`;
+        petal.style.animationDuration = `${Math.random() * 5 + 4}s`; // 4-9 секунд
+        petal.style.animationDelay = `${Math.random() * 15}s`;
+        // случайный оттенок розового
+        const pink = 180 + Math.random() * 75;
+        petal.style.background = `rgba(255, ${pink}, 200, 0.8)`;
+        container.appendChild(petal);
+        
+        // удаляем после анимации
+        petal.addEventListener('animationend', () => petal.remove());
+    }
+
+    // Создаём начальные лепестки
+    for (let i = 0; i < 50; i++) {
+        setTimeout(() => createPetal(), Math.random() * 2000);
+    }
+
+    // Постоянно добавляем новые
+    setInterval(() => {
+        if (container.children.length < 100) {
+            createPetal();
+        }
+    }, 800);
+}
+
+// Запускаем после загрузки страницы
+window.addEventListener('load', createSakuraPetals);
 });
 
 // Добавляем возможность выбора игрока при правильном/неправильном ответе (дополнительно)
