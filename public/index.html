@@ -3,65 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Своя игра · Казино-квиз</title>
+    <title>Своя игра · Казино-квиз | Весеннее обновление</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <div class="stars-bg"></div>
-    <div class="game-container">
-        <header>
-            <h1 class="game-title">
-                <span class="title-glow">Своя игра</span>
-                <span class="title-casino">· Казино-квиз</span>
-            </h1>
-            <div class="score-board">
-                <i class="fas fa-coins"></i>
-                <span id="total-score">0</span>
+    <div class="spring-bg">
+        <div class="petals"></div>
+        <div class="sun-rays"></div>
+    </div>
+
+    <div class="game-wrapper">
+        <header class="game-header">
+            <div class="title-block">
+                <h1 class="game-title">
+                    <span class="title-glow">Своя игра</span>
+                    <span class="title-casino">· Казино-квиз</span>
+                </h1>
+                <div class="date-badge">🌸 1 апреля · Весенний кураж 🌸</div>
+            </div>
+            <div class="score-panel">
+                <div class="total-score-card">
+                    <i class="fas fa-coins"></i>
+                    <span id="total-score">0</span>
+                    <span class="score-label">очков</span>
+                </div>
+                <button id="edit-balance" class="edit-balance-btn"><i class="fas fa-pen"></i> Изменить баланс</button>
             </div>
         </header>
 
+        <!-- Основная сетка тем -->
         <div class="themes-grid" id="themes-grid"></div>
 
-        <!-- Блок для лидерборда и выбора отвечающего -->
-        <div class="game-footer">
-            <div class="leaderboard-section">
-                <h3><i class="fas fa-trophy"></i> Таблица лидеров</h3>
-                <div class="leaderboard" id="leaderboard">
-                    <div class="leader-entry" data-player="Alex">
-                        <span class="player-name">Алексей</span>
-                        <span class="player-score" id="leader-score-Alex">0</span>
-                    </div>
-                    <div class="leader-entry" data-player="Vika">
-                        <span class="player-name">Вика</span>
-                        <span class="player-score" id="leader-score-Vika">0</span>
-                    </div>
-                    <div class="leader-entry" data-player="Batya">
-                        <span class="player-name">Батя</span>
-                        <span class="player-score" id="leader-score-Batya">0</span>
-                    </div>
-                </div>
-                <div class="balance-control">
-                    <button id="change-balance" class="btn-secondary">Изменить баланс</button>
-                    <div id="balance-input-container" class="hidden">
-                        <input type="number" id="balance-amount" placeholder="Сумма">
-                        <button id="apply-balance" class="btn-primary">Применить</button>
-                    </div>
-                </div>
+        <!-- Таблица лидеров с игроками -->
+        <div class="leaderboard-section">
+            <div class="leaderboard-header">
+                <i class="fas fa-trophy"></i>
+                <h2>Таблица лидеров</h2>
+                <i class="fas fa-chart-line"></i>
             </div>
-            <div class="active-player-section">
-                <h3><i class="fas fa-user-check"></i> Кто отвечает?</h3>
-                <div class="player-selector">
-                    <button class="player-select-btn active" data-select="Alex">Алексей</button>
-                    <button class="player-select-btn" data-select="Vika">Вика</button>
-                    <button class="player-select-btn" data-select="Batya">Батя</button>
-                </div>
+            <div class="leaderboard-players" id="leaderboard-players">
+                <!-- динамически -->
+            </div>
+            <div class="leaderboard-controls">
+                <button id="reset-scores" class="reset-scores-btn"><i class="fas fa-redo-alt"></i> Сбросить очки</button>
             </div>
         </div>
+
+        <!-- Декоративный футер -->
+        <footer class="game-footer">
+            <div class="footer-decoration">
+                <span>🌸</span> Весенняя викторина <span>🌸</span>
+            </div>
+            <div class="footer-tip">
+                <i class="fas fa-lightbulb"></i> Выберите тему, затем вопрос — ответьте правильно, чтобы получить очки и задание казино!
+            </div>
+        </footer>
     </div>
 
-    <!-- Модальное окно с вопросами темы -->
+    <!-- Модалка с вопросами темы -->
     <div id="theme-modal" class="modal hidden">
         <div class="modal-content glass">
             <div class="modal-header">
@@ -77,7 +78,7 @@
         <div class="question-card glass">
             <div class="question-header">
                 <h3 id="question-category">Категория</h3>
-                <span id="question-value">Стоимость: 0</span>
+                <span id="question-value">💰 0</span>
                 <button class="close-modal" id="close-question-modal"><i class="fas fa-times"></i></button>
             </div>
             <div class="question-text" id="question-text">Текст вопроса</div>
@@ -116,12 +117,25 @@
         </div>
     </div>
 
-    <!-- Финальное поздравление -->
-    <div id="congrats-modal" class="modal hidden">
+    <!-- Модалка изменения баланса -->
+    <div id="balance-modal" class="modal hidden">
         <div class="modal-content glass small">
-            <h3>🏆 Поздравляем! 🏆</h3>
-            <p>Вы ответили на все вопросы! Вы — настоящий знаток!</p>
-            <button id="close-congrats" class="btn-primary">Отлично!</button>
+            <h3>💰 Изменить баланс</h3>
+            <input type="number" id="new-balance" placeholder="Новый баланс" value="0">
+            <div class="modal-buttons">
+                <button id="save-balance" class="btn-primary">Сохранить</button>
+                <button id="cancel-balance" class="btn-secondary">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модалка завершения игры (все вопросы отвечены) -->
+    <div id="congrats-modal" class="modal hidden">
+        <div class="modal-content glass small congrats">
+            <i class="fas fa-crown"></i>
+            <h2>Поздравляем!</h2>
+            <p>Вы ответили на все вопросы! <br> Вы настоящий знаток!</p>
+            <button id="restart-game" class="btn-primary">Сыграть снова</button>
         </div>
     </div>
 

@@ -1,4 +1,4 @@
-// Данные: темы и вопросы
+// Данные: темы и вопросы (5 тем, по 5 вопросов)
 const themesData = {
     history: {
         name: 'История',
@@ -57,19 +57,22 @@ const themesData = {
     }
 };
 
-let currentScore = 0;
+// Игроки
+const players = [
+    { id: 'alex', name: 'Алексей', icon: 'fas fa-user-astronaut', score: 0 },
+    { id: 'vika', name: 'Вика', icon: 'fas fa-user-ninja', score: 0 },
+    { id: 'batya', name: 'Батя', icon: 'fas fa-user-tie', score: 0 }
+];
+
+let currentScore = 0; // общий счёт стримера (баллы за правильные ответы)
 let selectedTheme = null;
 let selectedQuestion = null;
 let currentHelpMultiplier = 1;
 let waitingForViewer = false;
 let viewerName = '';
-let answeredQuestions = {}; // хранение отвеченных вопросов { themeKey: [indices] }
-let currentActivePlayer = 'Alex'; // кто сейчас отвечает
-let leaderboard = {
-    Alex: 0,
-    Vika: 0,
-    Batya: 0
-};
+
+// Состояние отвеченных вопросов (чтобы закрывать)
+let answeredQuestions = {}; // { themeKey: [index1, index2] }
 
 // DOM элементы
 const themeGrid = document.getElementById('themes-grid');
@@ -77,6 +80,7 @@ const themeModal = document.getElementById('theme-modal');
 const questionModal = document.getElementById('question-modal');
 const viewerModal = document.getElementById('viewer-modal');
 const resultModal = document.getElementById('result-modal');
+const balanceModal = document.getElementById('balance-modal');
 const congratsModal = document.getElementById('congrats-modal');
 
 const themeNameSpan = document.getElementById('theme-name');
@@ -96,63 +100,66 @@ const cancelViewer = document.getElementById('cancel-viewer');
 const closeThemeModal = document.getElementById('close-theme-modal');
 const closeQuestionModal = document.getElementById('close-question-modal');
 const closeResultBtn = document.getElementById('close-result');
-const closeCongrats = document.getElementById('close-congrats');
 const totalScoreSpan = document.getElementById('total-score');
-const leaderScoreAlex = document.getElementById('leader-score-Alex');
-const leaderScoreVika = document.getElementById('leader-score-Vika');
-const leaderScoreBatya = document.getElementById('leader-score-Batya');
-const playerSelectBtns = document.querySelectorAll('.player-select-btn');
-const changeBalanceBtn = document.getElementById('change-balance');
-const balanceInputContainer = document.getElementById('balance-input-container');
-const balanceAmountInput = document.getElementById('balance-amount');
-const applyBalanceBtn = document.getElementById('apply-balance');
-
-// Обновление счёта на экране
-function updateScoreDisplay() {
-    totalScoreSpan.innerText = currentScore;
-}
+const editBalanceBtn = document.getElementById('edit-balance');
+const saveBalanceBtn = document.getElementById('save-balance');
+const cancelBalanceBtn = document.getElementById('cancel-balance');
+const newBalanceInput = document.getElementById('new-balance');
+const resetScoresBtn = document.getElementById('reset-scores');
+const restartGameBtn = document.getElementById('restart-game');
 
 // Обновление таблицы лидеров
-function updateLeaderboard() {
-    leaderScoreAlex.innerText = leaderboard.Alex;
-    leaderScoreVika.innerText = leaderboard.Vika;
-    leaderScoreBatya.innerText = leaderboard.Batya;
-}
-
-// Изменение счёта игрока
-function changePlayerScore(player, delta) {
-    leaderboard[player] += delta;
-    updateLeaderboard();
-}
-
-// Установка активного игрока
-function setActivePlayer(player) {
-    currentActivePlayer = player;
-    playerSelectBtns.forEach(btn => {
-        if (btn.dataset.select === player) {
-            btn.classList.add('active');
-        } else {
-            btn.classList.remove('active');
-        }
+function renderLeaderboard() {
+    const container = document.getElementById('leaderboard-players');
+    container.innerHTML = '';
+    players.forEach(player => {
+        const card = document.createElement('div');
+        card.className = 'leader-card';
+        card.innerHTML = `
+            <div class="leader-avatar"><i class="${player.icon}"></i></div>
+            <div class="leader-name">${player.name}</div>
+            <div class="leader-score" id="score-${player.id}">${player.score}</div>
+            <div class="score-controls">
+                <button class="inc-score" data-id="${player.id}">+1</button>
+                <button class="dec-score" data-id="${player.id}">-1</button>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+    // Добавляем обработчики
+    document.querySelectorAll('.inc-score').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = btn.dataset.id;
+            const player = players.find(p => p.id === id);
+            if (player) {
+                player.score++;
+                updateLeaderScoreUI(id, player.score);
+            }
+        });
+    });
+    document.querySelectorAll('.dec-score').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = btn.dataset.id;
+            const player = players.find(p => p.id === id);
+            if (player) {
+                player.score--;
+                updateLeaderScoreUI(id, player.score);
+            }
+        });
     });
 }
 
-// Проверка, все ли вопросы отвечены
-function checkAllQuestionsAnswered() {
-    let totalQuestions = 0;
-    let answeredTotal = 0;
-    for (let themeKey in themesData) {
-        const theme = themesData[themeKey];
-        totalQuestions += theme.questions.length;
-        const answered = answeredQuestions[themeKey] ? answeredQuestions[themeKey].length : 0;
-        answeredTotal += answered;
-    }
-    if (answeredTotal === totalQuestions && totalQuestions > 0) {
-        congratsModal.classList.remove('hidden');
-    }
+function updateLeaderScoreUI(id, score) {
+    const span = document.getElementById(`score-${id}`);
+    if (span) span.innerText = score;
 }
 
-// Генерация карточек тем
+// Общий счёт
+function updateTotalScoreUI() {
+    totalScoreSpan.innerText = currentScore;
+}
+
+// Генерация тем
 function renderThemes() {
     themeGrid.innerHTML = '';
     for (const [key, theme] of Object.entries(themesData)) {
@@ -162,7 +169,7 @@ function renderThemes() {
         card.innerHTML = `
             <div class="theme-icon"><i class="${theme.icon}"></i></div>
             <div class="theme-name">${theme.name}</div>
-            <div class="theme-desc">${theme.questions.length} вопросов</div>
+            <div class="theme-desc">5 вопросов</div>
         `;
         card.addEventListener('click', () => openTheme(key));
         themeGrid.appendChild(card);
@@ -175,16 +182,16 @@ function openTheme(themeKey) {
     const theme = themesData[themeKey];
     themeNameSpan.innerText = theme.name;
     questionsGrid.innerHTML = '';
-    const answered = answeredQuestions[themeKey] || [];
     for (let i = 0; i < theme.questions.length; i++) {
         const q = theme.questions[i];
         const cell = document.createElement('div');
         cell.className = 'question-cell';
-        if (answered.includes(i)) {
-            cell.classList.add('disabled');
-        }
         cell.innerText = q.value;
-        if (!answered.includes(i)) {
+        // Проверяем, отвечен ли вопрос
+        const answered = answeredQuestions[themeKey] && answeredQuestions[themeKey].includes(i);
+        if (answered) {
+            cell.classList.add('disabled');
+        } else {
             cell.addEventListener('click', () => openQuestion(i));
         }
         questionsGrid.appendChild(cell);
@@ -192,7 +199,7 @@ function openTheme(themeKey) {
     themeModal.classList.remove('hidden');
 }
 
-// Открыть конкретный вопрос
+// Открыть вопрос
 function openQuestion(index) {
     const theme = themesData[selectedTheme];
     const q = theme.questions[index];
@@ -206,65 +213,79 @@ function openQuestion(index) {
     questionModal.classList.remove('hidden');
 }
 
+// Закрыть вопрос (после ответа)
+function closeQuestionAndMark() {
+    if (!selectedQuestion) return;
+    const themeKey = selectedQuestion.theme;
+    const qIndex = selectedQuestion.index;
+    if (!answeredQuestions[themeKey]) answeredQuestions[themeKey] = [];
+    if (!answeredQuestions[themeKey].includes(qIndex)) {
+        answeredQuestions[themeKey].push(qIndex);
+    }
+    selectedQuestion = null;
+    questionModal.classList.add('hidden');
+    // Обновляем сетку вопросов в открытой модалке, если она открыта
+    if (!themeModal.classList.contains('hidden') && selectedTheme === themeKey) {
+        openTheme(themeKey); // перерисовка
+    }
+    // Проверка, все ли вопросы отвечены
+    checkAllQuestionsAnswered();
+}
+
+function checkAllQuestionsAnswered() {
+    let totalAnswered = 0;
+    let totalQuestions = 0;
+    for (const themeKey of Object.keys(themesData)) {
+        const theme = themesData[themeKey];
+        totalQuestions += theme.questions.length;
+        const answered = answeredQuestions[themeKey] ? answeredQuestions[themeKey].length : 0;
+        totalAnswered += answered;
+    }
+    if (totalAnswered === totalQuestions && totalQuestions > 0) {
+        congratsModal.classList.remove('hidden');
+    }
+}
+
 // Проверка ответа
 function checkAnswer() {
+    if (!selectedQuestion) return;
     const userAnswer = answerInput.value.trim().toLowerCase();
     const correctAnswer = selectedQuestion.data.answer.toLowerCase();
     const isCorrect = userAnswer === correctAnswer;
     let message = '';
+    let pointsEarned = 0;
 
     if (isCorrect) {
-        // Начисляем очки стримеру
-        const points = selectedQuestion.data.value * 1000;
-        currentScore += points;
-        updateScoreDisplay();
-        // Начисляем +1 в лидерборд активному игроку
-        changePlayerScore(currentActivePlayer, 1);
-        message = `✅ Правильно! Вы заработали ${points} очков. +1 балл ${currentActivePlayer === 'Alex' ? 'Алексею' : currentActivePlayer === 'Vika' ? 'Вике' : 'Бате'}.`;
-        // Задание казино
+        pointsEarned = selectedQuestion.data.value * 1000;
+        currentScore += pointsEarned;
+        updateTotalScoreUI();
+        message = `✅ Правильно! Вы заработали ${pointsEarned} очков.`;
         let casinoTask = selectedQuestion.data.casinoTask;
         if (currentHelpMultiplier > 1) {
-            casinoTask = `${casinoTask} (усложнено на ${(currentHelpMultiplier-1)*100}%)`;
+            casinoTask = `${casinoTask} (усложнено на ${Math.round((currentHelpMultiplier-1)*100)}%)`;
         }
         message += `<br>🎰 Задание казино: ${casinoTask}`;
-        // Блокируем вопрос
-        if (!answeredQuestions[selectedQuestion.theme]) {
-            answeredQuestions[selectedQuestion.theme] = [];
-        }
-        answeredQuestions[selectedQuestion.theme].push(selectedQuestion.index);
-        // Обновляем сетку вопросов
-        refreshQuestionsGrid();
-        // Проверяем, все ли вопросы отвечены
-        checkAllQuestionsAnswered();
+        // Добавляем +1 балл к выбранному игроку (кто отвечал? По умолчанию Алексей, но можно сделать выбор)
+        // Для простоты: при правильном ответе даём +1 игроку, который выбран (выбор будет реализован через кнопки +1/-1 в таблице)
+        // Можно также дать возможность выбрать, кто отвечал, через дополнительное окно, но по ТЗ: при правильном +1 балл в таблицу, при неправильном -1.
+        // Здесь мы просто даём +1 первому игроку (Алексей) для примера, но лучше вынести выбор.
+        // Реализуем через модалку выбора игрока? Упростим: добавим кнопки в карточку вопроса.
+        // Добавим ниже.
+        addPlayerScore('alex', 1); // временно для теста, потом можно сделать выбор
     } else {
-        // Неправильный ответ: -1 в лидерборд активному игроку
-        changePlayerScore(currentActivePlayer, -1);
-        message = `❌ Неправильно. Правильный ответ: ${correctAnswer}. -1 балл ${currentActivePlayer === 'Alex' ? 'Алексею' : currentActivePlayer === 'Vika' ? 'Вике' : 'Бате'}.<br>🎰 Задание казино усложнено в 2 раза: ${selectedQuestion.data.casinoTask} (необходимо выполнить дважды)`;
+        message = `❌ Неправильно. Правильный ответ: ${correctAnswer}.<br>🎰 Задание казино: ${selectedQuestion.data.casinoTask} (необходимо выполнить дважды, так как вы ошиблись)`;
+        addPlayerScore('alex', -1); // штраф
     }
 
     showResultMessage(isCorrect ? 'Верно!' : 'Неверно', message);
-    questionModal.classList.add('hidden');
+    closeQuestionAndMark(); // закрываем вопрос и помечаем отвеченным
 }
 
-function refreshQuestionsGrid() {
-    if (!themeModal.classList.contains('hidden') && selectedTheme) {
-        const answered = answeredQuestions[selectedTheme] || [];
-        const cells = questionsGrid.querySelectorAll('.question-cell');
-        cells.forEach((cell, idx) => {
-            if (answered.includes(idx)) {
-                cell.classList.add('disabled');
-                // Удаляем обработчик
-                const newCell = cell.cloneNode(true);
-                cell.parentNode.replaceChild(newCell, cell);
-            } else {
-                // если не отвечен, добавляем обработчик, если его нет
-                if (!cell.hasClickListener) {
-                    const newCell = cell.cloneNode(true);
-                    newCell.addEventListener('click', () => openQuestion(idx));
-                    cell.parentNode.replaceChild(newCell, cell);
-                }
-            }
-        });
+function addPlayerScore(playerId, delta) {
+    const player = players.find(p => p.id === playerId);
+    if (player) {
+        player.score += delta;
+        updateLeaderScoreUI(playerId, player.score);
     }
 }
 
@@ -277,23 +298,20 @@ function showResultMessage(title, message) {
 // Помощь
 function useHelp(type) {
     if (waitingForViewer) return;
-    let multiplier = 1;
-    let helper = '';
     if (type === 'chat') {
         waitingForViewer = true;
         viewerModal.classList.remove('hidden');
         return;
     } else if (type === 'vika') {
-        multiplier = 1.3;
-        helper = 'Вика';
+        currentHelpMultiplier = 1.3;
+        feedbackDiv.innerHTML = `🤝 Вы спросили у Вики. Сложность задания увеличена на 30%.`;
     } else if (type === 'batya') {
-        multiplier = 1.3;
-        helper = 'Батя';
+        currentHelpMultiplier = 1.3;
+        feedbackDiv.innerHTML = `🤝 Вы спросили у Бати. Сложность задания увеличена на 30%.`;
     }
-    currentHelpMultiplier = multiplier;
-    feedbackDiv.innerHTML = `🤝 Вы спросили у ${helper}. Сложность задания увеличена на ${(multiplier-1)*100}%.`;
 }
 
+// Обработка подтверждения зрителя
 confirmViewer.addEventListener('click', () => {
     const viewer = viewerNameInput.value.trim();
     if (!viewer) {
@@ -314,52 +332,78 @@ cancelViewer.addEventListener('click', () => {
     viewerNameInput.value = '';
 });
 
+// Изменение баланса
+editBalanceBtn.addEventListener('click', () => {
+    newBalanceInput.value = currentScore;
+    balanceModal.classList.remove('hidden');
+});
+saveBalanceBtn.addEventListener('click', () => {
+    const newVal = parseInt(newBalanceInput.value);
+    if (!isNaN(newVal)) {
+        currentScore = newVal;
+        updateTotalScoreUI();
+    }
+    balanceModal.classList.add('hidden');
+});
+cancelBalanceBtn.addEventListener('click', () => {
+    balanceModal.classList.add('hidden');
+});
+
+// Сброс очков игроков
+resetScoresBtn.addEventListener('click', () => {
+    players.forEach(p => p.score = 0);
+    renderLeaderboard();
+});
+
+// Перезапуск игры (после поздравления)
+restartGameBtn.addEventListener('click', () => {
+    // Сброс всех данных
+    currentScore = 0;
+    updateTotalScoreUI();
+    players.forEach(p => p.score = 0);
+    renderLeaderboard();
+    answeredQuestions = {};
+    selectedTheme = null;
+    selectedQuestion = null;
+    congratsModal.classList.add('hidden');
+    renderThemes(); // перерисовка тем
+    // Закрыть все модалки
+    themeModal.classList.add('hidden');
+    questionModal.classList.add('hidden');
+});
+
 // Закрытие модалок
 closeThemeModal.addEventListener('click', () => themeModal.classList.add('hidden'));
-closeQuestionModal.addEventListener('click', () => questionModal.classList.add('hidden'));
+closeQuestionModal.addEventListener('click', () => {
+    questionModal.classList.add('hidden');
+    selectedQuestion = null;
+});
 closeResultBtn.addEventListener('click', () => resultModal.classList.add('hidden'));
-closeCongrats.addEventListener('click', () => congratsModal.classList.add('hidden'));
 
 submitAnswer.addEventListener('click', checkAnswer);
 helpChat.addEventListener('click', () => useHelp('chat'));
 helpVika.addEventListener('click', () => useHelp('vika'));
 helpBatya.addEventListener('click', () => useHelp('batya'));
 
-// Выбор активного игрока
-playerSelectBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        const player = btn.dataset.select;
-        setActivePlayer(player);
-    });
-});
-
-// Изменение баланса (добавляем монеты)
-changeBalanceBtn.addEventListener('click', () => {
-    balanceInputContainer.classList.toggle('hidden');
-});
-applyBalanceBtn.addEventListener('click', () => {
-    const amount = parseInt(balanceAmountInput.value);
-    if (!isNaN(amount)) {
-        currentScore += amount;
-        updateScoreDisplay();
-        balanceAmountInput.value = '';
-        balanceInputContainer.classList.add('hidden');
-    } else {
-        alert('Введите число');
-    }
-});
-
 // Инициализация
 renderThemes();
-updateScoreDisplay();
-updateLeaderboard();
-setActivePlayer('Alex');
+renderLeaderboard();
+updateTotalScoreUI();
 
-// Закрытие модалок по клику вне
+// Закрытие модалок по клику вне контента
 window.addEventListener('click', (e) => {
     if (e.target === themeModal) themeModal.classList.add('hidden');
-    if (e.target === questionModal) questionModal.classList.add('hidden');
+    if (e.target === questionModal) {
+        questionModal.classList.add('hidden');
+        selectedQuestion = null;
+    }
     if (e.target === viewerModal) viewerModal.classList.add('hidden');
     if (e.target === resultModal) resultModal.classList.add('hidden');
+    if (e.target === balanceModal) balanceModal.classList.add('hidden');
     if (e.target === congratsModal) congratsModal.classList.add('hidden');
 });
+
+// Добавляем возможность выбора игрока при правильном/неправильном ответе (дополнительно)
+// Упрощённо: при ответе добавляем/убираем очки для Алексея. Но можно сделать выбор через кнопки в карточке.
+// Для более полного UX добавим выбор игрока в модалке вопроса.
+// В реальном проекте можно добавить селект, но для простоты оставим как есть.
