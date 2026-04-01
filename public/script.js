@@ -60,15 +60,19 @@ const themesData = {
 let currentScore = 0;
 let selectedTheme = null;
 let selectedQuestion = null;
-let currentHelpMultiplier = 1; // множитель сложности задания
+let currentHelpMultiplier = 1;
 let waitingForViewer = false;
 let viewerName = '';
+
+// Отслеживание отвеченных вопросов
+let answeredQuestions = {}; // ключ: `${themeKey}-${index}`
 
 const themeGrid = document.getElementById('themes-grid');
 const themeModal = document.getElementById('theme-modal');
 const questionModal = document.getElementById('question-modal');
 const viewerModal = document.getElementById('viewer-modal');
 const resultModal = document.getElementById('result-modal');
+const congratsModal = document.getElementById('congrats-modal'); // новое окно
 
 const themeNameSpan = document.getElementById('theme-name');
 const questionsGrid = document.getElementById('questions-grid');
@@ -87,10 +91,62 @@ const cancelViewer = document.getElementById('cancel-viewer');
 const closeThemeModal = document.getElementById('close-theme-modal');
 const closeQuestionModal = document.getElementById('close-question-modal');
 const closeResultBtn = document.getElementById('close-result');
+const closeCongratsBtn = document.getElementById('close-congrats');
 
-// Обновление счёта на экране
 function updateScoreDisplay() {
     document.getElementById('total-score').innerText = currentScore;
+}
+
+// Проверка, все ли вопросы отвечены
+function checkAllQuestionsAnswered() {
+    let totalQuestions = 0;
+    let answeredCount = 0;
+    for (const themeKey in themesData) {
+        const theme = themesData[themeKey];
+        for (let i = 0; i < theme.questions.length; i++) {
+            totalQuestions++;
+            if (answeredQuestions[`${themeKey}-${i}`]) answeredCount++;
+        }
+    }
+    if (totalQuestions === answeredCount && totalQuestions > 0) {
+        // Показать окно поздравлений
+        congratsModal.classList.remove('hidden');
+    }
+}
+
+// Отметить вопрос как отвеченный
+function markQuestionAnswered(themeKey, index) {
+    const key = `${themeKey}-${index}`;
+    if (!answeredQuestions[key]) {
+        answeredQuestions[key] = true;
+    }
+    // Обновляем сетку вопросов, если открыта
+    if (selectedTheme === themeKey && !themeModal.classList.contains('hidden')) {
+        refreshQuestionsGrid(themeKey);
+    }
+    // Проверяем, все ли вопросы отвечены
+    checkAllQuestionsAnswered();
+}
+
+// Обновить сетку вопросов (добавить крестики на отвеченные)
+function refreshQuestionsGrid(themeKey) {
+    const theme = themesData[themeKey];
+    const cells = document.querySelectorAll('.question-cell');
+    for (let i = 0; i < theme.questions.length; i++) {
+        const key = `${themeKey}-${i}`;
+        const cell = cells[i];
+        if (answeredQuestions[key]) {
+            cell.classList.add('answered');
+            // Добавляем крестик, если ещё нет
+            if (!cell.querySelector('.checkmark')) {
+                const check = document.createElement('i');
+                check.className = 'fas fa-times checkmark';
+                check.style.marginLeft = '5px';
+                cell.appendChild(check);
+            }
+            cell.style.pointerEvents = 'none';
+        }
+    }
 }
 
 // Генерация карточек тем
@@ -110,7 +166,6 @@ function renderThemes() {
     }
 }
 
-// Открыть модалку с вопросами темы
 function openTheme(themeKey) {
     selectedTheme = themeKey;
     const theme = themesData[themeKey];
@@ -121,14 +176,21 @@ function openTheme(themeKey) {
         const cell = document.createElement('div');
         cell.className = 'question-cell';
         cell.innerText = q.value;
-        // Проверяем, не отвечен ли уже этот вопрос (в localstorage можно, но для простоты пока нет)
-        cell.addEventListener('click', () => openQuestion(i));
+        const key = `${themeKey}-${i}`;
+        if (answeredQuestions[key]) {
+            cell.classList.add('answered');
+            cell.style.pointerEvents = 'none';
+            const check = document.createElement('i');
+            check.className = 'fas fa-times checkmark';
+            cell.appendChild(check);
+        } else {
+            cell.addEventListener('click', () => openQuestion(i));
+        }
         questionsGrid.appendChild(cell);
     }
     themeModal.classList.remove('hidden');
 }
 
-// Открыть конкретный вопрос
 function openQuestion(index) {
     const theme = themesData[selectedTheme];
     const q = theme.questions[index];
@@ -138,51 +200,35 @@ function openQuestion(index) {
     questionTextEl.innerText = q.text;
     answerInput.value = '';
     feedbackDiv.innerHTML = '';
-    currentHelpMultiplier = 1; // сбрасываем множитель
+    currentHelpMultiplier = 1;
     questionModal.classList.remove('hidden');
 }
 
-// Проверка ответа
 function checkAnswer() {
     const userAnswer = answerInput.value.trim().toLowerCase();
     const correctAnswer = selectedQuestion.data.answer.toLowerCase();
     const isCorrect = userAnswer === correctAnswer;
     let message = '';
-    let bonus = 0;
 
     if (isCorrect) {
-        // Начисляем очки
-        const points = selectedQuestion.data.value * 1000; // 1к за 1 очко
+        const points = selectedQuestion.data.value * 1000;
         currentScore += points;
         updateScoreDisplay();
         message = `✅ Правильно! Вы заработали ${points} очков.`;
-        // Теперь задание казино: увеличиваем сложность в зависимости от помощи
         let casinoTask = selectedQuestion.data.casinoTask;
         if (currentHelpMultiplier > 1) {
             casinoTask = `${casinoTask} (усложнено на ${(currentHelpMultiplier-1)*100}%)`;
         }
         message += `<br>🎰 Задание казино: ${casinoTask}`;
-        // Отметить вопрос как отвеченный (можно сохранить)
-        // Здесь можно добавить логику блокировки вопроса
+        // Отмечаем вопрос как отвеченный
+        markQuestionAnswered(selectedQuestion.theme, selectedQuestion.index);
     } else {
-        // Неправильный ответ: задание увеличивается в 100% сложности
         const multipliedTask = `⚠️ Задание усложнено в 2 раза: ${selectedQuestion.data.casinoTask} (необходимо выполнить дважды)`;
         message = `❌ Неправильно. Правильный ответ: ${correctAnswer}.<br>🎰 ${multipliedTask}`;
     }
 
     showResultMessage(isCorrect ? 'Верно!' : 'Неверно', message);
-    // Закрываем окно вопроса и обновляем состояние (можно заблокировать вопрос)
     questionModal.classList.add('hidden');
-    // Обновляем сетку вопросов, чтобы отметить использованный (например, сделать серым)
-    refreshQuestionsGrid();
-}
-
-function refreshQuestionsGrid() {
-    // Если модалка с вопросами открыта, обновляем её
-    if (!themeModal.classList.contains('hidden') && selectedTheme) {
-        // можно перерисовать, но для простоты пока не блокируем повторные ответы
-        // в реальном проекте нужно хранить массив отвеченных вопросов
-    }
 }
 
 function showResultMessage(title, message) {
@@ -191,32 +237,21 @@ function showResultMessage(title, message) {
     resultModal.classList.remove('hidden');
 }
 
-// Помощь
 function useHelp(type) {
     if (waitingForViewer) return;
-    let multiplier = 1;
-    let helper = '';
     if (type === 'chat') {
-        // Открываем окно ввода ника
         waitingForViewer = true;
         viewerModal.classList.remove('hidden');
         return;
     } else if (type === 'vika') {
-        multiplier = 1.3;
-        helper = 'Вика';
+        currentHelpMultiplier = 1.3;
+        feedbackDiv.innerHTML = `🤝 Вы спросили у Вики. Сложность задания увеличена на 30%.`;
     } else if (type === 'batya') {
-        multiplier = 1.3;
-        helper = 'Батя';
-    }
-    currentHelpMultiplier = multiplier;
-    feedbackDiv.innerHTML = `🤝 Вы спросили у ${helper}. Сложность задания увеличена на ${(multiplier-1)*100}%.`;
-    // Если это не чат, то сразу закрываем помощь
-    if (type !== 'chat') {
-        // можно дополнительно показать подсказку
+        currentHelpMultiplier = 1.3;
+        feedbackDiv.innerHTML = `🤝 Вы спросили у Бати. Сложность задания увеличена на 30%.`;
     }
 }
 
-// Обработка подтверждения зрителя
 confirmViewer.addEventListener('click', () => {
     const viewer = viewerNameInput.value.trim();
     if (!viewer) {
@@ -224,7 +259,6 @@ confirmViewer.addEventListener('click', () => {
         return;
     }
     viewerName = viewer;
-    // Начисляем зрителю +5к (пока просто показываем)
     feedbackDiv.innerHTML = `💬 Чат: ${viewer} помогает! +5000 монет зрителю. Сложность задания увеличена на 60%.`;
     currentHelpMultiplier = 1.6;
     waitingForViewer = false;
@@ -238,10 +272,10 @@ cancelViewer.addEventListener('click', () => {
     viewerNameInput.value = '';
 });
 
-// Закрытие модалок
 closeThemeModal.addEventListener('click', () => themeModal.classList.add('hidden'));
 closeQuestionModal.addEventListener('click', () => questionModal.classList.add('hidden'));
 closeResultBtn.addEventListener('click', () => resultModal.classList.add('hidden'));
+closeCongratsBtn.addEventListener('click', () => congratsModal.classList.add('hidden'));
 
 submitAnswer.addEventListener('click', checkAnswer);
 helpChat.addEventListener('click', () => useHelp('chat'));
@@ -252,10 +286,10 @@ helpBatya.addEventListener('click', () => useHelp('batya'));
 renderThemes();
 updateScoreDisplay();
 
-// Закрытие модалок по клику вне контента
 window.addEventListener('click', (e) => {
     if (e.target === themeModal) themeModal.classList.add('hidden');
     if (e.target === questionModal) questionModal.classList.add('hidden');
     if (e.target === viewerModal) viewerModal.classList.add('hidden');
     if (e.target === resultModal) resultModal.classList.add('hidden');
+    if (e.target === congratsModal) congratsModal.classList.add('hidden');
 });

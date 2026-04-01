@@ -354,3 +354,78 @@ footer {
         font-size: 1.2rem;
     }
 }
+/* Информационная панель внизу */
+.info-panel {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+    background: rgba(0,0,0,0.4);
+    border-radius: 24px;
+    padding: 1.5rem;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,215,0,0.2);
+}
+
+.leaderboard, .last-events, .casino-tip {
+    background: rgba(0,0,0,0.3);
+    border-radius: 20px;
+    padding: 1rem;
+}
+
+.leaderboard h3, .last-events h3 {
+    color: #FFD700;
+    margin-bottom: 0.8rem;
+    font-size: 1.1rem;
+}
+
+.leader-entry {
+    padding: 0.3rem 0;
+    border-bottom: 1px solid rgba(255,215,0,0.2);
+    font-size: 0.9rem;
+}
+
+.event {
+    padding: 0.3rem 0;
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+.casino-tip {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    justify-content: center;
+    text-align: center;
+}
+
+.casino-tip i {
+    font-size: 2rem;
+    color: #FFD700;
+}
+
+.casino-tip p {
+    font-size: 0.9rem;
+}
+
+/* Крестик на отвеченных вопросах */
+.question-cell.answered {
+    background: rgba(0,0,0,0.6);
+    text-decoration: line-through;
+    color: #888;
+    position: relative;
+}
+
+.checkmark {
+    margin-left: 0.3rem;
+    font-size: 0.8rem;
+    color: #ff4444;
+}
+
+@media (max-width: 768px) {
+    .info-panel {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}

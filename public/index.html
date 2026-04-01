@@ -22,8 +22,28 @@
             </div>
         </header>
 
-        <div class="themes-grid" id="themes-grid">
-            <!-- темы будут добавлены динамически -->
+        <div class="themes-grid" id="themes-grid"></div>
+
+        <!-- Новый блок внизу -->
+        <div class="info-panel">
+            <div class="leaderboard">
+                <h3><i class="fas fa-trophy"></i> Таблица лидеров</h3>
+                <div id="leaderboard-list">
+                    <div class="leader-entry">Алексей: 0</div>
+                    <div class="leader-entry">Вика: 0</div>
+                    <div class="leader-entry">Батя: 0</div>
+                </div>
+            </div>
+            <div class="last-events">
+                <h3><i class="fas fa-history"></i> Последние события</h3>
+                <div id="events-list">
+                    <div class="event">✨ Выберите тему и начните игру!</div>
+                </div>
+            </div>
+            <div class="casino-tip">
+                <i class="fas fa-dice-d6"></i>
+                <p>Самый умный получает бонус в казино!</p>
+            </div>
         </div>
 
         <footer>
@@ -83,6 +103,17 @@
             <h3 id="result-title"></h3>
             <p id="result-message"></p>
             <button id="close-result" class="btn-primary">Продолжить</button>
+        </div>
+    </div>
+
+    <!-- Окно поздравления -->
+    <div id="congrats-modal" class="modal hidden">
+        <div class="modal-content glass">
+            <h2><i class="fas fa-crown"></i> Поздравляем!</h2>
+            <p>Вы ответили на все вопросы!</p>
+            <p>Ваш итоговый счёт: <span id="final-score">0</span> очков.</p>
+            <p>Вы — настоящий знаток!</p>
+            <button id="close-congrats" class="btn-primary">Закрыть</button>
         </div>
     </div>
 
