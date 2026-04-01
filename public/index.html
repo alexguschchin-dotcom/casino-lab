@@ -2,56 +2,90 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Своя игра | Казино-квиз</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Своя игра · Казино-квиз</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
+    <div class="stars-bg"></div>
     <div class="game-container">
         <header>
-            <h1><i class="fas fa-dice-d6"></i> Своя игра · Казино-квиз <i class="fas fa-trophy"></i></h1>
-            <div class="score-board">💰 Счёт: <span id="score">0</span></div>
+            <h1 class="game-title">
+                <span class="title-glow">Своя игра</span>
+                <span class="title-casino">· Казино-квиз</span>
+            </h1>
+            <div class="score-board">
+                <i class="fas fa-coins"></i>
+                <span id="total-score">0</span>
+            </div>
         </header>
 
-        <div class="game-board" id="game-board">
-            <!-- Таблица тем и сложностей будет создана JS -->
+        <div class="themes-grid" id="themes-grid">
+            <!-- темы будут добавлены динамически -->
         </div>
 
-        <div class="question-panel hidden" id="question-panel">
-            <div class="question-card">
-                <h2 id="question-text"></h2>
-                <div class="task-info" id="task-info"></div>
-                <div class="answer-area">
-                    <input type="text" id="answer-input" placeholder="Введите ответ">
-                    <button id="submit-answer">Ответить</button>
-                </div>
-                <div class="help-buttons">
-                    <button id="help-chat">💬 Спросить чат (+60% сложности)</button>
-                    <button id="help-vika">👩 Спросить Вику (+30%)</button>
-                    <button id="help-batya">👨 Спросить Батю (+30%)</button>
-                </div>
-                <div class="help-result hidden" id="help-result"></div>
-                <div class="message" id="message"></div>
+        <footer>
+            <p>Выберите тему, затем вопрос — и докажите, что вы — самый умный!</p>
+        </footer>
+    </div>
+
+    <!-- Модальное окно с вопросами темы -->
+    <div id="theme-modal" class="modal hidden">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h2 id="theme-name">Тема</h2>
+                <button class="close-modal" id="close-theme-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="questions-grid" id="questions-grid"></div>
+        </div>
+    </div>
+
+    <!-- Карточка вопроса -->
+    <div id="question-modal" class="modal hidden">
+        <div class="question-card glass">
+            <div class="question-header">
+                <h3 id="question-category">Категория</h3>
+                <span id="question-value">Стоимость: 0</span>
+                <button class="close-modal" id="close-question-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="question-text" id="question-text">Текст вопроса</div>
+            <div class="answer-area">
+                <input type="text" id="answer-input" placeholder="Введите ваш ответ..." autocomplete="off">
+                <button id="submit-answer" class="btn-primary">Ответить</button>
+            </div>
+            <div class="help-buttons">
+                <button id="help-chat" class="help-btn"><i class="fas fa-comments"></i> Спросить чат</button>
+                <button id="help-vika" class="help-btn"><i class="fas fa-user-ninja"></i> Спросить Вику</button>
+                <button id="help-batya" class="help-btn"><i class="fas fa-user-tie"></i> Спросить Батю</button>
+            </div>
+            <div class="feedback" id="feedback"></div>
+        </div>
+    </div>
+
+    <!-- Модалка для выбора зрителя (помощь чата) -->
+    <div id="viewer-modal" class="modal hidden">
+        <div class="modal-content glass small">
+            <h3>👥 Помощь чата</h3>
+            <p>Введите ник зрителя, который поможет:</p>
+            <input type="text" id="viewer-name" placeholder="Ник зрителя">
+            <div class="modal-buttons">
+                <button id="confirm-viewer" class="btn-primary">Подтвердить</button>
+                <button id="cancel-viewer" class="btn-secondary">Отмена</button>
             </div>
         </div>
-
-        <div class="controls">
-            <button id="reset-game" class="reset-btn">🔄 Новая игра</button>
-        </div>
     </div>
 
+    <!-- Модалка результата -->
     <div id="result-modal" class="modal hidden">
-        <div class="modal-content">
-            <h2 id="modal-title"></h2>
-            <p id="modal-message"></p>
-            <p id="modal-task"></p>
-            <button id="close-modal">Продолжить</button>
+        <div class="modal-content glass small">
+            <h3 id="result-title"></h3>
+            <p id="result-message"></p>
+            <button id="close-result" class="btn-primary">Продолжить</button>
         </div>
     </div>
 
-    <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
