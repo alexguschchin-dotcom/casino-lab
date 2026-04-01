@@ -70,6 +70,7 @@ let selectedQuestion = null;
 let currentHelpMultiplier = 1;
 let waitingForViewer = false;
 let viewerName = '';
+let isChatHelpUsed = false; // флаг, использовалась ли помощь чата для текущего вопроса
 let answeredQuestions = {}; // { themeKey: [index1, index2] }
 
 // DOM элементы
@@ -80,6 +81,7 @@ const viewerModal = document.getElementById('viewer-modal');
 const resultModal = document.getElementById('result-modal');
 const balanceModal = document.getElementById('balance-modal');
 const congratsModal = document.getElementById('congrats-modal');
+const rulesModal = document.getElementById('rules-modal');
 
 const themeNameSpan = document.getElementById('theme-name');
 const questionsGrid = document.getElementById('questions-grid');
@@ -106,6 +108,7 @@ const newBalanceInput = document.getElementById('new-balance');
 const resetScoresBtn = document.getElementById('reset-scores');
 const restartGameBtn = document.getElementById('restart-game');
 const answeringPlayerSelect = document.getElementById('answering-player');
+const closeRulesBtn = document.getElementById('close-rules');
 
 // Обновление таблицы лидеров
 function renderLeaderboard() {
@@ -204,6 +207,7 @@ function openQuestion(index) {
     answerInput.value = '';
     feedbackDiv.innerHTML = '';
     currentHelpMultiplier = 1;
+    isChatHelpUsed = false;
     answeringPlayerSelect.value = 'alex';
     questionModal.classList.remove('hidden');
 }
@@ -252,12 +256,10 @@ function checkAnswer() {
     const correctAnswer = selectedQuestion.data.answer.toLowerCase();
     const isCorrect = userAnswer === correctAnswer;
     const questionLevel = selectedQuestion.data.value; // 1..5
-    const basePoints = questionLevel * 1000;
     let message = '';
     const selectedPlayerId = answeringPlayerSelect.value;
 
     if (isCorrect) {
-        // НЕ меняем currentScore (баланс казино) — оставляем для ручного редактирования
         message = `✅ Правильно!`;
         let casinoTask = selectedQuestion.data.casinoTask;
         if (currentHelpMultiplier > 1) {
@@ -266,14 +268,27 @@ function checkAnswer() {
         message += `<br>🎰 Задание казино: ${casinoTask}`;
         // Начисляем игроку +questionLevel баллов (за уровень)
         addPlayerScore(selectedPlayerId, questionLevel);
+        
+        // Если использовалась помощь чата — начисляем зрителю +5000 монет
+        if (isChatHelpUsed && viewerName) {
+            message += `<br>💬 Зритель ${viewerName} получает +5000 монет за правильный ответ!`;
+            // Здесь можно добавить логику реального начисления монет зрителю, если нужно
+        }
     } else {
         message = `❌ Неправильно. Правильный ответ: ${correctAnswer}.<br>🎰 Задание казино: ${selectedQuestion.data.casinoTask} (необходимо выполнить дважды, так как вы ошиблись)`;
         // Штрафуем игрока на questionLevel баллов
         addPlayerScore(selectedPlayerId, -questionLevel);
+        // Если помощь чата была использована, но ответ неправильный — зритель не получает бонус
+        if (isChatHelpUsed && viewerName) {
+            message += `<br>💬 К сожалению, зритель ${viewerName} не получает бонус, так как ответ неверный.`;
+        }
     }
 
     showResultMessage(isCorrect ? 'Верно!' : 'Неверно', message);
     closeQuestionAndMark();
+    // Сбрасываем флаги помощи чата
+    isChatHelpUsed = false;
+    viewerName = '';
 }
 
 function showResultMessage(title, message) {
@@ -304,8 +319,9 @@ confirmViewer.addEventListener('click', () => {
         return;
     }
     viewerName = viewer;
-    feedbackDiv.innerHTML = `💬 Чат: ${viewer} помогает! +5000 монет зрителю. Сложность задания увеличена на 60%.`;
+    feedbackDiv.innerHTML = `💬 Чат: ${viewer} помогает! Если ответ будет правильным, зритель получит +5000 монет. Сложность задания увеличена на 60%.`;
     currentHelpMultiplier = 1.6;
+    isChatHelpUsed = true;
     waitingForViewer = false;
     viewerModal.classList.add('hidden');
     viewerNameInput.value = '';
@@ -358,6 +374,9 @@ closeQuestionModal.addEventListener('click', () => {
     selectedQuestion = null;
 });
 closeResultBtn.addEventListener('click', () => resultModal.classList.add('hidden'));
+closeRulesBtn.addEventListener('click', () => {
+    rulesModal.classList.add('hidden');
+});
 
 submitAnswer.addEventListener('click', checkAnswer);
 helpChat.addEventListener('click', () => useHelp('chat'));
@@ -374,6 +393,7 @@ window.addEventListener('click', (e) => {
     if (e.target === resultModal) resultModal.classList.add('hidden');
     if (e.target === balanceModal) balanceModal.classList.add('hidden');
     if (e.target === congratsModal) congratsModal.classList.add('hidden');
+    if (e.target === rulesModal) rulesModal.classList.add('hidden');
 });
 
 // Генерация падающих лепестков сакуры
@@ -411,4 +431,8 @@ function createSakuraPetals() {
 renderThemes();
 renderLeaderboard();
 updateTotalScoreUI();
-window.addEventListener('load', createSakuraPetals);
+window.addEventListener('load', () => {
+    createSakuraPetals();
+    // Показываем модалку правил при загрузке
+    rulesModal.classList.remove('hidden');
+});

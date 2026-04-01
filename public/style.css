@@ -611,3 +611,51 @@ body {
         font-size: 1.2rem;
     }
 }
+/* В конец файла добавить: */
+
+.rules-modal {
+    text-align: center;
+    max-width: 550px;
+    width: 90%;
+}
+
+.rules-icon {
+    font-size: 3rem;
+    color: #f9a825;
+    margin-bottom: 1rem;
+}
+
+.rules-text {
+    text-align: left;
+    margin: 1.5rem 0;
+}
+
+.rules-text p {
+    margin: 0.8rem 0;
+    line-height: 1.4;
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-start;
+}
+
+.rules-text p i {
+    margin-top: 0.2rem;
+    min-width: 1.5rem;
+    color: #f9a825;
+}
+
+#close-rules {
+    margin-top: 1rem;
+    background: #f9a825;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 60px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#close-rules:hover {
+    background: #ffb74d;
+    transform: scale(1.02);
+}

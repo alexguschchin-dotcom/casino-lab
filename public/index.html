@@ -22,13 +22,13 @@
                     <span class="title-glow">Своя игра</span>
                     <span class="title-casino">· Казино-квиз</span>
                 </h1>
-                <div class="date-badge">🌸 1 апреля · Весенний кураж 🌸</div>
+                <div class="date-badge">🌸  Весенний кураж 🌸</div>
             </div>
             <div class="score-panel">
                 <div class="total-score-card">
                     <i class="fas fa-coins"></i>
                     <span id="total-score">0</span>
-                    <span class="score-label">очков</span>
+                    <span class="score-label">баланс казино</span>
                 </div>
                 <button id="edit-balance" class="edit-balance-btn"><i class="fas fa-pen"></i> Изменить баланс</button>
             </div>
@@ -53,7 +53,7 @@
                 <span>🌸</span> Весенняя викторина <span>🌸</span>
             </div>
             <div class="footer-tip">
-                <i class="fas fa-lightbulb"></i> Выберите тему, затем вопрос — ответьте правильно, чтобы получить очки и задание казино!
+                <i class="fas fa-lightbulb"></i> Выберите тему, затем вопрос — ответьте правильно, чтобы получить очки лидеров и задание казино!
             </div>
         </footer>
     </div>
@@ -143,6 +143,24 @@
             <h2>Поздравляем!</h2>
             <p>Вы ответили на все вопросы! <br> Вы настоящий знаток!</p>
             <button id="restart-game" class="btn-primary">Сыграть снова</button>
+        </div>
+    </div>
+
+    <!-- Модалка правил (весенний дизайн) -->
+    <div id="rules-modal" class="modal">
+        <div class="modal-content glass small rules-modal">
+            <i class="fas fa-seedling rules-icon"></i>
+            <h2>🌸 Весенние правила игры 🌸</h2>
+            <div class="rules-text">
+                <p><i class="fas fa-question-circle"></i> <strong>Выберите тему</strong> и вопрос (стоимость 1–5).</p>
+                <p><i class="fas fa-edit"></i> <strong>Ответьте на вопрос</strong> — правильный ответ приносит вам очки в таблицу лидеров (количество очков равно сложности вопроса).</p>
+                <p><i class="fas fa-users"></i> <strong>Помощь чата</strong> — если зритель поможет правильно ответить, он получит +5000 монет, а задание казино усложнится на 60%.</p>
+                <p><i class="fas fa-user-friends"></i> <strong>Помощь Вики или Бати</strong> — сложность задания увеличивается на 30%.</p>
+                <p><i class="fas fa-balance-scale"></i> <strong>Баланс казино</strong> можно менять вручную кнопкой "Изменить баланс".</p>
+                <p><i class="fas fa-chart-line"></i> <strong>Таблица лидеров</strong> — очки начисляются за правильные ответы и снимаются за неправильные (по уровню сложности).</p>
+                <p><i class="fas fa-trophy"></i> <strong>После ответа на все вопросы</strong> вы увидите поздравление!</p>
+            </div>
+            <button id="close-rules" class="btn-primary">Погнали! 🚀</button>
         </div>
     </div>
 
