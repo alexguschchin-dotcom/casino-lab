@@ -225,7 +225,8 @@ function closeQuestionAndMark() {
     if (!themeModal.classList.contains('hidden') && selectedTheme === themeKey) {
         openTheme(themeKey);
     }
-    checkAllQuestionsAnswered();
+    // Принудительная проверка всех вопросов с небольшой задержкой
+    setTimeout(() => checkAllQuestionsAnswered(), 100);
 }
 
 function checkAllQuestionsAnswered() {
