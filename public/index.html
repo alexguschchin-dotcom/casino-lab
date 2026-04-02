@@ -79,7 +79,6 @@
             </div>
             <div class="question-text" id="question-text">Текст вопроса</div>
             
-            <!-- Выбор игрока, который отвечает -->
             <div class="player-selector">
                 <label>Кто отвечает?</label>
                 <select id="answering-player">
@@ -102,7 +101,7 @@
         </div>
     </div>
 
-    <!-- Модалка для выбора зрителя (помощь чата) -->
+    <!-- Модалка для выбора зрителя -->
     <div id="viewer-modal" class="modal hidden">
         <div class="modal-content glass small">
             <h3>👥 Помощь чата</h3>
@@ -136,26 +135,30 @@
         </div>
     </div>
 
-    <!-- Модалка завершения игры -->
+    <!-- НОВАЯ МОДАЛКА ПОЗДРАВЛЕНИЙ -->
     <div id="congrats-modal" class="modal hidden">
-        <div class="modal-content glass small congrats">
-            <i class="fas fa-crown"></i>
-            <h2>Поздравляем!</h2>
-            <p>Вы ответили на все вопросы! <br> Вы настоящий знаток!</p>
-            <button id="restart-game" class="btn-primary">Сыграть снова</button>
+        <div class="modal-content glass congrats-modal-content">
+            <div class="confetti-bg"></div>
+            <i class="fas fa-crown congrats-crown"></i>
+            <h2 class="congrats-title">🎉 Поздравляем! 🎉</h2>
+            <p class="congrats-subtitle">Вы прошли всю викторину!</p>
+            <div class="congrats-scores" id="congrats-scores"></div>
+            <div class="congrats-buttons">
+                <button id="restart-game" class="btn-primary congrats-btn">🌸 Сыграть снова 🌸</button>
+            </div>
         </div>
     </div>
 
-    <!-- Модалка правил (весенний дизайн) -->
+    <!-- Модалка правил -->
     <div id="rules-modal" class="modal">
         <div class="modal-content glass small rules-modal">
             <i class="fas fa-seedling rules-icon"></i>
             <h2>🌸 Весенние правила игры 🌸</h2>
             <div class="rules-text">
-                <p><i class="fas fa-question-circle"></i> <strong>Выберите тему</strong> после выберите вопрос и ответьте на негои выполните задание(стоимость 1–5).</p>
+                <p><i class="fas fa-question-circle"></i> <strong>Выберите тему</strong> и вопрос (стоимость 1–5).</p>
                 <p><i class="fas fa-edit"></i> <strong>Ответьте на вопрос</strong> — правильный ответ приносит вам очки в таблицу лидеров (количество очков равно сложности вопроса).</p>
-                <p><i class="fas fa-users"></i> <strong>Помощь чата</strong> — если зритель поможет правильно ответить, он получит +5000 монет, а задание казино усложнится на 60% (Важно! Вы сами увеличиваете сложность на 60%).</p>
-                <p><i class="fas fa-user-friends"></i> <strong>Помощь Вики или Бати</strong> — сложность задания увеличивается на 30% (Важно! Вы сами увеличиваете сложность на 60%).</p>
+                <p><i class="fas fa-users"></i> <strong>Помощь чата</strong> — если зритель поможет правильно ответить, он получит +5000 монет, а задание казино усложнится на 60%.</p>
+                <p><i class="fas fa-user-friends"></i> <strong>Помощь Вики или Бати</strong> — сложность задания увеличивается на 30%.</p>
                 <p><i class="fas fa-balance-scale"></i> <strong>Баланс казино</strong> можно менять вручную кнопкой "Изменить баланс".</p>
                 <p><i class="fas fa-chart-line"></i> <strong>Таблица лидеров</strong> — очки начисляются за правильные ответы и снимаются за неправильные (по уровню сложности).</p>
                 <p><i class="fas fa-trophy"></i> <strong>После ответа на все вопросы</strong> вы увидите поздравление!</p>

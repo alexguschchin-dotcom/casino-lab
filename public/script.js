@@ -64,14 +64,14 @@ const players = [
     { id: 'batya', name: 'Батя', icon: 'fas fa-user-tie', score: 0 }
 ];
 
-let currentScore = 0; // общий счёт (баланс казино) — изменяется только вручную
+let currentScore = 0;
 let selectedTheme = null;
 let selectedQuestion = null;
 let currentHelpMultiplier = 1;
 let waitingForViewer = false;
 let viewerName = '';
-let isChatHelpUsed = false; // флаг, использовалась ли помощь чата для текущего вопроса
-let answeredQuestions = {}; // { themeKey: [index1, index2] }
+let isChatHelpUsed = false;
+let answeredQuestions = {};
 
 // DOM элементы
 const themeGrid = document.getElementById('themes-grid');
@@ -135,6 +135,8 @@ function renderLeaderboard() {
             if (player) {
                 player.score++;
                 updateLeaderScoreUI(id, player.score);
+                // После изменения вручную тоже проверяем завершение
+                checkAllQuestionsAnswered();
             }
         });
     });
@@ -145,6 +147,7 @@ function renderLeaderboard() {
             if (player) {
                 player.score--;
                 updateLeaderScoreUI(id, player.score);
+                checkAllQuestionsAnswered();
             }
         });
     });
@@ -225,8 +228,8 @@ function closeQuestionAndMark() {
     if (!themeModal.classList.contains('hidden') && selectedTheme === themeKey) {
         openTheme(themeKey);
     }
-    // Принудительная проверка всех вопросов с небольшой задержкой
-    setTimeout(() => checkAllQuestionsAnswered(), 100);
+    // Обязательно проверяем завершение после каждого закрытия вопроса
+    checkAllQuestionsAnswered();
 }
 
 function checkAllQuestionsAnswered() {
@@ -239,8 +242,25 @@ function checkAllQuestionsAnswered() {
         totalAnswered += answered;
     }
     if (totalAnswered === totalQuestions && totalQuestions > 0) {
-        congratsModal.classList.remove('hidden');
+        showCongratsModal();
     }
+}
+
+function showCongratsModal() {
+    // Заполняем итоговыми очками
+    const container = document.getElementById('congrats-scores');
+    container.innerHTML = '';
+    const sorted = [...players].sort((a,b) => b.score - a.score);
+    sorted.forEach(player => {
+        const item = document.createElement('div');
+        item.className = 'congrats-score-item';
+        item.innerHTML = `
+            <div class="congrats-score-name"><i class="${player.icon}"></i> ${player.name}</div>
+            <div class="congrats-score-value">${player.score} очков</div>
+        `;
+        container.appendChild(item);
+    });
+    congratsModal.classList.remove('hidden');
 }
 
 function addPlayerScore(playerId, delta) {
@@ -248,6 +268,7 @@ function addPlayerScore(playerId, delta) {
     if (player) {
         player.score += delta;
         updateLeaderScoreUI(playerId, player.score);
+        // После изменения счёта проверяем, не завершилась ли игра (хотя это уже делается после закрытия вопроса)
     }
 }
 
@@ -256,7 +277,7 @@ function checkAnswer() {
     const userAnswer = answerInput.value.trim().toLowerCase();
     const correctAnswer = selectedQuestion.data.answer.toLowerCase();
     const isCorrect = userAnswer === correctAnswer;
-    const questionLevel = selectedQuestion.data.value; // 1..5
+    const questionLevel = selectedQuestion.data.value;
     let message = '';
     const selectedPlayerId = answeringPlayerSelect.value;
 
@@ -267,27 +288,20 @@ function checkAnswer() {
             casinoTask = `${casinoTask} (усложнено на ${Math.round((currentHelpMultiplier-1)*100)}%)`;
         }
         message += `<br>🎰 Задание казино: ${casinoTask}`;
-        // Начисляем игроку +questionLevel баллов (за уровень)
         addPlayerScore(selectedPlayerId, questionLevel);
-        
-        // Если использовалась помощь чата — начисляем зрителю +5000 монет
         if (isChatHelpUsed && viewerName) {
             message += `<br>💬 Зритель ${viewerName} получает +5000 монет за правильный ответ!`;
-            // Здесь можно добавить логику реального начисления монет зрителю, если нужно
         }
     } else {
         message = `❌ Неправильно. Правильный ответ: ${correctAnswer}.<br>🎰 Задание казино: ${selectedQuestion.data.casinoTask} (необходимо выполнить дважды, так как вы ошиблись)`;
-        // Штрафуем игрока на questionLevel баллов
         addPlayerScore(selectedPlayerId, -questionLevel);
-        // Если помощь чата была использована, но ответ неправильный — зритель не получает бонус
         if (isChatHelpUsed && viewerName) {
             message += `<br>💬 К сожалению, зритель ${viewerName} не получает бонус, так как ответ неверный.`;
         }
     }
 
     showResultMessage(isCorrect ? 'Верно!' : 'Неверно', message);
-    closeQuestionAndMark();
-    // Сбрасываем флаги помощи чата
+    closeQuestionAndMark(); // Здесь вызовется checkAllQuestionsAnswered
     isChatHelpUsed = false;
     viewerName = '';
 }
@@ -353,6 +367,7 @@ cancelBalanceBtn.addEventListener('click', () => {
 resetScoresBtn.addEventListener('click', () => {
     players.forEach(p => p.score = 0);
     renderLeaderboard();
+    checkAllQuestionsAnswered(); // на случай если сброс произошёл после завершения
 });
 
 restartGameBtn.addEventListener('click', () => {
@@ -434,6 +449,5 @@ renderLeaderboard();
 updateTotalScoreUI();
 window.addEventListener('load', () => {
     createSakuraPetals();
-    // Показываем модалку правил при загрузке
     rulesModal.classList.remove('hidden');
 });
