@@ -37,11 +37,11 @@ const themesData = {
         name: 'Наука',
         icon: 'fas fa-flask',
         questions: [
-            { value: 1, text: 'Кто открыл закон всемирного тяготения?', answer: 'Исаак Ньютон', casinoTask: 'Поставить 100к в любой лайв игре' },
+            { value: 1, text: 'Кто открыл закон всемирного тяготения?', answer: 'Ньютон', casinoTask: 'Поставить 100к в любой лайв игре' },
             { value: 2, text: 'Какой химический элемент обозначается буквой O?', answer: 'Кислород', casinoTask: 'Окупить бонус в retro sweet' },
             { value: 3, text: 'Сколько планет в Солнечной системе? Ответ цифрой', answer: '8', casinoTask: 'Пробить топовую бонуску в Мумии в рандомке за 90к ' },
             { value: 4, text: 'Назовите самую маленькую частицу, сохраняющую свойства элемента', answer: 'Атом', casinoTask: 'Покупать топовый бонус в le bandit за 100к пока не окупиться' },
-            { value: 5, text: 'Кто изобрёл радио? В ответ только фамилию', answer: 'Попов', casinoTask: 'Выбить х1000 в sweet bonanza 1000 в бонуске за 36к' }
+            { value: 5, text: 'Кто изобрёл радио?', answer: 'Попов', casinoTask: 'Выбить х1000 в sweet bonanza 1000 в бонуске за 36к' }
         ]
     },
     casino: {
@@ -72,6 +72,7 @@ let waitingForViewer = false;
 let viewerName = '';
 let isChatHelpUsed = false;
 let answeredQuestions = {};
+let pendingLastQuestion = false; // флаг, что текущий вопрос последний и нужно показать поздравление после подтверждения
 
 // DOM элементы
 const themeGrid = document.getElementById('themes-grid');
@@ -225,11 +226,15 @@ function closeQuestionAndMark() {
     if (!themeModal.classList.contains('hidden') && selectedTheme === themeKey) {
         openTheme(themeKey);
     }
-    // Проверяем завершение игры ТОЛЬКО после того, как вопрос отвечен и закрыт
-    checkAllQuestionsAnswered();
+    // Проверяем, все ли вопросы отвечены
+    const allAnswered = checkAllQuestionsAnsweredFlag();
+    if (allAnswered) {
+        // Если все вопросы отвечены, показываем поздравление
+        showCongratsModal();
+    }
 }
 
-function checkAllQuestionsAnswered() {
+function checkAllQuestionsAnsweredFlag() {
     let totalAnswered = 0;
     let totalQuestions = 0;
     for (const themeKey of Object.keys(themesData)) {
@@ -238,10 +243,7 @@ function checkAllQuestionsAnswered() {
         const answered = answeredQuestions[themeKey] ? answeredQuestions[themeKey].length : 0;
         totalAnswered += answered;
     }
-    if (totalAnswered === totalQuestions && totalQuestions > 0) {
-        // Небольшая задержка, чтобы модалка результата успела закрыться
-        setTimeout(() => showCongratsModal(), 300);
-    }
+    return totalAnswered === totalQuestions && totalQuestions > 0;
 }
 
 function showCongratsModal() {
@@ -296,17 +298,46 @@ function checkAnswer() {
         }
     }
 
-    showResultMessage(isCorrect ? 'Верно!' : 'Неверно', message);
-    closeQuestionAndMark(); // вызовет проверку завершения после закрытия вопроса
+    // Перед показом результата проверяем, был ли это последний вопрос
+    const wasLastQuestion = checkIfLastQuestion();
+
+    showResultMessage(isCorrect ? 'Верно!' : 'Неверно', message, wasLastQuestion);
     isChatHelpUsed = false;
     viewerName = '';
 }
 
-function showResultMessage(title, message) {
+function checkIfLastQuestion() {
+    // Подсчитываем количество уже отвеченных вопросов (включая текущий, который ещё не добавлен)
+    let answeredCount = 0;
+    for (const themeKey of Object.keys(themesData)) {
+        const answered = answeredQuestions[themeKey] ? answeredQuestions[themeKey].length : 0;
+        answeredCount += answered;
+    }
+    // Текущий вопрос ещё не добавлен в answeredQuestions, поэтому если сейчас отвечено 24 из 25, то текущий последний
+    const totalQuestions = 25;
+    return answeredCount === totalQuestions - 1;
+}
+
+function showResultMessage(title, message, isLastQuestion) {
     document.getElementById('result-title').innerText = title;
     document.getElementById('result-message').innerHTML = message;
     resultModal.classList.remove('hidden');
+    
+    // Сохраняем флаг, чтобы после нажатия "Продолжить" обработать завершение
+    if (isLastQuestion) {
+        pendingLastQuestion = true;
+    } else {
+        pendingLastQuestion = false;
+    }
 }
+
+// Обработчик кнопки "Продолжить" в модалке результата
+closeResultBtn.onclick = () => {
+    resultModal.classList.add('hidden');
+    // Закрываем текущий вопрос и помечаем его отвеченным
+    closeQuestionAndMark();
+    pendingLastQuestion = false;
+};
 
 function useHelp(type) {
     if (waitingForViewer) return;
@@ -384,7 +415,6 @@ closeQuestionModal.addEventListener('click', () => {
     questionModal.classList.add('hidden');
     selectedQuestion = null;
 });
-closeResultBtn.addEventListener('click', () => resultModal.classList.add('hidden'));
 closeRulesBtn.addEventListener('click', () => {
     rulesModal.classList.add('hidden');
 });
