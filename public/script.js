@@ -18,7 +18,7 @@ const themesData = {
             { value: 1, text: 'Какая река является самой длинной в мире?', answer: 'Нил', casinoTask: 'Поставьте на 1-12 в рулетке по 5к' },
             { value: 2, text: 'Столица Австралии?', answer: 'Канберра', casinoTask: 'Выбить бонус в hot fiesta от 1000 монет' },
             { value: 3, text: 'Самая высокая гора на Земле?', answer: 'Эверест', casinoTask: 'Сделать депное колесо от 1000$ на 50к' },
-            { value: 4, text: 'Назовите самый большой океан', answer: 'Тихий', casinoTask: 'Выбить любой бонус в crazy time' },
+            { value: 4, text: 'Назовите самый большой океан. Ответ одним словом', answer: 'Тихий', casinoTask: 'Выбить любой бонус в crazy time' },
             { value: 5, text: 'Какая страна имеет самое большое количество часовых поясов?', answer: 'Россия', casinoTask: 'Сделать накид создателю' }
         ]
     },
@@ -37,11 +37,11 @@ const themesData = {
         name: 'Наука',
         icon: 'fas fa-flask',
         questions: [
-            { value: 1, text: 'Кто открыл закон всемирного тяготения?', answer: 'Ньютон', casinoTask: 'Поставить 100к в любой лайв игре' },
+            { value: 1, text: 'Кто открыл закон всемирного тяготения?', answer: 'Исаак Ньютон', casinoTask: 'Поставить 100к в любой лайв игре' },
             { value: 2, text: 'Какой химический элемент обозначается буквой O?', answer: 'Кислород', casinoTask: 'Окупить бонус в retro sweet' },
             { value: 3, text: 'Сколько планет в Солнечной системе? Ответ цифрой', answer: '8', casinoTask: 'Пробить топовую бонуску в Мумии в рандомке за 90к ' },
             { value: 4, text: 'Назовите самую маленькую частицу, сохраняющую свойства элемента', answer: 'Атом', casinoTask: 'Покупать топовый бонус в le bandit за 100к пока не окупиться' },
-            { value: 5, text: 'Кто изобрёл радио?', answer: 'Попов', casinoTask: 'Выбить х1000 в sweet bonanza 1000 в бонуске за 36к' }
+            { value: 5, text: 'Кто изобрёл радио? В ответ только фамилию', answer: 'Попов', casinoTask: 'Выбить х1000 в sweet bonanza 1000 в бонуске за 36к' }
         ]
     },
     casino: {
@@ -49,10 +49,10 @@ const themesData = {
         icon: 'fas fa-dice',
         questions: [
             { value: 1, text: 'Что означает RTP в слотах? Ответ на английском', answer: 'Return to Player', casinoTask: 'Купить бонус в hot fiesta за 50000 монет' },
-            { value: 2, text: 'Какая карта в блэкджеке самая ценная?Сколько чисел в европейской рулетке?', answer: 'Туз', casinoTask: 'Получите блэкджек' },
+            { value: 2, text: 'Какая карта в блэкджеке самая ценная?', answer: 'Туз', casinoTask: 'Получите блэкджек' },
             { value: 3, text: 'Сколько чисел в европейской рулетке? Ответ цифрой', answer: '37', casinoTask: 'Выбить бонуску в pirates pub ставка от 500 монет' },
             { value: 4, text: 'Как называется комбинация в покере: 2, 3, 4, 5, 6 одной масти?', answer: 'Стрит-флеш', casinoTask: 'Выбить ретриггер в sugar rush в бонуске от 80000 монет' },
-            { value: 5, text: 'Какой биохимический процесс в мозге усиливает желание играть в казино?', answer: 'Выроботка эндорфинов', casinoTask: 'Выиграйте х300 в Sweet bonanza' }
+            { value: 5, text: 'Какой биохимический процесс в мозге усиливает желание играть в казино?', answer: 'Выработка эндорфинов', casinoTask: 'Выиграйте х300 в Sweet bonanza' }
         ]
     }
 };
@@ -135,8 +135,6 @@ function renderLeaderboard() {
             if (player) {
                 player.score++;
                 updateLeaderScoreUI(id, player.score);
-                // После изменения вручную тоже проверяем завершение
-                checkAllQuestionsAnswered();
             }
         });
     });
@@ -147,7 +145,6 @@ function renderLeaderboard() {
             if (player) {
                 player.score--;
                 updateLeaderScoreUI(id, player.score);
-                checkAllQuestionsAnswered();
             }
         });
     });
@@ -228,7 +225,7 @@ function closeQuestionAndMark() {
     if (!themeModal.classList.contains('hidden') && selectedTheme === themeKey) {
         openTheme(themeKey);
     }
-    // Обязательно проверяем завершение после каждого закрытия вопроса
+    // Проверяем завершение игры ТОЛЬКО после того, как вопрос отвечен и закрыт
     checkAllQuestionsAnswered();
 }
 
@@ -242,12 +239,12 @@ function checkAllQuestionsAnswered() {
         totalAnswered += answered;
     }
     if (totalAnswered === totalQuestions && totalQuestions > 0) {
-        showCongratsModal();
+        // Небольшая задержка, чтобы модалка результата успела закрыться
+        setTimeout(() => showCongratsModal(), 300);
     }
 }
 
 function showCongratsModal() {
-    // Заполняем итоговыми очками
     const container = document.getElementById('congrats-scores');
     container.innerHTML = '';
     const sorted = [...players].sort((a,b) => b.score - a.score);
@@ -268,7 +265,6 @@ function addPlayerScore(playerId, delta) {
     if (player) {
         player.score += delta;
         updateLeaderScoreUI(playerId, player.score);
-        // После изменения счёта проверяем, не завершилась ли игра (хотя это уже делается после закрытия вопроса)
     }
 }
 
@@ -301,7 +297,7 @@ function checkAnswer() {
     }
 
     showResultMessage(isCorrect ? 'Верно!' : 'Неверно', message);
-    closeQuestionAndMark(); // Здесь вызовется checkAllQuestionsAnswered
+    closeQuestionAndMark(); // вызовет проверку завершения после закрытия вопроса
     isChatHelpUsed = false;
     viewerName = '';
 }
@@ -367,7 +363,6 @@ cancelBalanceBtn.addEventListener('click', () => {
 resetScoresBtn.addEventListener('click', () => {
     players.forEach(p => p.score = 0);
     renderLeaderboard();
-    checkAllQuestionsAnswered(); // на случай если сброс произошёл после завершения
 });
 
 restartGameBtn.addEventListener('click', () => {
