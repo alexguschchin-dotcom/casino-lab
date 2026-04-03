@@ -40,7 +40,7 @@ const themesData = {
             { value: 1, text: 'Кто открыл закон всемирного тяготения?', options: ['Эйнштейн', 'Ньютон', 'Галилей', 'Коперник'], correct: 1, casinoTask: 'Поставить 800$ в любой лайв игре' },
             { value: 2, text: 'Какой химический элемент обозначается буквой O?', options: ['Осмий', 'Олово', 'Кислород', 'Золото'], correct: 2, casinoTask: 'Окупить бонус в retro sweet в бонуске от 600$' },
             { value: 3, text: 'Сколько планет в Солнечной системе?', options: ['7', '8', '9', '6'], correct: 1, casinoTask: 'Пробить топовую бонуску в Мумии в рандомке за 900$' },
-            { value: 4, text: 'Назовите самую маленькую частицу, сохраняющую свойства элемента', options: ['Молекула', 'Протон', 'Электрон', 'Атом'], correct: 3, casinoTask: 'Покупать топовый бонус в le pharaon за 1000$ пока не окупиться' },
+            { value: 4, text: 'Назовите самую маленькую частицу, сохраняющую свойства элемента', options: ['Молекула', 'Протон', 'Электрон', 'Атом'], correct: 3, casinoTask: 'Покупать топовый бонус в le pharaon за 1000$ пока не окупится' },
             { value: 5, text: 'Кто изобрёл радио?', options: ['Попов', 'Маркони', 'Тесла', 'Эдисон'], correct: 0, casinoTask: 'Выбить х1000 в sweet bonanza 1000 в бонуске за 400$' }
         ]
     },
@@ -173,7 +173,7 @@ function submitAnswer(answerIndex) {
         message += `<br>🎰 Задание казино: ${casinoTask}`;
         addPlayerScore(selectedPlayerId, questionLevel);
         if (isChatHelpUsed && viewerName) {
-            message += `<br>💬 Зритель ${viewerName} получает +5000 монет за правильный ответ!`;
+            message += `<br>💬 Зритель ${viewerName} получает 50$ за правильный ответ!`;
         }
     } else {
         const correctOption = selectedQuestion.data.options[selectedQuestion.data.correct];
