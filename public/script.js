@@ -52,7 +52,7 @@ const themesData = {
             { value: 2, text: 'Какая карта в блэкджеке самая ценная?', options: ['Король', 'Туз', 'Десятка', 'Дама'], correct: 1, casinoTask: 'Получите блэкджек по ставке 300$ за руку' },
             { value: 3, text: 'Сколько чисел в европейской рулетке?', options: ['36', '37', '38', '39'], correct: 1, casinoTask: 'Выбить бонуску в pirates pub ставка от 9$' },
             { value: 4, text: 'Как называется комбинация в покере: 2, 3, 4, 5, 6 одной масти?', options: ['Флеш', 'Стрит', 'Стрит-флеш', 'Каре'], correct: 2, casinoTask: 'Выбить ретриггер в sugar rush в бонуске от 800$' },
-            { value: 5, text: 'Какой биохимический процесс в мозге усиливает желание играть в казино?', options: ['Выработка адреналина', 'Выработка дофамина', 'Выработка эндорфинов', 'Выработка серотонина'], correct: 2, casinoTask: 'Выиграйте х300 в Sweet bonanza по ставке ' }
+            { value: 5, text: 'Какой биохимический процесс в мозге усиливает желание играть в казино?', options: ['Выработка адреналина', 'Выработка дофамина', 'Выработка эндорфинов', 'Выработка серотонина'], correct: 2, casinoTask: 'Выиграйте х300 в Sweet bonanza по ставке от 500$ ' }
         ]
     }
 };
@@ -109,7 +109,7 @@ const restartGameBtn = document.getElementById('restart-game');
 const answeringPlayerSelect = document.getElementById('answering-player');
 const closeRulesBtn = document.getElementById('close-rules');
 
-// Рендер вариантов ответа (всегда активны, если вопрос не отвечен)
+// Рендер вариантов ответа
 function renderOptions(question) {
     optionsArea.innerHTML = '';
     const letters = ['A', 'B', 'C', 'D'];
@@ -118,7 +118,7 @@ function renderOptions(question) {
         btn.className = 'option-btn';
         btn.innerHTML = `<span class="option-letter">${letters[idx]}</span> <span class="option-text">${opt}</span>`;
         btn.dataset.index = idx;
-        // Делаем кнопки активными, если вопрос ещё не отвечен и игра не завершена
+        // Если вопрос уже отвечен или игра завершена, блокируем
         if (gameStateAnswered || gameStateCompleted) {
             btn.disabled = true;
         } else {
@@ -342,7 +342,6 @@ function renderLeaderboard() {
         `;
         container.appendChild(card);
     });
-    // Обработчики для +1 / -1
     document.querySelectorAll('.inc-score').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const id = btn.dataset.id;
@@ -456,10 +455,11 @@ window.addEventListener('click', (e) => {
         selectedQuestion = null;
     }
     if (e.target === viewerModal) viewerModal.classList.add('hidden');
-    if (e.target === resultModal) resultModal.classList.add('hidden');
     if (e.target === balanceModal) balanceModal.classList.add('hidden');
     if (e.target === congratsModal) congratsModal.classList.add('hidden');
     if (e.target === rulesModal) rulesModal.classList.add('hidden');
+    // Убираем закрытие модалки результата по клику на фон
+    // if (e.target === resultModal) resultModal.classList.add('hidden');  // УДАЛЕНО!
 });
 
 function showToast(message) {
