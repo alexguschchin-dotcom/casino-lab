@@ -118,8 +118,8 @@ function renderOptions(question) {
         btn.className = 'option-btn';
         btn.innerHTML = `<span class="option-letter">${letters[idx]}</span> <span class="option-text">${opt}</span>`;
         btn.dataset.index = idx;
-        // Блокируем варианты, если вопрос уже отвечен или игра завершена, или ещё не выбран отвечающий
-        if (selectedQuestion && (gameStateAnswered || gameStateCompleted || !pendingPlayer)) {
+        // Блокируем, если нет выбранного игрока или вопрос уже отвечен
+        if (gameStateAnswered || gameStateCompleted || !pendingPlayer) {
             btn.disabled = true;
         } else {
             btn.disabled = false;
@@ -130,7 +130,7 @@ function renderOptions(question) {
                 return;
             }
             if (!pendingPlayer) {
-                showToast('Сначала выберите, кто отвечает (в выпадающем списке) и нажмите кнопку "Ответить" под своим именем в таблице лидеров!');
+                showToast('Сначала выберите, кто отвечает (нажмите кнопку "Ответить" под именем игрока в таблице лидеров)!');
                 return;
             }
             const answerIndex = parseInt(btn.dataset.index);
@@ -345,9 +345,11 @@ function renderLeaderboard() {
                 <button class="inc-score" data-id="${player.id}">+1</button>
                 <button class="dec-score" data-id="${player.id}">-1</button>
             </div>
+            <button class="answer-btn" data-player="${player.id}" style="margin-top: 8px; background: #f9a825; border: none; border-radius: 40px; padding: 5px 12px; cursor: pointer;">Ответить</button>
         `;
         container.appendChild(card);
     });
+    // Обработчики для +1 / -1
     document.querySelectorAll('.inc-score').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const id = btn.dataset.id;
@@ -366,6 +368,24 @@ function renderLeaderboard() {
                 player.score--;
                 updateLeaderScoreUI(id, player.score);
             }
+        });
+    });
+    // Обработчики для кнопок "Ответить"
+    document.querySelectorAll('.answer-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const player = btn.dataset.player;
+            if (gameStateAnswered || gameStateCompleted) {
+                showToast('На этот вопрос уже ответили!');
+                return;
+            }
+            if (pendingPlayer) {
+                showToast(`Сейчас отвечает другой игрок!`);
+                return;
+            }
+            pendingPlayer = player;
+            showToast(`Игрок ${player}, выберите вариант ответа!`);
+            // Активируем все кнопки вариантов
+            document.querySelectorAll('.option-btn').forEach(optBtn => optBtn.disabled = false);
         });
     });
 }
@@ -469,25 +489,6 @@ window.addEventListener('click', (e) => {
 
 // Глобальная переменная pendingPlayer для выбора отвечающего (из таблицы лидеров)
 let pendingPlayer = null;
-
-// Обработчики кнопок "Ответить" в таблице лидеров
-document.querySelectorAll('.answer-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const player = btn.dataset.player;
-        if (gameStateAnswered || gameStateCompleted) {
-            showToast('На этот вопрос уже ответили!');
-            return;
-        }
-        if (pendingPlayer) {
-            showToast(`Сейчас отвечает другой игрок!`);
-            return;
-        }
-        pendingPlayer = player;
-        showToast(`Игрок ${player}, выберите вариант ответа!`);
-        // Активируем варианты
-        document.querySelectorAll('.option-btn').forEach(optBtn => optBtn.disabled = false);
-    });
-});
 
 function showToast(message) {
     const toast = document.getElementById('toast');
