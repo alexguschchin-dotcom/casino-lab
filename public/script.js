@@ -67,7 +67,6 @@ const players = [
 let currentScore = 0;
 let selectedTheme = null;
 let selectedQuestion = null;
-let currentHelpMultiplier = 1;
 let waitingForViewer = false;
 let viewerName = '';
 let isChatHelpUsed = false;
@@ -146,7 +145,6 @@ function openQuestion(index) {
     questionValueSpan.innerText = `💰 ${q.value} очков`;
     questionTextEl.innerText = q.text;
     feedbackDiv.innerHTML = '';
-    currentHelpMultiplier = 1;
     isChatHelpUsed = false;
     gameStateAnswered = false;
     gameStateCompleted = false;
@@ -163,10 +161,7 @@ function submitAnswer(answerIndex) {
 
     if (isCorrect) {
         message = `✅ Правильно!`;
-        let casinoTask = selectedQuestion.data.casinoTask;
-        if (currentHelpMultiplier > 1) {
-            casinoTask = `${casinoTask} (усложнено на ${Math.round((currentHelpMultiplier-1)*100)}%)`;
-        }
+        const casinoTask = selectedQuestion.data.casinoTask;
         message += `<br>🎰 Задание казино: ${casinoTask}`;
         addPlayerScore(selectedPlayerId, questionLevel);
         if (isChatHelpUsed && viewerName) {
@@ -363,11 +358,9 @@ function useHelp(type) {
         viewerModal.classList.remove('hidden');
         return;
     } else if (type === 'vika') {
-        currentHelpMultiplier = 1.25; // 25%
-        feedbackDiv.innerHTML = `🤝 Вы спросили у Вики. Сложность задания увеличена на 25%.`;
+        feedbackDiv.innerHTML = `🤝 Вы спросили у Вики.`;
     } else if (type === 'batya') {
-        currentHelpMultiplier = 1.25; // 25%
-        feedbackDiv.innerHTML = `🤝 Вы спросили у Бати. Сложность задания увеличена на 25%.`;
+        feedbackDiv.innerHTML = `🤝 Вы спросили у Бати.`;
     }
 }
 
@@ -378,9 +371,8 @@ confirmViewer.addEventListener('click', () => {
         return;
     }
     viewerName = viewer;
-    currentHelpMultiplier = 1.5; // 50%
+    feedbackDiv.innerHTML = `💬 Чат: ${viewer} помогает! Если ответ будет правильным, зритель получит 50$.`;
     isChatHelpUsed = true;
-    feedbackDiv.innerHTML = `💬 Чат: ${viewer} помогает! Если ответ будет правильным, зритель получит 50$. Сложность задания увеличена на 50%.`;
     waitingForViewer = false;
     viewerModal.classList.add('hidden');
     viewerNameInput.value = '';
