@@ -91,6 +91,7 @@ const optionsArea = document.getElementById('options-area');
 const helpChat = document.getElementById('help-chat');
 const helpVika = document.getElementById('help-vika');
 const helpBatya = document.getElementById('help-batya');
+const helpAlex = document.getElementById('help-alex'); // новая кнопка
 const feedbackDiv = document.getElementById('feedback');
 const viewerNameInput = document.getElementById('viewer-name');
 const confirmViewer = document.getElementById('confirm-viewer');
@@ -358,9 +359,11 @@ function useHelp(type) {
         viewerModal.classList.remove('hidden');
         return;
     } else if (type === 'vika') {
-        feedbackDiv.innerHTML = `🤝 Вы спросили ответ у Вики, увеличьте сложность задания на 25%.`;
+        feedbackDiv.innerHTML = `🤝 Вы спросили ответ у Вики. Увеличьте сложность задания на 25% при правильном ответе.`;
     } else if (type === 'batya') {
-        feedbackDiv.innerHTML = `🤝 Вы спросили у Бати, увеличьте сложность задания на 25%.`;
+        feedbackDiv.innerHTML = `🤝 Вы спросили у Бати. Увеличьте сложность задания на 25% при правильном ответе.`;
+    } else if (type === 'alex') {
+        feedbackDiv.innerHTML = `🤝 Вы спросили у Алексея. Увеличьте сложность задания на 25% при правильном ответе.`;
     }
 }
 
@@ -371,7 +374,7 @@ confirmViewer.addEventListener('click', () => {
         return;
     }
     viewerName = viewer;
-    feedbackDiv.innerHTML = `💬 Чат: ${viewer} помогает! Если ответ будет правильным, зритель получит 50$. Увеличьте сложность задания на 50%`;
+    feedbackDiv.innerHTML = `💬 Чат: ${viewer} помогает! Если ответ будет правильным, зритель получит 50$. Увеличьте сложность задания на 50% при правильном ответе.`;
     isChatHelpUsed = true;
     waitingForViewer = false;
     viewerModal.classList.add('hidden');
@@ -431,6 +434,7 @@ closeRulesBtn.addEventListener('click', () => {
 helpChat.addEventListener('click', () => useHelp('chat'));
 helpVika.addEventListener('click', () => useHelp('vika'));
 helpBatya.addEventListener('click', () => useHelp('batya'));
+helpAlex.addEventListener('click', () => useHelp('alex'));
 
 window.addEventListener('click', (e) => {
     if (e.target === themeModal) themeModal.classList.add('hidden');
