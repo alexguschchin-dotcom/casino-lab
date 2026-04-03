@@ -165,7 +165,7 @@ function submitAnswer(answerIndex) {
         message += `<br>🎰 Задание казино: ${casinoTask}`;
         addPlayerScore(selectedPlayerId, questionLevel);
         if (isChatHelpUsed && viewerName) {
-            message += `<br>💬 Зритель ${viewerName} получает 50$ за правильный ответ!`;
+            message += `<br>💬 Зритель ${viewerName} получает 50$ за правильный ответ! Увеличьте сложность задания на 50%`;
         }
     } else {
         const correctOption = selectedQuestion.data.options[selectedQuestion.data.correct];
@@ -358,9 +358,9 @@ function useHelp(type) {
         viewerModal.classList.remove('hidden');
         return;
     } else if (type === 'vika') {
-        feedbackDiv.innerHTML = `🤝 Вы спросили у Вики.`;
+        feedbackDiv.innerHTML = `🤝 Вы спросили ответ у Вики, увеличьте сложность задания на 25%.`;
     } else if (type === 'batya') {
-        feedbackDiv.innerHTML = `🤝 Вы спросили у Бати.`;
+        feedbackDiv.innerHTML = `🤝 Вы спросили у Бати, увеличьте сложность задания на 25%.`;
     }
 }
 
