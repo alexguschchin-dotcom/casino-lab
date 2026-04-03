@@ -109,7 +109,7 @@ const restartGameBtn = document.getElementById('restart-game');
 const answeringPlayerSelect = document.getElementById('answering-player');
 const closeRulesBtn = document.getElementById('close-rules');
 
-// Рендер вариантов ответа
+// Рендер вариантов ответа (всегда активны, если вопрос не отвечен)
 function renderOptions(question) {
     optionsArea.innerHTML = '';
     const letters = ['A', 'B', 'C', 'D'];
@@ -118,8 +118,8 @@ function renderOptions(question) {
         btn.className = 'option-btn';
         btn.innerHTML = `<span class="option-letter">${letters[idx]}</span> <span class="option-text">${opt}</span>`;
         btn.dataset.index = idx;
-        // Блокируем, если нет выбранного игрока или вопрос уже отвечен
-        if (gameStateAnswered || gameStateCompleted || !pendingPlayer) {
+        // Делаем кнопки активными, если вопрос ещё не отвечен и игра не завершена
+        if (gameStateAnswered || gameStateCompleted) {
             btn.disabled = true;
         } else {
             btn.disabled = false;
@@ -127,10 +127,6 @@ function renderOptions(question) {
         btn.addEventListener('click', () => {
             if (gameStateAnswered || gameStateCompleted) {
                 showToast('На этот вопрос уже ответили!');
-                return;
-            }
-            if (!pendingPlayer) {
-                showToast('Сначала выберите, кто отвечает (нажмите кнопку "Ответить" под именем игрока в таблице лидеров)!');
                 return;
             }
             const answerIndex = parseInt(btn.dataset.index);
@@ -157,7 +153,6 @@ function openQuestion(index) {
     isChatHelpUsed = false;
     gameStateAnswered = false;
     gameStateCompleted = false;
-    pendingPlayer = null; // сброс выбранного игрока
     renderOptions(q);
     questionModal.classList.remove('hidden');
 }
@@ -232,7 +227,6 @@ closeResultBtn.onclick = () => {
         }
         selectedQuestion = null;
         gameStateAnswered = false;
-        pendingPlayer = null;
         // Закрываем модалку вопроса
         questionModal.classList.add('hidden');
         // Обновляем сетку вопросов, если открыта тема
@@ -345,7 +339,6 @@ function renderLeaderboard() {
                 <button class="inc-score" data-id="${player.id}">+1</button>
                 <button class="dec-score" data-id="${player.id}">-1</button>
             </div>
-            <button class="answer-btn" data-player="${player.id}" style="margin-top: 8px; background: #f9a825; border: none; border-radius: 40px; padding: 5px 12px; cursor: pointer;">Ответить</button>
         `;
         container.appendChild(card);
     });
@@ -368,24 +361,6 @@ function renderLeaderboard() {
                 player.score--;
                 updateLeaderScoreUI(id, player.score);
             }
-        });
-    });
-    // Обработчики для кнопок "Ответить"
-    document.querySelectorAll('.answer-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const player = btn.dataset.player;
-            if (gameStateAnswered || gameStateCompleted) {
-                showToast('На этот вопрос уже ответили!');
-                return;
-            }
-            if (pendingPlayer) {
-                showToast(`Сейчас отвечает другой игрок!`);
-                return;
-            }
-            pendingPlayer = player;
-            showToast(`Игрок ${player}, выберите вариант ответа!`);
-            // Активируем все кнопки вариантов
-            document.querySelectorAll('.option-btn').forEach(optBtn => optBtn.disabled = false);
         });
     });
 }
@@ -486,9 +461,6 @@ window.addEventListener('click', (e) => {
     if (e.target === congratsModal) congratsModal.classList.add('hidden');
     if (e.target === rulesModal) rulesModal.classList.add('hidden');
 });
-
-// Глобальная переменная pendingPlayer для выбора отвечающего (из таблицы лидеров)
-let pendingPlayer = null;
 
 function showToast(message) {
     const toast = document.getElementById('toast');
