@@ -143,7 +143,6 @@ function openQuestion(index) {
     const q = theme.questions[index];
     selectedQuestion = { theme: selectedTheme, index, data: q };
     questionCategory.innerText = theme.name;
-    // Убираем отображение "1000 баллов", оставляем только стоимость вопроса
     questionValueSpan.innerText = `💰 ${q.value} очков`;
     questionTextEl.innerText = q.text;
     feedbackDiv.innerHTML = '';
@@ -364,11 +363,11 @@ function useHelp(type) {
         viewerModal.classList.remove('hidden');
         return;
     } else if (type === 'vika') {
-        currentHelpMultiplier = 1.3;
-        feedbackDiv.innerHTML = `🤝 Вы спросили у Вики. Сложность задания увеличена на 30%.`;
+        currentHelpMultiplier = 1.25; // 25%
+        feedbackDiv.innerHTML = `🤝 Вы спросили у Вики. Сложность задания увеличена на 25%.`;
     } else if (type === 'batya') {
-        currentHelpMultiplier = 1.3;
-        feedbackDiv.innerHTML = `🤝 Вы спросили у Бати. Сложность задания увеличена на 30%.`;
+        currentHelpMultiplier = 1.25; // 25%
+        feedbackDiv.innerHTML = `🤝 Вы спросили у Бати. Сложность задания увеличена на 25%.`;
     }
 }
 
@@ -379,10 +378,9 @@ confirmViewer.addEventListener('click', () => {
         return;
     }
     viewerName = viewer;
-    // Исправленное сообщение: вместо 5000 монет теперь 50$
-    feedbackDiv.innerHTML = `💬 Чат: ${viewer} помогает! Если ответ будет правильным, зритель получит 50$. Сложность задания увеличена на 60%.`;
-    currentHelpMultiplier = 1.6;
+    currentHelpMultiplier = 1.5; // 50%
     isChatHelpUsed = true;
+    feedbackDiv.innerHTML = `💬 Чат: ${viewer} помогает! Если ответ будет правильным, зритель получит 50$. Сложность задания увеличена на 50%.`;
     waitingForViewer = false;
     viewerModal.classList.add('hidden');
     viewerNameInput.value = '';
