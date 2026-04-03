@@ -165,7 +165,7 @@ function submitAnswer(answerIndex) {
         message += `<br>🎰 Задание казино: ${casinoTask}`;
         addPlayerScore(selectedPlayerId, questionLevel);
         if (isChatHelpUsed && viewerName) {
-            message += `<br>💬 Зритель ${viewerName} получает 50$ за правильный ответ! Увеличьте сложность задания на 50%`;
+            message += `<br>💬 Зритель ${viewerName} получает 50$ за правильный ответ!`;
         }
     } else {
         const correctOption = selectedQuestion.data.options[selectedQuestion.data.correct];
@@ -371,7 +371,7 @@ confirmViewer.addEventListener('click', () => {
         return;
     }
     viewerName = viewer;
-    feedbackDiv.innerHTML = `💬 Чат: ${viewer} помогает! Если ответ будет правильным, зритель получит 50$.`;
+    feedbackDiv.innerHTML = `💬 Чат: ${viewer} помогает! Если ответ будет правильным, зритель получит 50$. Увеличьте сложность задания на 50%`;
     isChatHelpUsed = true;
     waitingForViewer = false;
     viewerModal.classList.add('hidden');
