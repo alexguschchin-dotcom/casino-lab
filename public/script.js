@@ -118,7 +118,6 @@ function renderOptions(question) {
         btn.className = 'option-btn';
         btn.innerHTML = `<span class="option-letter">${letters[idx]}</span> <span class="option-text">${opt}</span>`;
         btn.dataset.index = idx;
-        // Если вопрос уже отвечен или игра завершена, блокируем
         if (gameStateAnswered || gameStateCompleted) {
             btn.disabled = true;
         } else {
@@ -136,7 +135,6 @@ function renderOptions(question) {
     });
 }
 
-// Состояние игры (глобальные флаги)
 let gameStateAnswered = false;
 let gameStateCompleted = false;
 
@@ -145,8 +143,8 @@ function openQuestion(index) {
     const q = theme.questions[index];
     selectedQuestion = { theme: selectedTheme, index, data: q };
     questionCategory.innerText = theme.name;
-    const pointsForCorrect = q.value * 1000;
-    questionValueSpan.innerText = `💰 ${q.value} очков (${pointsForCorrect} баллов)`;
+    // Убираем отображение "1000 баллов", оставляем только стоимость вопроса
+    questionValueSpan.innerText = `💰 ${q.value} очков`;
     questionTextEl.innerText = q.text;
     feedbackDiv.innerHTML = '';
     currentHelpMultiplier = 1;
@@ -214,10 +212,8 @@ function showResultMessage(title, message, isLastQuestion) {
 
 let pendingLastQuestion = false;
 
-// Обработчик кнопки "Продолжить" в модалке результата
 closeResultBtn.onclick = () => {
     resultModal.classList.add('hidden');
-    // Помечаем вопрос отвеченным
     if (selectedQuestion) {
         const themeKey = selectedQuestion.theme;
         const qIndex = selectedQuestion.index;
@@ -227,13 +223,10 @@ closeResultBtn.onclick = () => {
         }
         selectedQuestion = null;
         gameStateAnswered = false;
-        // Закрываем модалку вопроса
         questionModal.classList.add('hidden');
-        // Обновляем сетку вопросов, если открыта тема
         if (!themeModal.classList.contains('hidden') && selectedTheme === themeKey) {
             openTheme(themeKey);
         }
-        // Проверяем завершение
         if (pendingLastQuestion) {
             checkAllQuestionsAnswered();
         }
@@ -386,7 +379,8 @@ confirmViewer.addEventListener('click', () => {
         return;
     }
     viewerName = viewer;
-    feedbackDiv.innerHTML = `💬 Чат: ${viewer} помогает! Если ответ будет правильным, зритель получит +5000 монет. Сложность задания увеличена на 60%.`;
+    // Исправленное сообщение: вместо 5000 монет теперь 50$
+    feedbackDiv.innerHTML = `💬 Чат: ${viewer} помогает! Если ответ будет правильным, зритель получит 50$. Сложность задания увеличена на 60%.`;
     currentHelpMultiplier = 1.6;
     isChatHelpUsed = true;
     waitingForViewer = false;
@@ -458,8 +452,6 @@ window.addEventListener('click', (e) => {
     if (e.target === balanceModal) balanceModal.classList.add('hidden');
     if (e.target === congratsModal) congratsModal.classList.add('hidden');
     if (e.target === rulesModal) rulesModal.classList.add('hidden');
-    // Убираем закрытие модалки результата по клику на фон
-    // if (e.target === resultModal) resultModal.classList.add('hidden');  // УДАЛЕНО!
 });
 
 function showToast(message) {
