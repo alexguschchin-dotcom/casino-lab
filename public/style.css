@@ -764,3 +764,45 @@ body {
     transform: scale(1.05);
     box-shadow: 0 0 15px rgba(249,168,37,0.5);
 }
+/* Добавьте в конец файла */
+
+.options-area {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+    margin: 1rem 0;
+}
+
+.option-btn {
+    background: #f5f0e0;
+    border: 1px solid #ffd966;
+    border-radius: 60px;
+    padding: 0.7rem 0.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    padding-left: 1rem;
+}
+
+.option-btn:hover:not(:disabled) {
+    background: #ffd966;
+    transform: scale(1.01);
+}
+
+.option-btn.disabled, .option-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.option-letter {
+    display: inline-block;
+    font-weight: bold;
+    width: 2rem;
+    color: #f9a825;
+}
+
+.option-text {
+    color: #2e3b2c;
+}

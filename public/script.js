@@ -1,58 +1,58 @@
-// Данные: темы и вопросы (5 тем, по 5 вопросов)
+// Данные: темы и вопросы (5 тем, по 5 вопросов) с вариантами ответов
 const themesData = {
     history: {
         name: 'История',
         icon: 'fas fa-landmark',
         questions: [
-            { value: 1, text: 'В каком году началась Вторая мировая война? Ответ цифрами', answer: '1939', casinoTask: 'Сделайте 100 спинов по 1000 монет в Dog house' },
-            { value: 2, text: 'Кто был первым президентом США?', answer: 'Джордж Вашингтон', casinoTask: 'Сыграйте в блэкджек на две руки по ставке 70000 монет на руку' },
-            { value: 3, text: 'Какое событие произошло в 1066 году в Англии?', answer: 'Битва при Гастингсе', casinoTask: 'Купить бонус в Money train 3 за 200000' },
-            { value: 4, text: 'Назовите имя древнегреческого бога морей', answer: 'Посейдон', casinoTask: 'Выбейте топовую бонуску в le bandit ставка от 1000 монет' },
-            { value: 5, text: 'Какая империя правила большей частью Южной Америки до прихода европейцев?', answer: 'Империя инков', casinoTask: 'Бонус за 300000 в sweet bonanza' }
+            { value: 1, text: 'В каком году началась Вторая мировая война?', options: ['1939', '1941', '1937', '1945'], correct: 0, casinoTask: 'Сделайте 100 спинов по 20$  в Dog house' },
+            { value: 2, text: 'Кто был первым президентом США?', options: ['Томас Джефферсон', 'Джордж Вашингтон', 'Авраам Линкольн', 'Бенджамин Франклин'], correct: 1, casinoTask: 'Сыграйте в блэкджек на две руки по ставке 500$ на руку' },
+            { value: 3, text: 'Какое событие произошло в 1066 году в Англии?', options: ['Великая хартия вольностей', 'Битва при Гастингсе', 'Чума', 'Строительство Тауэра'], correct: 1, casinoTask: 'Купить бонус в Money train 4 за 2000$' },
+            { value: 4, text: 'Назовите имя древнегреческого бога морей', options: ['Зевс', 'Аид', 'Посейдон', 'Аполлон'], correct: 2, casinoTask: 'Выбейте топовую бонуску в le bandit ставка от 24$ ' },
+            { value: 5, text: 'Какая империя правила большей частью Южной Америки до прихода европейцев?', options: ['Ацтеки', 'Майя', 'Империя инков', 'Ольмеки'], correct: 2, casinoTask: 'Бонус за 1600$ в sweet bonanza' }
         ]
     },
     geography: {
         name: 'География',
         icon: 'fas fa-map',
         questions: [
-            { value: 1, text: 'Какая река является самой длинной в мире?', answer: 'Нил', casinoTask: 'Поставьте на 1-12 в рулетке по 5к' },
-            { value: 2, text: 'Столица Австралии?', answer: 'Канберра', casinoTask: 'Выбить бонус в hot fiesta от 1000 монет' },
-            { value: 3, text: 'Самая высокая гора на Земле?', answer: 'Эверест', casinoTask: 'Сделать депное колесо от 1000$ на 50к' },
-            { value: 4, text: 'Назовите самый большой океан. Ответ одним словом', answer: 'Тихий', casinoTask: 'Выбить любой бонус в crazy time' },
-            { value: 5, text: 'Какая страна имеет самое большое количество часовых поясов?', answer: 'Россия', casinoTask: 'Сделать накид создателю' }
+            { value: 1, text: 'Какая река является самой длинной в мире?', options: ['Амазонка', 'Нил', 'Янцзы', 'Миссисипи'], correct: 1, casinoTask: 'Поставьте на 1-12 в рулетке по 40$' },
+            { value: 2, text: 'Столица Австралии?', options: ['Сидней', 'Мельбурн', 'Канберра', 'Перт'], correct: 2, casinoTask: 'Выбить бонус в hot fiesta от  21$ за спин (с шансом)' },
+            { value: 3, text: 'Самая высокая гора на Земле?', options: ['К2', 'Эверест', 'Канченджанга', 'Лхоцзе'], correct: 1, casinoTask: 'Сделать депное колесо от 1000$ на 400$ между 5-ю людьми' },
+            { value: 4, text: 'Назовите самый большой океан', options: ['Атлантический', 'Индийский', 'Северный Ледовитый', 'Тихий'], correct: 3, casinoTask: 'Выбить любой бонус в crazy time' },
+            { value: 5, text: 'Какая страна имеет самое большое количество часовых поясов?', options: ['США', 'Канада', 'Россия', 'Китай'], correct: 2, casinoTask: 'Сделать накид создателю ( по желанию )' }
         ]
     },
     cinema: {
         name: 'Кино',
         icon: 'fas fa-film',
         questions: [
-            { value: 1, text: 'Кто сыграл роль Джека Воробья?', answer: 'Джонни Депп', casinoTask: 'Купить бонус в sweet rush bonanza ставка от 50к' },
-            { value: 2, text: 'Как называется фильм, где Леонардо Ди Каприо сбегает из дома и становится мошенником?', answer: 'Поймай меня, если сможешь', casinoTask: 'Купить бонус в gates of olympus за 100000 монет' },
-            { value: 3, text: 'Назовите режиссёра "Криминального чтива"', answer: 'Квентин Тарантино', casinoTask: 'Выбить минотавра на любом барабане по ставке от 2000 монет' },
-            { value: 4, text: 'В каком фильме звучит фраза "Я оглянулся посмотреть, не оглянулась ли она"?', answer: 'Ирония судьбы', casinoTask: 'Окупить бонус в dog house multihold по ставке 100000 монет' },
-            { value: 5, text: 'Какой актёр получил Оскар за роль Джокера в "Тёмном рыцаре"?', answer: 'Хит Леджер', casinoTask: 'Выбить хот мод в le cowboy' }
+            { value: 1, text: 'Кто сыграл роль Джека Воробья?', options: ['Орландо Блум', 'Киану Ривз', 'Джонни Депп', 'Брэд Питт'], correct: 2, casinoTask: 'Купить бонус в sweet rush bonanza ставка от 500$' },
+            { value: 2, text: 'Как называется фильм, где Леонардо Ди Каприо сбегает из дома и становится мошенником?', options: ['Волк с Уолл-стрит', 'Остров проклятых', 'Поймай меня, если сможешь', 'Начало'], correct: 2, casinoTask: 'Купить бонус в gates of olympus за 1000$' },
+            { value: 3, text: 'Назовите режиссёра "Криминального чтива"', options: ['Мартин Скорсезе', 'Квентин Тарантино', 'Дэвид Финчер', 'Кристофер Нолан'], correct: 1, casinoTask: 'Выбить минотавра на любом барабане по ставке от 20$ ' },
+            { value: 4, text: 'В каком фильме звучит фраза "Я оглянулся посмотреть, не оглянулась ли она"?', options: ['Москва слезам не верит', 'Ирония судьбы', 'Служебный роман', 'Карнавальная ночь'], correct: 1, casinoTask: 'Окупить бонус в dog house multihold за 1000$' },
+            { value: 5, text: 'Какой актёр получил Оскар за роль Джокера в "Тёмном рыцаре"?', options: ['Хоакин Феникс', 'Джек Николсон', 'Хит Леджер', 'Джаред Лето'], correct: 2, casinoTask: 'Выбить хот мод в le cowboy' }
         ]
     },
     science: {
         name: 'Наука',
         icon: 'fas fa-flask',
         questions: [
-            { value: 1, text: 'Кто открыл закон всемирного тяготения?', answer: 'Ньютон', casinoTask: 'Поставить 100к в любой лайв игре' },
-            { value: 2, text: 'Какой химический элемент обозначается буквой O?', answer: 'Кислород', casinoTask: 'Окупить бонус в retro sweet' },
-            { value: 3, text: 'Сколько планет в Солнечной системе? Ответ цифрой', answer: '8', casinoTask: 'Пробить топовую бонуску в Мумии в рандомке за 90к ' },
-            { value: 4, text: 'Назовите самую маленькую частицу, сохраняющую свойства элемента', answer: 'Атом', casinoTask: 'Покупать топовый бонус в le bandit за 100к пока не окупиться' },
-            { value: 5, text: 'Кто изобрёл радио?', answer: 'Попов', casinoTask: 'Выбить х1000 в sweet bonanza 1000 в бонуске за 36к' }
+            { value: 1, text: 'Кто открыл закон всемирного тяготения?', options: ['Эйнштейн', 'Ньютон', 'Галилей', 'Коперник'], correct: 1, casinoTask: 'Поставить 800$ в любой лайв игре' },
+            { value: 2, text: 'Какой химический элемент обозначается буквой O?', options: ['Осмий', 'Олово', 'Кислород', 'Золото'], correct: 2, casinoTask: 'Окупить бонус в retro sweet в бонуске от 600$' },
+            { value: 3, text: 'Сколько планет в Солнечной системе?', options: ['7', '8', '9', '6'], correct: 1, casinoTask: 'Пробить топовую бонуску в Мумии в рандомке за 900$' },
+            { value: 4, text: 'Назовите самую маленькую частицу, сохраняющую свойства элемента', options: ['Молекула', 'Протон', 'Электрон', 'Атом'], correct: 3, casinoTask: 'Покупать топовый бонус в le pharaon за 1000$ пока не окупиться' },
+            { value: 5, text: 'Кто изобрёл радио?', options: ['Попов', 'Маркони', 'Тесла', 'Эдисон'], correct: 0, casinoTask: 'Выбить х1000 в sweet bonanza 1000 в бонуске за 400$' }
         ]
     },
     casino: {
         name: 'Казино',
         icon: 'fas fa-dice',
         questions: [
-            { value: 1, text: 'Что означает RTP в слотах? Ответ на английском', answer: 'Return to Player', casinoTask: 'Купить бонус в hot fiesta за 50000 монет' },
-            { value: 2, text: 'Какая карта в блэкджеке самая ценная?', answer: 'Туз', casinoTask: 'Получите блэкджек' },
-            { value: 3, text: 'Сколько чисел в европейской рулетке? Ответ цифрой', answer: '37', casinoTask: 'Выбить бонуску в pirates pub ставка от 500 монет' },
-            { value: 4, text: 'Как называется комбинация в покере: 2, 3, 4, 5, 6 одной масти?', answer: 'Стрит-флеш', casinoTask: 'Выбить ретриггер в sugar rush в бонуске от 80000 монет' },
-            { value: 5, text: 'Какой биохимический процесс в мозге усиливает желание играть в казино?', answer: 'Выработка эндорфинов', casinoTask: 'Выиграйте х300 в Sweet bonanza' }
+            { value: 1, text: 'Что означает RTP в слотах?', options: ['Return to Player', 'Real Time Play', 'Random Table Payout', 'Реальный шанс выигрыша'], correct: 0, casinoTask: 'Зрители которые напишут <<Леха, Вика и Батя - самые умные стримеры + id>> рандомно получат 50$ (5 человек)' },
+            { value: 2, text: 'Какая карта в блэкджеке самая ценная?', options: ['Король', 'Туз', 'Десятка', 'Дама'], correct: 1, casinoTask: 'Получите блэкджек по ставке 300$ за руку' },
+            { value: 3, text: 'Сколько чисел в европейской рулетке?', options: ['36', '37', '38', '39'], correct: 1, casinoTask: 'Выбить бонуску в pirates pub ставка от 9$' },
+            { value: 4, text: 'Как называется комбинация в покере: 2, 3, 4, 5, 6 одной масти?', options: ['Флеш', 'Стрит', 'Стрит-флеш', 'Каре'], correct: 2, casinoTask: 'Выбить ретриггер в sugar rush в бонуске от 800$' },
+            { value: 5, text: 'Какой биохимический процесс в мозге усиливает желание играть в казино?', options: ['Выработка адреналина', 'Выработка дофамина', 'Выработка эндорфинов', 'Выработка серотонина'], correct: 2, casinoTask: 'Выиграйте х300 в Sweet bonanza по ставке ' }
         ]
     }
 };
@@ -72,7 +72,6 @@ let waitingForViewer = false;
 let viewerName = '';
 let isChatHelpUsed = false;
 let answeredQuestions = {};
-let pendingLastQuestion = false; // флаг, что текущий вопрос последний и нужно показать поздравление после подтверждения
 
 // DOM элементы
 const themeGrid = document.getElementById('themes-grid');
@@ -89,8 +88,7 @@ const questionsGrid = document.getElementById('questions-grid');
 const questionCategory = document.getElementById('question-category');
 const questionValueSpan = document.getElementById('question-value');
 const questionTextEl = document.getElementById('question-text');
-const answerInput = document.getElementById('answer-input');
-const submitAnswer = document.getElementById('submit-answer');
+const optionsArea = document.getElementById('options-area');
 const helpChat = document.getElementById('help-chat');
 const helpVika = document.getElementById('help-vika');
 const helpBatya = document.getElementById('help-batya');
@@ -111,44 +109,180 @@ const restartGameBtn = document.getElementById('restart-game');
 const answeringPlayerSelect = document.getElementById('answering-player');
 const closeRulesBtn = document.getElementById('close-rules');
 
-// Обновление таблицы лидеров
-function renderLeaderboard() {
-    const container = document.getElementById('leaderboard-players');
+// Рендер вариантов ответа
+function renderOptions(question) {
+    optionsArea.innerHTML = '';
+    const letters = ['A', 'B', 'C', 'D'];
+    question.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerHTML = `<span class="option-letter">${letters[idx]}</span> <span class="option-text">${opt}</span>`;
+        btn.dataset.index = idx;
+        // Блокируем варианты, если вопрос уже отвечен или игра завершена, или ещё не выбран отвечающий
+        if (selectedQuestion && (gameStateAnswered || gameStateCompleted || !pendingPlayer)) {
+            btn.disabled = true;
+        } else {
+            btn.disabled = false;
+        }
+        btn.addEventListener('click', () => {
+            if (gameStateAnswered || gameStateCompleted) {
+                showToast('На этот вопрос уже ответили!');
+                return;
+            }
+            if (!pendingPlayer) {
+                showToast('Сначала выберите, кто отвечает (в выпадающем списке) и нажмите кнопку "Ответить" под своим именем в таблице лидеров!');
+                return;
+            }
+            const answerIndex = parseInt(btn.dataset.index);
+            submitAnswer(answerIndex);
+        });
+        optionsArea.appendChild(btn);
+    });
+}
+
+// Состояние игры (глобальные флаги)
+let gameStateAnswered = false;
+let gameStateCompleted = false;
+
+function openQuestion(index) {
+    const theme = themesData[selectedTheme];
+    const q = theme.questions[index];
+    selectedQuestion = { theme: selectedTheme, index, data: q };
+    questionCategory.innerText = theme.name;
+    const pointsForCorrect = q.value * 1000;
+    questionValueSpan.innerText = `💰 ${q.value} очков (${pointsForCorrect} баллов)`;
+    questionTextEl.innerText = q.text;
+    feedbackDiv.innerHTML = '';
+    currentHelpMultiplier = 1;
+    isChatHelpUsed = false;
+    gameStateAnswered = false;
+    gameStateCompleted = false;
+    pendingPlayer = null; // сброс выбранного игрока
+    renderOptions(q);
+    questionModal.classList.remove('hidden');
+}
+
+function submitAnswer(answerIndex) {
+    if (!selectedQuestion) return;
+    const isCorrect = (answerIndex === selectedQuestion.data.correct);
+    const questionLevel = selectedQuestion.data.value;
+    const selectedPlayerId = answeringPlayerSelect.value;
+    let message = '';
+
+    if (isCorrect) {
+        message = `✅ Правильно!`;
+        let casinoTask = selectedQuestion.data.casinoTask;
+        if (currentHelpMultiplier > 1) {
+            casinoTask = `${casinoTask} (усложнено на ${Math.round((currentHelpMultiplier-1)*100)}%)`;
+        }
+        message += `<br>🎰 Задание казино: ${casinoTask}`;
+        addPlayerScore(selectedPlayerId, questionLevel);
+        if (isChatHelpUsed && viewerName) {
+            message += `<br>💬 Зритель ${viewerName} получает +5000 монет за правильный ответ!`;
+        }
+    } else {
+        const correctOption = selectedQuestion.data.options[selectedQuestion.data.correct];
+        message = `❌ Неправильно. Правильный ответ: ${correctOption}.<br>🎰 Задание казино: ${selectedQuestion.data.casinoTask} (необходимо выполнить дважды, так как вы ошиблись)`;
+        addPlayerScore(selectedPlayerId, -questionLevel);
+        if (isChatHelpUsed && viewerName) {
+            message += `<br>💬 К сожалению, зритель ${viewerName} не получает бонус, так как ответ неверный.`;
+        }
+    }
+
+    gameStateAnswered = true;
+    const wasLastQuestion = checkIfLastQuestion();
+    showResultMessage(isCorrect ? 'Верно!' : 'Неверно', message, wasLastQuestion);
+    isChatHelpUsed = false;
+    viewerName = '';
+}
+
+function checkIfLastQuestion() {
+    let answeredCount = 0;
+    for (const themeKey of Object.keys(themesData)) {
+        const answered = answeredQuestions[themeKey] ? answeredQuestions[themeKey].length : 0;
+        answeredCount += answered;
+    }
+    const totalQuestions = 25;
+    return answeredCount === totalQuestions - 1;
+}
+
+function showResultMessage(title, message, isLastQuestion) {
+    document.getElementById('result-title').innerText = title;
+    document.getElementById('result-message').innerHTML = message;
+    resultModal.classList.remove('hidden');
+    if (isLastQuestion) {
+        pendingLastQuestion = true;
+    } else {
+        pendingLastQuestion = false;
+    }
+}
+
+let pendingLastQuestion = false;
+
+// Обработчик кнопки "Продолжить" в модалке результата
+closeResultBtn.onclick = () => {
+    resultModal.classList.add('hidden');
+    // Помечаем вопрос отвеченным
+    if (selectedQuestion) {
+        const themeKey = selectedQuestion.theme;
+        const qIndex = selectedQuestion.index;
+        if (!answeredQuestions[themeKey]) answeredQuestions[themeKey] = [];
+        if (!answeredQuestions[themeKey].includes(qIndex)) {
+            answeredQuestions[themeKey].push(qIndex);
+        }
+        selectedQuestion = null;
+        gameStateAnswered = false;
+        pendingPlayer = null;
+        // Закрываем модалку вопроса
+        questionModal.classList.add('hidden');
+        // Обновляем сетку вопросов, если открыта тема
+        if (!themeModal.classList.contains('hidden') && selectedTheme === themeKey) {
+            openTheme(themeKey);
+        }
+        // Проверяем завершение
+        if (pendingLastQuestion) {
+            checkAllQuestionsAnswered();
+        }
+    }
+    pendingLastQuestion = false;
+};
+
+function checkAllQuestionsAnswered() {
+    let totalAnswered = 0;
+    let totalQuestions = 0;
+    for (const themeKey of Object.keys(themesData)) {
+        const theme = themesData[themeKey];
+        totalQuestions += theme.questions.length;
+        const answered = answeredQuestions[themeKey] ? answeredQuestions[themeKey].length : 0;
+        totalAnswered += answered;
+    }
+    if (totalAnswered === totalQuestions && totalQuestions > 0) {
+        showCongratsModal();
+    }
+}
+
+function showCongratsModal() {
+    const container = document.getElementById('congrats-scores');
     container.innerHTML = '';
-    players.forEach(player => {
-        const card = document.createElement('div');
-        card.className = 'leader-card';
-        card.innerHTML = `
-            <div class="leader-avatar"><i class="${player.icon}"></i></div>
-            <div class="leader-name">${player.name}</div>
-            <div class="leader-score" id="score-${player.id}">${player.score}</div>
-            <div class="score-controls">
-                <button class="inc-score" data-id="${player.id}">+1</button>
-                <button class="dec-score" data-id="${player.id}">-1</button>
-            </div>
+    const sorted = [...players].sort((a,b) => b.score - a.score);
+    sorted.forEach(player => {
+        const item = document.createElement('div');
+        item.className = 'congrats-score-item';
+        item.innerHTML = `
+            <div class="congrats-score-name"><i class="${player.icon}"></i> ${player.name}</div>
+            <div class="congrats-score-value">${player.score} очков</div>
         `;
-        container.appendChild(card);
+        container.appendChild(item);
     });
-    document.querySelectorAll('.inc-score').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const id = btn.dataset.id;
-            const player = players.find(p => p.id === id);
-            if (player) {
-                player.score++;
-                updateLeaderScoreUI(id, player.score);
-            }
-        });
-    });
-    document.querySelectorAll('.dec-score').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const id = btn.dataset.id;
-            const player = players.find(p => p.id === id);
-            if (player) {
-                player.score--;
-                updateLeaderScoreUI(id, player.score);
-            }
-        });
-    });
+    congratsModal.classList.remove('hidden');
+}
+
+function addPlayerScore(playerId, delta) {
+    const player = players.find(p => p.id === playerId);
+    if (player) {
+        player.score += delta;
+        updateLeaderScoreUI(playerId, player.score);
+    }
 }
 
 function updateLeaderScoreUI(id, score) {
@@ -197,147 +331,44 @@ function openTheme(themeKey) {
     themeModal.classList.remove('hidden');
 }
 
-function openQuestion(index) {
-    const theme = themesData[selectedTheme];
-    const q = theme.questions[index];
-    selectedQuestion = { theme: selectedTheme, index, data: q };
-    questionCategory.innerText = theme.name;
-    const pointsForCorrect = q.value * 1000;
-    questionValueSpan.innerText = `💰 ${q.value} очков (${pointsForCorrect} баллов)`;
-    questionTextEl.innerText = q.text;
-    answerInput.value = '';
-    feedbackDiv.innerHTML = '';
-    currentHelpMultiplier = 1;
-    isChatHelpUsed = false;
-    answeringPlayerSelect.value = 'alex';
-    questionModal.classList.remove('hidden');
-}
-
-function closeQuestionAndMark() {
-    if (!selectedQuestion) return;
-    const themeKey = selectedQuestion.theme;
-    const qIndex = selectedQuestion.index;
-    if (!answeredQuestions[themeKey]) answeredQuestions[themeKey] = [];
-    if (!answeredQuestions[themeKey].includes(qIndex)) {
-        answeredQuestions[themeKey].push(qIndex);
-    }
-    selectedQuestion = null;
-    questionModal.classList.add('hidden');
-    if (!themeModal.classList.contains('hidden') && selectedTheme === themeKey) {
-        openTheme(themeKey);
-    }
-    // Проверяем, все ли вопросы отвечены
-    const allAnswered = checkAllQuestionsAnsweredFlag();
-    if (allAnswered) {
-        // Если все вопросы отвечены, показываем поздравление
-        showCongratsModal();
-    }
-}
-
-function checkAllQuestionsAnsweredFlag() {
-    let totalAnswered = 0;
-    let totalQuestions = 0;
-    for (const themeKey of Object.keys(themesData)) {
-        const theme = themesData[themeKey];
-        totalQuestions += theme.questions.length;
-        const answered = answeredQuestions[themeKey] ? answeredQuestions[themeKey].length : 0;
-        totalAnswered += answered;
-    }
-    return totalAnswered === totalQuestions && totalQuestions > 0;
-}
-
-function showCongratsModal() {
-    const container = document.getElementById('congrats-scores');
+function renderLeaderboard() {
+    const container = document.getElementById('leaderboard-players');
     container.innerHTML = '';
-    const sorted = [...players].sort((a,b) => b.score - a.score);
-    sorted.forEach(player => {
-        const item = document.createElement('div');
-        item.className = 'congrats-score-item';
-        item.innerHTML = `
-            <div class="congrats-score-name"><i class="${player.icon}"></i> ${player.name}</div>
-            <div class="congrats-score-value">${player.score} очков</div>
+    players.forEach(player => {
+        const card = document.createElement('div');
+        card.className = 'leader-card';
+        card.innerHTML = `
+            <div class="leader-avatar"><i class="${player.icon}"></i></div>
+            <div class="leader-name">${player.name}</div>
+            <div class="leader-score" id="score-${player.id}">${player.score}</div>
+            <div class="score-controls">
+                <button class="inc-score" data-id="${player.id}">+1</button>
+                <button class="dec-score" data-id="${player.id}">-1</button>
+            </div>
         `;
-        container.appendChild(item);
+        container.appendChild(card);
     });
-    congratsModal.classList.remove('hidden');
+    document.querySelectorAll('.inc-score').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = btn.dataset.id;
+            const player = players.find(p => p.id === id);
+            if (player) {
+                player.score++;
+                updateLeaderScoreUI(id, player.score);
+            }
+        });
+    });
+    document.querySelectorAll('.dec-score').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = btn.dataset.id;
+            const player = players.find(p => p.id === id);
+            if (player) {
+                player.score--;
+                updateLeaderScoreUI(id, player.score);
+            }
+        });
+    });
 }
-
-function addPlayerScore(playerId, delta) {
-    const player = players.find(p => p.id === playerId);
-    if (player) {
-        player.score += delta;
-        updateLeaderScoreUI(playerId, player.score);
-    }
-}
-
-function checkAnswer() {
-    if (!selectedQuestion) return;
-    const userAnswer = answerInput.value.trim().toLowerCase();
-    const correctAnswer = selectedQuestion.data.answer.toLowerCase();
-    const isCorrect = userAnswer === correctAnswer;
-    const questionLevel = selectedQuestion.data.value;
-    let message = '';
-    const selectedPlayerId = answeringPlayerSelect.value;
-
-    if (isCorrect) {
-        message = `✅ Правильно!`;
-        let casinoTask = selectedQuestion.data.casinoTask;
-        if (currentHelpMultiplier > 1) {
-            casinoTask = `${casinoTask} (усложнено на ${Math.round((currentHelpMultiplier-1)*100)}%)`;
-        }
-        message += `<br>🎰 Задание казино: ${casinoTask}`;
-        addPlayerScore(selectedPlayerId, questionLevel);
-        if (isChatHelpUsed && viewerName) {
-            message += `<br>💬 Зритель ${viewerName} получает +5000 монет за правильный ответ!`;
-        }
-    } else {
-        message = `❌ Неправильно. Правильный ответ: ${correctAnswer}.<br>🎰 Задание казино: ${selectedQuestion.data.casinoTask} (необходимо выполнить дважды, так как вы ошиблись)`;
-        addPlayerScore(selectedPlayerId, -questionLevel);
-        if (isChatHelpUsed && viewerName) {
-            message += `<br>💬 К сожалению, зритель ${viewerName} не получает бонус, так как ответ неверный.`;
-        }
-    }
-
-    // Перед показом результата проверяем, был ли это последний вопрос
-    const wasLastQuestion = checkIfLastQuestion();
-
-    showResultMessage(isCorrect ? 'Верно!' : 'Неверно', message, wasLastQuestion);
-    isChatHelpUsed = false;
-    viewerName = '';
-}
-
-function checkIfLastQuestion() {
-    // Подсчитываем количество уже отвеченных вопросов (включая текущий, который ещё не добавлен)
-    let answeredCount = 0;
-    for (const themeKey of Object.keys(themesData)) {
-        const answered = answeredQuestions[themeKey] ? answeredQuestions[themeKey].length : 0;
-        answeredCount += answered;
-    }
-    // Текущий вопрос ещё не добавлен в answeredQuestions, поэтому если сейчас отвечено 24 из 25, то текущий последний
-    const totalQuestions = 25;
-    return answeredCount === totalQuestions - 1;
-}
-
-function showResultMessage(title, message, isLastQuestion) {
-    document.getElementById('result-title').innerText = title;
-    document.getElementById('result-message').innerHTML = message;
-    resultModal.classList.remove('hidden');
-    
-    // Сохраняем флаг, чтобы после нажатия "Продолжить" обработать завершение
-    if (isLastQuestion) {
-        pendingLastQuestion = true;
-    } else {
-        pendingLastQuestion = false;
-    }
-}
-
-// Обработчик кнопки "Продолжить" в модалке результата
-closeResultBtn.onclick = () => {
-    resultModal.classList.add('hidden');
-    // Закрываем текущий вопрос и помечаем его отвеченным
-    closeQuestionAndMark();
-    pendingLastQuestion = false;
-};
 
 function useHelp(type) {
     if (waitingForViewer) return;
@@ -419,7 +450,6 @@ closeRulesBtn.addEventListener('click', () => {
     rulesModal.classList.add('hidden');
 });
 
-submitAnswer.addEventListener('click', checkAnswer);
 helpChat.addEventListener('click', () => useHelp('chat'));
 helpVika.addEventListener('click', () => useHelp('vika'));
 helpBatya.addEventListener('click', () => useHelp('batya'));
@@ -436,6 +466,35 @@ window.addEventListener('click', (e) => {
     if (e.target === congratsModal) congratsModal.classList.add('hidden');
     if (e.target === rulesModal) rulesModal.classList.add('hidden');
 });
+
+// Глобальная переменная pendingPlayer для выбора отвечающего (из таблицы лидеров)
+let pendingPlayer = null;
+
+// Обработчики кнопок "Ответить" в таблице лидеров
+document.querySelectorAll('.answer-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const player = btn.dataset.player;
+        if (gameStateAnswered || gameStateCompleted) {
+            showToast('На этот вопрос уже ответили!');
+            return;
+        }
+        if (pendingPlayer) {
+            showToast(`Сейчас отвечает другой игрок!`);
+            return;
+        }
+        pendingPlayer = player;
+        showToast(`Игрок ${player}, выберите вариант ответа!`);
+        // Активируем варианты
+        document.querySelectorAll('.option-btn').forEach(optBtn => optBtn.disabled = false);
+    });
+});
+
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.remove('hidden');
+    setTimeout(() => toast.classList.add('hidden'), 3000);
+}
 
 // Генерация падающих лепестков сакуры
 function createSakuraPetals() {
