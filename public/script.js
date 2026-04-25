@@ -166,7 +166,7 @@ function submitAnswer(answerIndex) {
         message += `<br>🎰 Задание казино: ${casinoTask}`;
         addPlayerScore(selectedPlayerId, questionLevel);
         if (isChatHelpUsed && viewerName) {
-            message += `<br>💬 Зритель ${viewerName} получает 50$ за правильный ответ!`;
+            message += `<br>💬 Зритель ${viewerName} выбирает слот, если он занесет он получает накид!`;
         }
     } else {
         const correctOption = selectedQuestion.data.options[selectedQuestion.data.correct];
@@ -359,11 +359,11 @@ function useHelp(type) {
         viewerModal.classList.remove('hidden');
         return;
     } else if (type === 'vika') {
-        feedbackDiv.innerHTML = `🤝 Вы спросили ответ у Вики. Увеличьте сложность задания на 25% при правильном ответе.`;
+        feedbackDiv.innerHTML = `🤝 Вы спросили ответ у Вики. Увеличьте сложность задания на 15% при правильном ответе.`;
     } else if (type === 'batya') {
-        feedbackDiv.innerHTML = `🤝 Вы спросили у Бати. Увеличьте сложность задания на 25% при правильном ответе.`;
+        feedbackDiv.innerHTML = `🤝 Вы спросили у Бати. Увеличьте сложность задания на 15% при правильном ответе.`;
     } else if (type === 'alex') {
-        feedbackDiv.innerHTML = `🤝 Вы спросили у Алексея. Увеличьте сложность задания на 25% при правильном ответе.`;
+        feedbackDiv.innerHTML = `🤝 Вы спросили у Алексея. Увеличьте сложность задания на 15% при правильном ответе.`;
     }
 }
 
@@ -374,7 +374,7 @@ confirmViewer.addEventListener('click', () => {
         return;
     }
     viewerName = viewer;
-    feedbackDiv.innerHTML = `💬 Чат: ${viewer} помогает! Если ответ будет правильным, зритель получит 50$. Увеличьте сложность задания на 50% при правильном ответе.`;
+    feedbackDiv.innerHTML = `💬 Чат: ${viewer} помогает! Если ответ будет правильным, зритель выбирет себе слот и получит накид если этот слот даст 300х. Увеличьте сложность задания на 30% при правильном ответе.`;
     isChatHelpUsed = true;
     waitingForViewer = false;
     viewerModal.classList.add('hidden');
