@@ -222,6 +222,8 @@ closeResultBtn.onclick = () => {
         if (!themeModal.classList.contains('hidden') && selectedTheme === themeKey) {
             openTheme(themeKey);
         }
+        // Обновляем главную сетку тем, чтобы обновить счётчик оставшихся вопросов
+        renderThemes();
         if (pendingLastQuestion) {
             checkAllQuestionsAnswered();
         }
@@ -279,13 +281,16 @@ function updateTotalScoreUI() {
 function renderThemes() {
     themeGrid.innerHTML = '';
     for (const [key, theme] of Object.entries(themesData)) {
+        const answeredCount = answeredQuestions[key] ? answeredQuestions[key].length : 0;
+        const remaining = 5 - answeredCount;
+        const questionsText = remaining === 1 ? 'вопрос' : 'вопроса';
         const card = document.createElement('div');
         card.className = 'theme-card';
         card.dataset.theme = key;
         card.innerHTML = `
             <div class="theme-icon"><i class="${theme.icon}"></i></div>
             <div class="theme-name">${theme.name}</div>
-            <div class="theme-desc">5 вопросов</div>
+            <div class="theme-desc">${remaining} ${questionsText}</div>
         `;
         card.addEventListener('click', () => openTheme(key));
         themeGrid.appendChild(card);
