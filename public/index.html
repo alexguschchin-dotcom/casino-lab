@@ -692,7 +692,7 @@
             setTimeout(() => popup.remove(), 3000);
         }
 
-        // Функция сброса игры – удаляет все сохранения и перезагружает страницу
+        // Функция сброса игры – полная очистка и перезагрузка
         function resetGame() {
             if (confirm('⚠️ ВНИМАНИЕ! Сброс удалит весь текущий прогресс. Начать квест заново?')) {
                 // Удаляем все возможные ключи сохранений (старые версии)
@@ -702,13 +702,16 @@
                     'cloverQuestFinalV5',
                     'cloverQuestFinalV6',
                     'cloverQuestFinalV7',
-                    'cloverQuestFinalV8'
+                    'cloverQuestFinalV8',
+                    'cloverQuestFinalV9'
                 ];
                 keys.forEach(key => localStorage.removeItem(key));
-                // Полностью очищаем localStorage (на всякий случай)
+                // Также очищаем всё хранилище на всякий случай
                 localStorage.clear();
-                // Принудительная перезагрузка страницы без кэша
-                window.location.href = window.location.href.split('#')[0];
+                // Устанавливаем флаг сброса в sessionStorage, чтобы при загрузке не пытаться загрузить сохранение
+                sessionStorage.setItem('gameReset', 'true');
+                // Перезагружаем страницу с принудительным обновлением
+                window.location.href = window.location.href.split('#')[0] + '?reset=' + Date.now();
             }
         }
 
@@ -1257,6 +1260,7 @@
         }
 
         function saveGame() {
+            if (sessionStorage.getItem('gameReset') === 'true') return;
             let save = {
                 tasks: game.tasks, completedCount: game.completedCount, totalScore: game.totalScore,
                 timeLeftSec: game.timeLeftSec, energy: game.energy, comboLevel: game.comboLevel,
@@ -1265,16 +1269,21 @@
                 lastCompleteTimestamp: game.lastCompleteTimestamp, minigamePlays, minigameClickTotal,
                 difficulty: game.difficulty, energyCostActivate: game.energyCostActivate,
                 doubleNext: game.doubleNext, emergencyUsed: game.emergencyUsed,
-                version: 6
+                version: 7
             };
-            localStorage.setItem('cloverQuestFinalV6', JSON.stringify(save));
+            localStorage.setItem('cloverQuestFinalV7', JSON.stringify(save));
         }
         function loadGame() {
-            let raw = localStorage.getItem('cloverQuestFinalV6');
+            // Если есть флаг сброса – не загружаем
+            if (sessionStorage.getItem('gameReset') === 'true') {
+                sessionStorage.removeItem('gameReset');
+                return false;
+            }
+            let raw = localStorage.getItem('cloverQuestFinalV7');
             if (!raw) return false;
             try {
                 let d = JSON.parse(raw);
-                if (d.version !== 6) return false;
+                if (d.version !== 7) return false;
                 game.tasks = d.tasks; game.completedCount = d.completedCount; game.totalScore = d.totalScore;
                 game.timeLeftSec = d.timeLeftSec; game.energy = d.energy; game.comboLevel = d.comboLevel;
                 game.comboTimeLeft = d.comboTimeLeft; game.bonusChatUses = d.bonusChatUses;
@@ -1335,6 +1344,15 @@
         }
 
         async function init() {
+            // Проверяем параметр сброса в URL
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('reset')) {
+                sessionStorage.setItem('gameReset', 'true');
+                // Очищаем localStorage ещё раз
+                localStorage.clear();
+                // Удаляем параметр из URL без перезагрузки
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
             let loaded = loadGame();
             if (!loaded) {
                 await showRulesModal();
