@@ -40,7 +40,6 @@
             color: var(--text-primary);
             transition: filter 0.2s;
         }
-        /* затемнение при критическом таймере */
         body.critical-time {
             filter: brightness(0.85);
             transition: filter 0.3s;
@@ -551,12 +550,12 @@
         </div>
         <div id="chatMessages" class="chat-messages"></div>
     </div>
-    <div class="footer-tip">💡 Свайп карточки | Комбо растёт при быстрых выполнениях | Энергия тратится на всё | Случайные события меняют ход игры</div>
+    <div class="footer-tip">💡 Комбо держится 5 минут | Энергия тратится на задания (25), активацию (15+) | Регенерация +3 каждые 8 сек</div>
 </div>
 
 <script>
     (function(){
-        // ЗАДАНИЯ (награды снижены для баланса)
+        // ЗАДАНИЯ (сбалансированные)
         const TASKS_DATA = [
             { id:0, slot:"Wisdom of Athena", condition:"x20 + 3 Scatter", baseReward:240, completed:false, active:false, desc:"Достигни x20 + 3 скаттера" },
             { id:1, slot:"Power of Thor", condition:"5 молний в бонусе", baseReward:270, completed:false, active:false, desc:"5 молниеносных сборов" },
@@ -588,16 +587,20 @@
             bonusChatUses: 3,
             gameActive: true,
             winFlag: false,
-            energyCostTask: 15,
-            energyCostActivate: 10,
-            energyCostMinigame: 15,
-            energyCostBonus: 20,
+            energyCostTask: 25,
+            energyCostActivate: 15,
+            energyCostMinigame: 20,
+            energyCostBonus: 25,
+            doubleNext: 0,
+            emergencyUsed: false,
             achievements: { fastStart: false, comboMaster: false, timeKeeper: false, minigameFan: false, berryPuncher: false },
             timers: { comboDecay: null, gameTimer: null, energyRegen: null, autoChat: null, eventTimer: null },
-            difficulty: 1,   // множитель сложности (стоимость активации растёт)
-            eventCooldown: 0
+            difficulty: 1,
         };
         let minigamePlays = 0, minigameClickTotal = 0;
+        const MAX_MINIGAME_PLAYS = 5;
+        const COMBO_WINDOW_SEC = 300;     // 5 минут для удержания комбо
+        const COMBO_DECAY_SEC = 300;       // 5 минут угасание
 
         // DOM
         const carousel = document.getElementById('carouselWrapper');
@@ -667,6 +670,14 @@
             } else {
                 showToast(`❌ Не хватает энергии для ${actionName}! Нужно ${amount}`, true);
                 shakeScreen();
+                if (!game.emergencyUsed && game.gameActive && !game.winFlag && actionName !== "открытия нового задания") {
+                    game.emergencyUsed = true;
+                    game.energy = Math.min(100, game.energy + 20);
+                    addChatMessage("⚠️ АКТИВИРОВАН ЭКСТРЕННЫЙ ПРОТОКОЛ: +20 энергии!", true);
+                    showToast("Экстренный протокол: +20 энергии");
+                    updateUI();
+                    return true;
+                }
                 return false;
             }
         }
@@ -716,15 +727,20 @@
             let mult = multValues[game.comboLevel] || 1;
             game.comboMultiplier = mult;
             comboMultSpan.innerText = `x${mult}`;
-            comboFillDiv.style.width = `${(game.comboTimeLeft / 45) * 100}%`;
+            let fillPercent = (game.comboTimeLeft / COMBO_DECAY_SEC) * 100;
+            comboFillDiv.style.width = `${Math.min(100, fillPercent)}%`;
             comboTimerSpan.innerText = `${Math.ceil(game.comboTimeLeft)}с`;
             renderTasksCarousel();
             renderAchievements();
             updateCanvasBackground();
-            // Проверка на "застревание"
             let anyActive = game.tasks.some(t => t.active && !t.completed);
-            if (!anyActive && game.energy < 10 && game.bonusChatUses === 0 && game.totalScore < 100 && !game.winFlag && game.gameActive) {
-                addChatMessage("Критическая ситуация: энергия на нуле, нет активных заданий. Система фиксирует провал.");
+            if (!anyActive && game.energy < 10 && game.bonusChatUses === 0 && game.totalScore < 100 && !game.emergencyUsed && game.gameActive && !game.winFlag) {
+                addChatMessage("Критическая ситуация: энергия на нуле, нет активных заданий. Активирую экстренный протокол.");
+                game.emergencyUsed = true;
+                game.energy += 20;
+                updateUI();
+            } else if (!anyActive && game.energy < 10 && game.bonusChatUses === 0 && game.totalScore < 100 && game.emergencyUsed && game.gameActive) {
+                addChatMessage("Система фиксирует необратимый провал. Игра окончена.");
                 gameLose();
             }
             if (game.totalScore >= 8000 && game.completedCount === 15 && !game.winFlag) gameWin();
@@ -766,18 +782,18 @@
             });
         }
 
-        // КОМБО
+        // КОМБО (окно 5 минут, угасание 5 минут)
         function updateComboOnComplete() {
             let now = Date.now();
             let timeSinceLast = (now - game.lastCompleteTimestamp) / 1000;
-            if (timeSinceLast <= 20) {
+            if (timeSinceLast <= COMBO_WINDOW_SEC) {
                 if (game.comboLevel < 5) game.comboLevel++;
-                game.comboTimeLeft = 45;
+                game.comboTimeLeft = COMBO_DECAY_SEC;
             } else {
                 game.comboLevel = Math.max(0, game.comboLevel - 1);
-                game.comboTimeLeft = 45;
+                game.comboTimeLeft = COMBO_DECAY_SEC;
             }
-            if (game.comboTimeLeft < 45) game.comboTimeLeft = 45;
+            if (game.comboTimeLeft < COMBO_DECAY_SEC) game.comboTimeLeft = COMBO_DECAY_SEC;
             game.lastCompleteTimestamp = now;
             if (game.timers.comboDecay) clearInterval(game.timers.comboDecay);
             game.timers.comboDecay = setInterval(() => {
@@ -786,7 +802,7 @@
                     game.comboTimeLeft -= 1;
                     if (game.comboTimeLeft <= 0 && game.comboLevel > 0) {
                         game.comboLevel--;
-                        game.comboTimeLeft = 45;
+                        game.comboTimeLeft = COMBO_DECAY_SEC;
                         if (game.comboLevel === 0) showToast("Комбо потерян...", true);
                         else addChatMessage(`Комбо снижен до уровня ${game.comboLevel}`);
                     }
@@ -798,34 +814,34 @@
             updateUI();
         }
 
-        // ПРОГРЕССИЯ СЛОЖНОСТИ (каждые 5 заданий)
         function increaseDifficulty() {
             let tasksDone = game.completedCount;
             if (tasksDone > 0 && tasksDone % 5 === 0 && tasksDone !== game.difficulty*5) {
                 game.difficulty++;
-                game.energyCostActivate = Math.min(25, 10 + (game.difficulty-1)*3);
+                game.energyCostActivate = Math.min(30, 15 + (game.difficulty-1)*3);
                 addChatMessage(`⚠️ Сложность повышена! Стоимость активации теперь ${game.energyCostActivate} энергии.`, true);
             }
         }
 
-        // СЛУЧАЙНОЕ СОБЫТИЕ
         function triggerRandomEvent() {
             if (!game.gameActive || game.winFlag) return;
-            let events = [
-                { text: "🌧 Проливной дождь повредил часть урожая! -150 очков.", effect: () => { game.totalScore = Math.max(0, game.totalScore - 150); }, bad: true },
-                { text: "🍀 Внезапная удача! +200 очков.", effect: () => { game.totalScore += 200; }, bad: false },
-                { text: "⚡ Энергетический шторм! +25 энергии.", effect: () => { game.energy = Math.min(100, game.energy+25); }, bad: false },
-                { text: "🔥 Твоя репутация растёт! Следующее задание даст х2 очков.", effect: () => { game.doubleNext = 2; }, bad: false, special: true },
-                { text: "⏳ Время ускоряется! -45 секунд.", effect: () => { game.timeLeftSec = Math.max(0, game.timeLeftSec-45); }, bad: true },
-                { text: "🎁 Тайный благодетель оставил бонус. +1 использование бонуса чата.", effect: () => { game.bonusChatUses = Math.min(5, game.bonusChatUses+1); }, bad: false }
-            ];
-            let event = events[Math.floor(Math.random() * events.length)];
-            addChatMessage(`🔔 СОБЫТИЕ: ${event.text}`, true);
-            event.effect();
-            if (event.special) game.doubleNext = 2;
-            flashScreen();
-            updateUI();
-            saveGame();
+            if (Math.random() < 0.25) {
+                let events = [
+                    { text: "🌧 Проливной дождь повредил часть урожая! -150 очков.", effect: () => { game.totalScore = Math.max(0, game.totalScore - 150); }, bad: true },
+                    { text: "🍀 Внезапная удача! +200 очков.", effect: () => { game.totalScore += 200; }, bad: false },
+                    { text: "⚡ Энергетический шторм! +25 энергии.", effect: () => { game.energy = Math.min(100, game.energy+25); }, bad: false },
+                    { text: "🔥 Твоя репутация растёт! Следующее задание даст х2 очков.", effect: () => { game.doubleNext = 2; }, bad: false, special: true },
+                    { text: "⏳ Время ускоряется! -45 секунд.", effect: () => { game.timeLeftSec = Math.max(0, game.timeLeftSec-45); }, bad: true },
+                    { text: "🎁 Тайный благодетель оставил бонус. +1 использование бонуса чата.", effect: () => { game.bonusChatUses = Math.min(5, game.bonusChatUses+1); }, bad: false }
+                ];
+                let event = events[Math.floor(Math.random() * events.length)];
+                addChatMessage(`🔔 СОБЫТИЕ: ${event.text}`, true);
+                event.effect();
+                if (event.special) game.doubleNext = 2;
+                flashScreen();
+                updateUI();
+                saveGame();
+            }
         }
 
         async function completeTask(id) {
@@ -834,7 +850,7 @@
             let task = game.tasks.find(t => t.id === id);
             if (!task || task.completed || !task.active) return;
             let earned = Math.floor(task.baseReward * game.comboMultiplier);
-            if (game.doubleNext) {
+            if (game.doubleNext > 0) {
                 earned *= game.doubleNext;
                 game.doubleNext = 0;
                 addChatMessage("✨ Удвоение очков из-за события! ✨");
@@ -848,7 +864,6 @@
                 game.energy = Math.min(100, game.energy + 15);
                 showToast(`🔥 Комбо 3+! +15 энергии`);
             }
-            // Активация следующего задания с проверкой энергии
             let nextActivated = false;
             for (let t of game.tasks) {
                 if (!t.completed && !t.active) {
@@ -923,6 +938,10 @@
         // МИНИ-ИГРА
         function startMiniGame() {
             if (!game.gameActive || game.winFlag) return;
+            if (minigamePlays >= MAX_MINIGAME_PLAYS) {
+                showToast("Лимит мини-игр исчерпан на эту игру.", true);
+                return;
+            }
             if (!spendEnergy(game.energyCostMinigame, "мини-игры")) return;
             let modal = document.createElement('div');
             modal.className = 'mini-game-modal';
@@ -1012,7 +1031,7 @@
                 { text:"🍬 +250 очков", effect:()=>{ game.totalScore+=250; animateScoreGain(250); } },
                 { text:"⏳ +3 минуты", effect:()=>{ game.timeLeftSec+=180; } },
                 { text:"⚡ Энергия 100%", effect:()=>{ game.energy=100; } },
-                { text:"🔥 +2 уровня комбо", effect:()=>{ game.comboLevel = Math.min(5, game.comboLevel+2); game.comboTimeLeft=45; } },
+                { text:"🔥 +2 уровня комбо", effect:()=>{ game.comboLevel = Math.min(5, game.comboLevel+2); game.comboTimeLeft=COMBO_DECAY_SEC; } },
                 { text:"🎲 Подсказка: Wisdom of Athena x20", effect:()=>{ addChatMessage("Подсказка: лови x20 в Wisdom of Athena!"); } }
             ];
             let chosen = bonuses[Math.floor(Math.random()*bonuses.length)];
@@ -1023,16 +1042,14 @@
             saveGame();
         }
 
-        // AI НАБЛЮДАТЕЛЬ (давит)
         function aiCommentary() {
             if (!game.gameActive || game.winFlag) return;
             if (game.energy < 20) addChatMessage("Ты выглядишь уставшей. Энергия на исходе. Рекомендую отдых или покупку.");
             else if (game.comboLevel === 0 && game.completedCount > 2) addChatMessage("Теряешь темп. Без комбо тяжело победить.");
             else if (game.timeLeftSec < 180) addChatMessage("Времени почти не осталось! Давай быстрее, урожай под угрозой!");
-            else if (game.totalScore > 5000) addChatMessage("Ты близка к победе. Не расслабляйся, система следит.");
+            else if (game.totalScore > 6000) addChatMessage("Ты близка к победе. Не расслабляйся, система следит.");
         }
 
-        // ТАЙМЕРЫ И СИСТЕМЫ
         function startGameSystems() {
             if (game.timers.gameTimer) clearInterval(game.timers.gameTimer);
             game.timers.gameTimer = setInterval(()=>{
@@ -1043,18 +1060,18 @@
             },1000);
             game.timers.energyRegen = setInterval(()=>{
                 if (!game.gameActive || game.winFlag) return;
-                if (game.energy < 100) game.energy = Math.min(100, game.energy + 5);
+                if (game.energy < 100) game.energy = Math.min(100, game.energy + 3);
                 updateUI();
             },8000);
             game.timers.autoChat = setInterval(()=>{
                 if (!game.gameActive || game.winFlag) return;
-                let phrases = ["Наблюдаю за тобой. Комбо — залог успеха.", "Случайные события могут помочь или помешать.", "Сложность растёт с каждым выполненным заданием.", "Энергия — твой главный ресурс."];
+                let phrases = ["Наблюдаю за тобой. Комбо держится 5 минут — не спеши.", "Случайные события могут помочь или помешать.", "Сложность растёт с каждым выполненным заданием.", "Энергия — твой главный ресурс."];
                 addChatMessage(phrases[Math.floor(Math.random()*phrases.length)]);
                 aiCommentary();
             },25000);
             game.timers.eventTimer = setInterval(() => {
                 if (!game.gameActive || game.winFlag) return;
-                if (Math.random() < 0.4) triggerRandomEvent();
+                triggerRandomEvent();
             }, 45000);
         }
 
@@ -1085,45 +1102,48 @@
                 gameActive: game.gameActive, winFlag: game.winFlag, achievements: game.achievements,
                 lastCompleteTimestamp: game.lastCompleteTimestamp, minigamePlays, minigameClickTotal,
                 difficulty: game.difficulty, energyCostActivate: game.energyCostActivate,
-                version: 9
+                doubleNext: game.doubleNext, emergencyUsed: game.emergencyUsed,
+                version: 11
             };
-            localStorage.setItem('cloverQuestFinal', JSON.stringify(save));
+            localStorage.setItem('cloverQuestFinalV3', JSON.stringify(save));
         }
         function loadGame() {
-            let raw = localStorage.getItem('cloverQuestFinal');
+            let raw = localStorage.getItem('cloverQuestFinalV3');
             if (!raw) return false;
             try {
                 let d = JSON.parse(raw);
-                if (d.version !== 9) return false;
+                if (d.version !== 11) return false;
                 game.tasks = d.tasks; game.completedCount = d.completedCount; game.totalScore = d.totalScore;
                 game.timeLeftSec = d.timeLeftSec; game.energy = d.energy; game.comboLevel = d.comboLevel;
                 game.comboTimeLeft = d.comboTimeLeft; game.bonusChatUses = d.bonusChatUses;
                 game.gameActive = d.gameActive; game.winFlag = d.winFlag; game.achievements = d.achievements;
                 game.lastCompleteTimestamp = d.lastCompleteTimestamp;
                 game.difficulty = d.difficulty || 1;
-                game.energyCostActivate = d.energyCostActivate || 10;
+                game.energyCostActivate = d.energyCostActivate || 15;
+                game.doubleNext = d.doubleNext || 0;
+                game.emergencyUsed = d.emergencyUsed || false;
                 minigamePlays = d.minigamePlays || 0;
                 return true;
             } catch(e){ return false; }
         }
 
-        // МОДАЛКА ПРАВИЛ
         async function showRulesModal() {
             return new Promise((resolve) => {
                 let modal = document.createElement('div');
                 modal.className = 'rules-modal';
                 modal.innerHTML = `
                     <div class="rules-content">
-                        <h2><i class="fas fa-strawberry"></i> ПРАВИЛА КВЕСТА 2.0</h2>
+                        <h2><i class="fas fa-strawberry"></i> ПРАВИЛА КВЕСТА 3.0</h2>
                         <ul class="rules-list">
                             <li><strong>🎯 Цель:</strong> набрать <strong>8000 очков</strong>, выполнив 15 заданий. Время — <strong>2 часа</strong>.</li>
                             <li><strong>🍓 Задания:</strong> свайпай карточки, нажимай «ВЫПОЛНЕНО» после реального выполнения в слоте.</li>
-                            <li><strong>⚡ Энергия:</strong> тратится на выполнение (15), открытие новых (стоимость растёт), мини-игру (15) и бонус чата (20). Восстанавливается 5% каждые 8 сек.</li>
-                            <li><strong>🔥 Комбо:</strong> выполняй задания быстрее 20 секунд — множитель x1 → x3 (макс).</li>
+                            <li><strong>⚡ Энергия:</strong> тратится на выполнение (25), открытие новых (15→30), мини-игру (20) и бонус чата (25). Восстанавливается +3 каждые 8 сек.</li>
+                            <li><strong>🔥 Комбо:</strong> выполняй задания быстрее 5 минут — множитель растёт (x1 → x3 макс). Комбо держится 5 минут.</li>
                             <li><strong>🎲 Случайные события:</strong> каждые 45-90 секунд происходят события (позитивные или негативные).</li>
                             <li><strong>📈 Прогрессия сложности:</strong> после каждых 5 заданий стоимость активации растёт.</li>
-                            <li><strong>🎮 Мини-игра:</strong> лови клубнику, набирай комбо и получай очки/энергию.</li>
-                            <li><strong>💾 Сохранение:</strong> автоматическое. Можно закрыть и продолжить позже.</li>
+                            <li><strong>🎮 Мини-игра:</strong> лови клубнику (максимум 5 раз за игру).</li>
+                            <li><strong>🆘 Экстренный протокол:</strong> один раз за игру при нехватке энергии система даст +20.</li>
+                            <li><strong>💾 Сохранение:</strong> автоматическое.</li>
                         </ul>
                         <button id="closeRulesBtn" class="bonus-btn" style="background: var(--accent);">🍓 НАЧАТЬ КВЕСТ 🍓</button>
                     </div>
@@ -1133,7 +1153,6 @@
             });
         }
 
-        // ИНИЦИАЛИЗАЦИЯ
         async function init() {
             let loaded = loadGame();
             if (!loaded) {
@@ -1141,8 +1160,8 @@
                 for (let i=0; i<3; i++) game.tasks[i].active = true;
                 game.gameActive = true;
                 game.lastCompleteTimestamp = Date.now();
-                game.energyCostActivate = 10;
-                addChatMessage("Урожай под угрозой. У тебя 2 часа. Случайные события могут изменить ход игры.");
+                game.energyCostActivate = 15;
+                addChatMessage("Урожай под угрозой. У тебя 2 часа. Комбо держится 5 минут — не бойся медлить.");
             } else {
                 addChatMessage("Система перезагружена. Продолжаем спасение урожая.");
             }
@@ -1153,7 +1172,6 @@
             buyEnergyBtn.onclick = buyEnergy;
             window.addEventListener('beforeunload', ()=>saveGame());
             setInterval(saveGame, 30000);
-            // Фон с ягодами
             function resizeCanvas() { canvasElem.width = window.innerWidth; canvasElem.height = window.innerHeight; }
             window.addEventListener('resize', resizeCanvas);
             resizeCanvas();
