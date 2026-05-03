@@ -209,6 +209,8 @@
             border: 1px solid var(--border);
             transition: transform 0.2s, box-shadow 0.2s;
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
         }
         .task-card:hover {
             transform: translateY(-4px);
@@ -255,6 +257,11 @@
             color: var(--accent-gold);
             margin-top: 12px;
         }
+        /* Кнопка и статус прижаты к низу */
+        .task-footer {
+            margin-top: auto;
+            padding-top: 16px;
+        }
         .complete-btn {
             background: linear-gradient(95deg, #4caf50, #2e7d32);
             border: none;
@@ -264,7 +271,6 @@
             font-size: 1.05rem;
             letter-spacing: 0.5px;
             width: 100%;
-            margin-top: 16px;
             cursor: pointer;
             transition: filter 0.1s, transform 0.05s;
             color: white;
@@ -281,6 +287,14 @@
             cursor: not-allowed;
             opacity: 0.5;
             transform: none;
+        }
+        .task-status {
+            display: inline-block;
+            color: #8bc34a;
+            font-weight: bold;
+        }
+        .task-locked {
+            color: #866b78;
         }
 
         .achievements-section {
@@ -330,7 +344,7 @@
             margin-bottom: 12px;
             flex-wrap: wrap;
         }
-        .bonus-btn, .minigame-btn, .buy-energy-btn {
+        .bonus-btn, .minigame-btn, .buy-energy-btn, .rules-btn {
             background: #2e1622;
             border: 1px solid var(--accent);
             padding: 8px 20px;
@@ -340,7 +354,7 @@
             transition: all 0.1s;
             color: var(--text-primary);
         }
-        .bonus-btn:hover, .minigame-btn:hover, .buy-energy-btn:hover {
+        .bonus-btn:hover, .minigame-btn:hover, .buy-energy-btn:hover, .rules-btn:hover {
             background: var(--accent);
             color: #0a0208;
             transform: scale(0.98);
@@ -547,6 +561,7 @@
         <div class="action-buttons">
             <button id="bonusChatBtn" class="bonus-btn" disabled><i class="fas fa-gift"></i> Бонус чата (ост.3)</button>
             <button id="minigameBtn" class="minigame-btn"><i class="fas fa-gamepad"></i> Лови клубнику</button>
+            <button id="rulesBtn" class="rules-btn"><i class="fas fa-scroll"></i> Правила</button>
         </div>
         <div id="chatMessages" class="chat-messages"></div>
     </div>
@@ -555,7 +570,7 @@
 
 <script>
     (function(){
-        // ЗАДАНИЯ (сбалансированные)
+        // ЗАДАНИЯ (обновлённые пользователем)
         const TASKS_DATA = [
             { id:0, slot:"Wisdom of Athena", condition:"x15", baseReward:240, completed:false, active:false, desc:"Достигни x15" },
             { id:1, slot:"Power of Thor", condition:"х10", baseReward:270, completed:false, active:false, desc:"Дойти до множителя х10" },
@@ -618,6 +633,7 @@
         const minigameBtn = document.getElementById('minigameBtn');
         const achievementsContainer = document.getElementById('achievementsList');
         const buyEnergyBtn = document.getElementById('buyEnergyBtn');
+        const rulesBtn = document.getElementById('rulesBtn');
         const canvasElem = document.getElementById('berryCanvas');
         let canvasCtx = canvasElem.getContext('2d');
         let berriesArray = [];
@@ -756,20 +772,20 @@
                 else if (!task.active) statusClass += ' locked';
                 else if (task.active && !task.completed) statusClass += ' active';
                 card.className = statusClass;
-                let btnHtml = '';
+                let footerHtml = '';
                 if (!task.completed && task.active && game.gameActive && !game.winFlag) {
                     let disabledAttr = game.energy < game.energyCostTask ? 'disabled' : '';
-                    btnHtml = `<button class="complete-btn" data-id="${task.id}" ${disabledAttr}>✅ ВЫПОЛНЕНО (${game.energyCostTask}🔋)</button>`;
+                    footerHtml = `<div class="task-footer"><button class="complete-btn" data-id="${task.id}" ${disabledAttr}>✅ ВЫПОЛНЕНО (${game.energyCostTask}🔋)</button></div>`;
                 } else if (task.completed) {
-                    btnHtml = '<span style="color:#8bc34a;">✔️ Завершено</span>';
+                    footerHtml = `<div class="task-footer"><span class="task-status">✔️ Завершено</span></div>`;
                 } else {
-                    btnHtml = '<span style="color:#866b78;">🔒 Заблокировано</span>';
+                    footerHtml = `<div class="task-footer"><span class="task-locked">🔒 Заблокировано</span></div>`;
                 }
                 card.innerHTML = `
                     <div class="task-title"><span>🍓 ${task.slot}</span><span class="slot-badge">🎰 PRAGMATIC</span></div>
                     <div class="task-desc"><strong>Задание:</strong> ${task.desc}</div>
                     <div class="task-reward"><i class="fas fa-star"></i> Награда: ${task.baseReward} очков</div>
-                    ${btnHtml}
+                    ${footerHtml}
                 `;
                 carousel.appendChild(card);
             }
@@ -1103,16 +1119,16 @@
                 lastCompleteTimestamp: game.lastCompleteTimestamp, minigamePlays, minigameClickTotal,
                 difficulty: game.difficulty, energyCostActivate: game.energyCostActivate,
                 doubleNext: game.doubleNext, emergencyUsed: game.emergencyUsed,
-                version: 11
+                version: 12
             };
-            localStorage.setItem('cloverQuestFinalV3', JSON.stringify(save));
+            localStorage.setItem('cloverQuestFinalV4', JSON.stringify(save));
         }
         function loadGame() {
-            let raw = localStorage.getItem('cloverQuestFinalV3');
+            let raw = localStorage.getItem('cloverQuestFinalV4');
             if (!raw) return false;
             try {
                 let d = JSON.parse(raw);
-                if (d.version !== 11) return false;
+                if (d.version !== 12) return false;
                 game.tasks = d.tasks; game.completedCount = d.completedCount; game.totalScore = d.totalScore;
                 game.timeLeftSec = d.timeLeftSec; game.energy = d.energy; game.comboLevel = d.comboLevel;
                 game.comboTimeLeft = d.comboTimeLeft; game.bonusChatUses = d.bonusChatUses;
@@ -1145,7 +1161,7 @@
                             <li><strong>🆘 Экстренный протокол:</strong> один раз за игру при нехватке энергии система даст +20.</li>
                             <li><strong>💾 Сохранение:</strong> автоматическое.</li>
                         </ul>
-                        <button id="closeRulesBtn" class="bonus-btn" style="background: var(--accent);">🍓 НАЧАТЬ КВЕСТ 🍓</button>
+                        <button id="closeRulesBtn" class="bonus-btn" style="background: var(--accent);">🍓 ПОНЯТНО, НАЧАТЬ 🍓</button>
                     </div>
                 `;
                 document.body.appendChild(modal);
@@ -1170,6 +1186,7 @@
             bonusChatBtn.onclick = applyChatBonus;
             minigameBtn.onclick = startMiniGame;
             buyEnergyBtn.onclick = buyEnergy;
+            rulesBtn.onclick = showRulesModal;
             window.addEventListener('beforeunload', ()=>saveGame());
             setInterval(saveGame, 30000);
             function resizeCanvas() { canvasElem.width = window.innerWidth; canvasElem.height = window.innerHeight; }
