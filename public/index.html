@@ -557,21 +557,21 @@
     (function(){
         // ЗАДАНИЯ (сбалансированные)
         const TASKS_DATA = [
-            { id:0, slot:"Wisdom of Athena", condition:"x20 + 3 Scatter", baseReward:240, completed:false, active:false, desc:"Достигни x20 + 3 скаттера" },
-            { id:1, slot:"Power of Thor", condition:"5 молний в бонусе", baseReward:270, completed:false, active:false, desc:"5 молниеносных сборов" },
-            { id:2, slot:"5 Lions Megaways", condition:"5 диких на барабане", baseReward:300, completed:false, active:false, desc:"В фриспинах 5 wilds" },
-            { id:3, slot:"Juicy Fruits", condition:"3 бонуса за 15 мин", baseReward:250, completed:false, active:false, desc:"Лимит времени 15 мин" },
-            { id:4, slot:"Fire Strike 2", condition:"15 огней", baseReward:380, completed:false, active:false, desc:"Заполнить экран символами" },
+            { id:0, slot:"Wisdom of Athena", condition:"x15", baseReward:240, completed:false, active:false, desc:"Достигни x15" },
+            { id:1, slot:"Power of Thor", condition:"х10", baseReward:270, completed:false, active:false, desc:"Дойти до множителя х10" },
+            { id:2, slot:"5 Lions Megaways", condition:"Выбить бонуску", baseReward:300, completed:false, active:false, desc:"Выбить бонуску" },
+            { id:3, slot:"Juicy Fruits", condition:"Купить 3 бонуса за 75$", baseReward:250, completed:false, active:false, desc:"Купить 3 бонуса за 75$" },
+            { id:4, slot:"Bigger Barn House Bonanza", condition:"Выбить два бонуса", baseReward:380, completed:false, active:false, desc:"Выбить два бонуса" },
             { id:5, slot:"Empty the Bank", condition:"Выигрыш >200x", baseReward:350, completed:false, active:false, desc:"Бонус Empty the Bank" },
-            { id:6, slot:"Mysterious Egypt", condition:"3 саркофага", baseReward:330, completed:false, active:false, desc:"Бонусная игра" },
-            { id:7, slot:"Clover Gold", condition:"3 клевера", baseReward:220, completed:false, active:false, desc:"Три клевера" },
-            { id:8, slot:"Buffalo King", condition:"10 выигрышных спинов", baseReward:350, completed:false, active:false, desc:"10 спинов подряд" },
-            { id:9, slot:"Wild Walker", condition:"Зомби x15", baseReward:410, completed:false, active:false, desc:"Дикий зомби x15" },
-            { id:10, slot:"Voodoo Magic", condition:"Бонус x50", baseReward:430, completed:false, active:false, desc:"Купленный бонус x50" },
-            { id:11, slot:"Leprechaun Carol", condition:"100 монет", baseReward:310, completed:false, active:false, desc:"Накопить 100 монет" },
-            { id:12, slot:"John Hunter", condition:"4 уровня гробницы", baseReward:370, completed:false, active:false, desc:"Завершить 4 этапа" },
-            { id:13, slot:"Mustang Gold", condition:"3 жеребца", baseReward:260, completed:false, active:false, desc:"Три логотипа" },
-            { id:14, slot:"Chicken Escape", condition:"Побег x25", baseReward:440, completed:false, active:false, desc:"Множитель 25x" }
+            { id:6, slot:"3 Buzzing Wilds", condition:"2 пчелки в правой бонуске", baseReward:330, completed:false, active:false, desc:"2 пчелки в правой бонуске" },
+            { id:7, slot:"The Dog House Megaways", condition:"Выбить 4 лапы", baseReward:220, completed:false, active:false, desc:"Выбить Четыре лапы" },
+            { id:8, slot:"Buffalo King", condition:"Играть в слот пока не надоест Алексею:)", baseReward:350, completed:false, active:false, desc:"Играть в слот пока не надоест Алексею:)" },
+            { id:9, slot:"Wild Walker", condition:"Дойти до 3-х вилдов", baseReward:410, completed:false, active:false, desc:"Дойти до 3-х вилдов" },
+            { id:10, slot:"Voodoo Magic", condition:"Бонус x100", baseReward:430, completed:false, active:false, desc:"Купленный бонус x100 с первой попытки" },
+            { id:11, slot:"Gates of Olympus Super Scatter", condition:"Выбить Суперскаттер", baseReward:310, completed:false, active:false, desc:"Выбить Суперскаттер" },
+            { id:12, slot:"John Hunter", condition:"Купить бонус и выбить четыре туза за спин", baseReward:370, completed:false, active:false, desc:"четыре туза за спин" },
+            { id:13, slot:"Sugar rush", condition:"Ретриггер", baseReward:260, completed:false, active:false, desc:"Ретриггер" },
+            { id:14, slot:"Hot Tuna", condition:"Дойти до красной консервы", baseReward:440, completed:false, active:false, desc:"Дойти до красной консервы" }
         ];
 
         let game = {
