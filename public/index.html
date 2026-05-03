@@ -257,7 +257,6 @@
             color: var(--accent-gold);
             margin-top: 12px;
         }
-        /* Кнопка и статус прижаты к низу */
         .task-footer {
             margin-top: auto;
             padding-top: 16px;
@@ -289,7 +288,6 @@
             transform: none;
         }
         .task-status {
-            display: inline-block;
             color: #8bc34a;
             font-weight: bold;
         }
@@ -320,6 +318,12 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .achievement-badge:hover {
+            transform: scale(1.02);
+            background: #3e1f30;
         }
         .achievement-badge.unlocked {
             background: linear-gradient(135deg, var(--accent-gold), var(--accent));
@@ -344,7 +348,7 @@
             margin-bottom: 12px;
             flex-wrap: wrap;
         }
-        .bonus-btn, .minigame-btn, .buy-energy-btn, .rules-btn {
+        .bonus-btn, .minigame-btn, .buy-energy-btn, .rules-btn, .achievements-info-btn {
             background: #2e1622;
             border: 1px solid var(--accent);
             padding: 8px 20px;
@@ -354,7 +358,7 @@
             transition: all 0.1s;
             color: var(--text-primary);
         }
-        .bonus-btn:hover, .minigame-btn:hover, .buy-energy-btn:hover, .rules-btn:hover {
+        .bonus-btn:hover, .minigame-btn:hover, .buy-energy-btn:hover, .rules-btn:hover, .achievements-info-btn:hover {
             background: var(--accent);
             color: #0a0208;
             transform: scale(0.98);
@@ -453,7 +457,7 @@
             font-weight: bold;
         }
 
-        .rules-modal, .event-modal {
+        .rules-modal, .achievement-modal, .event-modal {
             position: fixed;
             top: 0;
             left: 0;
@@ -466,7 +470,7 @@
             justify-content: center;
             z-index: 6000;
         }
-        .rules-content, .event-content {
+        .rules-content, .achievement-content {
             background: linear-gradient(145deg, #1f0f19, #150a12);
             border-radius: var(--radius-big);
             padding: 32px;
@@ -475,7 +479,33 @@
             border: 1px solid var(--accent);
             color: var(--text-primary);
         }
-        .event-content { text-align: center; }
+        .achievement-desc {
+            margin: 10px 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .achievement-unlocked-popup {
+            position: fixed;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #ffc371, #ff5f6d);
+            color: #1a0510;
+            padding: 20px 35px;
+            border-radius: 80px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-align: center;
+            z-index: 7000;
+            animation: popupFade 0.3s ease-out;
+            box-shadow: 0 0 30px gold;
+            white-space: nowrap;
+            border: 2px solid white;
+        }
+        @keyframes popupFade {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
         .mini-game-modal {
             position: fixed;
             top: 0;
@@ -562,6 +592,7 @@
             <button id="bonusChatBtn" class="bonus-btn" disabled><i class="fas fa-gift"></i> Бонус чата (ост.3)</button>
             <button id="minigameBtn" class="minigame-btn"><i class="fas fa-gamepad"></i> Лови клубнику</button>
             <button id="rulesBtn" class="rules-btn"><i class="fas fa-scroll"></i> Правила</button>
+            <button id="achievementsInfoBtn" class="achievements-info-btn"><i class="fas fa-info-circle"></i> Как получить ачивки?</button>
         </div>
         <div id="chatMessages" class="chat-messages"></div>
     </div>
@@ -611,6 +642,7 @@
             achievements: { fastStart: false, comboMaster: false, timeKeeper: false, minigameFan: false, berryPuncher: false },
             timers: { comboDecay: null, gameTimer: null, energyRegen: null, autoChat: null, eventTimer: null },
             difficulty: 1,
+            processing: false, // флаг для блокировки двойного нажатия
         };
         let minigamePlays = 0, minigameClickTotal = 0;
         const MAX_MINIGAME_PLAYS = 5;
@@ -634,9 +666,19 @@
         const achievementsContainer = document.getElementById('achievementsList');
         const buyEnergyBtn = document.getElementById('buyEnergyBtn');
         const rulesBtn = document.getElementById('rulesBtn');
+        const achievementsInfoBtn = document.getElementById('achievementsInfoBtn');
         const canvasElem = document.getElementById('berryCanvas');
         let canvasCtx = canvasElem.getContext('2d');
         let berriesArray = [];
+
+        // Уведомление о получении ачивки (всплывающее окно)
+        function showAchievementPopup(title, bonusText) {
+            let popup = document.createElement('div');
+            popup.className = 'achievement-unlocked-popup';
+            popup.innerHTML = `<i class="fas fa-trophy" style="font-size:1.5rem;"></i> ДОСТИЖЕНИЕ ПОЛУЧЕНО!<br><strong>${title}</strong><br><span style="font-size:0.9rem;">${bonusText}</span>`;
+            document.body.appendChild(popup);
+            setTimeout(() => popup.remove(), 3000);
+        }
 
         // Вспомогательные функции
         function showToast(msg, isErr=false) {
@@ -798,7 +840,7 @@
             });
         }
 
-        // КОМБО (окно 5 минут, угасание 5 минут)
+        // КОМБО
         function updateComboOnComplete() {
             let now = Date.now();
             let timeSinceLast = (now - game.lastCompleteTimestamp) / 1000;
@@ -860,86 +902,119 @@
             }
         }
 
+        // ОСНОВНАЯ ФУНКЦИЯ ВЫПОЛНЕНИЯ ЗАДАНИЯ С ЗАЩИТОЙ ОТ ДВОЙНОГО НАЖАТИЯ
         async function completeTask(id) {
+            if (game.processing) {
+                showToast("Пожалуйста, подождите, задание уже выполняется...", true);
+                return;
+            }
             if (!game.gameActive || game.winFlag) return;
             if (!spendEnergy(game.energyCostTask, "выполнения задания")) return;
-            let task = game.tasks.find(t => t.id === id);
-            if (!task || task.completed || !task.active) return;
-            let earned = Math.floor(task.baseReward * game.comboMultiplier);
-            if (game.doubleNext > 0) {
-                earned *= game.doubleNext;
-                game.doubleNext = 0;
-                addChatMessage("✨ Удвоение очков из-за события! ✨");
-            }
-            game.totalScore += earned;
-            task.completed = true;
-            task.active = false;
-            game.completedCount++;
-            updateComboOnComplete();
-            if (game.comboLevel >= 3) {
-                game.energy = Math.min(100, game.energy + 15);
-                showToast(`🔥 Комбо 3+! +15 энергии`);
-            }
-            let nextActivated = false;
-            for (let t of game.tasks) {
-                if (!t.completed && !t.active) {
-                    if (game.energy >= game.energyCostActivate) {
-                        spendEnergy(game.energyCostActivate, "открытия нового задания");
-                        t.active = true;
-                        addChatMessage(`🔓 Новое задание: ${t.slot} — ${t.condition}`);
-                        nextActivated = true;
-                        break;
-                    } else {
-                        addChatMessage(`⚠️ Не хватает энергии (${game.energyCostActivate}) для открытия нового задания. Подожди регенерации.`);
-                        break;
+            
+            game.processing = true;
+            try {
+                let task = game.tasks.find(t => t.id === id);
+                if (!task || task.completed || !task.active) {
+                    game.processing = false;
+                    return;
+                }
+                let earned = Math.floor(task.baseReward * game.comboMultiplier);
+                if (game.doubleNext > 0) {
+                    earned *= game.doubleNext;
+                    game.doubleNext = 0;
+                    addChatMessage("✨ Удвоение очков из-за события! ✨");
+                }
+                game.totalScore += earned;
+                task.completed = true;
+                task.active = false;
+                game.completedCount++;
+                updateComboOnComplete();
+                if (game.comboLevel >= 3) {
+                    game.energy = Math.min(100, game.energy + 15);
+                    showToast(`🔥 Комбо 3+! +15 энергии`);
+                }
+                // Активация следующего задания
+                let nextActivated = false;
+                for (let t of game.tasks) {
+                    if (!t.completed && !t.active) {
+                        if (game.energy >= game.energyCostActivate) {
+                            spendEnergy(game.energyCostActivate, "открытия нового задания");
+                            t.active = true;
+                            addChatMessage(`🔓 Новое задание: ${t.slot} — ${t.condition}`);
+                            nextActivated = true;
+                            break;
+                        } else {
+                            addChatMessage(`⚠️ Не хватает энергии (${game.energyCostActivate}) для открытия нового задания. Подожди регенерации.`);
+                            break;
+                        }
                     }
                 }
+                increaseDifficulty();
+                showToast(`✅ +${earned} очков! Комбо x${game.comboMultiplier}`);
+                animateScoreGain(earned);
+                flashScreen();
+                addChatMessage(`Задание "${task.slot}" выполнено! +${earned} очков.`);
+                updateUI();
+                checkAchievements();
+                saveGame();
+            } finally {
+                game.processing = false;
             }
-            increaseDifficulty();
-            showToast(`✅ +${earned} очков! Комбо x${game.comboMultiplier}`);
-            animateScoreGain(earned);
-            flashScreen();
-            addChatMessage(`Задание "${task.slot}" выполнено! +${earned} очков.`);
-            updateUI();
-            checkAchievements();
-            saveGame();
         }
 
-        // Ачивки
-        function unlockAchievement(achKey, bonusFunc) {
+        // Ачивки с попап-уведомлением
+        function unlockAchievement(achKey, bonusFunc, bonusText) {
             if (game.achievements[achKey]) return;
             game.achievements[achKey] = true;
             bonusFunc();
-            showToast(`🏆 ДОСТИЖЕНИЕ ПОЛУЧЕНО! +БОНУС`);
-            flashScreen();
-            addChatMessage(`Ачивка ${achKey} активирована! Бонус получен.`, true);
+            // Показываем красивое всплывающее окно
+            let title = "";
+            switch(achKey) {
+                case 'fastStart': title = "⭐ Быстрый старт"; break;
+                case 'comboMaster': title = "🔥 Мастер комбо"; break;
+                case 'timeKeeper': title = "⏳ Хранитель времени"; break;
+                case 'minigameFan': title = "🎮 Любитель игр"; break;
+                case 'berryPuncher': title = "🍓 Ягодный удар"; break;
+                default: title = "Достижение";
+            }
+            showAchievementPopup(title, bonusText);
+            addChatMessage(`Ачивка "${title}" получена! ${bonusText}`, true);
             renderAchievements();
             saveGame();
         }
+
         function checkAchievements() {
             let completedFast = game.tasks.filter(t=>t.completed).length;
             if (completedFast >= 3 && !game.achievements.fastStart) {
                 let timePassed = (120*60 - game.timeLeftSec);
-                if (timePassed <= 900) unlockAchievement('fastStart', () => { game.timeLeftSec += 120; addChatMessage("Бонус: +2 минуты!"); });
+                if (timePassed <= 900) {
+                    unlockAchievement('fastStart', () => { game.timeLeftSec += 120; }, "+2 минуты к таймеру!");
+                }
             }
-            if (!game.achievements.comboMaster && game.comboLevel >= 3 && game.completedCount >= 3)
-                unlockAchievement('comboMaster', () => { game.totalScore += 300; addChatMessage("Бонус: +300 очков!"); });
-            if (!game.achievements.timeKeeper && game.winFlag && game.timeLeftSec > 600)
-                unlockAchievement('timeKeeper', () => { game.bonusChatUses = Math.min(5, game.bonusChatUses+1); });
+            if (!game.achievements.comboMaster && game.comboLevel >= 3 && game.completedCount >= 3) {
+                unlockAchievement('comboMaster', () => { game.totalScore += 300; }, "+300 очков!");
+            }
+            if (!game.achievements.timeKeeper && game.winFlag && game.timeLeftSec > 600) {
+                unlockAchievement('timeKeeper', () => { game.bonusChatUses = Math.min(5, game.bonusChatUses+1); }, "+1 бонус чата!");
+            }
         }
         function onMinigameFinish(score) {
             minigamePlays++;
-            if (score >= 20 && !game.achievements.berryPuncher)
-                unlockAchievement('berryPuncher', () => { game.totalScore += 500; game.energy = Math.min(100, game.energy+50); });
-            if (minigamePlays >= 2 && !game.achievements.minigameFan)
-                unlockAchievement('minigameFan', () => { game.timeLeftSec += 180; });
+            if (score >= 20 && !game.achievements.berryPuncher) {
+                unlockAchievement('berryPuncher', () => { game.totalScore += 500; game.energy = Math.min(100, game.energy+50); }, "+500 очков и +50 энергии!");
+            }
+            if (minigamePlays >= 2 && !game.achievements.minigameFan) {
+                unlockAchievement('minigameFan', () => { game.timeLeftSec += 180; }, "+3 минуты к таймеру!");
+            }
             saveGame();
         }
         function renderAchievements() {
             const list = [
-                { key:'fastStart', name:'⭐ Быстрый старт' }, { key:'comboMaster', name:'🔥 Мастер комбо' },
-                { key:'timeKeeper', name:'⏳ Хранитель времени' }, { key:'minigameFan', name:'🎮 Любитель игр' },
-                { key:'berryPuncher', name:'🍓 Ягодный удар' }
+                { key:'fastStart', name:'⭐ Быстрый старт', condition:"Выполнить 3 задания за первые 15 минут игры" },
+                { key:'comboMaster', name:'🔥 Мастер комбо', condition:"Достичь комбо уровня 3+ и выполнить 3 задания подряд с комбо" },
+                { key:'timeKeeper', name:'⏳ Хранитель времени', condition:"Победить, имея в запасе более 10 минут" },
+                { key:'minigameFan', name:'🎮 Любитель игр', condition:"Сыграть в мини-игру 2 раза за одну игровую сессию" },
+                { key:'berryPuncher', name:'🍓 Ягодный удар', condition:"Поймать 20 ягод в одной мини-игре" }
             ];
             achievementsContainer.innerHTML = '';
             for (let a of list) {
@@ -947,6 +1022,7 @@
                 let div = document.createElement('div');
                 div.className = 'achievement-badge ' + (unlocked ? 'unlocked' : '');
                 div.innerHTML = `<i class="fas ${unlocked ? 'fa-check-circle' : 'fa-lock'}"></i> ${a.name}`;
+                div.title = a.condition; // подсказка при наведении
                 achievementsContainer.appendChild(div);
             }
         }
@@ -1094,7 +1170,9 @@
         function gameWin() {
             if (game.winFlag) return;
             game.winFlag = true; game.gameActive = false;
-            if (!game.achievements.timeKeeper && game.timeLeftSec > 600) unlockAchievement('timeKeeper', () => { game.bonusChatUses = Math.min(5, game.bonusChatUses+1); });
+            if (!game.achievements.timeKeeper && game.timeLeftSec > 600) {
+                unlockAchievement('timeKeeper', () => { game.bonusChatUses = Math.min(5, game.bonusChatUses+1); }, "+1 бонус чата!");
+            }
             addChatMessage("🎉 ПОБЕДА! УРОЖАЙ СПАСЁН! Ты герой! 🎉", true);
             showToast("🏆 ПОБЕДА! ПЛАНТАЦИЯ СПАСЕНА! 🏆");
             updateCanvasBackground();
@@ -1119,16 +1197,16 @@
                 lastCompleteTimestamp: game.lastCompleteTimestamp, minigamePlays, minigameClickTotal,
                 difficulty: game.difficulty, energyCostActivate: game.energyCostActivate,
                 doubleNext: game.doubleNext, emergencyUsed: game.emergencyUsed,
-                version: 12
+                version: 13
             };
-            localStorage.setItem('cloverQuestFinalV4', JSON.stringify(save));
+            localStorage.setItem('cloverQuestFinalV5', JSON.stringify(save));
         }
         function loadGame() {
-            let raw = localStorage.getItem('cloverQuestFinalV4');
+            let raw = localStorage.getItem('cloverQuestFinalV5');
             if (!raw) return false;
             try {
                 let d = JSON.parse(raw);
-                if (d.version !== 12) return false;
+                if (d.version !== 13) return false;
                 game.tasks = d.tasks; game.completedCount = d.completedCount; game.totalScore = d.totalScore;
                 game.timeLeftSec = d.timeLeftSec; game.energy = d.energy; game.comboLevel = d.comboLevel;
                 game.comboTimeLeft = d.comboTimeLeft; game.bonusChatUses = d.bonusChatUses;
@@ -1169,6 +1247,26 @@
             });
         }
 
+        // Модалка с условиями ачивок
+        function showAchievementsInfo() {
+            let modal = document.createElement('div');
+            modal.className = 'achievement-modal';
+            modal.innerHTML = `
+                <div class="achievement-content">
+                    <h2><i class="fas fa-medal"></i> КАК ПОЛУЧИТЬ АЧИВКИ?</h2>
+                    <div class="achievement-desc"><strong>⭐ Быстрый старт</strong> — выполнить 3 задания за первые 15 минут игры.</div>
+                    <div class="achievement-desc"><strong>🔥 Мастер комбо</strong> — достичь комбо уровня 3+ и выполнить 3 задания подряд с активным комбо.</div>
+                    <div class="achievement-desc"><strong>⏳ Хранитель времени</strong> — победить, имея в запасе более 10 минут на таймере.</div>
+                    <div class="achievement-desc"><strong>🎮 Любитель игр</strong> — сыграть в мини-игру «Лови клубнику» 2 раза за одну игру.</div>
+                    <div class="achievement-desc"><strong>🍓 Ягодный удар</strong> — поймать 20 ягод в одной мини-игре.</div>
+                    <br>
+                    <button id="closeAchBtn" class="bonus-btn" style="background: var(--accent);">ЗАКРЫТЬ</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('closeAchBtn').onclick = () => modal.remove();
+        }
+
         async function init() {
             let loaded = loadGame();
             if (!loaded) {
@@ -1187,6 +1285,7 @@
             minigameBtn.onclick = startMiniGame;
             buyEnergyBtn.onclick = buyEnergy;
             rulesBtn.onclick = showRulesModal;
+            achievementsInfoBtn.onclick = showAchievementsInfo;
             window.addEventListener('beforeunload', ()=>saveGame());
             setInterval(saveGame, 30000);
             function resizeCanvas() { canvasElem.width = window.innerWidth; canvasElem.height = window.innerHeight; }
