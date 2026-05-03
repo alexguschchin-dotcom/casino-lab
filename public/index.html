@@ -657,7 +657,7 @@
         };
         let minigamePlays = 0, minigameClickTotal = 0;
         const MAX_MINIGAME_PLAYS = 5;
-        const COMBO_WINDOW_SEC = 300;     // 5 минут
+        const COMBO_WINDOW_SEC = 300;     
         const COMBO_DECAY_SEC = 300;
 
         // DOM
@@ -692,11 +692,23 @@
             setTimeout(() => popup.remove(), 3000);
         }
 
-        // Функция сброса игры
+        // Функция сброса игры – удаляет все сохранения и перезагружает страницу
         function resetGame() {
             if (confirm('⚠️ ВНИМАНИЕ! Сброс удалит весь текущий прогресс. Начать квест заново?')) {
-                localStorage.removeItem('cloverQuestFinalV6');
-                location.reload();
+                // Удаляем все возможные ключи сохранений (старые версии)
+                const keys = [
+                    'cloverQuestFinalV3',
+                    'cloverQuestFinalV4',
+                    'cloverQuestFinalV5',
+                    'cloverQuestFinalV6',
+                    'cloverQuestFinalV7',
+                    'cloverQuestFinalV8'
+                ];
+                keys.forEach(key => localStorage.removeItem(key));
+                // Полностью очищаем localStorage (на всякий случай)
+                localStorage.clear();
+                // Принудительная перезагрузка страницы без кэша
+                window.location.href = window.location.href.split('#')[0];
             }
         }
 
@@ -796,8 +808,12 @@
             energyValSpan.innerText = Math.floor(game.energy);
             let energyPercent = Math.min(100, game.energy);
             energyFillDiv.style.width = `${energyPercent}%`;
-            let goalPercent = (game.totalScore/8000)*100;
+            if (game.energy < 30) energyFillDiv.parentElement?.parentElement?.classList.add('low-energy');
+            else energyFillDiv.parentElement?.parentElement?.classList.remove('low-energy');
+            
+            let goalPercent = (game.totalScore / 8000) * 100;
             goalFill.style.width = `${Math.min(100, goalPercent)}%`;
+            
             bonusChatBtn.disabled = (game.bonusChatUses <= 0 || !game.gameActive || game.winFlag);
             comboLevelSpan.innerText = game.comboLevel;
             let multValues = [1, 1.3, 1.6, 2, 2.5, 3];
@@ -1193,24 +1209,22 @@
             if (game.winFlag) return;
             game.winFlag = true;
             game.gameActive = false;
-            // Ачивка хранитель времени
             if (!game.achievements.timeKeeper && game.timeLeftSec > 600) {
                 unlockAchievement('timeKeeper', () => { game.bonusChatUses = Math.min(5, game.bonusChatUses+1); }, "+1 бонус чата!");
             }
-            let message = winCondition ? "🎉 ПОБЕДА! УРОЖАЙ СПАСЁН! Ты настоящая Клубничка-герой! 🎉" : "🏆 ВСЕ ЗАДАНИЯ ВЫПОЛНЕНЫ! Но урожай не спасён — не хватило очков.";
+            let message = "🎉 ПОБЕДА! УРОЖАЙ СПАСЁН! Ты настоящая Клубничка-герой! 🎉";
             addChatMessage(message, true);
-            showToast(winCondition ? "🏆 ПОБЕДА! ПЛАНТАЦИЯ СПАСЕНА! 🏆" : "🌾 Задания выполнены, но ферма потеряна...");
+            showToast("🏆 ПОБЕДА! ПЛАНТАЦИЯ СПАСЕНА! 🏆");
             updateCanvasBackground();
             flashScreen();
             if (game.timers.gameTimer) clearInterval(game.timers.gameTimer);
             saveGame();
-            // Показываем модалку с результатом
             let modal = document.createElement('div');
             modal.className = 'game-over-modal';
             modal.innerHTML = `
                 <div class="game-over-content">
-                    <h2><i class="fas ${winCondition ? 'fa-trophy' : 'fa-skull'}"></i> ${winCondition ? 'ПОБЕДА!' : 'ПОРАЖЕНИЕ'}</h2>
-                    <p>${winCondition ? 'Вы спасли урожай! Ферма благодарит вас.' : 'Урожай погиб. Попробуйте снова, используя другую стратегию.'}</p>
+                    <h2><i class="fas fa-trophy"></i> ПОБЕДА!</h2>
+                    <p>Вы спасли урожай! Ферма благодарит вас.</p>
                     <p>Набрано очков: ${game.totalScore} / 8000</p>
                     <p>Выполнено заданий: ${game.completedCount} / 15</p>
                     <button id="closeFinalBtn" class="bonus-btn" style="background: var(--accent);">ЗАКРЫТЬ</button>
@@ -1291,7 +1305,7 @@
                             <li><strong>📈 Прогрессия сложности:</strong> после каждых 5 заданий стоимость активации растёт.</li>
                             <li><strong>🎮 Мини-игра:</strong> лови клубнику (максимум 5 раз за игру).</li>
                             <li><strong>🆘 Экстренный протокол:</strong> один раз за игру при нехватке энергии система даст +20.</li>
-                            <li><strong>💾 Сохранение:</strong> автоматическое. Кнопка "Сбросить квест" очищает прогресс.</li>
+                            <li><strong>💾 Сохранение:</strong> автоматическое. Кнопка "Сбросить квест" полностью очищает прогресс.</li>
                         </ul>
                         <button id="closeRulesBtn" class="bonus-btn" style="background: var(--accent);">🍓 ПОНЯТНО, НАЧАТЬ 🍓</button>
                     </div>
