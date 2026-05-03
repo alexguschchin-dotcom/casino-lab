@@ -13,282 +13,347 @@
         }
 
         body {
-            background: linear-gradient(125deg, #2a0d1a 0%, #6b2e4a 100%);
+            background: radial-gradient(circle at 20% 30%, #1f0b16, #0a0308);
             font-family: 'Segoe UI', 'Quicksand', 'Poppins', system-ui, sans-serif;
             min-height: 100vh;
-            padding: 20px;
+            padding: 24px;
             position: relative;
             overflow-x: hidden;
         }
 
-        /* Анимированные ягоды и семечки */
-        .berry-bg {
+        /* Анимированные ягоды на фоне (Canvas будет динамический) */
+        .canvas-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             pointer-events: none;
-            background-image: radial-gradient(circle at 15% 30%, rgba(255,150,150,0.25) 3%, transparent 3.5%),
-                              radial-gradient(circle at 75% 65%, rgba(255,200,100,0.2) 2%, transparent 2.5%);
-            background-size: 70px 70px, 50px 50px;
-            animation: floatBerries 30s linear infinite;
             z-index: 0;
-        }
-
-        @keyframes floatBerries {
-            0% { background-position: 0 0, 0 0; }
-            100% { background-position: 140px 140px, 100px 100px; }
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background: rgba(30, 15, 22, 0.85);
-            backdrop-filter: blur(12px);
-            border-radius: 64px;
+            background: rgba(25, 12, 19, 0.65);
+            backdrop-filter: blur(18px);
+            border-radius: 72px;
             padding: 28px;
-            box-shadow: 0 30px 50px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,200,200,0.3);
-            border: 1px solid #ff98b9;
+            box-shadow: 0 30px 45px rgba(0, 0, 0, 0.6), 0 0 0 2px rgba(255, 120, 160, 0.4) inset, 0 0 0 4px rgba(255, 200, 180, 0.2) inset;
             position: relative;
             z-index: 2;
             transition: all 0.2s;
         }
 
-        /* Шапка */
+        /* Шапка с золотым свечением */
         .header-stats {
             display: flex;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 15px;
-            background: #3d1f2fdd;
+            gap: 14px;
+            background: linear-gradient(135deg, #3e1a2bcc, #23111ccc);
             border-radius: 100px;
-            padding: 12px 30px;
-            margin-bottom: 30px;
-            backdrop-filter: blur(4px);
-            border: 1px solid #ffb9ce;
+            padding: 12px 28px;
+            margin-bottom: 32px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 180, 150, 0.7);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
 
         .stat-card {
-            background: #4c2a38;
-            padding: 8px 24px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            padding: 8px 22px;
             border-radius: 60px;
             display: flex;
             align-items: center;
             gap: 12px;
             font-weight: bold;
-            font-size: 1.2rem;
-            color: #fff0e0;
-            box-shadow: inset 0 -1px 0 rgba(0,0,0,0.1), 0 6px 12px rgba(0,0,0,0.2);
+            font-size: 1.1rem;
+            color: #fff2e6;
+            box-shadow: inset 0 1px 0 rgba(255,255,200,0.2), 0 5px 10px rgba(0,0,0,0.3);
+            border: 1px solid #ffb294;
         }
 
         .stat-card i {
             font-size: 1.5rem;
-            color: #ffbb77;
+            color: #ffcc88;
+            text-shadow: 0 0 3px #ff7e5e;
         }
 
-        .energy-bar {
-            background: #2d1620;
+        .energy-bar, .progress-goal {
+            background: #2c121e;
             border-radius: 30px;
             height: 10px;
-            width: 160px;
+            width: 140px;
             overflow: hidden;
+            box-shadow: inset 0 1px 3px #00000055;
         }
 
         .energy-fill {
-            background: linear-gradient(90deg, #f7b05e, #ff686b);
+            background: linear-gradient(90deg, #ffb347, #ff6b6b);
             width: 100%;
             height: 100%;
-            transition: width 0.3s;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 6px #ffaa66;
         }
 
-        .progress-goal {
-            background: #2d1620;
-            border-radius: 30px;
-            height: 10px;
-            width: 180px;
-            overflow: hidden;
-        }
         .progress-fill {
-            background: linear-gradient(90deg, #f0a3c2, #ff4d6d);
+            background: linear-gradient(90deg, #ff87a2, #ff4d7a);
             width: 0%;
             height: 100%;
-            transition: width 0.3s;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 6px #ff88aa;
         }
 
-        /* Сетка заданий */
+        /* Сетка заданий – карточки с 3D эффектом */
         .tasks-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 24px;
-            margin: 35px 0;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 28px;
+            margin: 40px 0;
         }
 
         .task-card {
-            background: #fffef7;
+            background: linear-gradient(145deg, #fff8f0, #ffe8dc);
             border-radius: 48px;
             padding: 22px;
-            box-shadow: 0 12px 28px rgba(0,0,0,0.2);
-            border-left: 8px solid #ff9b5c;
-            transition: transform 0.15s ease, box-shadow 0.2s;
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.3), 0 4px 8px rgba(255, 215, 150, 0.4) inset;
+            border-bottom: 3px solid #f5bc70;
+            transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .task-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,200,0.3) 0%, rgba(255,200,200,0) 70%);
+            opacity: 0;
+            transition: opacity 0.4s;
+            pointer-events: none;
+        }
+
+        .task-card:hover::before {
+            opacity: 0.3;
         }
 
         .task-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 30px rgba(0,0,0,0.25);
+            transform: translateY(-6px);
+            box-shadow: 0 28px 38px rgba(0, 0, 0, 0.35);
         }
 
         .task-card.locked {
-            opacity: 0.6;
+            background: linear-gradient(145deg, #8f7a82, #6e5763);
+            opacity: 0.7;
             filter: grayscale(0.2);
-            border-left-color: #8a6e7a;
-            cursor: not-allowed;
+            border-bottom-color: #c0a2b2;
         }
 
         .task-card.completed {
-            background: #e9f5e3;
-            border-left-color: #3da33d;
+            background: linear-gradient(145deg, #e2f7df, #c8e6c9);
+            border-bottom-color: #3ba33b;
             order: 1;
         }
 
         .task-card.active {
-            background: #fff0e5;
-            border-left-color: #e8436e;
-            box-shadow: 0 0 0 3px #ff86a8, 0 15px 25px rgba(0,0,0,0.2);
+            background: linear-gradient(145deg, #fff6ea, #ffecd9);
+            border-bottom: 3px solid #ff6f91;
+            box-shadow: 0 0 0 3px #ffb7c7, 0 20px 28px black;
         }
 
         .task-title {
-            font-size: 1.4rem;
+            font-size: 1.45rem;
             font-weight: 800;
             display: flex;
             justify-content: space-between;
-            margin-bottom: 12px;
-            color: #4a242f;
+            margin-bottom: 14px;
+            color: #882d4e;
+            align-items: center;
         }
 
         .slot-badge {
-            background: #f3b33d;
-            padding: 5px 14px;
+            background: linear-gradient(135deg, #f9b53c, #ff8c42);
+            padding: 6px 15px;
             border-radius: 50px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: bold;
-            color: #2d140e;
+            color: #2c0f18;
+            box-shadow: inset 0 1px 0 #ffdfaa, 0 2px 4px black;
         }
 
         .task-desc {
             font-size: 0.95rem;
-            color: #3e2a24;
-            margin: 14px 0;
+            color: #562a38;
+            margin: 16px 0;
             line-height: 1.4;
+            font-weight: 500;
         }
 
         .task-reward {
             font-weight: bold;
-            color: #c14a2e;
+            color: #c9512c;
             font-size: 1rem;
             margin-top: 12px;
+            background: #fce5d4;
+            display: inline-block;
+            padding: 5px 18px;
+            border-radius: 50px;
         }
 
         .complete-btn {
-            background: #48a148;
+            background: linear-gradient(95deg, #5bb85b, #2e8b57);
             border: none;
             color: white;
-            padding: 10px 0;
+            padding: 12px 0;
             border-radius: 60px;
             font-weight: bold;
-            margin-top: 18px;
+            margin-top: 20px;
             cursor: pointer;
             width: 100%;
             font-size: 1rem;
-            transition: 0.1s linear;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            transition: 0.1s;
+            box-shadow: 0 6px 0 #1c5a1c;
+            text-shadow: 0 1px 0 #145214;
         }
 
-        .complete-btn:hover {
-            background: #2e7d32;
-            transform: scale(1.01);
+        .complete-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 3px 0 #1c5a1c;
         }
 
-        /* Панель чата */
+        /* Чат – стильный glassmorphism */
         .chat-panel {
-            background: #26161fdd;
-            backdrop-filter: blur(12px);
-            border-radius: 56px;
-            margin-top: 35px;
+            background: rgba(20, 8, 14, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 60px;
+            margin-top: 40px;
             padding: 20px;
-            border: 1px solid #ff98b9;
+            border: 1px solid #ffa5c0;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
         }
 
         .chat-messages {
-            background: #180e13aa;
-            border-radius: 38px;
-            padding: 16px;
-            height: 220px;
+            background: #130a0faa;
+            border-radius: 42px;
+            padding: 18px;
+            height: 240px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
+            scroll-behavior: smooth;
         }
 
         .chat-message {
-            background: #fffaec33;
-            border-radius: 32px;
-            padding: 8px 18px;
+            background: rgba(255, 220, 200, 0.2);
+            backdrop-filter: blur(4px);
+            border-radius: 40px;
+            padding: 8px 20px;
             width: fit-content;
-            max-width: 90%;
-            animation: slideFade 0.2s;
+            max-width: 85%;
+            animation: slideFade 0.2s ease;
             font-size: 0.9rem;
+            font-weight: 500;
+            color: #ffefdb;
+            border-left: 3px solid #ffb27f;
         }
 
         @keyframes slideFade {
-            from { opacity: 0; transform: translateX(-8px); }
+            from { opacity: 0; transform: translateX(-12px); }
             to { opacity: 1; transform: translateX(0); }
         }
 
         .bonus-btn {
-            background: linear-gradient(95deg, #f7b05e, #fc836d);
+            background: linear-gradient(95deg, #ffb347, #ff6b4a);
             border: none;
             padding: 12px 28px;
             border-radius: 60px;
             font-weight: bold;
-            margin-top: 18px;
             cursor: pointer;
             font-size: 1rem;
-            transition: 0.1s;
-            color: #2c1720;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+            transition: 0.15s;
+            color: #2b111b;
+            box-shadow: 0 6px 0 #9b3a22;
+            text-shadow: 0 1px 0 #ffcf9a;
+        }
+
+        .bonus-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #9b3a22;
         }
 
         .bonus-btn:disabled {
             opacity: 0.5;
+            transform: none;
             cursor: default;
-            filter: grayscale(0.1);
         }
 
         .combo-indicator {
-            background: #eb9e3e;
+            background: #f0a3c2;
             border-radius: 40px;
             padding: 5px 18px;
             font-weight: bold;
             display: inline-block;
+            animation: pulse 0.6s;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); background: #ffa26b; }
+            100% { transform: scale(1); background: #f0a3c2; }
         }
 
         .footer-tip {
             text-align: center;
-            margin-top: 22px;
-            font-size: 0.8rem;
-            color: #ffd9c5;
+            margin-top: 28px;
+            font-size: 0.75rem;
+            color: #ffcfb0;
+            background: #2c0e1cdd;
+            display: inline-block;
+            width: auto;
+            border-radius: 50px;
+            padding: 6px 20px;
+            backdrop-filter: blur(2px);
         }
 
-        /* Модалка правил */
+        /* Тост-уведомления */
+        .toast-notify {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2a1420ee;
+            backdrop-filter: blur(20px);
+            color: #ffecd6;
+            padding: 14px 32px;
+            border-radius: 80px;
+            font-weight: bold;
+            border-left: 6px solid #ffb347;
+            z-index: 2000;
+            animation: fadeUp 0.3s ease;
+            box-shadow: 0 10px 20px black;
+            pointer-events: none;
+            white-space: nowrap;
+            font-size: 1rem;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
         .modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #1a0c13ee;
+            background: #0a0308dd;
             backdrop-filter: blur(20px);
             display: flex;
             align-items: center;
@@ -297,53 +362,51 @@
         }
 
         .modal-content {
-            background: #fff3e8;
-            border-radius: 64px;
-            padding: 32px;
-            max-width: 600px;
+            background: linear-gradient(145deg, #fff4e8, #ffe2cf);
+            border-radius: 72px;
+            padding: 34px;
+            max-width: 620px;
             width: 90%;
             max-height: 85vh;
             overflow-y: auto;
-            color: #3a1e2c;
-            border: 2px solid #ff99bb;
-            box-shadow: 0 30px 40px rgba(0,0,0,0.4);
+            color: #3e1d2c;
+            border: 2px solid #ffb896;
+            box-shadow: 0 40px 50px rgba(0,0,0,0.6);
         }
 
         .modal-content h2 {
-            color: #b33b5c;
-            margin-bottom: 20px;
+            color: #bd3b62;
+            font-weight: 800;
         }
 
-        .rules-list {
-            text-align: left;
-            margin: 20px 0;
-            padding-left: 20px;
-        }
-        .rules-list li {
-            margin: 12px 0;
-            line-height: 1.4;
-        }
         .modal-btn {
             background: #e8436e;
             color: white;
             border: none;
-            padding: 12px 28px;
+            padding: 14px 32px;
             border-radius: 60px;
             font-size: 1.2rem;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 15px;
+            transition: 0.1s;
+            box-shadow: 0 6px 0 #8c2241;
+        }
+
+        .modal-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #8c2241;
         }
 
         @media (max-width: 700px) {
-            .container { padding: 18px; }
-            .stat-card { font-size: 0.85rem; padding: 4px 16px; gap: 6px; }
+            .container { padding: 16px; }
+            .stat-card { padding: 4px 15px; font-size: 0.8rem; gap: 6px; }
+            .task-title { font-size: 1.2rem; }
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-<div class="berry-bg"></div>
+<canvas id="berryCanvas" class="canvas-bg"></canvas>
 <div class="container">
     <div class="header-stats">
         <div class="stat-card"><i class="fas fa-hourglass-half"></i> <span id="timerDisplay">02:00:00</span></div>
@@ -356,8 +419,8 @@
     <div id="tasksContainer" class="tasks-grid"></div>
 
     <div class="chat-panel">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-            <h3><i class="fas fa-comments"></i> 🍬 КЛУБНИЧНЫЙ ЧАТ</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+            <h3 style="color:#ffddcc;"><i class="fas fa-comments"></i> 🍓 КЛУБНИЧНЫЙ ЧАТ</h3>
             <button id="bonusChatBtn" class="bonus-btn" disabled><i class="fas fa-gift"></i> БОНУС ЧАТА (ост. 3)</button>
         </div>
         <div id="chatMessages" class="chat-messages">
@@ -369,18 +432,16 @@
     </div>
 </div>
 
-<!-- Модалка правил -->
 <div id="rulesModal" class="modal">
     <div class="modal-content">
         <h2><i class="fas fa-strawberry"></i> ПРАВИЛА КВЕСТА</h2>
-        <ul class="rules-list">
+        <ul class="rules-list" style="margin:20px 0 20px 20px;">
             <li><strong>🎯 Цель:</strong> набрать <strong>5000 очков</strong>, выполнив 15 заданий в реальных слотах Pragmatic Play. Время — <strong>2 часа</strong>.</li>
-            <li><strong>🍓 Задания:</strong> каждое требует определённого достижения в конкретном слоте (бонус, множитель, серия выигрышей и т.д.).</li>
-            <li><strong>⚡ Энергия:</strong> автоматически восстанавливается (5% каждые 10 секунд). Тратится на активацию новых заданий (не беспокойся, система сама открывает их по мере выполнения).</li>
+            <li><strong>🍓 Задания:</strong> каждое требует определённого достижения в конкретном слоте (бонус, множитель, серия выигрышей).</li>
+            <li><strong>⚡ Энергия:</strong> автоматически восстанавливается (5% каждые 10 сек). Тратится на активацию новых заданий.</li>
             <li><strong>🔥 Комбо:</strong> выполни 3 задания подряд — и следующие 2 задания принесут <strong>удвоенные очки</strong>!</li>
-            <li><strong>🎁 Бонусы чата:</strong> 3 раза за игру можно активировать случайный бонус (доп. время, очки, энергия или подсказка).</li>
-            <li><strong>💾 Сохранение:</strong> прогресс автоматически сохраняется. Можно закрыть страницу и продолжить позже.</li>
-            <li><strong>✅ Важно:</strong> после реального выполнения условия в казино — нажми кнопку «ВЫПОЛНЕНО» на карточке задания.</li>
+            <li><strong>🎁 Бонусы чата:</strong> 3 раза можно активировать случайный бонус (время, очки, энергия, подсказка).</li>
+            <li><strong>💾 Сохранение:</strong> прогресс автоматически сохраняется. Можно закрыть и продолжить позже.</li>
         </ul>
         <button id="closeRulesBtn" class="modal-btn">🍓 НАЧАТЬ ИГРУ 🍓</button>
     </div>
@@ -388,31 +449,31 @@
 
 <script>
     (function(){
-        // ---------- 15 новых слотов PRAGMATIC PLAY ----------
+        // 15 заданий PRAGMATIC PLAY (та же база)
         const TASKS_DATA = [
-            { id:0, slot:"Wisdom of Athena", condition:"Один спин с множителем x20 и одновременно 3+ Scatter", baseReward:280, completed:false, active:false, desc:"Достигни x20 + 3 скаттера за один спин" },
+            { id:0, slot:"Wisdom of Athena", condition:"Один спин с множителем x20 и 3+ Scatter", baseReward:280, completed:false, active:false, desc:"Достигни x20 + 3 скаттера за спин" },
             { id:1, slot:"Power of Thor Megaways", condition:"В бонусе собрать 5 молний подряд", baseReward:320, completed:false, active:false, desc:"Бонусная игра: 5 молниеносных сборов" },
-            { id:2, slot:"5 Lions Megaways", condition:"Активировать бонус и получить 5 диких символов на одном барабане", baseReward:350, completed:false, active:false, desc:"В фриспинах 5 wilds на барабане" },
+            { id:2, slot:"5 Lions Megaways", condition:"Активировать бонус и получить 5 диких символов", baseReward:350, completed:false, active:false, desc:"В фриспинах 5 wilds на барабане" },
             { id:3, slot:"Juicy Fruits", condition:"Собрать 3 фруктовых бонуса за 15 минут", baseReward:300, completed:false, active:false, desc:"Лимит времени 15 минут на 3 бонуса" },
-            { id:4, slot:"Fire Strike 2", condition:"Зажечь все 15 огней (заполнить экран Fire Strike)", baseReward:450, completed:false, active:false, desc:"Символы Fire Strike на всех позициях" },
-            { id:5, slot:"Empty the Bank", condition:"Украсть банк (выиграть >200x ставки) в бонусе", baseReward:420, completed:false, active:false, desc:"Бонус Empty the Bank: профит >200x" },
+            { id:4, slot:"Fire Strike 2", condition:"Зажечь все 15 огней (заполнить экран)", baseReward:450, completed:false, active:false, desc:"Символы Fire Strike на всех позициях" },
+            { id:5, slot:"Empty the Bank", condition:"Украсть банк (выигрыш >200x) в бонусе", baseReward:420, completed:false, active:false, desc:"Бонус Empty the Bank: профит >200x" },
             { id:6, slot:"Mysterious Egypt", condition:"Найти 3 саркофага в одном бонусе", baseReward:390, completed:false, active:false, desc:"Бонусная игра: 3 саркофага" },
-            { id:7, slot:"Clover Gold", condition:"Получить 3 четырёхлистных клевера в основной игре", baseReward:260, completed:false, active:false, desc:"Три клевера в любых спинах" },
+            { id:7, slot:"Clover Gold", condition:"Получить 3 четырёхлистных клевера в основе", baseReward:260, completed:false, active:false, desc:"Три клевера в любых спинах" },
             { id:8, slot:"Buffalo King Megaways", condition:"Серия из 10 выигрышных спинов подряд", baseReward:410, completed:false, active:false, desc:"10 спинов подряд с выигрышем" },
-            { id:9, slot:"Wild Walker", condition:"Зомби-символ проходит весь экран и даёт x15", baseReward:480, completed:false, active:false, desc:"Дикий зомби заполняет барабаны с множителем x15" },
+            { id:9, slot:"Wild Walker", condition:"Зомби-символ проходит экран и даёт x15", baseReward:480, completed:false, active:false, desc:"Дикий зомби заполняет барабаны x15" },
             { id:10, slot:"Voodoo Magic", condition:"Купить бонус и получить множитель x50", baseReward:500, completed:false, active:false, desc:"Бонус куплен, множитель 50x" },
-            { id:11, slot:"Leprechaun Carol", condition:"В бонусе собрать 100 монет", baseReward:370, completed:false, active:false, desc:"Накопить 100 монет в бонусной игре" },
-            { id:12, slot:"John Hunter and the Tomb of the Scarab Queen", condition:"Пройти 4 уровня гробницы", baseReward:440, completed:false, active:false, desc:"Завершить 4 этапа бонусной игры" },
+            { id:11, slot:"Leprechaun Carol", condition:"В бонусе собрать 100 монет", baseReward:370, completed:false, active:false, desc:"Накопить 100 монет в бонусе" },
+            { id:12, slot:"John Hunter Scarab Queen", condition:"Пройти 4 уровня гробницы", baseReward:440, completed:false, active:false, desc:"Завершить 4 этапа бонусной игры" },
             { id:13, slot:"Mustang Gold", condition:"Собрать 3 жеребца на одном спине", baseReward:310, completed:false, active:false, desc:"Три логотипа Mustang в линии" },
-            { id:14, slot:"The Great Chicken Escape", condition:"Помочь цыплёнку сбежать с множителем x25", baseReward:520, completed:false, active:false, desc:"Бонус с побегом цыплёнка и множителем 25x" }
+            { id:14, slot:"The Great Chicken Escape", condition:"Помочь цыплёнку сбежать с множителем x25", baseReward:520, completed:false, active:false, desc:"Бонус с побегом цыплёнка x25" }
         ];
 
-        // Игровое состояние
+        // Состояние игры
         let game = {
             tasks: JSON.parse(JSON.stringify(TASKS_DATA)),
             completedCount: 0,
             totalScore: 0,
-            timeLeftSec: 120 * 60,    // 2 часа
+            timeLeftSec: 120 * 60,
             energy: 100,
             combo: 0,
             doublePointsLeft: 0,
@@ -425,7 +486,6 @@
             saveInterval: null
         };
 
-        // DOM элементы
         const tasksContainer = document.getElementById('tasksContainer');
         const timerDisplay = document.getElementById('timerDisplay');
         const scoreSpan = document.getElementById('scoreDisplay');
@@ -435,6 +495,15 @@
         const bonusChatBtn = document.getElementById('bonusChatBtn');
         const chatDiv = document.getElementById('chatMessages');
         const goalFill = document.getElementById('goalFill');
+
+        // Улучшенные уведомления (тост)
+        function showToast(message, isError = false) {
+            let toast = document.createElement('div');
+            toast.className = 'toast-notify';
+            toast.innerHTML = `<i class="fas ${isError ? 'fa-skull' : 'fa-strawberry'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2800);
+        }
 
         function addChatMessage(text, isBonus = false) {
             const msgDiv = document.createElement('div');
@@ -462,7 +531,6 @@
             goalFill.style.width = `${Math.min(100, goalPercent)}%`;
             bonusChatBtn.disabled = (game.bonusChatUses <= 0 || !game.gameActive || game.winFlag);
             renderTasks();
-
             if (game.totalScore >= 5000 && game.completedCount === 15 && !game.winFlag) gameWin();
             if (game.timeLeftSec <= 0 && game.gameActive) gameLose();
         }
@@ -478,12 +546,12 @@
                 card.className = statusClass;
                 card.innerHTML = `
                     <div class="task-title">
-                        <span>🍓 ${task.slot}</span>
+                        <span><i class="fas fa-slot-machine"></i> 🍓 ${task.slot}</span>
                         <span class="slot-badge">🎰 PRAGMATIC</span>
                     </div>
                     <div class="task-desc"><strong>Задание:</strong> ${task.desc || task.condition}</div>
-                    <div class="task-reward"><i class="fas fa-star"></i> Награда: ${task.baseReward} очков</div>
-                    ${!task.completed && task.active && game.gameActive && !game.winFlag ? `<button class="complete-btn" data-id="${task.id}">✅ ВЫПОЛНЕНО</button>` : (task.completed ? '<span style="color:#3da33d;">✔️ Завершено</span>' : '<span style="color:#a56a7a;">🔒 Заблокировано</span>')}
+                    <div class="task-reward"><i class="fas fa-gem"></i> Награда: ${task.baseReward} очков</div>
+                    ${!task.completed && task.active && game.gameActive && !game.winFlag ? `<button class="complete-btn" data-id="${task.id}">✅ ВЫПОЛНЕНО ✅</button>` : (task.completed ? '<span style="color:#2b7a2b;"><i class="fas fa-check-circle"></i> Завершено</span>' : '<span style="color:#aa7b8e;"><i class="fas fa-lock"></i> Заблокировано</span>')}
                 `;
                 tasksContainer.appendChild(card);
             }
@@ -505,6 +573,7 @@
             if (game.doublePointsLeft > 0) {
                 earned *= 2;
                 game.doublePointsLeft--;
+                showToast(`✨ КОМБО! Награда x2: +${earned} очков! ✨`);
                 addChatMessage(`✨ КОМБО! Награда удвоена до ${earned} очков! ✨`, true);
             }
             game.totalScore += earned;
@@ -515,10 +584,10 @@
 
             if (game.combo === 3) {
                 game.doublePointsLeft = 2;
+                showToast("🔥 КОМБО 3! Следующие 2 задания ДАДУТ ДВОЙНЫЕ ОЧКИ!", false);
                 addChatMessage("🔥 КОМБО 3! Следующие 2 задания принесут ДВОЙНЫЕ очки!", true);
             }
-
-            // Открыть следующее задание, если есть закрытые
+            // открыть следующее
             for (let t of game.tasks) {
                 if (!t.completed && !t.active) {
                     t.active = true;
@@ -526,22 +595,22 @@
                     break;
                 }
             }
+            showToast(`✅ Задание выполнено! +${earned} очков.`);
             addChatMessage(`✅ Задание "${task.slot}" выполнено! +${earned} очков.`);
             updateUI();
             saveGameToLocal();
         }
 
-        // Бонус чата
         function applyChatBonus() {
             if (!game.gameActive || game.winFlag) return;
             if (game.bonusChatUses <= 0) return;
             game.bonusChatUses--;
             const bonuses = [
-                { text:"🍬 Ягодный коктейль: +250 очков!", effect:()=>{ game.totalScore += 250; addChatMessage("+250 очков!", true); updateUI(); } },
-                { text:"⏳ Заморозка таймера на 3 минуты", effect:()=>{ game.timeLeftSec += 180; updateUI(); addChatMessage("Таймер +3 минуты", true); } },
-                { text:"⚡ Энергия восполнена до 100%", effect:()=>{ game.energy = 100; updateUI(); } },
-                { text:"🔍 Подсказка: Wisdom of Athena горячий, лови x20!", effect:()=>{ addChatMessage("Подсказка: Wisdom of Athena может дать x20 и скаттеры!", true); } },
-                { text:"🎲 Удвоение комбо: +2 к счётчику комбо", effect:()=>{ game.combo += 2; if(game.combo>=3) game.doublePointsLeft = 2; updateUI(); } }
+                { text:"🍬 Ягодный коктейль: +250 очков!", effect:()=>{ game.totalScore += 250; showToast("+250 очков!"); addChatMessage("+250 очков!", true); updateUI(); } },
+                { text:"⏳ Заморозка таймера на 3 минуты", effect:()=>{ game.timeLeftSec += 180; updateUI(); showToast("Таймер +3 минуты"); addChatMessage("Таймер +3 минуты", true); } },
+                { text:"⚡ Энергия восполнена до 100%", effect:()=>{ game.energy = 100; updateUI(); showToast("Энергия полна!"); } },
+                { text:"🔍 Подсказка: Wisdom of Athena горячий, лови x20!", effect:()=>{ addChatMessage("Подсказка: Wisdom of Athena может дать x20 и скаттеры!", true); showToast("Подсказка активна!"); } },
+                { text:"🎲 Удвоение комбо: +2 к счётчику", effect:()=>{ game.combo += 2; if(game.combo>=3) game.doublePointsLeft = 2; updateUI(); showToast("Комбо увеличен!"); } }
             ];
             const chosen = bonuses[Math.floor(Math.random() * bonuses.length)];
             addChatMessage(`🎁 БОНУС ЧАТА: ${chosen.text}`, true);
@@ -550,7 +619,6 @@
             saveGameToLocal();
         }
 
-        // Таймер
         function startTimer() {
             if (game.timerInterval) clearInterval(game.timerInterval);
             game.timerInterval = setInterval(() => {
@@ -566,7 +634,6 @@
             }, 1000);
         }
 
-        // Регенерация энергии
         function startEnergyRegen() {
             if (game.energyRegenInterval) clearInterval(game.energyRegenInterval);
             game.energyRegenInterval = setInterval(() => {
@@ -578,26 +645,19 @@
             }, 10000);
         }
 
-        // Авточат (советы и бонус раз в 10 минут)
         function startAutoChat() {
             if (game.autoChatInterval) clearInterval(game.autoChatInterval);
             let lastBonusTime = Date.now();
             game.autoChatInterval = setInterval(() => {
                 if (!game.gameActive || game.winFlag) return;
-                const tips = [
-                    "Попробуй Wisdom of Athena — высокие множители.",
-                    "Комбо ускорит набор очков! Старайся выполнять задания подряд.",
-                    "Power of Thor: собирай молнии в бонусе.",
-                    "Juicy Fruits: фруктовые бонусы часто выпадают.",
-                    "Если сложно — купи бонус в Voodoo Magic и лови x50!"
-                ];
+                const tips = ["🍓 Wisdom of Athena – высокие множители!", "🔥 Комбо ускоряет набор очков!", "⚡ Power of Thor: молнии в бонусе.", "🍋 Juicy Fruits: часто дают бонусы.", "🎰 Купи бонус в Voodoo Magic х50!"];
                 const randomTip = tips[Math.floor(Math.random() * tips.length)];
                 addChatMessage(randomTip);
                 if (Date.now() - lastBonusTime > 600000 && game.bonusChatUses > 0) {
                     lastBonusTime = Date.now();
                     applyChatBonus();
                 }
-            }, 14000);
+            }, 16000);
         }
 
         function gameWin() {
@@ -606,30 +666,31 @@
             game.gameActive = false;
             if (game.timerInterval) clearInterval(game.timerInterval);
             addChatMessage("🎉🍓 ПОБЕДА! УРОЖАЙ СПАСЁН! Ты настоящая Клубничка-герой! 🍓🎉", true);
-            const overlay = document.createElement('div');
-            overlay.style.cssText = 'position:fixed; top:30%; left:50%; transform:translate(-50%,-50%); background:#f6b93b; padding:25px 50px; border-radius:80px; font-size:2rem; font-weight:bold; color:#4a1e2c; z-index:2000; white-space:nowrap; box-shadow:0 0 30px gold;';
-            overlay.innerText = '🍓 ПОБЕДА! ПЛАНТАЦИЯ СПАСЕНА! 🍓';
-            document.body.appendChild(overlay);
-            setTimeout(() => overlay.remove(), 5000);
+            showToast("🏆 ПОБЕДА! ПЛАНТАЦИЯ СПАСЕНА! 🏆");
             bonusChatBtn.disabled = true;
             saveGameToLocal();
+            // конфетти эффект
+            for(let i=0;i<40;i++) {
+                let conf = document.createElement('div');
+                conf.style.position = 'fixed'; conf.style.left = Math.random()*100+'%'; conf.style.top = '-10px';
+                conf.style.width = '10px'; conf.style.height = '10px'; conf.style.background = `hsl(${Math.random()*360}, 100%, 60%)`;
+                conf.style.borderRadius = '50%'; conf.style.pointerEvents = 'none'; conf.style.zIndex = '9999';
+                conf.style.animation = `fall ${1+Math.random()*2}s linear forwards`;
+                document.body.appendChild(conf);
+                setTimeout(()=>conf.remove(), 2000);
+            }
         }
 
         function gameLose() {
             if (!game.gameActive) return;
             game.gameActive = false;
             if (game.timerInterval) clearInterval(game.timerInterval);
-            addChatMessage("💀 Время вышло... Плантация погибла. Начни заново.", true);
-            const overlay = document.createElement('div');
-            overlay.style.cssText = 'position:fixed; top:30%; left:50%; transform:translate(-50%,-50%); background:#b33; padding:20px 40px; border-radius:60px; font-size:2rem; color:white; z-index:2000;';
-            overlay.innerText = '⏰ ПОРАЖЕНИЕ ⏰';
-            document.body.appendChild(overlay);
-            setTimeout(() => overlay.remove(), 3000);
+            addChatMessage("💀 Время вышло... Плантация погибла.", true);
+            showToast("⏰ ПОРАЖЕНИЕ ⏰", true);
             bonusChatBtn.disabled = true;
             saveGameToLocal();
         }
 
-        // Сохранение / загрузка
         function saveGameToLocal() {
             const saveData = {
                 tasks: game.tasks,
@@ -642,17 +703,17 @@
                 bonusChatUses: game.bonusChatUses,
                 gameActive: game.gameActive,
                 winFlag: game.winFlag,
-                version: 3
+                version: 4
             };
-            localStorage.setItem('clubburryQuestV2', JSON.stringify(saveData));
+            localStorage.setItem('clubburryQuestV3', JSON.stringify(saveData));
         }
 
         function loadGameFromLocal() {
-            const raw = localStorage.getItem('clubburryQuestV2');
+            const raw = localStorage.getItem('clubburryQuestV3');
             if (!raw) return false;
             try {
                 const data = JSON.parse(raw);
-                if (data.version !== 3) return false;
+                if (data.version !== 4) return false;
                 game.tasks = data.tasks;
                 game.completedCount = data.completedCount;
                 game.totalScore = data.totalScore;
@@ -663,26 +724,56 @@
                 game.bonusChatUses = data.bonusChatUses;
                 game.gameActive = data.gameActive;
                 game.winFlag = data.winFlag;
-                if (!game.gameActive && !game.winFlag) game.gameActive = true; // fallback
+                if (!game.gameActive && !game.winFlag) game.gameActive = true;
                 return true;
             } catch(e) { return false; }
         }
 
-        function resetGame() {
-            localStorage.removeItem('clubburryQuestV2');
-            location.reload();
+        // Фон с падающими ягодами (canvas)
+        function initCanvasBG() {
+            const canvas = document.getElementById('berryCanvas');
+            const ctx = canvas.getContext('2d');
+            let berries = [];
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+            for(let i=0;i<45;i++) {
+                berries.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: 4 + Math.random() * 8,
+                    speedY: 0.5 + Math.random() * 1.5,
+                    color: `hsl(${Math.random() * 20 + 340}, 80%, 60%)`
+                });
+            }
+            function draw() {
+                if(!canvas || !ctx) return;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for(let b of berries) {
+                    ctx.beginPath();
+                    ctx.arc(b.x, b.y, b.radius, 0, Math.PI*2);
+                    ctx.fillStyle = b.color;
+                    ctx.shadowBlur = 6; ctx.shadowColor = "#ff7b7b";
+                    ctx.fill();
+                    b.y += b.speedY;
+                    if(b.y > canvas.height + 30) b.y = -30;
+                }
+                requestAnimationFrame(draw);
+            }
+            draw();
         }
 
-        // Инициализация с модалкой
         function init() {
             const hasSave = loadGameFromLocal();
+            const modal = document.getElementById('rulesModal');
+            const closeBtn = document.getElementById('closeRulesBtn');
             if (!hasSave) {
-                // Показываем модалку правил, а после старта активируем первые 3 задания
-                const modal = document.getElementById('rulesModal');
-                const closeBtn = document.getElementById('closeRulesBtn');
+                modal.style.display = 'flex';
                 closeBtn.onclick = () => {
                     modal.style.display = 'none';
-                    // Активация первых 3 заданий
                     for (let i=0; i<3 && i<game.tasks.length; i++) game.tasks[i].active = true;
                     game.gameActive = true;
                     updateUI();
@@ -691,10 +782,8 @@
                     startAutoChat();
                     saveGameToLocal();
                 };
-                modal.style.display = 'flex';
             } else {
-                // Если была сохранённая игра, просто запускаем интерфейс
-                document.getElementById('rulesModal').style.display = 'none';
+                modal.style.display = 'none';
                 updateUI();
                 startTimer();
                 startEnergyRegen();
@@ -702,10 +791,14 @@
             }
             bonusChatBtn.addEventListener('click', applyChatBonus);
             window.addEventListener('beforeunload', () => saveGameToLocal());
-            // Автосохранение каждые 30 секунд
             setInterval(() => { if (game.gameActive) saveGameToLocal(); }, 30000);
-        }
+            initCanvasBG();
 
+            // добавим стиль анимации падения для конфетти
+            const style = document.createElement('style');
+            style.textContent = `@keyframes fall { 0% { transform: translateY(0) rotate(0deg); opacity:1; } 100% { transform: translateY(100vh) rotate(360deg); opacity:0; } }`;
+            document.head.appendChild(style);
+        }
         init();
     })();
 </script>
