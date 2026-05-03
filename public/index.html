@@ -348,7 +348,7 @@
             margin-bottom: 12px;
             flex-wrap: wrap;
         }
-        .bonus-btn, .minigame-btn, .buy-energy-btn, .rules-btn, .achievements-info-btn {
+        .bonus-btn, .minigame-btn, .buy-energy-btn, .rules-btn, .achievements-info-btn, .reset-btn {
             background: #2e1622;
             border: 1px solid var(--accent);
             padding: 8px 20px;
@@ -357,6 +357,15 @@
             cursor: pointer;
             transition: all 0.1s;
             color: var(--text-primary);
+        }
+        .reset-btn {
+            border-color: #ffaa44;
+            color: #ffaa44;
+        }
+        .reset-btn:hover {
+            background: #ffaa44;
+            color: #1a0510;
+            border-color: #ffaa44;
         }
         .bonus-btn:hover, .minigame-btn:hover, .buy-energy-btn:hover, .rules-btn:hover, .achievements-info-btn:hover {
             background: var(--accent);
@@ -457,7 +466,7 @@
             font-weight: bold;
         }
 
-        .rules-modal, .achievement-modal, .event-modal {
+        .rules-modal, .achievement-modal, .event-modal, .game-over-modal {
             position: fixed;
             top: 0;
             left: 0;
@@ -470,7 +479,7 @@
             justify-content: center;
             z-index: 6000;
         }
-        .rules-content, .achievement-content {
+        .rules-content, .achievement-content, .game-over-content {
             background: linear-gradient(145deg, #1f0f19, #150a12);
             border-radius: var(--radius-big);
             padding: 32px;
@@ -478,6 +487,7 @@
             width: 90%;
             border: 1px solid var(--accent);
             color: var(--text-primary);
+            text-align: center;
         }
         .achievement-desc {
             margin: 10px 0;
@@ -593,6 +603,7 @@
             <button id="minigameBtn" class="minigame-btn"><i class="fas fa-gamepad"></i> Лови клубнику</button>
             <button id="rulesBtn" class="rules-btn"><i class="fas fa-scroll"></i> Правила</button>
             <button id="achievementsInfoBtn" class="achievements-info-btn"><i class="fas fa-info-circle"></i> Как получить ачивки?</button>
+            <button id="resetGameBtn" class="reset-btn"><i class="fas fa-trash-alt"></i> Сбросить квест</button>
         </div>
         <div id="chatMessages" class="chat-messages"></div>
     </div>
@@ -642,12 +653,12 @@
             achievements: { fastStart: false, comboMaster: false, timeKeeper: false, minigameFan: false, berryPuncher: false },
             timers: { comboDecay: null, gameTimer: null, energyRegen: null, autoChat: null, eventTimer: null },
             difficulty: 1,
-            processing: false, // флаг для блокировки двойного нажатия
+            processing: false,
         };
         let minigamePlays = 0, minigameClickTotal = 0;
         const MAX_MINIGAME_PLAYS = 5;
-        const COMBO_WINDOW_SEC = 300;     // 5 минут для удержания комбо
-        const COMBO_DECAY_SEC = 300;       // 5 минут угасание
+        const COMBO_WINDOW_SEC = 300;     // 5 минут
+        const COMBO_DECAY_SEC = 300;
 
         // DOM
         const carousel = document.getElementById('carouselWrapper');
@@ -667,11 +678,12 @@
         const buyEnergyBtn = document.getElementById('buyEnergyBtn');
         const rulesBtn = document.getElementById('rulesBtn');
         const achievementsInfoBtn = document.getElementById('achievementsInfoBtn');
+        const resetGameBtn = document.getElementById('resetGameBtn');
         const canvasElem = document.getElementById('berryCanvas');
         let canvasCtx = canvasElem.getContext('2d');
         let berriesArray = [];
 
-        // Уведомление о получении ачивки (всплывающее окно)
+        // Уведомление о получении ачивки
         function showAchievementPopup(title, bonusText) {
             let popup = document.createElement('div');
             popup.className = 'achievement-unlocked-popup';
@@ -680,7 +692,14 @@
             setTimeout(() => popup.remove(), 3000);
         }
 
-        // Вспомогательные функции
+        // Функция сброса игры
+        function resetGame() {
+            if (confirm('⚠️ ВНИМАНИЕ! Сброс удалит весь текущий прогресс. Начать квест заново?')) {
+                localStorage.removeItem('cloverQuestFinalV6');
+                location.reload();
+            }
+        }
+
         function showToast(msg, isErr=false) {
             let t = document.createElement('div');
             t.className = 'toast';
@@ -797,12 +816,19 @@
                 game.emergencyUsed = true;
                 game.energy += 20;
                 updateUI();
-            } else if (!anyActive && game.energy < 10 && game.bonusChatUses === 0 && game.totalScore < 100 && game.emergencyUsed && game.gameActive) {
+            } else if (!anyActive && game.energy < 10 && game.bonusChatUses === 0 && game.totalScore < 100 && game.emergencyUsed && game.gameActive && !game.winFlag) {
                 addChatMessage("Система фиксирует необратимый провал. Игра окончена.");
-                gameLose();
+                gameLose("Поражение: не осталось способов продолжить игру.");
             }
-            if (game.totalScore >= 8000 && game.completedCount === 15 && !game.winFlag) gameWin();
-            if (game.timeLeftSec <= 0 && game.gameActive) gameLose();
+            // Проверка на выполнение всех заданий
+            if (game.completedCount === 15 && !game.winFlag && game.gameActive) {
+                if (game.totalScore >= 8000) {
+                    gameWin(true);
+                } else {
+                    gameLose(`Поражение: вы выполнили все задания, но не набрали нужные 8000 очков (${game.totalScore}/8000). Урожай не спасён.`);
+                }
+            }
+            if (game.timeLeftSec <= 0 && game.gameActive && !game.winFlag) gameLose("Время вышло. Урожай погиб.");
         }
 
         function renderTasksCarousel() {
@@ -902,7 +928,6 @@
             }
         }
 
-        // ОСНОВНАЯ ФУНКЦИЯ ВЫПОЛНЕНИЯ ЗАДАНИЯ С ЗАЩИТОЙ ОТ ДВОЙНОГО НАЖАТИЯ
         async function completeTask(id) {
             if (game.processing) {
                 showToast("Пожалуйста, подождите, задание уже выполняется...", true);
@@ -962,12 +987,11 @@
             }
         }
 
-        // Ачивки с попап-уведомлением
+        // Ачивки
         function unlockAchievement(achKey, bonusFunc, bonusText) {
             if (game.achievements[achKey]) return;
             game.achievements[achKey] = true;
             bonusFunc();
-            // Показываем красивое всплывающее окно
             let title = "";
             switch(achKey) {
                 case 'fastStart': title = "⭐ Быстрый старт"; break;
@@ -994,9 +1018,6 @@
             if (!game.achievements.comboMaster && game.comboLevel >= 3 && game.completedCount >= 3) {
                 unlockAchievement('comboMaster', () => { game.totalScore += 300; }, "+300 очков!");
             }
-            if (!game.achievements.timeKeeper && game.winFlag && game.timeLeftSec > 600) {
-                unlockAchievement('timeKeeper', () => { game.bonusChatUses = Math.min(5, game.bonusChatUses+1); }, "+1 бонус чата!");
-            }
         }
         function onMinigameFinish(score) {
             minigamePlays++;
@@ -1022,7 +1043,7 @@
                 let div = document.createElement('div');
                 div.className = 'achievement-badge ' + (unlocked ? 'unlocked' : '');
                 div.innerHTML = `<i class="fas ${unlocked ? 'fa-check-circle' : 'fa-lock'}"></i> ${a.name}`;
-                div.title = a.condition; // подсказка при наведении
+                div.title = a.condition;
                 achievementsContainer.appendChild(div);
             }
         }
@@ -1146,7 +1167,7 @@
             if (game.timers.gameTimer) clearInterval(game.timers.gameTimer);
             game.timers.gameTimer = setInterval(()=>{
                 if (!game.gameActive || game.winFlag) return;
-                if (game.timeLeftSec <= 1) gameLose();
+                if (game.timeLeftSec <= 1) gameLose("Время вышло. Урожай погиб.");
                 else game.timeLeftSec--;
                 updateUI();
             },1000);
@@ -1167,27 +1188,60 @@
             }, 45000);
         }
 
-        function gameWin() {
+        // ФИНАЛЫ
+        function gameWin(winCondition = true) {
             if (game.winFlag) return;
-            game.winFlag = true; game.gameActive = false;
+            game.winFlag = true;
+            game.gameActive = false;
+            // Ачивка хранитель времени
             if (!game.achievements.timeKeeper && game.timeLeftSec > 600) {
                 unlockAchievement('timeKeeper', () => { game.bonusChatUses = Math.min(5, game.bonusChatUses+1); }, "+1 бонус чата!");
             }
-            addChatMessage("🎉 ПОБЕДА! УРОЖАЙ СПАСЁН! Ты герой! 🎉", true);
-            showToast("🏆 ПОБЕДА! ПЛАНТАЦИЯ СПАСЕНА! 🏆");
+            let message = winCondition ? "🎉 ПОБЕДА! УРОЖАЙ СПАСЁН! Ты настоящая Клубничка-герой! 🎉" : "🏆 ВСЕ ЗАДАНИЯ ВЫПОЛНЕНЫ! Но урожай не спасён — не хватило очков.";
+            addChatMessage(message, true);
+            showToast(winCondition ? "🏆 ПОБЕДА! ПЛАНТАЦИЯ СПАСЕНА! 🏆" : "🌾 Задания выполнены, но ферма потеряна...");
             updateCanvasBackground();
             flashScreen();
             if (game.timers.gameTimer) clearInterval(game.timers.gameTimer);
             saveGame();
+            // Показываем модалку с результатом
+            let modal = document.createElement('div');
+            modal.className = 'game-over-modal';
+            modal.innerHTML = `
+                <div class="game-over-content">
+                    <h2><i class="fas ${winCondition ? 'fa-trophy' : 'fa-skull'}"></i> ${winCondition ? 'ПОБЕДА!' : 'ПОРАЖЕНИЕ'}</h2>
+                    <p>${winCondition ? 'Вы спасли урожай! Ферма благодарит вас.' : 'Урожай погиб. Попробуйте снова, используя другую стратегию.'}</p>
+                    <p>Набрано очков: ${game.totalScore} / 8000</p>
+                    <p>Выполнено заданий: ${game.completedCount} / 15</p>
+                    <button id="closeFinalBtn" class="bonus-btn" style="background: var(--accent);">ЗАКРЫТЬ</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('closeFinalBtn').onclick = () => modal.remove();
         }
-        function gameLose() {
-            if (!game.gameActive) return;
+
+        function gameLose(reason = "Поражение") {
+            if (!game.gameActive || game.winFlag) return;
             game.gameActive = false;
-            addChatMessage("💀 Система фиксирует провал. Урожай погиб. Начни заново.", true);
+            addChatMessage(`💀 ${reason}`, true);
             showToast("⏰ ПОРАЖЕНИЕ", true);
             if (game.timers.gameTimer) clearInterval(game.timers.gameTimer);
             saveGame();
+            let modal = document.createElement('div');
+            modal.className = 'game-over-modal';
+            modal.innerHTML = `
+                <div class="game-over-content">
+                    <h2><i class="fas fa-skull"></i> ПОРАЖЕНИЕ</h2>
+                    <p>${reason}</p>
+                    <p>Набрано очков: ${game.totalScore} / 8000</p>
+                    <p>Выполнено заданий: ${game.completedCount} / 15</p>
+                    <button id="closeFinalBtn" class="bonus-btn" style="background: var(--accent);">ЗАКРЫТЬ</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('closeFinalBtn').onclick = () => modal.remove();
         }
+
         function saveGame() {
             let save = {
                 tasks: game.tasks, completedCount: game.completedCount, totalScore: game.totalScore,
@@ -1197,16 +1251,16 @@
                 lastCompleteTimestamp: game.lastCompleteTimestamp, minigamePlays, minigameClickTotal,
                 difficulty: game.difficulty, energyCostActivate: game.energyCostActivate,
                 doubleNext: game.doubleNext, emergencyUsed: game.emergencyUsed,
-                version: 13
+                version: 6
             };
-            localStorage.setItem('cloverQuestFinalV5', JSON.stringify(save));
+            localStorage.setItem('cloverQuestFinalV6', JSON.stringify(save));
         }
         function loadGame() {
-            let raw = localStorage.getItem('cloverQuestFinalV5');
+            let raw = localStorage.getItem('cloverQuestFinalV6');
             if (!raw) return false;
             try {
                 let d = JSON.parse(raw);
-                if (d.version !== 13) return false;
+                if (d.version !== 6) return false;
                 game.tasks = d.tasks; game.completedCount = d.completedCount; game.totalScore = d.totalScore;
                 game.timeLeftSec = d.timeLeftSec; game.energy = d.energy; game.comboLevel = d.comboLevel;
                 game.comboTimeLeft = d.comboTimeLeft; game.bonusChatUses = d.bonusChatUses;
@@ -1237,7 +1291,7 @@
                             <li><strong>📈 Прогрессия сложности:</strong> после каждых 5 заданий стоимость активации растёт.</li>
                             <li><strong>🎮 Мини-игра:</strong> лови клубнику (максимум 5 раз за игру).</li>
                             <li><strong>🆘 Экстренный протокол:</strong> один раз за игру при нехватке энергии система даст +20.</li>
-                            <li><strong>💾 Сохранение:</strong> автоматическое.</li>
+                            <li><strong>💾 Сохранение:</strong> автоматическое. Кнопка "Сбросить квест" очищает прогресс.</li>
                         </ul>
                         <button id="closeRulesBtn" class="bonus-btn" style="background: var(--accent);">🍓 ПОНЯТНО, НАЧАТЬ 🍓</button>
                     </div>
@@ -1247,7 +1301,6 @@
             });
         }
 
-        // Модалка с условиями ачивок
         function showAchievementsInfo() {
             let modal = document.createElement('div');
             modal.className = 'achievement-modal';
@@ -1286,6 +1339,7 @@
             buyEnergyBtn.onclick = buyEnergy;
             rulesBtn.onclick = showRulesModal;
             achievementsInfoBtn.onclick = showAchievementsInfo;
+            resetGameBtn.onclick = resetGame;
             window.addEventListener('beforeunload', ()=>saveGame());
             setInterval(saveGame, 30000);
             function resizeCanvas() { canvasElem.width = window.innerWidth; canvasElem.height = window.innerHeight; }
