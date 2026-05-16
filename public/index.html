@@ -165,8 +165,48 @@
             color: #1a0510;
         }
 
-        .tasks-carousel {
+        /* Панель управления заданиями */
+        .tasks-control {
+            background: linear-gradient(145deg, #1f111a, #150a12);
+            border-radius: var(--radius-medium);
+            padding: 16px 20px;
             margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .pick-task-btn {
+            background: linear-gradient(95deg, #ffb347, #ff6b4a);
+            border: none;
+            padding: 10px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.1s;
+            color: #1a0510;
+            box-shadow: 0 4px 0 #9b3a22;
+        }
+        .pick-task-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #9b3a22;
+        }
+        .pick-task-btn:disabled {
+            opacity: 0.5;
+            transform: none;
+            cursor: not-allowed;
+        }
+        .tasks-left {
+            font-size: 1.1rem;
+            background: #2a1620;
+            padding: 6px 18px;
+            border-radius: 40px;
+        }
+
+        .tasks-carousel {
+            margin: 10px 0;
             position: relative;
         }
         .carousel-wrapper {
@@ -348,7 +388,7 @@
             margin-bottom: 12px;
             flex-wrap: wrap;
         }
-        .bonus-btn, .minigame-btn, .buy-energy-btn, .rules-btn, .achievements-info-btn, .reset-btn {
+        .bonus-btn, .minigame-btn, .energy-question-btn, .rules-btn, .achievements-info-btn, .reset-btn {
             background: #2e1622;
             border: 1px solid var(--accent);
             padding: 8px 20px;
@@ -357,6 +397,14 @@
             cursor: pointer;
             transition: all 0.1s;
             color: var(--text-primary);
+        }
+        .energy-question-btn {
+            border-color: #6eff6e;
+            color: #b3ffb3;
+        }
+        .energy-question-btn:hover {
+            background: #6eff6e;
+            color: #1a0510;
         }
         .reset-btn {
             border-color: #ffaa44;
@@ -367,7 +415,7 @@
             color: #1a0510;
             border-color: #ffaa44;
         }
-        .bonus-btn:hover, .minigame-btn:hover, .buy-energy-btn:hover, .rules-btn:hover, .achievements-info-btn:hover {
+        .bonus-btn:hover, .minigame-btn:hover, .rules-btn:hover, .achievements-info-btn:hover {
             background: var(--accent);
             color: #0a0208;
             transform: scale(0.98);
@@ -466,7 +514,7 @@
             font-weight: bold;
         }
 
-        .rules-modal, .achievement-modal, .event-modal, .game-over-modal {
+        .rules-modal, .achievement-modal, .event-modal, .game-over-modal, .question-modal {
             position: fixed;
             top: 0;
             left: 0;
@@ -479,7 +527,7 @@
             justify-content: center;
             z-index: 6000;
         }
-        .rules-content, .achievement-content, .game-over-content {
+        .rules-content, .achievement-content, .game-over-content, .question-content {
             background: linear-gradient(145deg, #1f0f19, #150a12);
             border-radius: var(--radius-big);
             padding: 32px;
@@ -487,6 +535,16 @@
             width: 90%;
             border: 1px solid var(--accent);
             color: var(--text-primary);
+            text-align: center;
+        }
+        .question-content input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 50px;
+            border: none;
+            margin: 20px 0;
+            background: #2a1620;
+            color: white;
             text-align: center;
         }
         .achievement-desc {
@@ -578,7 +636,7 @@
         <div class="stat-card"><i class="fas fa-trophy"></i> <span id="scoreDisplay">0</span> / 8000</div>
         <div class="stat-card"><i class="fas fa-bolt"></i> Энергия: <span id="energyVal">100</span>% <div class="energy-bar"><div id="energyFill" class="energy-fill"></div></div></div>
         <div class="stat-card"><i class="fas fa-chart-line"></i> Цель: <div class="progress-goal"><div id="goalFill" class="progress-fill"></div></div></div>
-        <div class="stat-card"><i class="fas fa-shopping-cart"></i> <button id="buyEnergyBtn" class="buy-energy-btn" style="padding:6px 14px;">💚 Купить (100)</button></div>
+        <div class="stat-card"><i class="fas fa-question-circle"></i> <button id="energyQuestionBtn" class="energy-question-btn" style="padding:6px 14px;">❓ Получить энергию</button></div>
     </div>
 
     <div class="combo-panel">
@@ -586,6 +644,12 @@
         <div class="combo-multiplier" id="comboMult">x1</div>
         <div class="combo-bar" style="width:140px"><div id="comboFill" class="combo-fill" style="width:0%"></div></div>
         <span id="comboTimer">⏱️ 0с</span>
+    </div>
+
+    <!-- Панель выбора заданий -->
+    <div class="tasks-control">
+        <div class="tasks-left">📋 Осталось заданий в пуле: <span id="tasksLeftCount">15</span></div>
+        <button id="pickTaskBtn" class="pick-task-btn">🎲 ВЗЯТЬ СЛУЧАЙНОЕ ЗАДАНИЕ</button>
     </div>
 
     <div class="tasks-carousel">
@@ -607,32 +671,42 @@
         </div>
         <div id="chatMessages" class="chat-messages"></div>
     </div>
-    <div class="footer-tip">💡 Комбо держится 5 минут | Энергия тратится на задания (25), активацию (15+) | Регенерация +3 каждые 8 сек</div>
+    <div class="footer-tip">💡 Комбо держится 5 минут | Энергия тратится на задания (25), активацию (15+) | Регенерация +3 каждые 8 сек | Задания выбираются случайно, без повторов</div>
 </div>
 
 <script>
     (function(){
-        // ЗАДАНИЯ (обновлённые пользователем)
-        const TASKS_DATA = [
-            { id:0, slot:"Wisdom of Athena", condition:"x15", baseReward:240, completed:false, active:false, desc:"Достигни x15" },
-            { id:1, slot:"Power of Thor", condition:"х10", baseReward:270, completed:false, active:false, desc:"Дойти до множителя х10" },
-            { id:2, slot:"5 Lions Megaways", condition:"Выбить бонуску", baseReward:300, completed:false, active:false, desc:"Выбить бонуску" },
-            { id:3, slot:"Juicy Fruits", condition:"Купить 3 бонуса за 75$", baseReward:250, completed:false, active:false, desc:"Купить 3 бонуса за 75$" },
-            { id:4, slot:"Bigger Barn House Bonanza", condition:"Выбить два бонуса", baseReward:380, completed:false, active:false, desc:"Выбить два бонуса" },
-            { id:5, slot:"Empty the Bank", condition:"Выигрыш >200x", baseReward:350, completed:false, active:false, desc:"Бонус Empty the Bank" },
-            { id:6, slot:"3 Buzzing Wilds", condition:"2 пчелки в правой бонуске", baseReward:330, completed:false, active:false, desc:"2 пчелки в правой бонуске" },
-            { id:7, slot:"The Dog House Megaways", condition:"Выбить 4 лапы", baseReward:220, completed:false, active:false, desc:"Выбить Четыре лапы" },
-            { id:8, slot:"Buffalo King", condition:"Играть в слот пока не надоест Алексею:)", baseReward:350, completed:false, active:false, desc:"Играть в слот пока не надоест Алексею:)" },
-            { id:9, slot:"Wild Walker", condition:"Дойти до 3-х вилдов", baseReward:410, completed:false, active:false, desc:"Дойти до 3-х вилдов" },
-            { id:10, slot:"Voodoo Magic", condition:"Бонус x100", baseReward:430, completed:false, active:false, desc:"Купленный бонус x100 с первой попытки" },
-            { id:11, slot:"Gates of Olympus Super Scatter", condition:"Выбить Суперскаттер", baseReward:310, completed:false, active:false, desc:"Выбить Суперскаттер" },
-            { id:12, slot:"John Hunter", condition:"Купить бонус и выбить четыре туза за спин", baseReward:370, completed:false, active:false, desc:"четыре туза за спин" },
-            { id:13, slot:"Sugar rush", condition:"Ретриггер", baseReward:260, completed:false, active:false, desc:"Ретриггер" },
-            { id:14, slot:"Hot Tuna", condition:"Дойти до красной консервы", baseReward:440, completed:false, active:false, desc:"Дойти до красной консервы" }
+        // ----- СПИСОК ЗАДАНИЙ (увеличенные награды) -----
+        const TASKS_POOL = [
+            { id:0, slot:"Wisdom of Athena", condition:"x15", baseReward:530, desc:"Достигни x15" },
+            { id:1, slot:"Power of Thor", condition:"х10", baseReward:540, desc:"Дойти до множителя х10" },
+            { id:2, slot:"5 Lions Megaways", condition:"Выбить бонуску", baseReward:560, desc:"Выбить бонуску" },
+            { id:3, slot:"Juicy Fruits", condition:"Купить 3 бонуса за 75$", baseReward:520, desc:"Купить 3 бонуса за 75$" },
+            { id:4, slot:"Bigger Barn House Bonanza", condition:"Выбить два бонуса", baseReward:600, desc:"Выбить два бонуса" },
+            { id:5, slot:"Empty the Bank", condition:"Выигрыш >200x", baseReward:570, desc:"Бонус Empty the Bank" },
+            { id:6, slot:"3 Buzzing Wilds", condition:"2 пчелки в правой бонуске", baseReward:550, desc:"2 пчелки в правой бонуске" },
+            { id:7, slot:"The Dog House Megaways", condition:"Выбить 4 лапы", baseReward:500, desc:"Выбить Четыре лапы" },
+            { id:8, slot:"Buffalo King", condition:"Играть в слот пока не надоест Алексею:)", baseReward:560, desc:"Играть в слот пока не надоест Алексею:)" },
+            { id:9, slot:"Wild Walker", condition:"Дойти до 3-х вилдов", baseReward:590, desc:"Дойти до 3-х вилдов" },
+            { id:10, slot:"Voodoo Magic", condition:"Бонус x100", baseReward:620, desc:"Купленный бонус x100 с первой попытки" },
+            { id:11, slot:"Gates of Olympus Super Scatter", condition:"Выбить Суперскаттер", baseReward:540, desc:"Выбить Суперскаттер" },
+            { id:12, slot:"John Hunter", condition:"Купить бонус и выбить четыре туза за спин", baseReward:580, desc:"четыре туза за спин" },
+            { id:13, slot:"Sugar rush", condition:"Ретриггер", baseReward:510, desc:"Ретриггер" },
+            { id:14, slot:"Hot Tuna", condition:"Дойти до красной консервы", baseReward:600, desc:"Дойти до красной консервы" }
+        ];
+
+        // Вопросы для получения энергии
+        const ENERGY_QUESTIONS = [
+            { question: "Какой слот Pragmatic Play имеет механизм Megaways и бонус с падающими дикими?", answer: "the dog house megaways" },
+            { question: "В каком слоте есть символ 'Scatter' в виде золотого кубка?", answer: "wisdom of athena" },
+            { question: "Какой слот даёт множитель до x100 в бонусе?", answer: "voodoo magic" },
+            { question: "В каком слоте нужно собирать монеты в бонусной игре?", answer: "leprechaun carol" },
+            { question: "Какой слот имеет бонус 'Empty the Bank'?", answer: "empty the bank" }
         ];
 
         let game = {
-            tasks: JSON.parse(JSON.stringify(TASKS_DATA)),
+            tasks: [],            // активные/выполненные задания (будет заполняться из пула)
+            remainingPool: [],    // невыбранные задания
             completedCount: 0,
             totalScore: 0,
             timeLeftSec: 120 * 60,
@@ -654,11 +728,36 @@
             timers: { comboDecay: null, gameTimer: null, energyRegen: null, autoChat: null, eventTimer: null },
             difficulty: 1,
             processing: false,
+            energyQuestionsUsed: 0,    // сколько раз отвечал на вопросы (макс 5)
         };
         let minigamePlays = 0, minigameClickTotal = 0;
         const MAX_MINIGAME_PLAYS = 5;
+        const MAX_ENERGY_QUESTIONS = 5;
         const COMBO_WINDOW_SEC = 300;     
         const COMBO_DECAY_SEC = 300;
+
+        // Инициализация пула заданий
+        function initTasksPool() {
+            game.remainingPool = TASKS_POOL.map(t => ({ ...t, completed: false, active: false }));
+            game.tasks = [];
+        }
+
+        // Выбор случайного задания из пула
+        function pickRandomTask() {
+            if (game.remainingPool.length === 0) {
+                showToast("Больше нет доступных заданий! Все задания уже выбраны.", true);
+                return false;
+            }
+            const randomIndex = Math.floor(Math.random() * game.remainingPool.length);
+            const selected = game.remainingPool[randomIndex];
+            selected.active = true;
+            game.tasks.push(selected);
+            game.remainingPool.splice(randomIndex, 1);
+            addChatMessage(`🎲 Выбрано новое задание: ${selected.slot} — ${selected.desc}`);
+            updateUI();
+            saveGame();
+            return true;
+        }
 
         // DOM
         const carousel = document.getElementById('carouselWrapper');
@@ -675,15 +774,16 @@
         const bonusChatBtn = document.getElementById('bonusChatBtn');
         const minigameBtn = document.getElementById('minigameBtn');
         const achievementsContainer = document.getElementById('achievementsList');
-        const buyEnergyBtn = document.getElementById('buyEnergyBtn');
+        const pickTaskBtn = document.getElementById('pickTaskBtn');
+        const energyQuestionBtn = document.getElementById('energyQuestionBtn');
         const rulesBtn = document.getElementById('rulesBtn');
         const achievementsInfoBtn = document.getElementById('achievementsInfoBtn');
         const resetGameBtn = document.getElementById('resetGameBtn');
+        const tasksLeftSpan = document.getElementById('tasksLeftCount');
         const canvasElem = document.getElementById('berryCanvas');
         let canvasCtx = canvasElem.getContext('2d');
         let berriesArray = [];
 
-        // Уведомление о получении ачивки
         function showAchievementPopup(title, bonusText) {
             let popup = document.createElement('div');
             popup.className = 'achievement-unlocked-popup';
@@ -692,25 +792,12 @@
             setTimeout(() => popup.remove(), 3000);
         }
 
-        // Функция сброса игры – полная очистка и перезагрузка
         function resetGame() {
             if (confirm('⚠️ ВНИМАНИЕ! Сброс удалит весь текущий прогресс. Начать квест заново?')) {
-                // Удаляем все возможные ключи сохранений (старые версии)
-                const keys = [
-                    'cloverQuestFinalV3',
-                    'cloverQuestFinalV4',
-                    'cloverQuestFinalV5',
-                    'cloverQuestFinalV6',
-                    'cloverQuestFinalV7',
-                    'cloverQuestFinalV8',
-                    'cloverQuestFinalV9'
-                ];
+                const keys = ['cloverQuestFinalV8'];
                 keys.forEach(key => localStorage.removeItem(key));
-                // Также очищаем всё хранилище на всякий случай
                 localStorage.clear();
-                // Устанавливаем флаг сброса в sessionStorage, чтобы при загрузке не пытаться загрузить сохранение
                 sessionStorage.setItem('gameReset', 'true');
-                // Перезагружаем страницу с принудительным обновлением
                 window.location.href = window.location.href.split('#')[0] + '?reset=' + Date.now();
             }
         }
@@ -773,20 +860,6 @@
                 return false;
             }
         }
-        function buyEnergy() {
-            if (!game.gameActive || game.winFlag) return;
-            if (game.totalScore >= 100) {
-                game.totalScore -= 100;
-                game.energy = Math.min(100, game.energy + 30);
-                updateUI();
-                showToast(`💚 Куплено +30 энергии! -100 очков`);
-                addChatMessage(`Купила энергию за 100 очков!`, true);
-                saveGame();
-            } else {
-                showToast(`Не хватает очков (нужно 100)`, true);
-                shakeScreen();
-            }
-        }
 
         function updateCanvasBackground() {
             if (!canvasElem) return;
@@ -826,32 +899,36 @@
             let fillPercent = (game.comboTimeLeft / COMBO_DECAY_SEC) * 100;
             comboFillDiv.style.width = `${Math.min(100, fillPercent)}%`;
             comboTimerSpan.innerText = `${Math.ceil(game.comboTimeLeft)}с`;
+            
+            tasksLeftSpan.innerText = game.remainingPool.length;
+            if (game.remainingPool.length === 0 && game.tasks.filter(t=>!t.completed).length === 0 && !game.winFlag) {
+                // Все задания выбраны и выполнены?
+                if (game.completedCount === TASKS_POOL.length && !game.winFlag) {
+                    if (game.totalScore >= 8000) gameWin(true);
+                    else gameLose(`Поражение: вы выполнили все задания, но не набрали нужные 8000 очков (${game.totalScore}/8000). Урожай не спасён.`);
+                }
+            }
             renderTasksCarousel();
             renderAchievements();
             updateCanvasBackground();
             let anyActive = game.tasks.some(t => t.active && !t.completed);
-            if (!anyActive && game.energy < 10 && game.bonusChatUses === 0 && game.totalScore < 100 && !game.emergencyUsed && game.gameActive && !game.winFlag) {
-                addChatMessage("Критическая ситуация: энергия на нуле, нет активных заданий. Активирую экстренный протокол.");
-                game.emergencyUsed = true;
-                game.energy += 20;
-                updateUI();
-            } else if (!anyActive && game.energy < 10 && game.bonusChatUses === 0 && game.totalScore < 100 && game.emergencyUsed && game.gameActive && !game.winFlag) {
-                addChatMessage("Система фиксирует необратимый провал. Игра окончена.");
-                gameLose("Поражение: не осталось способов продолжить игру.");
+            if (!anyActive && game.remainingPool.length === 0 && game.completedCount < TASKS_POOL.length && !game.winFlag) {
+                // Нет активных, но есть невыбранные задания – нужно взять новое
+                if (game.remainingPool.length > 0 && game.gameActive && !game.winFlag) {
+                    addChatMessage("Нет активных заданий! Возьми новое через кнопку.");
+                }
             }
             // Проверка на выполнение всех заданий
-            if (game.completedCount === 15 && !game.winFlag && game.gameActive) {
-                if (game.totalScore >= 8000) {
-                    gameWin(true);
-                } else {
-                    gameLose(`Поражение: вы выполнили все задания, но не набрали нужные 8000 очков (${game.totalScore}/8000). Урожай не спасён.`);
-                }
+            if (game.completedCount === TASKS_POOL.length && !game.winFlag && game.gameActive) {
+                if (game.totalScore >= 8000) gameWin(true);
+                else gameLose(`Поражение: вы выполнили все задания, но не набрали нужные 8000 очков (${game.totalScore}/8000). Урожай не спасён.`);
             }
             if (game.timeLeftSec <= 0 && game.gameActive && !game.winFlag) gameLose("Время вышло. Урожай погиб.");
         }
 
         function renderTasksCarousel() {
             carousel.innerHTML = '';
+            // Показываем только активные/выполненные задания (game.tasks)
             for (let task of game.tasks) {
                 let card = document.createElement('div');
                 let statusClass = 'task-card';
@@ -977,22 +1054,7 @@
                     game.energy = Math.min(100, game.energy + 15);
                     showToast(`🔥 Комбо 3+! +15 энергии`);
                 }
-                // Активация следующего задания
-                let nextActivated = false;
-                for (let t of game.tasks) {
-                    if (!t.completed && !t.active) {
-                        if (game.energy >= game.energyCostActivate) {
-                            spendEnergy(game.energyCostActivate, "открытия нового задания");
-                            t.active = true;
-                            addChatMessage(`🔓 Новое задание: ${t.slot} — ${t.condition}`);
-                            nextActivated = true;
-                            break;
-                        } else {
-                            addChatMessage(`⚠️ Не хватает энергии (${game.energyCostActivate}) для открытия нового задания. Подожди регенерации.`);
-                            break;
-                        }
-                    }
-                }
+                // Активация следующего задания не требуется, игрок сам выбирает новое кнопкой
                 increaseDifficulty();
                 showToast(`✅ +${earned} очков! Комбо x${game.comboMultiplier}`);
                 animateScoreGain(earned);
@@ -1174,9 +1236,55 @@
             saveGame();
         }
 
+        // ВОПРОСЫ ДЛЯ ЭНЕРГИИ
+        function askEnergyQuestion() {
+            if (!game.gameActive || game.winFlag) return;
+            if (game.energyQuestionsUsed >= MAX_ENERGY_QUESTIONS) {
+                showToast("Вы уже использовали все попытки получить энергию через вопросы. Максимум 5 раз.", true);
+                return;
+            }
+            const q = ENERGY_QUESTIONS[Math.floor(Math.random() * ENERGY_QUESTIONS.length)];
+            const modal = document.createElement('div');
+            modal.className = 'question-modal';
+            modal.innerHTML = `
+                <div class="question-content">
+                    <h2><i class="fas fa-question-circle"></i> Вопрос</h2>
+                    <p>${q.question}</p>
+                    <input type="text" id="answerInput" placeholder="Ваш ответ" autocomplete="off">
+                    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                        <button id="submitAnswerBtn" class="bonus-btn">Ответить</button>
+                        <button id="closeQuestionBtn" class="bonus-btn">Закрыть</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            const input = modal.querySelector('#answerInput');
+            const submitBtn = modal.querySelector('#submitAnswerBtn');
+            const closeBtn = modal.querySelector('#closeQuestionBtn');
+            const checkAnswer = () => {
+                const answer = input.value.trim().toLowerCase();
+                const isCorrect = answer === q.answer.toLowerCase();
+                if (isCorrect) {
+                    game.energy = Math.min(100, game.energy + 20);
+                    game.energyQuestionsUsed++;
+                    showToast(`✅ Правильно! +20 энергии. Осталось попыток: ${MAX_ENERGY_QUESTIONS - game.energyQuestionsUsed}`);
+                    addChatMessage(`Ответ на вопрос верный! Получено +20 энергии.`, true);
+                    updateUI();
+                    saveGame();
+                    modal.remove();
+                } else {
+                    showToast(`❌ Неправильно. Попробуйте другой вопрос позже.`, true);
+                    modal.remove();
+                }
+            };
+            submitBtn.onclick = checkAnswer;
+            closeBtn.onclick = () => modal.remove();
+            input.addEventListener('keypress', (e) => { if(e.key === 'Enter') checkAnswer(); });
+        }
+
         function aiCommentary() {
             if (!game.gameActive || game.winFlag) return;
-            if (game.energy < 20) addChatMessage("Ты выглядишь уставшей. Энергия на исходе. Рекомендую отдых или покупку.");
+            if (game.energy < 20) addChatMessage("Ты выглядишь уставшей. Энергия на исходе. Рекомендую ответить на вопросы.");
             else if (game.comboLevel === 0 && game.completedCount > 2) addChatMessage("Теряешь темп. Без комбо тяжело победить.");
             else if (game.timeLeftSec < 180) addChatMessage("Времени почти не осталось! Давай быстрее, урожай под угрозой!");
             else if (game.totalScore > 6000) addChatMessage("Ты близка к победе. Не расслабляйся, система следит.");
@@ -1197,7 +1305,7 @@
             },8000);
             game.timers.autoChat = setInterval(()=>{
                 if (!game.gameActive || game.winFlag) return;
-                let phrases = ["Наблюдаю за тобой. Комбо держится 5 минут — не спеши.", "Случайные события могут помочь или помешать.", "Сложность растёт с каждым выполненным заданием.", "Энергия — твой главный ресурс."];
+                let phrases = ["Наблюдаю за тобой. Комбо держится 5 минут — не спеши.", "Случайные события могут помочь или помешать.", "Сложность растёт с каждым выполненным заданием.", "Энергию можно получить ответив на вопросы."];
                 addChatMessage(phrases[Math.floor(Math.random()*phrases.length)]);
                 aiCommentary();
             },25000);
@@ -1207,16 +1315,14 @@
             }, 45000);
         }
 
-        // ФИНАЛЫ
-        function gameWin(winCondition = true) {
+        function gameWin() {
             if (game.winFlag) return;
             game.winFlag = true;
             game.gameActive = false;
             if (!game.achievements.timeKeeper && game.timeLeftSec > 600) {
                 unlockAchievement('timeKeeper', () => { game.bonusChatUses = Math.min(5, game.bonusChatUses+1); }, "+1 бонус чата!");
             }
-            let message = "🎉 ПОБЕДА! УРОЖАЙ СПАСЁН! Ты настоящая Клубничка-герой! 🎉";
-            addChatMessage(message, true);
+            addChatMessage("🎉 ПОБЕДА! УРОЖАЙ СПАСЁН! Ты настоящая Клубничка-герой! 🎉", true);
             showToast("🏆 ПОБЕДА! ПЛАНТАЦИЯ СПАСЕНА! 🏆");
             updateCanvasBackground();
             flashScreen();
@@ -1262,37 +1368,57 @@
         function saveGame() {
             if (sessionStorage.getItem('gameReset') === 'true') return;
             let save = {
-                tasks: game.tasks, completedCount: game.completedCount, totalScore: game.totalScore,
-                timeLeftSec: game.timeLeftSec, energy: game.energy, comboLevel: game.comboLevel,
-                comboTimeLeft: game.comboTimeLeft, bonusChatUses: game.bonusChatUses,
-                gameActive: game.gameActive, winFlag: game.winFlag, achievements: game.achievements,
-                lastCompleteTimestamp: game.lastCompleteTimestamp, minigamePlays, minigameClickTotal,
-                difficulty: game.difficulty, energyCostActivate: game.energyCostActivate,
-                doubleNext: game.doubleNext, emergencyUsed: game.emergencyUsed,
-                version: 7
+                tasks: game.tasks,
+                remainingPool: game.remainingPool,
+                completedCount: game.completedCount,
+                totalScore: game.totalScore,
+                timeLeftSec: game.timeLeftSec,
+                energy: game.energy,
+                comboLevel: game.comboLevel,
+                comboTimeLeft: game.comboTimeLeft,
+                bonusChatUses: game.bonusChatUses,
+                gameActive: game.gameActive,
+                winFlag: game.winFlag,
+                achievements: game.achievements,
+                lastCompleteTimestamp: game.lastCompleteTimestamp,
+                minigamePlays, minigameClickTotal,
+                difficulty: game.difficulty,
+                energyCostActivate: game.energyCostActivate,
+                doubleNext: game.doubleNext,
+                emergencyUsed: game.emergencyUsed,
+                energyQuestionsUsed: game.energyQuestionsUsed,
+                version: 8
             };
-            localStorage.setItem('cloverQuestFinalV7', JSON.stringify(save));
+            localStorage.setItem('cloverQuestFinalV8', JSON.stringify(save));
         }
         function loadGame() {
-            // Если есть флаг сброса – не загружаем
             if (sessionStorage.getItem('gameReset') === 'true') {
                 sessionStorage.removeItem('gameReset');
                 return false;
             }
-            let raw = localStorage.getItem('cloverQuestFinalV7');
+            let raw = localStorage.getItem('cloverQuestFinalV8');
             if (!raw) return false;
             try {
                 let d = JSON.parse(raw);
-                if (d.version !== 7) return false;
-                game.tasks = d.tasks; game.completedCount = d.completedCount; game.totalScore = d.totalScore;
-                game.timeLeftSec = d.timeLeftSec; game.energy = d.energy; game.comboLevel = d.comboLevel;
-                game.comboTimeLeft = d.comboTimeLeft; game.bonusChatUses = d.bonusChatUses;
-                game.gameActive = d.gameActive; game.winFlag = d.winFlag; game.achievements = d.achievements;
+                if (d.version !== 8) return false;
+                game.tasks = d.tasks;
+                game.remainingPool = d.remainingPool;
+                game.completedCount = d.completedCount;
+                game.totalScore = d.totalScore;
+                game.timeLeftSec = d.timeLeftSec;
+                game.energy = d.energy;
+                game.comboLevel = d.comboLevel;
+                game.comboTimeLeft = d.comboTimeLeft;
+                game.bonusChatUses = d.bonusChatUses;
+                game.gameActive = d.gameActive;
+                game.winFlag = d.winFlag;
+                game.achievements = d.achievements;
                 game.lastCompleteTimestamp = d.lastCompleteTimestamp;
                 game.difficulty = d.difficulty || 1;
                 game.energyCostActivate = d.energyCostActivate || 15;
                 game.doubleNext = d.doubleNext || 0;
                 game.emergencyUsed = d.emergencyUsed || false;
+                game.energyQuestionsUsed = d.energyQuestionsUsed || 0;
                 minigamePlays = d.minigamePlays || 0;
                 return true;
             } catch(e){ return false; }
@@ -1304,15 +1430,16 @@
                 modal.className = 'rules-modal';
                 modal.innerHTML = `
                     <div class="rules-content">
-                        <h2><i class="fas fa-strawberry"></i> ПРАВИЛА КВЕСТА 3.0</h2>
+                        <h2><i class="fas fa-strawberry"></i> ПРАВИЛА КВЕСТА 4.0</h2>
                         <ul class="rules-list">
-                            <li><strong>🎯 Цель:</strong> Спасти клубниный урожай набрав <strong>8000 очков</strong>, выполнив 15 заданий. Время — <strong>2 часа</strong>.</li>
-                            <li><strong>🍓 Задания:</strong> свайпай карточки, нажимай «ВЫПОЛНЕНО» после выполнения задания.</li>
-                            <li><strong>⚡ Энергия:</strong> тратится на выполнение заданий (25), открытие новых (15→30), мини-игру (20) и бонус чата (25). Восстанавливается +3 каждые 8 сек.</li>
-                            <li><strong>🔥 Комбо:</strong> выполняй задания быстрее 5 минут — множитель очков растёт (x1 → x3 макс). Комбо держится 5 минут.</li>
-                            <li><strong>🎲 Случайные события:</strong> каждые 45-90 секунд происходят события (позитивные или негативные).</li>
+                            <li><strong>🎯 Цель:</strong> Спасти клубничный урожай, набрав <strong>8000 очков</strong>, выполнив 15 заданий (случайных). Время — <strong>2 часа</strong>.</li>
+                            <li><strong>🍓 Задания:</strong> нажимай «ВЗЯТЬ СЛУЧАЙНОЕ ЗАДАНИЕ», затем выполняй его и отмечай «ВЫПОЛНЕНО».</li>
+                            <li><strong>⚡ Энергия:</strong> тратится на выполнение заданий (25), мини-игру (20) и бонус чата (25). Восстанавливается +3 каждые 8 сек.</li>
+                            <li><strong>❓ Получить энергию:</strong> отвечай на вопросы о слотах Pragmatic Play (до 5 раз за игру).</li>
+                            <li><strong>🔥 Комбо:</strong> выполняй задания быстрее 5 минут — множитель очков растёт (x1 → x3 макс).</li>
+                            <li><strong>🎲 Случайные события:</strong> каждые 45-90 секунд происходят события.</li>
                             <li><strong>📈 Прогрессия сложности:</strong> после каждых 5 заданий стоимость активации растёт.</li>
-                            <li><strong>🎮 Мини-игра:</strong> лови клубнику, дает очки и энергию (максимум 5 раз за игру).</li>
+                            <li><strong>🎮 Мини-игра:</strong> лови клубнику, дает очки и энергию (макс 5 раз).</li>
                             <li><strong>🆘 Экстренный протокол:</strong> один раз за игру при нехватке энергии система даст +20.</li>
                             <li><strong>💾 Сохранение:</strong> автоматическое. Кнопка "Сбросить квест" полностью очищает прогресс.</li>
                         </ul>
@@ -1344,23 +1471,20 @@
         }
 
         async function init() {
-            // Проверяем параметр сброса в URL
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('reset')) {
                 sessionStorage.setItem('gameReset', 'true');
-                // Очищаем localStorage ещё раз
                 localStorage.clear();
-                // Удаляем параметр из URL без перезагрузки
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
             let loaded = loadGame();
             if (!loaded) {
                 await showRulesModal();
-                for (let i=0; i<3; i++) game.tasks[i].active = true;
+                initTasksPool();
                 game.gameActive = true;
                 game.lastCompleteTimestamp = Date.now();
                 game.energyCostActivate = 15;
-                addChatMessage("Урожай под угрозой. У тебя 2 часа. Комбо держится 5 минут — не бойся медлить.");
+                addChatMessage("Урожай под угрозой. У тебя 2 часа. Нажимай «ВЗЯТЬ СЛУЧАЙНОЕ ЗАДАНИЕ» и выполняй.");
             } else {
                 addChatMessage("Система перезагружена. Продолжаем спасение урожая.");
             }
@@ -1368,7 +1492,8 @@
             startGameSystems();
             bonusChatBtn.onclick = applyChatBonus;
             minigameBtn.onclick = startMiniGame;
-            buyEnergyBtn.onclick = buyEnergy;
+            pickTaskBtn.onclick = pickRandomTask;
+            energyQuestionBtn.onclick = askEnergyQuestion;
             rulesBtn.onclick = showRulesModal;
             achievementsInfoBtn.onclick = showAchievementsInfo;
             resetGameBtn.onclick = resetGame;
