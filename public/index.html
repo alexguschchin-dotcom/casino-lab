@@ -277,6 +277,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            min-height: 70px;  /* фиксированная высота заголовка */
         }
         .slot-badge {
             background: #2d0f1b;
@@ -291,7 +292,7 @@
             color: var(--text-secondary);
             margin: 12px 0;
             line-height: 1.4;
-            min-height: 70px; /* фиксируем высоту, чтобы кнопка не прыгала */
+            min-height: 70px;  /* фиксируем высоту описания */
         }
         .task-reward {
             font-weight: bold;
@@ -369,7 +370,6 @@
         .achievement-badge.unlocked {
             background: linear-gradient(135deg, var(--accent-gold), var(--accent));
             color: #0a0208;
-            /* анимация мигания будет добавляться отдельно через класс .pulse, и удаляться после просмотра */
         }
         .achievement-badge.unlocked.pulse {
             animation: glowPulse 0.5s 2;
@@ -755,7 +755,7 @@
             bonusChatUses: 3,
             gameActive: true,
             winFlag: false,
-            energyCost: 25, // фиксированная стоимость
+            energyCost: 25,
             doubleNext: 0,
             emergencyUsed: false,
             achievements: { fastStart: false, comboMaster: false, timeKeeper: false, minigameFan: false, berryPuncher: false, viewed: { fastStart: false, comboMaster: false, timeKeeper: false, minigameFan: false, berryPuncher: false } },
@@ -770,13 +770,11 @@
         const COMBO_WINDOW_SEC = 300;
         const COMBO_DECAY_SEC = 300;
 
-        // Инициализация пула заданий
         function initTasksPool() {
             game.remainingPool = TASKS_POOL.map(t => ({ ...t, completed: false, active: false }));
             game.tasks = [];
         }
 
-        // Выбор случайного задания
         function pickRandomTask() {
             if (game.remainingPool.length === 0) {
                 showToast("Больше нет доступных заданий! Все задания уже выбраны.", true);
@@ -818,7 +816,7 @@
         let canvasCtx = canvasElem.getContext('2d');
         let berriesArray = [];
 
-        // Запуск таймера комбо при загрузке (если есть остаток)
+        // Запуск таймера комбо (исправлено)
         function startComboDecayIfNeeded() {
             if (game.timers.comboDecay) clearInterval(game.timers.comboDecay);
             if (game.comboTimeLeft > 0 && game.comboLevel > 0) {
@@ -832,7 +830,7 @@
                             if (game.comboLevel === 0) showToast("Комбо потерян...", true);
                             else addChatMessage(`Комбо снижен до уровня ${game.comboLevel}`);
                         }
-                        updateUI();
+                        updateUI(); // обновляем интерфейс, чтобы таймер отображался
                     } else {
                         clearInterval(game.timers.comboDecay);
                     }
@@ -1103,11 +1101,10 @@
             }
         }
 
-        // Ачивки с сохранением просмотра
         function unlockAchievement(achKey, bonusFunc, bonusText) {
             if (game.achievements[achKey]) return;
             game.achievements[achKey] = true;
-            game.achievements.viewed[achKey] = false; // новая ачивка, ещё не просмотрена
+            game.achievements.viewed[achKey] = false;
             bonusFunc();
             let title = "";
             switch(achKey) {
@@ -1150,7 +1147,6 @@
             `;
             document.body.appendChild(modal);
             document.getElementById('closeAchDetail').onclick = () => modal.remove();
-            // Отмечаем ачивку как просмотренную, чтобы убрать мигание
             if (game.achievements.viewed[achKey] === false) {
                 game.achievements.viewed[achKey] = true;
                 renderAchievements();
@@ -1312,7 +1308,7 @@
             saveGame();
         }
 
-        // ВОПРОСЫ ДЛЯ ЭНЕРГИИ (с вариантами)
+        // ВОПРОСЫ
         function askEnergyQuestion() {
             if (!game.gameActive || game.winFlag) return;
             if (game.energyQuestionsUsed >= MAX_ENERGY_QUESTIONS) {
