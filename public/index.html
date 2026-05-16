@@ -141,7 +141,7 @@
         .progress-fill {
             background: linear-gradient(90deg, var(--accent-soft), var(--accent));
             width: 0%;
-            transition: width 0.3s;
+            transition: width 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
 
         .combo-panel {
@@ -277,7 +277,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            min-height: 70px;  /* фиксированная высота заголовка */
+            min-height: 70px;
         }
         .slot-badge {
             background: #2d0f1b;
@@ -292,7 +292,7 @@
             color: var(--text-secondary);
             margin: 12px 0;
             line-height: 1.4;
-            min-height: 70px;  /* фиксируем высоту описания */
+            min-height: 70px;
         }
         .task-reward {
             font-weight: bold;
@@ -688,7 +688,7 @@
         </div>
         <div id="chatMessages" class="chat-messages"></div>
     </div>
-    <div class="footer-tip">💡 Комбо держится 5 минут | Энергия тратится на всё по 25 | Регенерация +3 каждые 8 сек | Задания выбираются случайно</div>
+    <div class="footer-tip">💡 Комбо держится 5 минут | Энергия тратится на всё по 25 | Восстановление: +8 энергии каждые 5 минут | Задания выбираются случайно</div>
 </div>
 
 <script>
@@ -712,33 +712,13 @@
             { id:14, slot:"Madam destiny Megaways", condition:"Поймать 8х и больше в бонуске за 60$", baseReward:600, desc:"Поймать 8х и больше в бонуске за 60$" }
         ];
 
-        // Вопросы про фильмы ужасов с вариантами ответов
+        // Вопросы про фильмы ужасов
         const ENERGY_QUESTIONS = [
-            {
-                question: "В каком фильме появляется демон Пазузу?",
-                options: ["Изгоняющий дьявола", "Заклятие", "Астрал", "Тишина"],
-                correct: 0
-            },
-            {
-                question: "Какой актёр сыграл Фредди Крюгера в «Кошмаре на улице Вязов»?",
-                options: ["Роберт Инглунд", "Брюс Кэмпбелл", "Тони Тодд", "Даг Брэдли"],
-                correct: 0
-            },
-            {
-                question: "Как называется культовый фильм ужасов 1973 года, снятый Уильямом Фридкиным?",
-                options: ["Изгоняющий дьявола", "Омен", "Техасская резня бензопилой", "Хэллоуин"],
-                correct: 0
-            },
-            {
-                question: "В каком фильме главный герой использует книгу «Некрономикон»?",
-                options: ["Зловещие мертвецы", "Реаниматор", "Взвод монстров", "Восставший из ада"],
-                correct: 0
-            },
-            {
-                question: "Как называется хоррор-серия фильмов о кукле-убийце?",
-                options: ["Детские игры", "Кукла", "Аннабель", "Проклятие куклы"],
-                correct: 0
-            }
+            { question: "В каком фильме появляется демон Пазузу?", options: ["Изгоняющий дьявола", "Заклятие", "Астрал", "Тишина"], correct: 0 },
+            { question: "Какой актёр сыграл Фредди Крюгера в «Кошмаре на улице Вязов»?", options: ["Роберт Инглунд", "Брюс Кэмпбелл", "Тони Тодд", "Даг Брэдли"], correct: 0 },
+            { question: "Как называется культовый фильм ужасов 1973 года, снятый Уильямом Фридкиным?", options: ["Изгоняющий дьявола", "Омен", "Техасская резня бензопилой", "Хэллоуин"], correct: 0 },
+            { question: "В каком фильме главный герой использует книгу «Некрономикон»?", options: ["Зловещие мертвецы", "Реаниматор", "Взвод монстров", "Восставший из ада"], correct: 0 },
+            { question: "Как называется хоррор-серия фильмов о кукле-убийце?", options: ["Детские игры", "Кукла", "Аннабель", "Проклятие куклы"], correct: 0 }
         ];
 
         let game = {
@@ -816,7 +796,6 @@
         let canvasCtx = canvasElem.getContext('2d');
         let berriesArray = [];
 
-        // Запуск таймера комбо (исправлено)
         function startComboDecayIfNeeded() {
             if (game.timers.comboDecay) clearInterval(game.timers.comboDecay);
             if (game.comboTimeLeft > 0 && game.comboLevel > 0) {
@@ -830,7 +809,7 @@
                             if (game.comboLevel === 0) showToast("Комбо потерян...", true);
                             else addChatMessage(`Комбо снижен до уровня ${game.comboLevel}`);
                         }
-                        updateUI(); // обновляем интерфейс, чтобы таймер отображался
+                        updateUI();
                     } else {
                         clearInterval(game.timers.comboDecay);
                     }
@@ -1012,7 +991,6 @@
             });
         }
 
-        // КОМБО
         function updateComboOnComplete() {
             let now = Date.now();
             let timeSinceLast = (now - game.lastCompleteTimestamp) / 1000;
@@ -1384,11 +1362,17 @@
                 else game.timeLeftSec--;
                 updateUI();
             },1000);
+            
+            // Новая регенерация: +8 энергии каждые 5 минут (300 000 мс)
             game.timers.energyRegen = setInterval(()=>{
                 if (!game.gameActive || game.winFlag) return;
-                if (game.energy < 100) game.energy = Math.min(100, game.energy + 3);
-                updateUI();
-            },8000);
+                if (game.energy < 100) {
+                    game.energy = Math.min(100, game.energy + 8);
+                    updateUI();
+                    addChatMessage(`🔋 Восстановлено +8 энергии (регенерация).`, false);
+                }
+            }, 300000); // 5 минут
+            
             game.timers.autoChat = setInterval(()=>{
                 if (!game.gameActive || game.winFlag) return;
                 let phrases = ["Наблюдаю за тобой. Комбо держится 5 минут — не спеши.", "Случайные события могут помочь или помешать.", "Сложность растёт с каждым выполненным заданием.", "Энергию можно получить ответив на вопросы."];
@@ -1519,7 +1503,7 @@
                         <ul class="rules-list">
                             <li><strong>🎯 Цель:</strong> Спасти клубничный урожай, набрав <strong>8000 очков</strong>, выполнив 15 заданий (случайных). Время — <strong>2 часа</strong>.</li>
                             <li><strong>🍓 Задания:</strong> нажимай «ВЗЯТЬ СЛУЧАЙНОЕ ЗАДАНИЕ», затем выполняй его и отмечай «ВЫПОЛНЕНО» (стоит 25 энергии).</li>
-                            <li><strong>⚡ Энергия:</strong> тратится на выполнение заданий, мини-игру и бонус чата (везде по 25). Восстанавливается +3 каждые 8 сек.</li>
+                            <li><strong>⚡ Энергия:</strong> тратится на выполнение заданий, мини-игру и бонус чата (везде по 25). Восстанавливается +8 каждые 5 минут.</li>
                             <li><strong>❓ Получить энергию:</strong> отвечай на вопросы о фильмах ужасов (до 5 раз за игру).</li>
                             <li><strong>🔥 Комбо:</strong> выполняй задания быстрее 5 минут — множитель очков растёт (x1 → x3 макс).</li>
                             <li><strong>🎲 Случайные события:</strong> каждые 45-90 секунд происходят события.</li>
