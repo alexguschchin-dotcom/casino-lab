@@ -251,6 +251,7 @@
             cursor: pointer;
             display: flex;
             flex-direction: column;
+            min-height: 280px;
         }
         .task-card:hover {
             transform: translateY(-4px);
@@ -368,7 +369,6 @@
         .achievement-badge.unlocked {
             background: linear-gradient(135deg, var(--accent-gold), var(--accent));
             color: #0a0208;
-            animation: glowPulse 0.5s;
         }
         @keyframes glowPulse {
             0% { transform: scale(1); }
@@ -537,15 +537,24 @@
             color: var(--text-primary);
             text-align: center;
         }
-        .question-content input {
-            width: 100%;
-            padding: 10px;
-            border-radius: 50px;
-            border: none;
+        .question-content .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             margin: 20px 0;
-            background: #2a1620;
+        }
+        .answer-btn {
+            background: #2e1622;
+            border: 1px solid var(--accent);
+            padding: 8px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.1s;
             color: white;
-            text-align: center;
+        }
+        .answer-btn:hover {
+            background: var(--accent);
+            color: #0a0208;
         }
         .achievement-desc {
             margin: 10px 0;
@@ -636,7 +645,7 @@
         <div class="stat-card"><i class="fas fa-trophy"></i> <span id="scoreDisplay">0</span> / 8000</div>
         <div class="stat-card"><i class="fas fa-bolt"></i> Энергия: <span id="energyVal">100</span>% <div class="energy-bar"><div id="energyFill" class="energy-fill"></div></div></div>
         <div class="stat-card"><i class="fas fa-chart-line"></i> Цель: <div class="progress-goal"><div id="goalFill" class="progress-fill"></div></div></div>
-        <div class="stat-card"><i class="fas fa-question-circle"></i> <button id="energyQuestionBtn" class="energy-question-btn" style="padding:6px 14px;">❓ Получить энергию</button></div>
+        <div class="stat-card"><i class="fas fa-question-circle"></i> <button id="energyQuestionBtn" class="energy-question-btn" style="padding:6px 14px;">❓ Энергия (вопрос)</button></div>
     </div>
 
     <div class="combo-panel">
@@ -646,7 +655,6 @@
         <span id="comboTimer">⏱️ 0с</span>
     </div>
 
-    <!-- Панель выбора заданий -->
     <div class="tasks-control">
         <div class="tasks-left">📋 Осталось заданий в пуле: <span id="tasksLeftCount">15</span></div>
         <button id="pickTaskBtn" class="pick-task-btn">🎲 ВЗЯТЬ СЛУЧАЙНОЕ ЗАДАНИЕ</button>
@@ -671,12 +679,12 @@
         </div>
         <div id="chatMessages" class="chat-messages"></div>
     </div>
-    <div class="footer-tip">💡 Комбо держится 5 минут | Энергия тратится на задания (25), активацию (15+) | Регенерация +3 каждые 8 сек | Задания выбираются случайно, без повторов</div>
+    <div class="footer-tip">💡 Комбо держится 5 минут | Энергия тратится везде по 25 | Регенерация +3 каждые 8 сек | Задания случайны, без повторов</div>
 </div>
 
 <script>
     (function(){
-        // ----- СПИСОК ЗАДАНИЙ (увеличенные награды) -----
+        // ----- СПИСОК ЗАДАНИЙ (увеличенные награды, чтобы набрать 8000) -----
         const TASKS_POOL = [
             { id:0, slot:"Wisdom of Athena", condition:"x15", baseReward:530, desc:"Достигни x15" },
             { id:1, slot:"Power of Thor", condition:"х10", baseReward:540, desc:"Дойти до множителя х10" },
@@ -695,17 +703,37 @@
             { id:14, slot:"Hot Tuna", condition:"Дойти до красной консервы", baseReward:600, desc:"Дойти до красной консервы" }
         ];
 
-        // Вопросы для получения энергии
+        // Вопросы на тему ужасов с вариантами ответов
         const ENERGY_QUESTIONS = [
-            { question: "Какой слот Pragmatic Play имеет механизм Megaways и бонус с падающими дикими?", answer: "the dog house megaways" },
-            { question: "В каком слоте есть символ 'Scatter' в виде золотого кубка?", answer: "wisdom of athena" },
-            { question: "Какой слот даёт множитель до x100 в бонусе?", answer: "voodoo magic" },
-            { question: "В каком слоте нужно собирать монеты в бонусной игре?", answer: "leprechaun carol" },
-            { question: "Какой слот имеет бонус 'Empty the Bank'?", answer: "empty the bank" }
+            { 
+                question: "Как зовут культового маньяка из фильма «Кошмар на улице Вязов»?",
+                answers: ["Майкл Майерс", "Фредди Крюгер", "Джейсон Вурхиз", "Пила"],
+                correct: 1
+            },
+            { 
+                question: "Какой фильм ужасов 1999 года снят в стиле «найденной плёнки» и повествует о ведьме из леса Блэр?",
+                answers: ["Паранормальное явление", "Ведьма из Блэр: Курсовая с того света", "Реаниматор", "Звонок"],
+                correct: 1
+            },
+            { 
+                question: "В какой известной хоррор-игре действие происходит в городе Сайлент-Хилл?",
+                answers: ["Resident Evil", "Silent Hill", "The Evil Within", "Outlast"],
+                correct: 1
+            },
+            { 
+                question: "Как зовут главную героиню фильма «Чужой» (1979)?",
+                answers: ["Сара Коннор", "Эллен Рипли", "Лори Строуд", "Клариса Старлинг"],
+                correct: 1
+            },
+            { 
+                question: "Какой американский писатель известен как «король ужасов»?",
+                answers: ["Говард Лавкрафт", "Стивен Кинг", "Эдгар По", "Клайв Баркер"],
+                correct: 1
+            }
         ];
 
         let game = {
-            tasks: [],            // активные/выполненные задания (будет заполняться из пула)
+            tasks: [],            // активные/выполненные задания
             remainingPool: [],    // невыбранные задания
             completedCount: 0,
             totalScore: 0,
@@ -718,9 +746,8 @@
             bonusChatUses: 3,
             gameActive: true,
             winFlag: false,
-            energyCostTask: 25,
-            energyCostActivate: 15,
-            energyCostMinigame: 20,
+            energyCostTask: 25,        // фиксированная стоимость выполнения
+            energyCostMinigame: 25,
             energyCostBonus: 25,
             doubleNext: 0,
             emergencyUsed: false,
@@ -728,7 +755,7 @@
             timers: { comboDecay: null, gameTimer: null, energyRegen: null, autoChat: null, eventTimer: null },
             difficulty: 1,
             processing: false,
-            energyQuestionsUsed: 0,    // сколько раз отвечал на вопросы (макс 5)
+            energyQuestionsUsed: 0,
         };
         let minigamePlays = 0, minigameClickTotal = 0;
         const MAX_MINIGAME_PLAYS = 5;
@@ -736,13 +763,11 @@
         const COMBO_WINDOW_SEC = 300;     
         const COMBO_DECAY_SEC = 300;
 
-        // Инициализация пула заданий
         function initTasksPool() {
             game.remainingPool = TASKS_POOL.map(t => ({ ...t, completed: false, active: false }));
             game.tasks = [];
         }
 
-        // Выбор случайного задания из пула
         function pickRandomTask() {
             if (game.remainingPool.length === 0) {
                 showToast("Больше нет доступных заданий! Все задания уже выбраны.", true);
@@ -794,7 +819,7 @@
 
         function resetGame() {
             if (confirm('⚠️ ВНИМАНИЕ! Сброс удалит весь текущий прогресс. Начать квест заново?')) {
-                const keys = ['cloverQuestFinalV8'];
+                const keys = ['cloverQuestFinalV9'];
                 keys.forEach(key => localStorage.removeItem(key));
                 localStorage.clear();
                 sessionStorage.setItem('gameReset', 'true');
@@ -849,7 +874,7 @@
             } else {
                 showToast(`❌ Не хватает энергии для ${actionName}! Нужно ${amount}`, true);
                 shakeScreen();
-                if (!game.emergencyUsed && game.gameActive && !game.winFlag && actionName !== "открытия нового задания") {
+                if (!game.emergencyUsed && game.gameActive && !game.winFlag) {
                     game.emergencyUsed = true;
                     game.energy = Math.min(100, game.energy + 20);
                     addChatMessage("⚠️ АКТИВИРОВАН ЭКСТРЕННЫЙ ПРОТОКОЛ: +20 энергии!", true);
@@ -901,34 +926,18 @@
             comboTimerSpan.innerText = `${Math.ceil(game.comboTimeLeft)}с`;
             
             tasksLeftSpan.innerText = game.remainingPool.length;
-            if (game.remainingPool.length === 0 && game.tasks.filter(t=>!t.completed).length === 0 && !game.winFlag) {
-                // Все задания выбраны и выполнены?
-                if (game.completedCount === TASKS_POOL.length && !game.winFlag) {
-                    if (game.totalScore >= 8000) gameWin(true);
-                    else gameLose(`Поражение: вы выполнили все задания, но не набрали нужные 8000 очков (${game.totalScore}/8000). Урожай не спасён.`);
-                }
+            if (game.remainingPool.length === 0 && game.tasks.filter(t=>!t.completed).length === 0 && !game.winFlag && game.gameActive && game.completedCount === TASKS_POOL.length) {
+                if (game.totalScore >= 8000) gameWin();
+                else gameLose(`Поражение: вы выполнили все задания, но не набрали нужные 8000 очков (${game.totalScore}/8000). Урожай не спасён.`);
             }
             renderTasksCarousel();
             renderAchievements();
             updateCanvasBackground();
-            let anyActive = game.tasks.some(t => t.active && !t.completed);
-            if (!anyActive && game.remainingPool.length === 0 && game.completedCount < TASKS_POOL.length && !game.winFlag) {
-                // Нет активных, но есть невыбранные задания – нужно взять новое
-                if (game.remainingPool.length > 0 && game.gameActive && !game.winFlag) {
-                    addChatMessage("Нет активных заданий! Возьми новое через кнопку.");
-                }
-            }
-            // Проверка на выполнение всех заданий
-            if (game.completedCount === TASKS_POOL.length && !game.winFlag && game.gameActive) {
-                if (game.totalScore >= 8000) gameWin(true);
-                else gameLose(`Поражение: вы выполнили все задания, но не набрали нужные 8000 очков (${game.totalScore}/8000). Урожай не спасён.`);
-            }
             if (game.timeLeftSec <= 0 && game.gameActive && !game.winFlag) gameLose("Время вышло. Урожай погиб.");
         }
 
         function renderTasksCarousel() {
             carousel.innerHTML = '';
-            // Показываем только активные/выполненные задания (game.tasks)
             for (let task of game.tasks) {
                 let card = document.createElement('div');
                 let statusClass = 'task-card';
@@ -962,7 +971,6 @@
             });
         }
 
-        // КОМБО
         function updateComboOnComplete() {
             let now = Date.now();
             let timeSinceLast = (now - game.lastCompleteTimestamp) / 1000;
@@ -998,8 +1006,7 @@
             let tasksDone = game.completedCount;
             if (tasksDone > 0 && tasksDone % 5 === 0 && tasksDone !== game.difficulty*5) {
                 game.difficulty++;
-                game.energyCostActivate = Math.min(30, 15 + (game.difficulty-1)*3);
-                addChatMessage(`⚠️ Сложность повышена! Стоимость активации теперь ${game.energyCostActivate} энергии.`, true);
+                addChatMessage(`⚠️ Сложность повышена! Теперь задания сложнее (но энергия не меняется).`, true);
             }
         }
 
@@ -1054,7 +1061,6 @@
                     game.energy = Math.min(100, game.energy + 15);
                     showToast(`🔥 Комбо 3+! +15 энергии`);
                 }
-                // Активация следующего задания не требуется, игрок сам выбирает новое кнопкой
                 increaseDifficulty();
                 showToast(`✅ +${earned} очков! Комбо x${game.comboMultiplier}`);
                 animateScoreGain(earned);
@@ -1068,7 +1074,6 @@
             }
         }
 
-        // Ачивки
         function unlockAchievement(achKey, bonusFunc, bonusText) {
             if (game.achievements[achKey]) return;
             game.achievements[achKey] = true;
@@ -1125,11 +1130,23 @@
                 div.className = 'achievement-badge ' + (unlocked ? 'unlocked' : '');
                 div.innerHTML = `<i class="fas ${unlocked ? 'fa-check-circle' : 'fa-lock'}"></i> ${a.name}`;
                 div.title = a.condition;
+                div.addEventListener('click', () => {
+                    let modal = document.createElement('div');
+                    modal.className = 'achievement-modal';
+                    modal.innerHTML = `
+                        <div class="achievement-content">
+                            <h2><i class="fas fa-medal"></i> ${a.name}</h2>
+                            <p>${a.condition}</p>
+                            <button id="closeAchPop" class="bonus-btn" style="background: var(--accent);">ЗАКРЫТЬ</button>
+                        </div>
+                    `;
+                    document.body.appendChild(modal);
+                    document.getElementById('closeAchPop').onclick = () => modal.remove();
+                });
                 achievementsContainer.appendChild(div);
             }
         }
 
-        // МИНИ-ИГРА
         function startMiniGame() {
             if (!game.gameActive || game.winFlag) return;
             if (minigamePlays >= MAX_MINIGAME_PLAYS) {
@@ -1216,7 +1233,6 @@
             closeBtn.onclick = () => { clearInterval(interval); clearInterval(spawn); modal.remove(); };
         }
 
-        // БОНУС ЧАТА
         function applyChatBonus() {
             if (game.bonusChatUses <= 0 || !game.gameActive || game.winFlag) return;
             if (!spendEnergy(game.energyCostBonus, "бонуса чата")) return;
@@ -1236,7 +1252,6 @@
             saveGame();
         }
 
-        // ВОПРОСЫ ДЛЯ ЭНЕРГИИ
         function askEnergyQuestion() {
             if (!game.gameActive || game.winFlag) return;
             if (game.energyQuestionsUsed >= MAX_ENERGY_QUESTIONS) {
@@ -1246,45 +1261,46 @@
             const q = ENERGY_QUESTIONS[Math.floor(Math.random() * ENERGY_QUESTIONS.length)];
             const modal = document.createElement('div');
             modal.className = 'question-modal';
+            let answersHtml = '';
+            q.answers.forEach((ans, idx) => {
+                answersHtml += `<button class="answer-btn" data-ans="${idx}">${ans}</button>`;
+            });
             modal.innerHTML = `
                 <div class="question-content">
-                    <h2><i class="fas fa-question-circle"></i> Вопрос</h2>
+                    <h2><i class="fas fa-question-circle"></i> ❓ ВОПРОС НА ЭНЕРГИЮ</h2>
                     <p>${q.question}</p>
-                    <input type="text" id="answerInput" placeholder="Ваш ответ" autocomplete="off">
-                    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-                        <button id="submitAnswerBtn" class="bonus-btn">Ответить</button>
-                        <button id="closeQuestionBtn" class="bonus-btn">Закрыть</button>
+                    <div class="answers">
+                        ${answersHtml}
                     </div>
+                    <button id="closeQuestionBtn" class="bonus-btn">Закрыть</button>
                 </div>
             `;
             document.body.appendChild(modal);
-            const input = modal.querySelector('#answerInput');
-            const submitBtn = modal.querySelector('#submitAnswerBtn');
             const closeBtn = modal.querySelector('#closeQuestionBtn');
-            const checkAnswer = () => {
-                const answer = input.value.trim().toLowerCase();
-                const isCorrect = answer === q.answer.toLowerCase();
-                if (isCorrect) {
-                    game.energy = Math.min(100, game.energy + 20);
-                    game.energyQuestionsUsed++;
-                    showToast(`✅ Правильно! +20 энергии. Осталось попыток: ${MAX_ENERGY_QUESTIONS - game.energyQuestionsUsed}`);
-                    addChatMessage(`Ответ на вопрос верный! Получено +20 энергии.`, true);
-                    updateUI();
-                    saveGame();
-                    modal.remove();
-                } else {
-                    showToast(`❌ Неправильно. Попробуйте другой вопрос позже.`, true);
-                    modal.remove();
-                }
-            };
-            submitBtn.onclick = checkAnswer;
+            const answerBtns = modal.querySelectorAll('.answer-btn');
+            answerBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const selectedIdx = parseInt(btn.getAttribute('data-ans'));
+                    if (selectedIdx === q.correct) {
+                        game.energy = Math.min(100, game.energy + 20);
+                        game.energyQuestionsUsed++;
+                        showToast(`✅ Правильно! +20 энергии. Осталось попыток: ${MAX_ENERGY_QUESTIONS - game.energyQuestionsUsed}`);
+                        addChatMessage(`Ответ верный! +20 энергии.`, true);
+                        updateUI();
+                        saveGame();
+                        modal.remove();
+                    } else {
+                        showToast(`❌ Неправильно. Попробуйте другой вопрос позже.`, true);
+                        modal.remove();
+                    }
+                });
+            });
             closeBtn.onclick = () => modal.remove();
-            input.addEventListener('keypress', (e) => { if(e.key === 'Enter') checkAnswer(); });
         }
 
         function aiCommentary() {
             if (!game.gameActive || game.winFlag) return;
-            if (game.energy < 20) addChatMessage("Ты выглядишь уставшей. Энергия на исходе. Рекомендую ответить на вопросы.");
+            if (game.energy < 20) addChatMessage("Ты выглядишь уставшей. Энергия на исходе. Ответь на вопросы!");
             else if (game.comboLevel === 0 && game.completedCount > 2) addChatMessage("Теряешь темп. Без комбо тяжело победить.");
             else if (game.timeLeftSec < 180) addChatMessage("Времени почти не осталось! Давай быстрее, урожай под угрозой!");
             else if (game.totalScore > 6000) addChatMessage("Ты близка к победе. Не расслабляйся, система следит.");
@@ -1305,7 +1321,7 @@
             },8000);
             game.timers.autoChat = setInterval(()=>{
                 if (!game.gameActive || game.winFlag) return;
-                let phrases = ["Наблюдаю за тобой. Комбо держится 5 минут — не спеши.", "Случайные события могут помочь или помешать.", "Сложность растёт с каждым выполненным заданием.", "Энергию можно получить ответив на вопросы."];
+                let phrases = ["Наблюдаю за тобой. Комбо держится 5 минут — не спеши.", "Случайные события могут помочь или помешать.", "Сложность растёт с каждым выполненным заданием.", "Энергию можно получить ответив на вопросы ужасов."];
                 addChatMessage(phrases[Math.floor(Math.random()*phrases.length)]);
                 aiCommentary();
             },25000);
@@ -1383,24 +1399,23 @@
                 lastCompleteTimestamp: game.lastCompleteTimestamp,
                 minigamePlays, minigameClickTotal,
                 difficulty: game.difficulty,
-                energyCostActivate: game.energyCostActivate,
                 doubleNext: game.doubleNext,
                 emergencyUsed: game.emergencyUsed,
                 energyQuestionsUsed: game.energyQuestionsUsed,
-                version: 8
+                version: 9
             };
-            localStorage.setItem('cloverQuestFinalV8', JSON.stringify(save));
+            localStorage.setItem('cloverQuestFinalV9', JSON.stringify(save));
         }
         function loadGame() {
             if (sessionStorage.getItem('gameReset') === 'true') {
                 sessionStorage.removeItem('gameReset');
                 return false;
             }
-            let raw = localStorage.getItem('cloverQuestFinalV8');
+            let raw = localStorage.getItem('cloverQuestFinalV9');
             if (!raw) return false;
             try {
                 let d = JSON.parse(raw);
-                if (d.version !== 8) return false;
+                if (d.version !== 9) return false;
                 game.tasks = d.tasks;
                 game.remainingPool = d.remainingPool;
                 game.completedCount = d.completedCount;
@@ -1415,7 +1430,6 @@
                 game.achievements = d.achievements;
                 game.lastCompleteTimestamp = d.lastCompleteTimestamp;
                 game.difficulty = d.difficulty || 1;
-                game.energyCostActivate = d.energyCostActivate || 15;
                 game.doubleNext = d.doubleNext || 0;
                 game.emergencyUsed = d.emergencyUsed || false;
                 game.energyQuestionsUsed = d.energyQuestionsUsed || 0;
@@ -1432,14 +1446,13 @@
                     <div class="rules-content">
                         <h2><i class="fas fa-strawberry"></i> ПРАВИЛА КВЕСТА 4.0</h2>
                         <ul class="rules-list">
-                            <li><strong>🎯 Цель:</strong> Спасти клубничный урожай, набрав <strong>8000 очков</strong>, выполнив 15 заданий (случайных). Время — <strong>2 часа</strong>.</li>
-                            <li><strong>🍓 Задания:</strong> нажимай «ВЗЯТЬ СЛУЧАЙНОЕ ЗАДАНИЕ», затем выполняй его и отмечай «ВЫПОЛНЕНО».</li>
-                            <li><strong>⚡ Энергия:</strong> тратится на выполнение заданий (25), мини-игру (20) и бонус чата (25). Восстанавливается +3 каждые 8 сек.</li>
-                            <li><strong>❓ Получить энергию:</strong> отвечай на вопросы о слотах Pragmatic Play (до 5 раз за игру).</li>
-                            <li><strong>🔥 Комбо:</strong> выполняй задания быстрее 5 минут — множитель очков растёт (x1 → x3 макс).</li>
-                            <li><strong>🎲 Случайные события:</strong> каждые 45-90 секунд происходят события.</li>
-                            <li><strong>📈 Прогрессия сложности:</strong> после каждых 5 заданий стоимость активации растёт.</li>
-                            <li><strong>🎮 Мини-игра:</strong> лови клубнику, дает очки и энергию (макс 5 раз).</li>
+                            <li><strong>🎯 Цель:</strong> Спасти урожай, набрав <strong>8000 очков</strong>, выполнив 15 случайных заданий. Время — <strong>2 часа</strong>.</li>
+                            <li><strong>🍓 Задания:</strong> нажимай «ВЗЯТЬ СЛУЧАЙНОЕ ЗАДАНИЕ», затем выполняй и отмечай «ВЫПОЛНЕНО».</li>
+                            <li><strong>⚡ Энергия:</strong> тратится везде по <strong>25 единиц</strong> (выполнение, мини-игра, бонус чата). Восстанавливается +3 каждые 8 сек.</li>
+                            <li><strong>❓ Получить энергию:</strong> отвечай на вопросы из мира ужасов (до 5 раз).</li>
+                            <li><strong>🔥 Комбо:</strong> выполняй задания быстрее 5 минут — множитель очков растёт (x1 → x3).</li>
+                            <li><strong>🎲 Случайные события:</strong> каждые 45-90 секунд.</li>
+                            <li><strong>🎮 Мини-игра:</strong> лови клубнику, даёт очки и энергию (макс 5 раз).</li>
                             <li><strong>🆘 Экстренный протокол:</strong> один раз за игру при нехватке энергии система даст +20.</li>
                             <li><strong>💾 Сохранение:</strong> автоматическое. Кнопка "Сбросить квест" полностью очищает прогресс.</li>
                         </ul>
@@ -1483,7 +1496,6 @@
                 initTasksPool();
                 game.gameActive = true;
                 game.lastCompleteTimestamp = Date.now();
-                game.energyCostActivate = 15;
                 addChatMessage("Урожай под угрозой. У тебя 2 часа. Нажимай «ВЗЯТЬ СЛУЧАЙНОЕ ЗАДАНИЕ» и выполняй.");
             } else {
                 addChatMessage("Система перезагружена. Продолжаем спасение урожая.");
