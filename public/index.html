@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>🍓 Спаси клубничный урожай</title>
+    <title>🍓 Клубничная ферма | Спаси урожай и выполняй задания в слотах!</title>
     <style>
         * {
             margin: 0;
@@ -48,13 +48,13 @@
             height: 100%;
             pointer-events: none;
             z-index: 1;
-            opacity: 0.6;
+            opacity: 0.5;
         }
 
         .container {
             position: relative;
             z-index: 2;
-            max-width: 1200px;
+            max-width: 1300px;
             width: 100%;
             margin: 0 auto;
             padding: 20px;
@@ -64,7 +64,7 @@
             gap: 20px;
         }
 
-        /* Шапка со статусом */
+        /* Шапка */
         .header-panel {
             background: var(--bg-card);
             border: 2px solid var(--border);
@@ -155,7 +155,7 @@
         .energy-fill { background: linear-gradient(90deg, var(--accent-soft), var(--accent)); }
         .danger-fill { background: linear-gradient(90deg, var(--accent-gold), #ff3333); }
 
-        /* Основной игровой экран */
+        /* Основной экран */
         .main-game {
             display: grid;
             grid-template-columns: 1fr 1.2fr;
@@ -233,12 +233,12 @@
             background: linear-gradient(135deg, #ffe082, var(--accent-gold));
         }
 
-        /* Список заданий */
+        /* Список заданий (из казино) */
         .task-list {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            max-height: 380px;
+            max-height: 420px;
             overflow-y: auto;
             padding-right: 5px;
         }
@@ -259,6 +259,7 @@
 
         .task-item.active {
             border-color: var(--accent);
+            background: linear-gradient(145deg, #2a1620, #1f0f19);
         }
 
         .task-header {
@@ -274,7 +275,7 @@
             gap: 15px;
         }
 
-        /* Секция Крафта и Лог */
+        /* Кухня */
         .craft-zone {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -301,31 +302,28 @@
             font-family: monospace;
             font-size: 0.85rem;
             color: #bfa3b2;
-            height: 120px;
+            height: 140px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 4px;
         }
 
-        /* Модальные окна */
+        /* Модалки */
         .modal {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(12, 6, 10, 0.85);
+            background: rgba(12, 6, 10, 0.9);
             backdrop-filter: blur(8px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 1000;
-            opacity: 1;
-            transition: opacity 0.3s ease;
         }
 
         .modal.hidden {
             display: none;
-            opacity: 0;
         }
 
         .modal-content {
@@ -381,7 +379,7 @@
             <div class="stats-grid">
                 <div class="stat-badge"><i class="fas fa-seedling"></i> Ягоды: <span id="berriesText">0</span></div>
                 <div class="stat-badge"><i class="fas fa-wine-bottle"></i> Варенье: <span id="jamText">0</span></div>
-                <div class="stat-badge"><i class="fas fa-users"></i> Чат-Донаты: <span id="donationsText">0</span> ₽</div>
+                <div class="stat-badge"><i class="fas fa-users"></i> Донаты: <span id="donationsText">0</span> ₽</div>
             </div>
 
             <div class="progress-container" style="max-width: 300px; width: 100%;">
@@ -392,13 +390,12 @@
 
         <div class="main-game">
             <div class="panel">
-                <div class="panel-title"><i class="fas fa-tasks"></i> Текущие дела на грядках</div>
+                <div class="panel-title"><i class="fas fa-tasks"></i> Задания в казино (Pragmatic Play)</div>
                 <div style="display: flex; gap: 10px;">
-                    <button id="pickTaskBtn" class="btn" style="flex: 1;"><i class="fas fa-plus-circle"></i> Найти задачу</button>
+                    <button id="pickTaskBtn" class="btn" style="flex: 1;"><i class="fas fa-plus-circle"></i> Взять случайное задание</button>
                     <button id="buyEnergyBtn" class="btn btn-gold"><i class="fas fa-bolt"></i> Купить Энергию (-500₽)</button>
                 </div>
-                <div class="task-list" id="taskListContainer">
-                    </div>
+                <div class="task-list" id="taskListContainer"></div>
             </div>
 
             <div class="panel">
@@ -418,8 +415,8 @@
                 </div>
 
                 <div class="craft-card" style="background: linear-gradient(135deg, #2a121d, var(--bg-surface));">
-                    <h4><i class="fas fa-gamepad"></i> Спец-Событие: Сбор ягод на скорость</h4>
-                    <p style="font-size: 0.85rem; color: var(--text-secondary);">Поиграть с чатом в мини-игру (+ягоды!)</p>
+                    <h4><i class="fas fa-gamepad"></i> Спец-событие: Сбор ягод на скорость</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary);">Поиграть с чатом (+ягоды, +энергия)</p>
                     <button id="minigameBtn" class="btn btn-gold"><i class="fas fa-star"></i> Запустить мини-игру</button>
                 </div>
 
@@ -433,25 +430,46 @@
         <div class="modal-content">
             <h3 class="modal-title" id="infoModalTitle">Событие</h3>
             <p id="infoModalDesc"></p>
-            <button onclick="window.closeModal('infoModal')" class="btn">Замечательно</button>
+            <button onclick="window.closeModal('infoModal')" class="btn">Отлично</button>
         </div>
     </div>
 
     <div id="rulesModal" class="modal hidden">
         <div class="modal-content">
-            <h3 class="modal-title">Правила Спасения Урожая</h3>
+            <h3 class="modal-title">Правила фермы и казино</h3>
             <p style="text-align: left; font-size: 0.9rem; line-height: 1.5; color: var(--text-secondary);">
-                1. Твоя цель — собирать ягоды и варить вкусное варенье для подписчиков.<br>
-                2. Задачи требуют энергию, но приносят ягоды и лояльность (донаты).<br>
-                3. Опасность вредителей растет со временем. Модераторы чата могут сбивать её!<br>
-                4. Если опасность достигнет 100%, жуки съедят весь урожай ягод! Не допускай этого.
+                🎰 Твоя задача — выполнять задания в слотах Pragmatic Play. За каждое выполненное задание ты получаешь ягоды и донаты.<br>
+                🍓 Ягоды нужны для варки варенья (продажа варенья приносит донаты).<br>
+                ⚡ Энергия тратится на выполнение заданий и варку варенья. Восстанавливается +2 каждые 5 секунд. Можно купить за донаты.<br>
+                🐛 Угроза вредителей растёт со временем. Если достигнет 100% — жуки съедят часть ягод. Чат может помочь снизить угрозу.<br>
+                🎮 Мини-игра "Сбор ягод" даёт дополнительные ягоды и энергию.<br>
+                🏆 Открывай достижения, зарабатывай больше!
             </p>
-            <button onclick="window.closeModal('rulesModal')" class="btn">Всё понятно!</button>
+            <button onclick="window.closeModal('rulesModal')" class="btn">Понятно!</button>
         </div>
     </div>
 
     <script>
     (function(){
+        // ---------- ПУЛ ЗАДАНИЙ (СЛОТЫ PRAGMATIC PLAY) ----------
+        const TASKS_POOL = [
+            { id: 0, slot: "Wisdom of Athena", condition: "x15", desc: "Достигни множителя x15 в бонусе за 100$", rewardBerries: 25, rewardCash: 300, energyCost: 15 },
+            { id: 1, slot: "Big Bass Trophy Catch", condition: "Выбить бонус", desc: "Выбить бонус по ставке 2.5$", rewardBerries: 28, rewardCash: 350, energyCost: 18 },
+            { id: 2, slot: "Starlight Princess Super Scatter", condition: "Окупить топовую бонуску в х2", desc: "Окупить топовую бонуску в х2", rewardBerries: 32, rewardCash: 400, energyCost: 20 },
+            { id: 3, slot: "Juicy Fruits", condition: "Купить 3 бонуса за 75$", desc: "Купить 3 бонуса за 75$", rewardBerries: 20, rewardCash: 250, energyCost: 12 },
+            { id: 4, slot: "Bigger Barn House Bonanza", condition: "Выбить два бонуса", desc: "Выбить два бонуса в одном сеансе", rewardBerries: 40, rewardCash: 500, energyCost: 25 },
+            { id: 5, slot: "Lobster House", condition: "Поймать линию вилдов в бонуске за 60$", desc: "Поймать линию вилдов в бонуске за 60$", rewardBerries: 35, rewardCash: 450, energyCost: 22 },
+            { id: 6, slot: "3 Buzzing Wilds", condition: "2 пчелки в правой бонуске", desc: "2 пчелки в правой бонуске по любой ставке", rewardBerries: 30, rewardCash: 380, energyCost: 20 },
+            { id: 7, slot: "The Dog House Megaways", condition: "Выбить 4 лапы", desc: "Выбить 4 лапы в бонусе", rewardBerries: 22, rewardCash: 280, energyCost: 14 },
+            { id: 8, slot: "Buffalo King", condition: "Играть пока не надоест Алексею", desc: "Играть в слот пока не надоест Алексею :)", rewardBerries: 25, rewardCash: 300, energyCost: 15 },
+            { id: 9, slot: "Wild West Gold", condition: "х250 в бонуске за 60$", desc: "Сделать х250 в бонуске за 60$", rewardBerries: 45, rewardCash: 600, energyCost: 28 },
+            { id: 10, slot: "Sugar Rush 1000", condition: "Топовый бонус", desc: "Купить топовый бонус по ставке, которую захочет чат", rewardBerries: 50, rewardCash: 700, energyCost: 30 },
+            { id: 11, slot: "Gates of Olympus Super Scatter", condition: "Суперскаттер в бонуске за 80$", desc: "Выбить Суперскаттер в бонуске за 80$", rewardBerries: 42, rewardCash: 550, energyCost: 26 },
+            { id: 12, slot: "Zeus vs Hades", condition: "Две шторы в топовой бонуске", desc: "Поймать две шторы в топовой бонуске", rewardBerries: 38, rewardCash: 480, energyCost: 24 },
+            { id: 13, slot: "Sugar Rush", condition: "Ретриггер", desc: "Выбить ретриггер в бонусе", rewardBerries: 18, rewardCash: 220, energyCost: 10 },
+            { id: 14, slot: "Madam Destiny Megaways", condition: "8х и больше в бонуске за 60$", desc: "Поймать 8х и больше в бонуске за 60$", rewardBerries: 40, rewardCash: 520, energyCost: 25 }
+        ];
+
         // Состояние игры
         let gameState = {
             berries: 0,
@@ -459,129 +477,68 @@
             donations: 1000,
             energy: 100,
             danger: 0,
-            activeTasks: [],
+            activeTasks: [],        // текущие взятые задания (максимум 3)
+            remainingPoolIds: [],   // ID ещё не взятых заданий (чтобы не повторялись)
+            completedTaskIds: [],   // уже выполненные задания (для истории и ачивок)
             unlockedAchievements: []
         };
 
-        // Пул случайных задач
-        const tasksData = [
-            { id: 1, name: "Полить элитные кусты", cost: 15, rewardBerries: 25, rewardCash: 300, desc: "Требуется бережный уход за клубникой сорта 'Гигант'." },
-            { id: 2, name: "Прополоть грядки на стриме", cost: 20, rewardBerries: 35, rewardCash: 500, desc: "Чат активно советует, где вырывать сорняки." },
-            { id: 3, name: "Установить пугало от птиц", cost: 30, rewardBerries: 50, rewardCash: 800, desc: "Птицы пытаются склевать самые спелые ягоды." },
-            { id: 4, name: "Удобрить землю секретным соком", cost: 10, rewardBerries: 20, rewardCash: 200, desc: "Особое эко-удобрение для ускорения роста." },
-            { id: 5, name: "Прогнать наглого крота", cost: 25, rewardBerries: 40, rewardCash: 600, desc: "Крот вырыл нору прямо посреди плантации." }
-        ];
-
-        // DOM элементы
-        const els = {
-            energyText: document.getElementById('energyText'),
-            energyBar: document.getElementById('energyBar'),
-            berriesText: document.getElementById('berriesText'),
-            jamText: document.getElementById('jamText'),
-            donationsText: document.getElementById('donationsText'),
-            dangerText: document.getElementById('dangerText'),
-            dangerBar: document.getElementById('dangerBar'),
-            taskListContainer: document.getElementById('taskListContainer'),
-            logBoxContainer: document.getElementById('logBoxContainer'),
-            pickTaskBtn: document.getElementById('pickTaskBtn'),
-            buyEnergyBtn: document.getElementById('buyEnergyBtn'),
-            craftJamBtn: document.getElementById('craftJamBtn'),
-            bonusChatBtn: document.getElementById('bonusChatBtn'),
-            minigameBtn: document.getElementById('minigameBtn'),
-            rulesBtn: document.getElementById('rulesBtn'),
-            achievementsInfoBtn: document.getElementById('achievementsInfoBtn'),
-            resetGameBtn: document.getElementById('resetGameBtn')
-        };
-
-        // Лог сообщений
-        function addLog(msg) {
-            const p = document.createElement('p');
-            const now = new Date();
-            const timeStr = now.toTimeString().split(' ')[0];
-            p.innerText = `[${timeStr}] ${msg}`;
-            els.logBoxContainer.appendChild(p);
-            els.logBoxContainer.scrollTop = els.logBoxContainer.scrollHeight;
+        // Инициализация пула (все ID)
+        function initPool() {
+            gameState.remainingPoolIds = TASKS_POOL.map(t => t.id);
+            // Если игра новая, activeTasks пуст
         }
 
-        // Обновление UI
-        function updateUI() {
-            els.energyText.innerText = `${gameState.energy}/100`;
-            els.energyBar.style.width = `${gameState.energy}%`;
-            els.berriesText.innerText = gameState.berries;
-            els.jamText.innerText = gameState.jam;
-            els.donationsText.innerText = gameState.donations.toLocaleString();
-            els.dangerText.innerText = `${Math.round(gameState.danger)}%`;
-            els.dangerBar.style.width = `${gameState.danger}%`;
-
-            // Отрисовка списка активных задач
-            els.taskListContainer.innerHTML = '';
-            if (gameState.activeTasks.length === 0) {
-                els.taskListContainer.innerHTML = '<p style="color: var(--text-secondary); text-align:center; padding: 20px;">Нет активных задач. Нажмите "Найти задачу"!</p>';
-            } else {
-                gameState.activeTasks.forEach((task, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'task-item active';
-                    div.innerHTML = `
-                        <div class="task-header">
-                            <span>🍓 ${task.name}</span>
-                            <span style="color: var(--accent-soft); font-size:0.9rem;">-${task.cost} Энерг.</span>
-                        </div>
-                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 4px 0;">${task.desc}</p>
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
-                            <div class="task-rewards">
-                                <span><i class="fas fa-seedling"></i> +${task.rewardBerries}</span>
-                                <span><i class="fas fa-ruble-sign"></i> +${task.rewardCash}</span>
-                            </div>
-                            <button class="btn" style="padding: 6px 12px; font-size:0.85rem;" onclick="window.completeTask(${index})">Выполнить</button>
-                        </div>
-                    `;
-                    els.taskListContainer.appendChild(div);
-                });
-            }
-
-            // Блокировка кнопок по условиям
-            els.buyEnergyBtn.disabled = (gameState.donations < 500 || gameState.energy >= 100);
-            els.craftJamBtn.disabled = (gameState.berries < 15 || gameState.energy < 10);
-        }
-
-        // Модалки глобально доступны
-        window.showModal = function(title, desc) {
-            document.getElementById('infoModalTitle').innerText = title;
-            document.getElementById('infoModalDesc').innerText = desc;
-            document.getElementById('infoModal').classList.remove('hidden');
-        };
-
-        window.closeModal = function(id) {
-            document.getElementById(id).classList.add('hidden');
-        };
-
-        // Механика задач
+        // Взять случайное задание из оставшихся
         function pickRandomTask() {
             if (gameState.activeTasks.length >= 3) {
-                window.showModal("Очередь полна!", "Вы не можете взять больше 3 задач одновременно. Выполните старые.");
+                window.showModal("Очередь полна!", "У вас уже 3 активных задания. Выполните хотя бы одно, прежде чем брать новое.");
                 return;
             }
-            const randTask = tasksData[Math.floor(Math.random() * tasksData.length)];
-            gameState.activeTasks.push({ ...randTask });
-            addLog(`🍓 Взята новая задача: ${randTask.name}`);
+            if (gameState.remainingPoolIds.length === 0) {
+                window.showModal("Задания кончились!", "Вы выполнили все возможные задания. Поздравляем! Теперь можно сосредоточиться на варенье.");
+                return;
+            }
+            const randomIndex = Math.floor(Math.random() * gameState.remainingPoolIds.length);
+            const taskId = gameState.remainingPoolIds[randomIndex];
+            const taskData = TASKS_POOL.find(t => t.id === taskId);
+            if (!taskData) return;
+            // Создаём копию задания с активным флагом
+            const newTask = {
+                id: taskData.id,
+                slot: taskData.slot,
+                condition: taskData.condition,
+                desc: taskData.desc,
+                rewardBerries: taskData.rewardBerries,
+                rewardCash: taskData.rewardCash,
+                energyCost: taskData.energyCost
+            };
+            gameState.activeTasks.push(newTask);
+            // Удаляем из пула
+            gameState.remainingPoolIds.splice(randomIndex, 1);
+            addLog(`🎲 Взято новое задание: ${newTask.slot} — ${newTask.condition}`);
             updateUI();
             saveGame();
         }
 
+        // Выполнить задание по индексу
         window.completeTask = function(index) {
             const task = gameState.activeTasks[index];
             if (!task) return;
-            if (gameState.energy < task.cost) {
-                window.showModal("Усталость!", "Недостаточно энергии для выполнения этой задачи. Купите её или подождите.");
+            if (gameState.energy < task.energyCost) {
+                window.showModal("Не хватает энергии!", "Вам нужно восстановить энергию (купить или подождать).");
                 return;
             }
-
-            gameState.energy -= task.cost;
+            // Тратим энергию
+            gameState.energy -= task.energyCost;
+            // Награда
             gameState.berries += task.rewardBerries;
             gameState.donations += task.rewardCash;
+            // Помечаем как выполненное
+            gameState.completedTaskIds.push(task.id);
+            // Удаляем из активных
             gameState.activeTasks.splice(index, 1);
-
-            addLog(`✅ Выполнено: "${task.name}". Получено +${task.rewardBerries} ягод и +${task.rewardCash}₽ донатов!`);
+            addLog(`✅ Выполнено задание: ${task.slot} — +${task.rewardBerries} ягод, +${task.rewardCash}₽ донатов!`);
             checkAchievements();
             updateUI();
             saveGame();
@@ -594,22 +551,24 @@
                 gameState.energy -= 10;
                 gameState.jam += 1;
                 gameState.donations += 1200;
-                addLog(`🍓 Клубничка сварила баночку фирменного варенья! Чат задонатил +1200₽!`);
+                addLog(`🍓 Сварена баночка варенья! Чат задонатил +1200₽.`);
                 checkAchievements();
                 updateUI();
                 saveGame();
+            } else {
+                window.showModal("Не хватает ресурсов", "Нужно 15 ягод и 10 энергии для варки варенья.");
             }
         }
 
         // Интерактив чата (снижение угрозы)
         function cleanPestsByChat() {
             if (gameState.danger <= 0) {
-                window.showModal("Всё чисто!", "Жуков на грядках пока не видно, помощь модераторов не требуется.");
+                window.showModal("Всё чисто", "Жуков пока нет, помощь не требуется.");
                 return;
             }
             const reduction = 15 + Math.floor(Math.random() * 15);
             gameState.danger = Math.max(0, gameState.danger - reduction);
-            addLog(`💬 Модераторы активировали режим 'Анти-Жук'! Угроза снижена на ${reduction}%`);
+            addLog(`🐞 Модераторы чата прогнали жуков! Угроза снижена на ${reduction}%.`);
             updateUI();
             saveGame();
         }
@@ -619,74 +578,156 @@
             if (gameState.donations >= 500 && gameState.energy < 100) {
                 gameState.donations -= 500;
                 gameState.energy = Math.min(100, gameState.energy + 40);
-                addLog(`⚡ Клубничка выпила энергетический смузи. Восстановлено +40 энергии.`);
+                addLog(`⚡ Куплена энергия (+40). Остаток донатов: ${gameState.donations}₽.`);
                 updateUI();
                 saveGame();
+            } else {
+                window.showModal("Не хватает донатов", "Нужно 500₽ для покупки энергии, или энергия уже полная.");
             }
         }
 
-        // Спец-мини-игра «Сбор ягод»
+        // Мини-игра (сбор ягод)
         function startMiniGame() {
-            addLog(`🎮 Запущена интерактивная игра с чатом...`);
-            const collected = 10 + Math.floor(Math.random() * 25);
+            addLog(`🎮 Запущена мини-игра "Сбор ягод"!`);
+            const collected = 10 + Math.floor(Math.random() * 30);
+            const energyBonus = 5 + Math.floor(Math.random() * 15);
             gameState.berries += collected;
-            window.showModal("Результат мини-игры!", `Стримерша вместе с чатом ловили падающие ягоды и собрали целых +${collected} спелых клубничек!`);
-            addLog(`🎮 Игра окончена. Собрано ягодок: +${collected}`);
+            gameState.energy = Math.min(100, gameState.energy + energyBonus);
+            window.showModal("Итоги мини-игры", `Вы собрали ${collected} ягод и восстановили ${energyBonus} энергии!`);
+            addLog(`🎮 Собрано ягод: +${collected}, энергия +${energyBonus}.`);
             updateUI();
             saveGame();
         }
 
-        // Достижения
+        // Достижения (обновлённые под новую механику)
         function checkAchievements() {
             let newAch = [];
             if (gameState.jam >= 5 && !gameState.unlockedAchievements.includes("Мастер Варенья")) {
                 newAch.push("Мастер Варенья");
             }
-            if (gameState.donations >= 5000 && !gameState.unlockedAchievements.includes("Успешная Стримерша")) {
-                newAch.push("Успешная Стримерша");
+            if (gameState.donations >= 5000 && !gameState.unlockedAchievements.includes("Королева Донатов")) {
+                newAch.push("Королева Донатов");
             }
-            
-            if (newAch.length > 0) {
+            if (gameState.completedTaskIds.length >= 10 && !gameState.unlockedAchievements.includes("Опытный Фермер")) {
+                newAch.push("Опытный Фермер");
+            }
+            if (gameState.berries >= 200 && !gameState.unlockedAchievements.includes("Клубничный Магнат")) {
+                newAch.push("Клубничный Магнат");
+            }
+            if (newAch.length) {
                 newAch.forEach(ach => {
                     gameState.unlockedAchievements.push(ach);
-                    addLog(`🏆 ТРОФЕЙ РАЗБЛОКИРОВАН: [${ach}]!`);
-                    window.showModal("🏆 Новое достижение!", `Вы заслужили трофей: "${ach}"!`);
+                    addLog(`🏆 НОВОЕ ДОСТИЖЕНИЕ: ${ach}!`);
+                    window.showModal("🏆 Достижение!", `Вы открыли "${ach}"!`);
                 });
+                updateUI();
+                saveGame();
             }
         }
 
-        // Сохранение и Загрузка
+        // UI обновление
+        function updateUI() {
+            document.getElementById('energyText').innerText = `${gameState.energy}/100`;
+            document.getElementById('energyBar').style.width = `${gameState.energy}%`;
+            document.getElementById('berriesText').innerText = gameState.berries;
+            document.getElementById('jamText').innerText = gameState.jam;
+            document.getElementById('donationsText').innerText = gameState.donations.toLocaleString();
+            document.getElementById('dangerText').innerText = `${Math.round(gameState.danger)}%`;
+            document.getElementById('dangerBar').style.width = `${gameState.danger}%`;
+
+            // Отрисовка активных заданий
+            const container = document.getElementById('taskListContainer');
+            container.innerHTML = '';
+            if (gameState.activeTasks.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary); text-align:center; padding: 20px;">Нет активных заданий. Нажмите "Взять случайное задание"!</p>';
+            } else {
+                gameState.activeTasks.forEach((task, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'task-item active';
+                    div.innerHTML = `
+                        <div class="task-header">
+                            <span>🎰 ${task.slot}</span>
+                            <span style="color: var(--accent-soft);">-${task.energyCost} 🔋</span>
+                        </div>
+                        <div style="font-size:0.85rem;">${task.desc}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div class="task-rewards">
+                                <span><i class="fas fa-seedling"></i> +${task.rewardBerries}</span>
+                                <span><i class="fas fa-ruble-sign"></i> +${task.rewardCash}</span>
+                            </div>
+                            <button class="btn" style="padding: 6px 12px; font-size:0.8rem;" onclick="window.completeTask(${idx})">Выполнить</button>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+
+            // Блокировка кнопок
+            document.getElementById('buyEnergyBtn').disabled = (gameState.donations < 500 || gameState.energy >= 100);
+            document.getElementById('craftJamBtn').disabled = (gameState.berries < 15 || gameState.energy < 10);
+        }
+
+        // Лог сообщений
+        function addLog(msg) {
+            const logBox = document.getElementById('logBoxContainer');
+            const p = document.createElement('p');
+            const now = new Date();
+            const timeStr = now.toTimeString().split(' ')[0];
+            p.innerText = `[${timeStr}] ${msg}`;
+            logBox.appendChild(p);
+            logBox.scrollTop = logBox.scrollHeight;
+            if (logBox.children.length > 50) logBox.removeChild(logBox.children[0]);
+        }
+
+        // Сохранение/загрузка
         function saveGame() {
             try {
-                localStorage.setItem('strawberry_quest_save', JSON.stringify(gameState));
-            } catch(e) { console.warn("Не удалось сохранить игру", e); }
+                localStorage.setItem('strawberry_casino_quest', JSON.stringify({
+                    berries: gameState.berries,
+                    jam: gameState.jam,
+                    donations: gameState.donations,
+                    energy: gameState.energy,
+                    danger: gameState.danger,
+                    activeTasks: gameState.activeTasks,
+                    remainingPoolIds: gameState.remainingPoolIds,
+                    completedTaskIds: gameState.completedTaskIds,
+                    unlockedAchievements: gameState.unlockedAchievements
+                }));
+            } catch(e) { console.warn(e); }
         }
 
         function loadGame() {
-            const raw = localStorage.getItem('strawberry_quest_save');
-            if (raw) {
-                try {
-                    const parsed = JSON.parse(raw);
-                    if (parsed && typeof parsed === 'object') {
-                        gameState = {
-                            berries: parsed.berries || 0,
-                            jam: parsed.jam || 0,
-                            donations: parsed.donations !== undefined ? parsed.donations : 1000,
-                            energy: parsed.energy !== undefined ? parsed.energy : 100,
-                            danger: parsed.danger || 0,
-                            activeTasks: Array.isArray(parsed.activeTasks) ? parsed.activeTasks : [],
-                            unlockedAchievements: Array.isArray(parsed.unlockedAchievements) ? parsed.unlockedAchievements : []
-                        };
-                    }
-                } catch(e) {
-                    console.error("Ошибка загрузки данных", e);
+            const raw = localStorage.getItem('strawberry_casino_quest');
+            if (!raw) {
+                initPool();
+                return;
+            }
+            try {
+                const data = JSON.parse(raw);
+                gameState.berries = data.berries ?? 0;
+                gameState.jam = data.jam ?? 0;
+                gameState.donations = data.donations ?? 1000;
+                gameState.energy = data.energy ?? 100;
+                gameState.danger = data.danger ?? 0;
+                gameState.activeTasks = Array.isArray(data.activeTasks) ? data.activeTasks : [];
+                gameState.remainingPoolIds = Array.isArray(data.remainingPoolIds) ? data.remainingPoolIds : [];
+                gameState.completedTaskIds = Array.isArray(data.completedTaskIds) ? data.completedTaskIds : [];
+                gameState.unlockedAchievements = Array.isArray(data.unlockedAchievements) ? data.unlockedAchievements : [];
+                // Если пул пуст, но есть задания, которые ещё не выполнены, восстанавливаем пул
+                if (gameState.remainingPoolIds.length === 0 && gameState.completedTaskIds.length < TASKS_POOL.length) {
+                    const allIds = TASKS_POOL.map(t => t.id);
+                    gameState.remainingPoolIds = allIds.filter(id => !gameState.completedTaskIds.includes(id));
                 }
+            } catch(e) {
+                console.error("Ошибка загрузки", e);
+                initPool();
             }
         }
 
+        // Сброс игры
         function resetGame() {
-            if (confirm("Вы уверены, что хотите сбросить весь клубничный прогресс?")) {
-                localStorage.removeItem('strawberry_quest_save');
+            if (confirm("Сбросить весь прогресс? Все ягоды, варенье и задания будут удалены.")) {
+                localStorage.removeItem('strawberry_casino_quest');
                 gameState = {
                     berries: 0,
                     jam: 0,
@@ -694,101 +735,114 @@
                     energy: 100,
                     danger: 0,
                     activeTasks: [],
+                    remainingPoolIds: [],
+                    completedTaskIds: [],
                     unlockedAchievements: []
                 };
-                addLog("♻️ Весь прогресс успешно обнулен. Новая грядка ждет!");
+                initPool();
+                addLog("♻️ Прогресс сброшен. Начинаем с чистого листа!");
                 updateUI();
             }
         }
 
-        // Эффект падающих клубничек на Canvas (скорость зависит от угрозы)
-        const canvasElem = document.getElementById('berryCanvas');
-        const canvasCtx = canvasElem ? canvasElem.getContext('2d') : null;
+        // Модалки
+        window.showModal = function(title, desc) {
+            document.getElementById('infoModalTitle').innerText = title;
+            document.getElementById('infoModalDesc').innerText = desc;
+            document.getElementById('infoModal').classList.remove('hidden');
+        };
+        window.closeModal = function(id) {
+            document.getElementById(id).classList.add('hidden');
+        };
+
+        // Canvas с падающими ягодами (скорость зависит от угрозы)
+        const canvas = document.getElementById('berryCanvas');
+        let ctx = canvas.getContext('2d');
         let berriesArray = [];
-
         function resizeCanvas() {
-            if (canvasElem) {
-                canvasElem.width = window.innerWidth;
-                canvasElem.height = window.innerHeight;
-            }
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
-
         function drawCanvas() {
-            if (!canvasCtx || !canvasElem) return;
-            canvasCtx.clearRect(0, 0, canvasElem.width, canvasElem.height);
-            canvasCtx.shadowBlur = 8;
-            berriesArray.forEach(b => {
-                canvasCtx.beginPath();
-                canvasCtx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-                canvasCtx.fillStyle = b.col;
-                canvasCtx.shadowColor = b.col;
-                canvasCtx.fill();
-                // Скорость зависит от уровня угрозы (и немного от комбо, но тут danger)
-                let speed = b.sp + (gameState.danger / 35);
+            if (!ctx) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.shadowBlur = 6;
+            for (let b of berriesArray) {
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+                ctx.fillStyle = b.col;
+                ctx.shadowColor = b.col;
+                ctx.fill();
+                let speed = b.sp + (gameState.danger / 40);
                 b.y += speed;
-                if (b.y > canvasElem.height + 10) {
-                    b.y = -b.r - 5;
-                    b.x = Math.random() * canvasElem.width;
+                if (b.y > canvas.height + 20) {
+                    b.y = -b.r;
+                    b.x = Math.random() * canvas.width;
                 }
-            });
-            canvasCtx.shadowBlur = 0;
+            }
+            ctx.shadowBlur = 0;
             requestAnimationFrame(drawCanvas);
+        }
+        function initCanvas() {
+            resizeCanvas();
+            for (let i = 0; i < 50; i++) {
+                berriesArray.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: 4 + Math.random() * 8,
+                    sp: 0.4 + Math.random() * 1.2,
+                    col: `hsl(${340 + Math.random() * 20}, 80%, 65%)`
+                });
+            }
+            drawCanvas();
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        // Интервалы: восстановление энергии и рост угрозы
+        function startIntervals() {
+            setInterval(() => {
+                if (gameState.energy < 100) {
+                    gameState.energy = Math.min(100, gameState.energy + 2);
+                    updateUI();
+                    saveGame();
+                }
+            }, 5000);
+            setInterval(() => {
+                gameState.danger = Math.min(100, gameState.danger + 1.5);
+                if (gameState.danger >= 100) {
+                    gameState.danger = 0;
+                    const loss = Math.floor(gameState.berries * 0.3);
+                    gameState.berries = Math.max(0, gameState.berries - loss);
+                    window.showModal("Нашествие вредителей!", `Жуки съели ${loss} ягод! Просите чат помогать.`);
+                    addLog(`🐛 Вредители атаковали! Потеряно ${loss} ягод.`);
+                }
+                updateUI();
+                saveGame();
+            }, 8000);
         }
 
         // Инициализация событий
         function init() {
             loadGame();
+            updateUI();
+            initCanvas();
+            startIntervals();
 
-            els.pickTaskBtn.onclick = pickRandomTask;
-            els.buyEnergyBtn.onclick = buyEnergy;
-            els.craftJamBtn.onclick = craftJam;
-            els.bonusChatBtn.onclick = cleanPestsByChat;
-            els.minigameBtn.onclick = startMiniGame;
-            els.resetGameBtn.onclick = resetGame;
-            
-            els.rulesBtn.onclick = () => document.getElementById('rulesModal').classList.remove('hidden');
-            els.achievementsInfoBtn.onclick = () => {
-                const list = gameState.unlockedAchievements.length > 0 ? gameState.unlockedAchievements.join(", ") : "Пока нет открытых трофеев.";
+            document.getElementById('pickTaskBtn').onclick = pickRandomTask;
+            document.getElementById('buyEnergyBtn').onclick = buyEnergy;
+            document.getElementById('craftJamBtn').onclick = craftJam;
+            document.getElementById('bonusChatBtn').onclick = cleanPestsByChat;
+            document.getElementById('minigameBtn').onclick = startMiniGame;
+            document.getElementById('resetGameBtn').onclick = resetGame;
+            document.getElementById('rulesBtn').onclick = () => document.getElementById('rulesModal').classList.remove('hidden');
+            document.getElementById('achievementsInfoBtn').onclick = () => {
+                const list = gameState.unlockedAchievements.length ? gameState.unlockedAchievements.join(", ") : "Пока нет достижений";
                 window.showModal("Ваши трофеи", list);
             };
-
-            // Безопасный запуск Canvas
-            window.addEventListener('resize', resizeCanvas);
-            resizeCanvas();
-            for (let i = 0; i < 45; i++) {
-                berriesArray.push({
-                    x: Math.random() * (canvasElem ? canvasElem.width : 800),
-                    y: Math.random() * (canvasElem ? canvasElem.height : 600),
-                    r: 4 + Math.random() * 8,
-                    sp: 0.5 + Math.random() * 1.2,
-                    col: `hsl(${340 + Math.random() * 20}, 85%, 65%)`
-                });
-            }
-            drawCanvas();
-
-            // Интервал пассивного восстановления энергии и роста угрозы вредителей
-            setInterval(() => {
-                if (gameState.energy < 100) {
-                    gameState.energy = Math.min(100, gameState.energy + 2);
-                }
-                gameState.danger = Math.min(100, gameState.danger + 1.5);
-                
-                if (gameState.danger >= 100) {
-                    gameState.danger = 0;
-                    const loss = Math.floor(gameState.berries * 0.4);
-                    gameState.berries -= loss;
-                    window.showModal("🚨 Нашествие вредителей!", `Жуки прорвали оборону и съели часть твоего незащищенного урожая: -${loss} ягод! Попросите модераторов чистить грядки чаще.`);
-                    addLog(`🚨 Вредители съели ${loss} ягод из-за пассивности стрима.`);
-                }
-                updateUI();
-                saveGame();
-            }, 5000);
-
-            addLog("🍓 Добро пожаловать на клубничную ферму! Игра успешно загружена.");
-            updateUI();
+            addLog("🍓 Добро пожаловать на Клубничную ферму! Берите задания и спасайте урожай!");
         }
 
-        window.onload = init;
+        init();
     })();
     </script>
 </body>
