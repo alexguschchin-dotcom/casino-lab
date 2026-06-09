@@ -498,7 +498,7 @@
                 </div>
                 <div class="craft-card" style="background: linear-gradient(135deg, #2a121d, var(--bg-surface));">
                     <h4><i class="fas fa-gamepad"></i> Мини-игра «Лови клубнику»</h4>
-                    <p style="font-size: 0.85rem;">За 12 секунд лови ягоды — получишь урожай и энергию!</p>
+                    <p style="font-size: 0.85rem;">За 12 секунд лови ягоды (перезарядка 2 мин)</p>
                     <button id="minigameBtn" class="btn btn-gold"><i class="fas fa-star"></i> Играть</button>
                 </div>
                 <div class="panel-title" style="font-size: 1rem; border: none; padding: 0;"><i class="fas fa-history"></i> Журнал событий</div>
@@ -511,15 +511,15 @@
         <div class="modal-content">
             <h3 class="modal-title">🍓 Правила квеста</h3>
             <div style="text-align: left; font-size: 0.9rem; line-height: 1.5; color: var(--text-secondary);">
-                <p><strong>🎯 Цель:</strong> Выполнить <strong>все 15 заданий</strong> (слоты Pragmatic Play) <strong>и наварить 10 банок варенья</strong>. Как только оба условия выполнены – ты спасла урожай!</p>
-                <p><strong>🍓 Задания:</strong> Нажимай «Взять задание» – оно выбирается случайно из пула (без повторов). Каждое задание требует <strong>25 энергии</strong> и даёт ягоды и донаты.</p>
-                <p><strong>⚡ Энергия:</strong> тратится на выполнение заданий (25), варку варенья (10) и мини-игру (5). Восстанавливается +2 каждые 5 секунд, можно купить за 500 донатов (+40 энергии).</p>
+                <p><strong>🎯 Цель:</strong> Выполнить <strong>все 15 заданий</strong> (слоты Pragmatic Play) <strong>и наварить 10 банок варенья</strong>. Квест рассчитан примерно на <strong>1.5 часа</strong> активной игры.</p>
+                <p><strong>🍓 Задания:</strong> Нажимай «Взять задание» – оно выбирается случайно из пула (без повторов). Каждое задание требует <strong>30 энергии</strong> и даёт ягоды и донаты.</p>
+                <p><strong>⚡ Энергия:</strong> тратится на выполнение заданий (30), варку варенья (10) и мини-игру (5). Восстанавливается <strong>+1 каждые 15 секунд</strong> (~4 в минуту). Можно купить за 500 донатов (+40 энергии).</p>
                 <p><strong>💰 Донаты:</strong> даются за задания и варку варенья. Покупай энергию, если не хватает.</p>
                 <p><strong>🍯 Варенье:</strong> 15 ягод + 10 энергии → 1 банка варенья + 1200 донатов. <strong>Нужно 10 банок.</strong></p>
                 <p><strong>🐛 Угроза вредителей:</strong> растёт сама (+1.5% каждые 8 сек). При 100% — жуки съедают 30% ягод. Чат может снизить угрозу на 15–30% (кнопка «Позвать модераторов»).</p>
-                <p><strong>🎮 Мини-игра:</strong> «Лови клубнику» — за 12 секунд лови падающие ягоды. Каждая ягода +1 к счёту, комбо растёт при быстрых кликах. Награда: ягоды = пойманные × 2, энергия +5, плюс бонус за комбо.</p>
+                <p><strong>🎮 Мини-игра:</strong> «Лови клубнику» — за 12 секунд лови падающие ягоды. <strong>Перезарядка 2 минуты</strong> (чтобы не фармить). Награда: ягоды = пойманные × 2 + бонус комбо, энергия +5.</p>
                 <p><strong>🏆 Прогресс:</strong> Кнопка «Прогресс» покажет, сколько заданий выполнено и банок сварено.</p>
-                <p><em>Игра сохраняется автоматически. Стримерша, удачи!</em></p>
+                <p><em>Игра сохраняется автоматически. Удачи!</em></p>
             </div>
             <button id="closeRulesModalBtn" class="btn btn-secondary">Понятно, погнали!</button>
         </div>
@@ -541,21 +541,21 @@
     (function(){
         // --- Пул заданий (15 штук) ---
         const TASKS_POOL = [
-            { id: 0, slot: "Wisdom of Athena", desc: "Достигни множителя x15 в бонусе за 100$", rewardBerries: 25, rewardCash: 300, energyCost: 25 },
-            { id: 1, slot: "Big Bass Trophy Catch", desc: "Выбить бонус по ставке 2.5$", rewardBerries: 28, rewardCash: 350, energyCost: 25 },
-            { id: 2, slot: "Starlight Princess Super Scatter", desc: "Окупить топовую бонуску в х2", rewardBerries: 32, rewardCash: 400, energyCost: 25 },
-            { id: 3, slot: "Juicy Fruits", desc: "Купить 3 бонуса за 75$", rewardBerries: 20, rewardCash: 250, energyCost: 25 },
-            { id: 4, slot: "Bigger Barn House Bonanza", desc: "Выбить два бонуса в одном сеансе", rewardBerries: 40, rewardCash: 500, energyCost: 25 },
-            { id: 5, slot: "Lobster House", desc: "Поймать линию вилдов в бонуске за 60$", rewardBerries: 35, rewardCash: 450, energyCost: 25 },
-            { id: 6, slot: "3 Buzzing Wilds", desc: "2 пчелки в правой бонуске по любой ставке", rewardBerries: 30, rewardCash: 380, energyCost: 25 },
-            { id: 7, slot: "The Dog House Megaways", desc: "Выбить 4 лапы в бонусе", rewardBerries: 22, rewardCash: 280, energyCost: 25 },
-            { id: 8, slot: "Buffalo King", desc: "Играть пока не надоест Алексею :)", rewardBerries: 25, rewardCash: 300, energyCost: 25 },
-            { id: 9, slot: "Wild West Gold", desc: "Сделать х250 в бонуске за 60$", rewardBerries: 45, rewardCash: 600, energyCost: 25 },
-            { id: 10, slot: "Sugar Rush 1000", desc: "Купить топовый бонус по ставке чата", rewardBerries: 50, rewardCash: 700, energyCost: 25 },
-            { id: 11, slot: "Gates of Olympus Super Scatter", desc: "Выбить Суперскаттер в бонуске за 80$", rewardBerries: 42, rewardCash: 550, energyCost: 25 },
-            { id: 12, slot: "Zeus vs Hades", desc: "Поймать две шторы в топовой бонуске", rewardBerries: 38, rewardCash: 480, energyCost: 25 },
-            { id: 13, slot: "Sugar Rush", desc: "Выбить ретриггер в бонусе", rewardBerries: 18, rewardCash: 220, energyCost: 25 },
-            { id: 14, slot: "Madam Destiny Megaways", desc: "Поймать 8х и больше в бонуске за 60$", rewardBerries: 40, rewardCash: 520, energyCost: 25 }
+            { id: 0, slot: "Wisdom of Athena", desc: "Достигни множителя x15 в бонусе за 100$", rewardBerries: 35, rewardCash: 400, energyCost: 30 },
+            { id: 1, slot: "Big Bass Trophy Catch", desc: "Выбить бонус по ставке 2.5$", rewardBerries: 38, rewardCash: 450, energyCost: 30 },
+            { id: 2, slot: "Starlight Princess Super Scatter", desc: "Окупить топовую бонуску в х2", rewardBerries: 42, rewardCash: 500, energyCost: 30 },
+            { id: 3, slot: "Juicy Fruits", desc: "Купить 3 бонуса за 75$", rewardBerries: 30, rewardCash: 350, energyCost: 30 },
+            { id: 4, slot: "Bigger Barn House Bonanza", desc: "Выбить два бонуса в одном сеансе", rewardBerries: 50, rewardCash: 600, energyCost: 30 },
+            { id: 5, slot: "Lobster House", desc: "Поймать линию вилдов в бонуске за 60$", rewardBerries: 45, rewardCash: 550, energyCost: 30 },
+            { id: 6, slot: "3 Buzzing Wilds", desc: "2 пчелки в правой бонуске по любой ставке", rewardBerries: 40, rewardCash: 480, energyCost: 30 },
+            { id: 7, slot: "The Dog House Megaways", desc: "Выбить 4 лапы в бонусе", rewardBerries: 32, rewardCash: 380, energyCost: 30 },
+            { id: 8, slot: "Buffalo King", desc: "Играть пока не надоест Алексею :)", rewardBerries: 35, rewardCash: 400, energyCost: 30 },
+            { id: 9, slot: "Wild West Gold", desc: "Сделать х250 в бонуске за 60$", rewardBerries: 55, rewardCash: 700, energyCost: 30 },
+            { id: 10, slot: "Sugar Rush 1000", desc: "Купить топовый бонус по ставке чата", rewardBerries: 60, rewardCash: 800, energyCost: 30 },
+            { id: 11, slot: "Gates of Olympus Super Scatter", desc: "Выбить Суперскаттер в бонуске за 80$", rewardBerries: 52, rewardCash: 650, energyCost: 30 },
+            { id: 12, slot: "Zeus vs Hades", desc: "Поймать две шторы в топовой бонуске", rewardBerries: 48, rewardCash: 580, energyCost: 30 },
+            { id: 13, slot: "Sugar Rush", desc: "Выбить ретриггер в бонусе", rewardBerries: 28, rewardCash: 320, energyCost: 30 },
+            { id: 14, slot: "Madam Destiny Megaways", desc: "Поймать 8х и больше в бонуске за 60$", rewardBerries: 50, rewardCash: 620, energyCost: 30 }
         ];
 
         let gameState = {
@@ -568,7 +568,8 @@
             remainingPoolIds: [],
             completedTaskIds: [],
             gameActive: true,
-            victory: false
+            victory: false,
+            lastMiniGameTime: 0
         };
 
         let isSoundEnabled = true;
@@ -765,14 +766,21 @@
             }
         }
 
-        // --- МИНИ-ИГРА «Лови клубнику» (динамическая) ---
+        // --- МИНИ-ИГРА с кулдауном 2 минуты ---
         function startMiniGame() {
             if (!gameState.gameActive || gameState.victory) return;
+            const now = Date.now();
+            if (gameState.lastMiniGameTime && (now - gameState.lastMiniGameTime) < 120000) {
+                const remain = Math.ceil((120000 - (now - gameState.lastMiniGameTime)) / 1000);
+                showToast(`Мини-игра перезаряжается: ${remain} сек`, "⏳");
+                return;
+            }
             if (gameState.energy < 5) {
                 showToast("Не хватает энергии для мини-игры (нужно 5)", "⚡");
                 return;
             }
             gameState.energy -= 5;
+            gameState.lastMiniGameTime = now;
             updateUI();
             // создаём модалку мини-игры
             const modal = document.createElement('div');
@@ -820,7 +828,6 @@
                     scoreSpan.innerText = score;
                     comboSpan.innerText = combo;
                     berry.remove();
-                    // визуальный эффект "+комбо"
                     const pop = document.createElement('div');
                     pop.innerText = `+${combo}`;
                     pop.style.position = 'absolute';
@@ -926,7 +933,7 @@
         // --- Сохранение / загрузка ---
         function saveGame() {
             try {
-                localStorage.setItem('strawberry_quest_v2', JSON.stringify({
+                localStorage.setItem('strawberry_quest_v3', JSON.stringify({
                     berries: gameState.berries,
                     jam: gameState.jam,
                     donations: gameState.donations,
@@ -936,13 +943,14 @@
                     completedTaskIds: gameState.completedTaskIds,
                     remainingPoolIds: gameState.remainingPoolIds,
                     gameActive: gameState.gameActive,
-                    victory: gameState.victory
+                    victory: gameState.victory,
+                    lastMiniGameTime: gameState.lastMiniGameTime
                 }));
             } catch(e) {}
         }
 
         function loadGame() {
-            const raw = localStorage.getItem('strawberry_quest_v2');
+            const raw = localStorage.getItem('strawberry_quest_v3');
             if (!raw) {
                 initPool();
                 return;
@@ -959,6 +967,7 @@
                 gameState.remainingPoolIds = Array.isArray(data.remainingPoolIds) ? data.remainingPoolIds : [];
                 gameState.gameActive = data.gameActive !== undefined ? data.gameActive : true;
                 gameState.victory = data.victory || false;
+                gameState.lastMiniGameTime = data.lastMiniGameTime || 0;
                 if (gameState.victory) gameState.gameActive = false;
                 const allIds = TASKS_POOL.map(t => t.id);
                 if (gameState.remainingPoolIds.length === 0 && gameState.completedTaskIds.length < TASKS_POOL.length) {
@@ -969,7 +978,7 @@
 
         function resetGame() {
             if (confirm("Сбросить весь прогресс? Все ягоды, варенье и задания будут удалены.")) {
-                localStorage.removeItem('strawberry_quest_v2');
+                localStorage.removeItem('strawberry_quest_v3');
                 location.reload();
             }
         }
@@ -1018,17 +1027,17 @@
         }
         window.addEventListener('resize', resizeCanvas);
 
-        // --- Интервалы (энергия, угроза) ---
+        // --- Интервалы (энергия +1/15сек, угроза) ---
         function startIntervals() {
             if (intervals.energy) clearInterval(intervals.energy);
             if (intervals.danger) clearInterval(intervals.danger);
             intervals.energy = setInterval(() => {
                 if (gameState.gameActive && !gameState.victory && gameState.energy < 100) {
-                    gameState.energy = Math.min(100, gameState.energy + 2);
+                    gameState.energy = Math.min(100, gameState.energy + 1);
                     updateUI();
                     saveGame();
                 }
-            }, 5000);
+            }, 15000); // +1 каждые 15 секунд
             intervals.danger = setInterval(() => {
                 if (gameState.gameActive && !gameState.victory) {
                     gameState.danger = Math.min(100, gameState.danger + 1.5);
@@ -1073,7 +1082,7 @@
             document.body.addEventListener('click', () => { initAudio(); }, { once: true });
 
             // Правила (обязательно при первом запуске)
-            const isFirstRun = !localStorage.getItem('strawberry_quest_v2');
+            const isFirstRun = !localStorage.getItem('strawberry_quest_v3');
             if (isFirstRun) {
                 document.getElementById('rulesModal').classList.remove('hidden');
             }
@@ -1088,7 +1097,6 @@
             };
             document.getElementById('closeProgressBtn').onclick = () => document.getElementById('progressModal').classList.add('hidden');
 
-            // Если уже победа, блокируем кнопки
             if (gameState.victory) {
                 document.getElementById('pickTaskBtn').disabled = true;
                 document.getElementById('buyEnergyBtn').disabled = true;
@@ -1097,7 +1105,7 @@
                 document.getElementById('minigameBtn').disabled = true;
             }
 
-            addLog("🍓 Квест запущен! Цель: 15 заданий и 10 банок варенья.", 'system');
+            addLog("🍓 Квест запущен! Цель: 15 заданий и 10 банок варенья. Энергия восстанавливается медленно — береги ресурсы!", 'system');
         }
 
         init();
