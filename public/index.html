@@ -308,7 +308,6 @@
             padding: 12px;
             font-family: monospace;
             font-size: 0.85rem;
-            color: #bfa3b2;
             height: 140px;
             overflow-y: auto;
             display: flex;
@@ -347,7 +346,7 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
-        /* Модалки (оставлены только для правил и достижений) */
+        /* Модалки */
         .modal {
             position: fixed;
             top: 0; left: 0;
@@ -371,6 +370,8 @@
             padding: 32px;
             max-width: 500px;
             width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
             box-shadow: var(--shadow);
             text-align: center;
             display: flex;
@@ -477,13 +478,20 @@
                 🎮 Мини-игра "Сбор ягод" даёт дополнительные ягоды и энергию.<br>
                 🏆 Открывай достижения, зарабатывай больше!
             </p>
-            <button onclick="closeRulesModal()" class="btn">Понятно!</button>
+            <button id="closeRulesModalBtn" class="btn btn-secondary">Понятно!</button>
+        </div>
+    </div>
+
+    <div id="achievementsModal" class="modal hidden">
+        <div class="modal-content">
+            <h3 class="modal-title">Ваши Трофеи</h3>
+            <p id="achievementsListContent" style="font-size: 1rem; color: var(--text-secondary);"></p>
+            <button id="closeAchBtn" class="btn btn-secondary">Отлично</button>
         </div>
     </div>
 
     <script>
     (function(){
-        // ---------- ПУЛ ЗАДАНИЙ (СЛОТЫ PRAGMATIC PLAY) ----------
         const TASKS_POOL = [
             { id: 0, slot: "Wisdom of Athena", condition: "x15", desc: "Достигни множителя x15 в бонусе за 100$", rewardBerries: 25, rewardCash: 300, energyCost: 15 },
             { id: 1, slot: "Big Bass Trophy Catch", condition: "Выбить бонус", desc: "Выбить бонус по ставке 2.5$", rewardBerries: 28, rewardCash: 350, energyCost: 18 },
@@ -502,7 +510,6 @@
             { id: 14, slot: "Madam Destiny Megaways", condition: "8х и больше в бонуске за 60$", desc: "Поймать 8х и больше в бонуске за 60$", rewardBerries: 40, rewardCash: 520, energyCost: 25 }
         ];
 
-        // Состояние игры
         let gameState = {
             berries: 0,
             jam: 0,
@@ -517,6 +524,8 @@
 
         let isSoundEnabled = true;
         let audioCtx = null;
+        let visualDanger = 0;
+        let intervals = { energy: null, danger: null };
 
         function initAudio() {
             if (!audioCtx) {
@@ -527,9 +536,8 @@
         function playSound(type) {
             if (!isSoundEnabled) return;
             initAudio();
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
             osc.connect(gainNode);
@@ -538,25 +546,25 @@
 
             if (type === 'click') {
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(600, now);
-                osc.frequency.exponentialRampToValueAtTime(200, now + 0.08);
+                osc.frequency.setValueAtTime(500, now);
+                osc.frequency.exponentialRampToValueAtTime(150, now + 0.1);
                 gainNode.gain.setValueAtTime(0.1, now);
-                gainNode.gain.linearRampToValueAtTime(0, now + 0.08);
-                osc.start(now); osc.stop(now + 0.08);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
             } else if (type === 'success') {
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(300, now);
-                osc.frequency.setValueAtTime(400, now + 0.06);
-                osc.frequency.setValueAtTime(600, now + 0.12);
+                osc.frequency.setValueAtTime(260, now);
+                osc.frequency.setValueAtTime(390, now + 0.08);
+                osc.frequency.setValueAtTime(520, now + 0.16);
                 gainNode.gain.setValueAtTime(0.15, now);
-                gainNode.gain.linearRampToValueAtTime(0, now + 0.3);
-                osc.start(now); osc.stop(now + 0.3);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.start(now); osc.stop(now + 0.35);
             } else if (type === 'alarm') {
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(150, now);
-                osc.frequency.linearRampToValueAtTime(250, now + 0.15);
+                osc.frequency.setValueAtTime(120, now);
+                osc.frequency.linearRampToValueAtTime(220, now + 0.2);
                 gainNode.gain.setValueAtTime(0.08, now);
-                gainNode.gain.linearRampToValueAtTime(0, now + 0.2);
+                gainNode.gain.linearRampToValueAtTime(0.01, now + 0.2);
                 osc.start(now); osc.stop(now + 0.2);
             }
         }
@@ -595,26 +603,19 @@
             const taskData = TASKS_POOL.find(t => t.id === taskId);
             if (!taskData) return;
 
-            const newTask = {
-                id: taskData.id,
-                slot: taskData.slot,
-                condition: taskData.condition,
-                desc: taskData.desc,
-                rewardBerries: taskData.rewardBerries,
-                rewardCash: taskData.rewardCash,
-                energyCost: taskData.energyCost
-            };
-            gameState.activeTasks.push(newTask);
+            gameState.activeTasks.push({...taskData});
             gameState.remainingPoolIds.splice(randomIndex, 1);
-            addLog(`🎲 Взято задание: ${newTask.slot}`);
+            addLog(`🎲 Взято задание: ${taskData.slot}`, 'system');
             updateUI();
             saveGame();
         }
 
-        window.completeTask = function(index) {
+        function executeTask(taskId) {
             playSound('click');
+            const index = gameState.activeTasks.findIndex(t => t.id === taskId);
+            if (index === -1) return;
             const task = gameState.activeTasks[index];
-            if (!task) return;
+            
             if (gameState.energy < task.energyCost) {
                 showToast("Не хватает энергии!", "⚡");
                 return;
@@ -627,11 +628,11 @@
 
             playSound('success');
             showToast(`Выполнено: +${task.rewardCash}₽!`, "💰");
-            addLog(`✅ Выполнено: ${task.slot} (+${task.rewardBerries} ягод, +${task.rewardCash}₽)`);
+            addLog(`✅ Выполнено: ${task.slot} (+${task.rewardBerries} ягод, +${task.rewardCash}₽)`, 'success');
             checkAchievements();
             updateUI();
             saveGame();
-        };
+        }
 
         function craftJam() {
             if (gameState.berries >= 15 && gameState.energy >= 10) {
@@ -641,7 +642,7 @@
                 gameState.donations += 1200;
                 playSound('success');
                 showToast("Фирменное варенье готово! +1200₽", "🍯");
-                addLog(`🍓 Сварена баночка варенья! Чат задонатил +1200₽.`);
+                addLog(`🍓 Сварена баночка варенья! Чат задонатил +1200₽.`, 'success');
                 checkAchievements();
                 updateUI();
                 saveGame();
@@ -659,7 +660,7 @@
             const reduction = 15 + Math.floor(Math.random() * 15);
             gameState.danger = Math.max(0, gameState.danger - reduction);
             showToast(`Угроза снижена на ${reduction}%!`, "🛡️");
-            addLog(`🐞 Модераторы чата прогнали жуков! Угроза снижена на ${reduction}%.`);
+            addLog(`🐞 Модераторы чата прогнали жуков! Угроза снижена на ${reduction}%.`, 'system');
             updateUI();
             saveGame();
         }
@@ -686,7 +687,7 @@
             gameState.berries += collected;
             gameState.energy = Math.min(100, gameState.energy + energyBonus);
             showToast(`Вы собрали ${collected} ягод и +${energyBonus} энергии!`, "🍓");
-            addLog(`🎮 Собрано ягод: +${collected}, энергия +${energyBonus}.`);
+            addLog(`🎮 Собрано ягод: +${collected}, энергия +${energyBonus}.`, 'success');
             checkAchievements();
             updateUI();
             saveGame();
@@ -694,23 +695,16 @@
 
         function checkAchievements() {
             let newAch = [];
-            if (gameState.jam >= 5 && !gameState.unlockedAchievements.includes("Мастер Варенья")) {
-                newAch.push("Мастер Варенья");
-            }
-            if (gameState.donations >= 5000 && !gameState.unlockedAchievements.includes("Королева Донатов")) {
-                newAch.push("Королева Донатов");
-            }
-            if (gameState.completedTaskIds.length >= 10 && !gameState.unlockedAchievements.includes("Опытный Фермер")) {
-                newAch.push("Опытный Фермер");
-            }
-            if (gameState.berries >= 200 && !gameState.unlockedAchievements.includes("Клубничный Магнат")) {
-                newAch.push("Клубничный Магнат");
-            }
+            if (gameState.jam >= 5 && !gameState.unlockedAchievements.includes("Мастер Варенья")) newAch.push("Мастер Варенья");
+            if (gameState.donations >= 5000 && !gameState.unlockedAchievements.includes("Королева Донатов")) newAch.push("Королева Донатов");
+            if (gameState.completedTaskIds.length >= 10 && !gameState.unlockedAchievements.includes("Опытный Фермер")) newAch.push("Опытный Фермер");
+            if (gameState.berries >= 200 && !gameState.unlockedAchievements.includes("Клубничный Магнат")) newAch.push("Клубничный Магнат");
+            
             if (newAch.length) {
                 newAch.forEach(ach => {
                     gameState.unlockedAchievements.push(ach);
                     playSound('success');
-                    addLog(`🏆 НОВОЕ ДОСТИЖЕНИЕ: ${ach}!`);
+                    addLog(`🏆 ТРОФЕЙ ПОЛУЧЕН: ${ach}!`, 'warning');
                     showToast(`Получен трофей: ${ach}!`, "🏆");
                 });
                 updateUI();
@@ -729,10 +723,11 @@
 
             const container = document.getElementById('taskListContainer');
             container.innerHTML = '';
+            
             if (gameState.activeTasks.length === 0) {
                 container.innerHTML = '<p style="color: var(--text-secondary); text-align:center; padding: 20px;">Нет активных заданий. Нажмите "Взять случайное задание"!</p>';
             } else {
-                gameState.activeTasks.forEach((task, idx) => {
+                gameState.activeTasks.forEach((task) => {
                     const div = document.createElement('div');
                     div.className = 'task-item active';
                     div.innerHTML = `
@@ -746,9 +741,10 @@
                                 <span><i class="fas fa-seedling"></i> +${task.rewardBerries}</span>
                                 <span><i class="fas fa-ruble-sign"></i> +${task.rewardCash}</span>
                             </div>
-                            <button class="btn" style="padding: 6px 12px; font-size:0.8rem;" onclick="window.completeTask(${idx})">Выполнить</button>
+                            <button class="btn btn-execute" style="padding: 6px 12px; font-size:0.8rem;">Выполнить</button>
                         </div>
                     `;
+                    div.querySelector('.btn-execute').addEventListener('click', () => executeTask(task.id));
                     container.appendChild(div);
                 });
             }
@@ -757,12 +753,15 @@
             document.getElementById('craftJamBtn').disabled = (gameState.berries < 15 || gameState.energy < 10);
         }
 
-        function addLog(msg) {
+        function addLog(msg, type = 'normal') {
             const logBox = document.getElementById('logBoxContainer');
             const p = document.createElement('p');
             const now = new Date();
             const timeStr = now.toTimeString().split(' ')[0];
             p.innerText = `[${timeStr}] ${msg}`;
+            if (type === 'success') p.style.color = '#81c784';
+            if (type === 'warning') p.style.color = '#ffd54f';
+            if (type === 'system') p.style.color = '#64b5f6';
             logBox.appendChild(p);
             logBox.scrollTop = logBox.scrollHeight;
             if (logBox.children.length > 50) logBox.removeChild(logBox.children[0]);
@@ -788,14 +787,11 @@
                 gameState.energy = data.energy ?? 100;
                 gameState.danger = data.danger ?? 0;
                 gameState.activeTasks = Array.isArray(data.activeTasks) ? data.activeTasks : [];
-                gameState.remainingPoolIds = Array.isArray(data.remainingPoolIds) ? data.remainingPoolIds : [];
                 gameState.completedTaskIds = Array.isArray(data.completedTaskIds) ? data.completedTaskIds : [];
                 gameState.unlockedAchievements = Array.isArray(data.unlockedAchievements) ? data.unlockedAchievements : [];
                 
-                if (gameState.remainingPoolIds.length === 0 && gameState.completedTaskIds.length < TASKS_POOL.length) {
-                    const allIds = TASKS_POOL.map(t => t.id);
-                    gameState.remainingPoolIds = allIds.filter(id => !gameState.completedTaskIds.includes(id));
-                }
+                const allIds = TASKS_POOL.map(t => t.id);
+                gameState.remainingPoolIds = allIds.filter(id => !gameState.completedTaskIds.includes(id) && !gameState.activeTasks.some(t => t.id === id));
             } catch(e) {
                 console.error("Ошибка загрузки", e);
                 initPool();
@@ -818,33 +814,34 @@
                     unlockedAchievements: []
                 };
                 initPool();
-                addLog("♻️ Прогресс сброшен. Начинаем с чистого листа!");
+                addLog("♻️ Прогресс сброшен. Начинаем с чистого листа!", 'warning');
                 updateUI();
             }
         }
 
-        window.closeRulesModal = function() {
-            document.getElementById('rulesModal').classList.add('hidden');
-        };
-
+        // --- Canvas с плавной анимацией ---
         const canvas = document.getElementById('berryCanvas');
         let ctx = canvas.getContext('2d');
         let berriesArray = [];
+        
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
+        
         function drawCanvas() {
             if (!ctx) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.shadowBlur = 6;
+            
+            visualDanger += (gameState.danger - visualDanger) * 0.05;
             for (let b of berriesArray) {
                 ctx.beginPath();
                 ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
                 ctx.fillStyle = b.col;
                 ctx.shadowColor = b.col;
                 ctx.fill();
-                let speed = b.sp + (gameState.danger / 40);
+                let speed = b.sp + (visualDanger / 40);
                 b.y += speed;
                 if (b.y > canvas.height + 20) {
                     b.y = -b.r;
@@ -854,6 +851,7 @@
             ctx.shadowBlur = 0;
             requestAnimationFrame(drawCanvas);
         }
+        
         function initCanvas() {
             resizeCanvas();
             for (let i = 0; i < 50; i++) {
@@ -870,14 +868,19 @@
         window.addEventListener('resize', resizeCanvas);
 
         function startIntervals() {
-            setInterval(() => {
+            // Очищаем старые интервалы, если они есть
+            if (intervals.energy) clearInterval(intervals.energy);
+            if (intervals.danger) clearInterval(intervals.danger);
+            
+            intervals.energy = setInterval(() => {
                 if (gameState.energy < 100) {
                     gameState.energy = Math.min(100, gameState.energy + 2);
                     updateUI();
                     saveGame();
                 }
             }, 5000);
-            setInterval(() => {
+            
+            intervals.danger = setInterval(() => {
                 gameState.danger = Math.min(100, gameState.danger + 1.5);
                 if (gameState.danger >= 100) {
                     playSound('alarm');
@@ -885,13 +888,14 @@
                     const loss = Math.floor(gameState.berries * 0.3);
                     gameState.berries = Math.max(0, gameState.berries - loss);
                     showToast(`Вредители съели ${loss} ягод! Зовите чат!`, "🐛");
-                    addLog(`🐛 Вредители атаковали! Потеряно ${loss} ягод.`);
+                    addLog(`🐛 Вредители атаковали! Потеряно ${loss} ягод.`, 'warning');
                 }
                 updateUI();
                 saveGame();
             }, 8000);
         }
 
+        // --- Инициализация ---
         function init() {
             loadGame();
             updateUI();
@@ -918,11 +922,16 @@
 
             document.body.addEventListener('click', () => { initAudio(); }, { once: true });
             document.getElementById('rulesBtn').onclick = () => document.getElementById('rulesModal').classList.remove('hidden');
+            document.getElementById('closeRulesModalBtn').onclick = () => document.getElementById('rulesModal').classList.add('hidden');
+            
             document.getElementById('achievementsInfoBtn').onclick = () => {
-                const list = gameState.unlockedAchievements.length ? gameState.unlockedAchievements.join(", ") : "Пока нет достижений";
-                showToast(`Ваши трофеи: ${list}`, "🏆");
+                const list = gameState.unlockedAchievements.length ? gameState.unlockedAchievements.join(", ") : "Пока нет достижений. Выполняйте задания в слотах!";
+                document.getElementById('achievementsListContent').innerText = list;
+                document.getElementById('achievementsModal').classList.remove('hidden');
             };
-            addLog("🍓 Добро пожаловать на Клубничную ферму! Берите задания и спасайте урожай!");
+            document.getElementById('closeAchBtn').onclick = () => document.getElementById('achievementsModal').classList.add('hidden');
+
+            addLog("🍓 Добро пожаловать на Клубничную ферму! Берите задания и спасайте урожай!", 'system');
         }
 
         init();
