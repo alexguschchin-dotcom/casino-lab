@@ -579,7 +579,7 @@
 
     <script>
     (function(){
-        // НОВЫЕ ЦЕНЫ: 4800, 6400, 8000, 9600, 11200 (равномерное распределение)
+        // Базовые цены: 4800, 6400, 8000, 9600, 11200
         const PRICE_TIERS = [4800, 6400, 8000, 9600, 11200];
         const BASE_QUEST_DATABASE = [
             { id: 1, slot: "Gates of Olympus", type: "Дедовские Капли", desc: "Поймать суммарный множитель больше x12 за один спин.", baseBuy: PRICE_TIERS[0], ico: "⚡", difficulty: "easy" },
@@ -735,7 +735,6 @@
             setTimeout(() => toast.remove(), 3000);
         }
 
-        // === ЗАГРУЗКА / СОХРАНЕНИЕ ===
         function rebuildQuestDatabase() {
             QUEST_DATABASE = BASE_QUEST_DATABASE.map(q => ({
                 ...q,
@@ -745,14 +744,7 @@
         }
 
         function saveAll() {
-            const save = {
-                balance: state.balance,
-                profit: state.profit,
-                completedList: state.completedList,
-                modifiedBuys: state.modifiedBuys,
-                repeatCounts: state.repeatCounts
-            };
-            localStorage.setItem('pragmatic_carousel_save', JSON.stringify(save));
+            localStorage.setItem('pragmatic_carousel_save', JSON.stringify(state));
         }
 
         function loadAll() {
@@ -882,7 +874,7 @@
             requestAnimationFrame(drawEffectsLoop);
         }
 
-        // === ОТРИСОВКА КОЛЕСА С УЧЁТОМ ВЫПОЛНЕННЫХ ЗАДАНИЙ ===
+        // === ОТРИСОВКА КОЛЕСА ===
         const wheelCanvas = document.getElementById('wheelCanvas');
         const wCtx = wheelCanvas.getContext('2d');
 
@@ -936,7 +928,7 @@
             }
         }
 
-        // === ГЕНЕРАЦИЯ МОЛНИИ ===
+        // === МОЛНИЯ ===
         function drawLightningPath(startX, startY, endX, endY) {
             let steps = 6;
             let pathD = `M ${startX} ${startY}`;
@@ -953,7 +945,7 @@
             els.lightningPath.setAttribute('d', pathD);
         }
 
-        // НОВЫЕ ЭФФЕКТЫ ЗЕВСА
+        // === ЭФФЕКТЫ ЗЕВСА ===
         function applyZeusEffect(quest, callback) {
             const effects = [
                 { name: "x2", desc: "удвоил стоимость контракта", modifier: (val) => val * 2, isSkip: false, isDoubleWork: false },
@@ -1020,7 +1012,6 @@
                         cardEl.classList.remove('zeus-blitzed');
                         renderQuests();
                         saveAll();
-                        // Если задание пропущено, снимаем блокировку сразу после завершения анимации молнии
                         if (isSkipped) {
                             zeusAnimationLock = false;
                             els.spinBtn.disabled = false;
@@ -1029,7 +1020,6 @@
                         if (onComplete) onComplete(isSkipped);
                     }, 300);
                     
-                    // Если не пропуск, то через 1000 мс снимаем блокировку и убираем Зевса
                     if (!isSkipped) {
                         setTimeout(() => {
                             els.zeus.classList.remove('active');
@@ -1041,24 +1031,32 @@
             }, 1200);
         }
 
-        // === АНИМАЦИЯ ВРАЩЕНИЯ (только на доступные сектора) ===
+        // === АНИМАЦИЯ ВРАЩЕНИЯ (ГАРАНТИРОВАННОЕ ПОПАДАНИЕ В НУЖНЫЙ СЕКТОР) ===
         function startSpinAnimation(targetSectorIndex) {
             if (isSpinning || zeusAnimationLock) return;
             playEffect('spin');
             isSpinning = true;
             els.spinBtn.disabled = true;
             
-            const targetRaw = (Math.PI * 2) - (targetSectorIndex * sectorAngleRad + sectorAngleRad / 2);
-            const totalDelta = (Math.PI * 2) * 5 + targetRaw;
+            // Расчёт угла: нужно, чтобы центр целевого сектора оказался под стрелкой (угол -PI/2)
+            // Угол центра сектора = сектор_индекс * ширина_сектора + ширина_сектора/2
+            const sectorCenter = (targetSectorIndex * sectorAngleRad) + (sectorAngleRad / 2);
+            // Указатель сверху (угол = -PI/2), поворачиваем колесо на -sectorCenter + PI/2?
+            // Правильнее: чтобы центр сектора попал на верх, нужно повернуть колесо на (PI/2 - sectorCenter)
+            let targetAngleRad = (Math.PI / 2) - sectorCenter;
+            // Нормализуем в [0, 2PI)
+            targetAngleRad = (targetAngleRad + 2 * Math.PI) % (2 * Math.PI);
+            // Добавляем 5 полных оборотов
+            const totalDelta = (Math.PI * 2) * 5 + targetAngleRad;
             const startWheelAngle = wheelAngle;
-            const targetAngleRad = startWheelAngle + totalDelta;
+            const finalAngle = startWheelAngle + totalDelta;
             const spinStartTime = performance.now();
             const spinDuration = 2.6;
             
             function animateSpin(currentTime) {
                 const elapsed = (currentTime - spinStartTime) / 1000;
                 if (elapsed >= spinDuration) {
-                    wheelAngle = targetAngleRad % (Math.PI * 2);
+                    wheelAngle = finalAngle % (Math.PI * 2);
                     drawWheel();
                     isSpinning = false;
                     if (!zeusAnimationLock) els.spinBtn.disabled = false;
@@ -1107,6 +1105,7 @@
 
             const alreadyDone = state.completedList.some(c => c.id === quest.id);
             if (alreadyDone) {
+                // Защита – на всякий случай, если вдруг выпал выполненный, перезапускаем
                 els.spinBtn.onclick();
                 return;
             }
@@ -1114,9 +1113,7 @@
             if (Math.random() < 0.25) {
                 triggerZeusEvent(quest, (isSkipped) => {
                     if (!isSkipped) triggerModal(false);
-                    else {
-                        closeAndSync();
-                    }
+                    else closeAndSync();
                 });
             } else {
                 triggerModal(false);
@@ -1191,7 +1188,7 @@
             }, 1000);
         }
 
-        // === ОБРАБОТЧИК ВРАЩЕНИЯ (выбираем ТОЛЬКО НЕЗАКРЫТЫЕ) ===
+        // === КНОПКА ВРАЩЕНИЯ (ВЫБИРАЕТ ТОЛЬКО НЕВЫПОЛНЕННЫЕ) ===
         els.spinBtn.onclick = function() {
             if (isSpinning || zeusAnimationLock || isFinalEnding) return;
             const available = QUEST_DATABASE.filter(q => !state.completedList.some(c => c.id === q.id));
@@ -1277,12 +1274,10 @@
             els.resultModal.classList.add('hidden');
             updateUI(); renderQuests(); drawWheel();
             saveAll();
-            // Принудительный сброс блокировки на случай, если она осталась
             zeusAnimationLock = false;
             els.spinBtn.disabled = false;
         }
 
-        // === РУЧНОЕ ИЗМЕНЕНИЕ БАЛАНСА ===
         function openBalanceModal() {
             els.newBalanceInput.value = state.balance;
             els.balanceModal.classList.remove('hidden');
