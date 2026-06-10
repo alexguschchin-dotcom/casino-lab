@@ -578,23 +578,23 @@
         const PRICE_TIERS = [4800, 6400, 8000, 9600, 11200];
         const BASE_QUEST_DATABASE = [
             { id: 1, slot: "Gates of Olympus", type: "Дедовские Капли", desc: "Поймать суммарный множитель больше x15.", baseBuy: PRICE_TIERS[0], ico: "⚡", difficulty: "easy" },
-            { id: 2, slot: "The Dog House Megaways", type: "Пёсий Созвон", desc: "Поймать линию будок на 2-м 3-м 4-м барабане.", baseBuy: PRICE_TIERS[1], ico: "🐶", difficulty: "medium" },
+            { id: 2, slot: "The Dog House Megaways", type: "Пёсий Созвон", desc: "Поймать линию будок на 2-м, 3-м, 4-м барабане.", baseBuy: PRICE_TIERS[1], ico: "🐶", difficulty: "medium" },
             { id: 3, slot: "Sugar Rush", type: "Диабет Отменяется", desc: "Раскачать хотя бы одну ячейку поля до множителя x32 в обычной бонуске.", baseBuy: PRICE_TIERS[1], ico: "🍬", difficulty: "medium" },
             { id: 4, slot: "Juicy Fruits", type: "Витаминный Бум", desc: "Вырастить дикий Скаттер-квадрат до размера 4x4 или выше.", baseBuy: PRICE_TIERS[0], ico: "🍋", difficulty: "easy" },
             { id: 5, slot: "Sweet Bonanza", type: "Заворот Кишок", desc: "Поймать ретриггер.", baseBuy: PRICE_TIERS[1], ico: "🍭", difficulty: "medium" },
             { id: 6, slot: "Big Bass Splash", type: "Рыбалка на Живца", desc: "Дойти минимум до 2-го уровня (множитель x2).", baseBuy: PRICE_TIERS[0], ico: "🐟", difficulty: "easy" },
-            { id: 7, slot: "Starlight Princess", type: "Аниме-Синдром", desc: "общий множитель x20 к концу бонуса.", baseBuy: PRICE_TIERS[2], ico: "⭐", difficulty: "hard" },
+            { id: 7, slot: "Starlight Princess", type: "Аниме-Синдром", desc: "Общий множитель x20 к концу бонуса.", baseBuy: PRICE_TIERS[2], ico: "⭐", difficulty: "hard" },
             { id: 8, slot: "Cleocatra", type: "Кошачий Лоток", desc: "Поймать полноценную линию.", baseBuy: PRICE_TIERS[1], ico: "🐱", difficulty: "medium" },
             { id: 9, slot: "Zeus vs Hades", type: "Семейные Разборки", desc: "Играть строго за Аида. Выбить хотя бы один расширяющийся барабан x6+.", baseBuy: PRICE_TIERS[1], ico: "🔥", difficulty: "medium" },
             { id: 10, slot: "Wild West Gold", type: "Ковбойский Занос", desc: "Поймать линию вилдов или ретриггер на 8 спинов.", baseBuy: PRICE_TIERS[1], ico: "🤠", difficulty: "medium" },
             { id: 11, slot: "Madame Destiny Megaways", type: "Гадание по Руке", desc: "На стартовом колесе фортуны выбить множитель не менее x8.", baseBuy: PRICE_TIERS[2], ico: "🔮", difficulty: "hard" },
-            { id: 12, slot: "Bigger barn house bonanza", type: "Бешеная лиса", desc: "Выбить 3 бонуса по ставке от 100 рублей.", ico: "🦬", difficulty: "hard" },
+            { id: 12, slot: "Bigger Barn House Bonanza", type: "Бешеная лиса", desc: "Выбить 3 бонуса по ставке от 100 рублей.", baseBuy: PRICE_TIERS[2], ico: "🦬", difficulty: "hard" },
             { id: 13, slot: "Big Bass Amazon Xtreme", type: "Амазонский Монстр", desc: "Окупить бонус.", baseBuy: PRICE_TIERS[2], ico: "🐊", difficulty: "hard" },
-            { id: 14, slot: "Sugar Rush 1000", type: "Сахарная Кома", desc: "Получить общую окупаемость бонуса ровно в x1.5 или выше.", baseBuy: PRICE_TIERS[3], ico: "🍩", difficulty: "hard" },
-            { id: 15, slot: "Wisdom of Athena", type: "Щит и Меч", desc: "Открыть 2 верхних заблокированный ряда ячеек.", baseBuy: PRICE_TIERS[3], ico: "🛡️", difficulty: "hard" },
+            { id: 14, slot: "Sugar Rush 1000", type: "Сахарная Кома", desc: "Получить общую окупаемость бонуса x1.5 или выше.", baseBuy: PRICE_TIERS[3], ico: "🍩", difficulty: "hard" },
+            { id: 15, slot: "Wisdom of Athena", type: "Щит и Меч", desc: "Открыть 2 верхних заблокированных ряда ячеек.", baseBuy: PRICE_TIERS[3], ico: "🛡️", difficulty: "hard" },
             { id: 16, slot: "Gems Bonanza", type: "Золотая Лихорадка", desc: "Успешно перейти на 3-й уровень прогресса карты (Gold Fever).", baseBuy: PRICE_TIERS[3], ico: "💎", difficulty: "hard" },
             { id: 17, slot: "The Dog House Multihold", type: "Будка на Прокачку", desc: "Открыть хотя бы 3 активных экрана.", baseBuy: PRICE_TIERS[3], ico: "🐾", difficulty: "hard" },
-            { id: 18, slot: "Gates of Olympus 1000", type: "Гнев Деда x1000", desc: "Покупать бонуски пока не будешь довольна :).", baseBuy: PRICE_TIERS[4], ico: "👑", difficulty: "hard" },
+            { id: 18, slot: "Gates of Olympus 1000", type: "Гнев Деда x1000", desc: "Покупать бонуски пока не будешь довольна :)", baseBuy: PRICE_TIERS[4], ico: "👑", difficulty: "hard" },
             { id: 19, slot: "Fruit Party 2", type: "Праздник Живота", desc: "Словить множитель x128 за сыгровку.", baseBuy: PRICE_TIERS[4], ico: "🍇", difficulty: "hard" },
             { id: 20, slot: "Слот на выбор Чата", type: "Финальный Аккорд", desc: "Взять бонус за 11 200 ₽ в любом слоте и закрыть его в чистый плюс.", baseBuy: PRICE_TIERS[4], ico: "💬", difficulty: "hard" }
         ];
@@ -1030,7 +1030,6 @@
             isSpinning = true;
             els.spinBtn.disabled = true;
             
-            // Адаптивные параметры вращения в зависимости от количества оставшихся заданий
             const remainingCount = QUEST_DATABASE.filter(q => !state.completedList.some(c => c.id === q.id)).length;
             let extraRotations = 5;
             let spinDuration = 2.6;
@@ -1075,7 +1074,6 @@
 
         function handleSpinEnd(sectorIndex) {
             const quest = QUEST_DATABASE[sectorIndex];
-            // Если этот контракт уже выполнен (защита от бага), перезапускаем вращение
             if (state.completedList.some(c => c.id === quest.id)) {
                 writeLog(`⚠️ Сектор ${quest.id} уже выполнен, перезапуск...`);
                 const available = QUEST_DATABASE.filter(q => !state.completedList.some(c => c.id === q.id));
