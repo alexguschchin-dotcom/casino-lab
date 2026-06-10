@@ -138,6 +138,7 @@
             position: relative;
             width: 320px;
             height: 320px;
+            margin: 0 auto;
         }
 
         .wheel-canvas-container {
@@ -420,6 +421,7 @@
         let soundOn = true;
         let audioCtx = null;
         let currentActiveQuest = null;
+        let spinInterval = null; // для звука треска при вращении
 
         function initAudio() { if(!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)(); }
         function playTone(freq, dur, type='sine') {
@@ -429,6 +431,19 @@
             g.gain.setValueAtTime(0.1, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
             osc.connect(g); g.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime+dur);
         }
+
+        function startSpinSound() {
+            if(spinInterval) clearInterval(spinInterval);
+            spinInterval = setInterval(() => {
+                if(!soundOn) return;
+                initAudio(); if(audioCtx.state === 'suspended') audioCtx.resume();
+                let osc = audioCtx.createOscillator(); let g = audioCtx.createGain();
+                osc.type = 'square'; osc.frequency.value = 800 + Math.random() * 200;
+                g.gain.setValueAtTime(0.03, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+                osc.connect(g); g.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime+0.08);
+            }, 80);
+        }
+        function stopSpinSound() { if(spinInterval) { clearInterval(spinInterval); spinInterval = null; } }
 
         function writeLog(text) {
             const box = document.getElementById('logBox');
@@ -472,7 +487,7 @@
             pDisp.style.color = state.profit >= 0 ? '#00ff66' : '#ff3333';
         }
 
-        // Отрисовка колеса выбора
+        // Отрисовка колеса выбора с номерами квестов
         const wCanvas = document.getElementById('wheelCanvas');
         const wCtx = wCanvas.getContext('2d');
         
@@ -491,6 +506,16 @@
                 wCtx.lineWidth = 1;
                 wCtx.strokeStyle = '#1b0a2e';
                 wCtx.stroke();
+                
+                // Рисуем номер квеста на секторе
+                wCtx.save();
+                wCtx.translate(160, 160);
+                wCtx.rotate(i * angle + angle / 2);
+                wCtx.fillStyle = "#ffffff";
+                wCtx.font = "bold 12px 'Comfortaa', 'Segoe UI'";
+                wCtx.shadowBlur = 0;
+                wCtx.fillText(QUEST_DATABASE[i].id, 105, 5);
+                wCtx.restore();
             }
             // Центральный круг
             wCtx.beginPath(); wCtx.arc(160, 160, 25, 0, Math.PI*2); wCtx.fillStyle = '#fff'; wCtx.fill();
@@ -498,6 +523,20 @@
 
         // Вращение колеса
         let isSpinning = false;
+        let originalMemesSpeed = null;
+
+        function setMemesSpeed(multiplier) {
+            if(!originalMemesSpeed) {
+                originalMemesSpeed = memes.map(m => ({ sX: m.sX, sY: m.sY }));
+            }
+            memes.forEach((m, idx) => {
+                if(originalMemesSpeed) {
+                    m.sX = originalMemesSpeed[idx].sX * multiplier;
+                    m.sY = originalMemesSpeed[idx].sY * multiplier;
+                }
+            });
+        }
+
         document.getElementById('spinWheelBtn').onclick = function() {
             if(isSpinning) return;
             let available = QUEST_DATABASE.filter(q => !state.completedList.some(item => item.id === q.id));
@@ -509,6 +548,9 @@
 
             isSpinning = true;
             playTone(400, 0.5, 'triangle');
+            startSpinSound();
+            // Ускоряем мемы в 3 раза
+            setMemesSpeed(3);
             
             let randomPick = available[Math.floor(Math.random() * available.length)];
             let index = QUEST_DATABASE.findIndex(q => q.id === randomPick.id);
@@ -524,6 +566,10 @@
 
             setTimeout(() => {
                 isSpinning = false;
+                stopSpinSound();
+                // Возвращаем мемы к нормальной скорости
+                setMemesSpeed(1);
+                
                 wheelContainer.style.transition = 'none';
                 wheelContainer.style.transform = `rotate(${targetAngle}deg)`;
                 setTimeout(() => { wheelContainer.style.transition = 'transform 4s cubic-bezier(0.1, 0.8, 0.1, 1)'; }, 50);
@@ -549,8 +595,15 @@
 
         function resolveQuest(status) {
             if(!currentActiveQuest) return;
-            let payout = parseFloat(document.getElementById('payoutValue').value);
-            if(isNaN(payout)) payout = 0;
+            let payout = 0;
+            if(status === 'win') {
+                payout = parseFloat(document.getElementById('payoutValue').value);
+                if(isNaN(payout)) payout = 0;
+            } else {
+                // При сливе игнорируем инпут, списываем полную стоимость
+                payout = 0;
+                document.getElementById('payoutValue').value = '0';
+            }
             let profit = payout - currentActiveQuest.buy;
 
             state.balance = state.balance - currentActiveQuest.buy + payout;
@@ -590,7 +643,7 @@
             }
         }
 
-        // ---------- ВЕСЁЛЫЕ ПАРАЗИТЫ И ПЕРСОНАЖИ PRAGMATIC (CANVAS) ----------
+        // ---------- ВЕСЁЛЫЕ ПЕРСОНАЖИ PRAGMATIC (CANVAS) ----------
         const canvas = document.getElementById('memePragmaticCanvas');
         const ctx = canvas.getContext('2d');
         let memes = [];
@@ -604,6 +657,7 @@
                 { x: 600, y: 200, r: 35, sX: 0.5, sY: -0.7, txt: "🍬🍭", name: "Конфета", col: "#ff007f" },
                 { x: 800, y: 500, r: 40, sX: -0.4, sY: -0.4, txt: "👑👸", name: "Принцесса", col: "#e0b0ff" }
             ];
+            originalMemesSpeed = memes.map(m => ({ sX: m.sX, sY: m.sY }));
         }
 
         function drawMemesAnimation() {
@@ -643,6 +697,7 @@
         document.getElementById('soundToggle').onclick = function() {
             soundOn = !soundOn;
             this.innerText = soundOn ? "🔊 ЗВУК: ВКЛ" : "🔇 ЗВУК: ВЫКЛ";
+            if(!soundOn && spinInterval) stopSpinSound();
         };
 
         document.getElementById('fullResetBtn').onclick = function() {
