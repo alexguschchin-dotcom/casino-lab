@@ -384,7 +384,6 @@
         .banner-bigwin { color: var(--pink); text-shadow: 0 0 40px var(--pink), 0 0 10px #fff; }
         .banner-megawin { color: var(--gold); text-shadow: 0 0 50px var(--gold), 0 0 20px #ff5500; }
 
-        /* АНИМАЦИЯ ЗЕВСА НА ОБЛАКЕ + АДАПТАЦИЯ ДЛЯ МОБИЛОК */
         #zeusCharacter {
             position: fixed;
             right: -250px;
@@ -432,7 +431,6 @@
         @keyframes floatCloud { 0% { transform: translateY(0); filter: drop-shadow(0 10px 15px rgba(0, 255, 255, 0.5)); } 100% { transform: translateY(-10px); filter: drop-shadow(0 15px 25px rgba(255, 0, 127, 0.6)); } }
         @keyframes floatZeus { 0% { transform: translateY(-15px) scale(1); } 100% { transform: translateY(-22px) scale(1.05); } }
 
-        /* ЛИНЕЙКА МИТИЧЕСКОЙ МОЛНИИ ДЛЯ ХОЛСТА */
         #lightningBoltSvg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -440,7 +438,6 @@
             opacity: 0; filter: drop-shadow(0 0 20px #fff) drop-shadow(0 0 40px var(--gold));
         }
 
-        /* TOAST-УВЕДОМЛЕНИЯ */
         .toast-notification {
             position: fixed;
             bottom: 30px;
@@ -532,7 +529,6 @@
         </div>
     </div>
 
-    <!-- Модалка изменения баланса -->
     <div id="balanceModal" class="modal-overlay hidden">
         <div class="modal-window">
             <h2 style="color: var(--gold); font-family: 'Orbitron', sans-serif;">💰 ИЗМЕНЕНИЕ БАЛАНСА</h2>
@@ -579,7 +575,6 @@
 
     <script>
     (function(){
-        // Базовые цены: 4800, 6400, 8000, 9600, 11200
         const PRICE_TIERS = [4800, 6400, 8000, 9600, 11200];
         const BASE_QUEST_DATABASE = [
             { id: 1, slot: "Gates of Olympus", type: "Дедовские Капли", desc: "Поймать суммарный множитель больше x12 за один спин.", baseBuy: PRICE_TIERS[0], ico: "⚡", difficulty: "easy" },
@@ -649,7 +644,6 @@
             initAudio();
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const now = audioCtx.currentTime;
-
             switch (type) {
                 case 'click': {
                     const osc = audioCtx.createOscillator();
@@ -744,7 +738,14 @@
         }
 
         function saveAll() {
-            localStorage.setItem('pragmatic_carousel_save', JSON.stringify(state));
+            const save = {
+                balance: state.balance,
+                profit: state.profit,
+                completedList: state.completedList,
+                modifiedBuys: state.modifiedBuys,
+                repeatCounts: state.repeatCounts
+            };
+            localStorage.setItem('pragmatic_carousel_save', JSON.stringify(save));
         }
 
         function loadAll() {
@@ -762,7 +763,7 @@
             rebuildQuestDatabase();
         }
 
-        // === ФОНОВЫЕ ЭФФЕКТЫ ===
+        // Фоновые эффекты
         const bgCanvas = document.getElementById('bgMemeCanvas');
         const bgCtx = bgCanvas.getContext('2d');
 
@@ -827,7 +828,6 @@
 
         function drawEffectsLoop() {
             bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-            
             bgParticles.forEach(m => {
                 bgCtx.save();
                 bgCtx.translate(m.x, m.y);
@@ -874,7 +874,7 @@
             requestAnimationFrame(drawEffectsLoop);
         }
 
-        // === ОТРИСОВКА КОЛЕСА ===
+        // ОТРИСОВКА КОЛЕСА
         const wheelCanvas = document.getElementById('wheelCanvas');
         const wCtx = wheelCanvas.getContext('2d');
 
@@ -909,16 +909,13 @@
 
                 wCtx.save();
                 wCtx.rotate(sectorAngleRad / 2);
-                // Иконка слота
                 wCtx.font = "14px 'Segoe UI Emoji'";
                 wCtx.textAlign = "center";
                 wCtx.fillStyle = isDone ? 'rgba(255,255,255,0.15)' : '#fff';
                 wCtx.fillText(q.ico || "🎰", radius - 50, 0);
-                // Цена
                 wCtx.font = "bold 9px 'Orbitron', sans-serif";
                 wCtx.fillStyle = isDone ? 'rgba(255,255,255,0.15)' : (i % 2 === 0 ? getStyleColor('--cyan') : getStyleColor('--pink'));
                 wCtx.fillText(formatPrice(q.buy), radius - 50, 16);
-                // Номер контракта
                 wCtx.font = "bold 10px 'Orbitron', sans-serif";
                 wCtx.fillStyle = isDone ? 'rgba(255,255,255,0.1)' : (i % 2 === 0 ? getStyleColor('--cyan') : getStyleColor('--pink'));
                 wCtx.textAlign = "right";
@@ -928,7 +925,7 @@
             }
         }
 
-        // === МОЛНИЯ ===
+        // Молния
         function drawLightningPath(startX, startY, endX, endY) {
             let steps = 6;
             let pathD = `M ${startX} ${startY}`;
@@ -945,7 +942,7 @@
             els.lightningPath.setAttribute('d', pathD);
         }
 
-        // === ЭФФЕКТЫ ЗЕВСА ===
+        // Эффекты Зевса
         function applyZeusEffect(quest, callback) {
             const effects = [
                 { name: "x2", desc: "удвоил стоимость контракта", modifier: (val) => val * 2, isSkip: false, isDoubleWork: false },
@@ -955,17 +952,14 @@
                 { name: "Пропуск", desc: "задание автоматически засчитано! Баланс не меняется", modifier: (val) => val, isSkip: true, isDoubleWork: false }
             ];
             const effect = effects[Math.floor(Math.random() * effects.length)];
-            
             writeLog(`⚡ Зевс применил "${effect.name}" к контракту №${quest.id}: ${effect.desc}`);
             showToast(`Зевс: ${effect.desc}`, effect.name === "Пропуск" ? false : true);
-            
             if (effect.isSkip) {
                 state.completedList.push({ id: quest.id, status: 'win', payout: 0 });
                 writeLog(`✨ Контракт №${quest.id} пропущен по воле Зевса!`);
                 callback(true);
                 return;
             }
-            
             if (effect.isDoubleWork) {
                 state.repeatCounts[quest.id] = 2;
                 quest.repeatCount = 2;
@@ -973,7 +967,6 @@
                 callback(false);
                 return;
             }
-            
             const newBuy = effect.modifier(quest.buy);
             quest.buy = newBuy;
             state.modifiedBuys[quest.id] = newBuy;
@@ -1019,7 +1012,6 @@
                         }
                         if (onComplete) onComplete(isSkipped);
                     }, 300);
-                    
                     if (!isSkipped) {
                         setTimeout(() => {
                             els.zeus.classList.remove('active');
@@ -1031,36 +1023,32 @@
             }, 1200);
         }
 
-        // === АНИМАЦИЯ ВРАЩЕНИЯ (ГАРАНТИРОВАННОЕ ПОПАДАНИЕ В НУЖНЫЙ СЕКТОР) ===
+        // === ГЛАВНАЯ ЛОГИКА ВРАЩЕНИЯ (СИНХРОНИЗАЦИЯ КОЛЕСА И ЗАДАНИЙ) ===
         function startSpinAnimation(targetSectorIndex) {
             if (isSpinning || zeusAnimationLock) return;
             playEffect('spin');
             isSpinning = true;
             els.spinBtn.disabled = true;
             
-            // Расчёт угла: нужно, чтобы центр целевого сектора оказался под стрелкой (угол -PI/2)
-            // Угол центра сектора = сектор_индекс * ширина_сектора + ширина_сектора/2
-            const sectorCenter = (targetSectorIndex * sectorAngleRad) + (sectorAngleRad / 2);
-            // Указатель сверху (угол = -PI/2), поворачиваем колесо на -sectorCenter + PI/2?
-            // Правильнее: чтобы центр сектора попал на верх, нужно повернуть колесо на (PI/2 - sectorCenter)
-            let targetAngleRad = (Math.PI / 2) - sectorCenter;
-            // Нормализуем в [0, 2PI)
-            targetAngleRad = (targetAngleRad + 2 * Math.PI) % (2 * Math.PI);
-            // Добавляем 5 полных оборотов
-            const totalDelta = (Math.PI * 2) * 5 + targetAngleRad;
+            // targetSectorIndex – индекс выбранного сектора (0..19), который соответствует QUEST_DATABASE[targetSectorIndex]
+            // Вычисляем угол, чтобы центр этого сектора оказался точно под стрелкой (стрелка вверху, угол -PI/2)
+            const targetRaw = (Math.PI * 2) - (targetSectorIndex * sectorAngleRad + sectorAngleRad / 2);
+            const totalDelta = (Math.PI * 2) * 5 + targetRaw;
             const startWheelAngle = wheelAngle;
-            const finalAngle = startWheelAngle + totalDelta;
+            const targetAngleRad = startWheelAngle + totalDelta;
             const spinStartTime = performance.now();
             const spinDuration = 2.6;
             
             function animateSpin(currentTime) {
                 const elapsed = (currentTime - spinStartTime) / 1000;
                 if (elapsed >= spinDuration) {
-                    wheelAngle = finalAngle % (Math.PI * 2);
+                    wheelAngle = targetAngleRad % (Math.PI * 2);
                     drawWheel();
                     isSpinning = false;
                     if (!zeusAnimationLock) els.spinBtn.disabled = false;
-                    setTimeout(() => handleSpinEnd(targetSectorIndex), 150);
+                    // Теперь определяем сектор, на который указывает стрелка, по итоговому углу
+                    const finalSector = Math.floor(((Math.PI * 2) - (wheelAngle % (Math.PI * 2))) / sectorAngleRad) % totalSectors;
+                    handleSpinEnd(finalSector);
                     return;
                 }
                 let t = elapsed / spinDuration;
@@ -1079,6 +1067,21 @@
 
         function handleSpinEnd(sectorIndex) {
             const quest = QUEST_DATABASE[sectorIndex];
+            // Если этот контракт уже выполнен (защита от бага), перезапускаем вращение
+            if (state.completedList.some(c => c.id === quest.id)) {
+                writeLog(`⚠️ Сектор ${quest.id} уже выполнен, перезапуск...`);
+                // Выбираем новый доступный квест и вращаем заново
+                const available = QUEST_DATABASE.filter(q => !state.completedList.some(c => c.id === q.id));
+                if (available.length === 0) {
+                    writeLog("🎉 Все контракты уже выполнены!");
+                    return;
+                }
+                const newQuest = available[Math.floor(Math.random() * available.length)];
+                const newIndex = QUEST_DATABASE.findIndex(x => x.id === newQuest.id);
+                startSpinAnimation(newIndex);
+                return;
+            }
+
             currentActiveQuest = quest;
             const card = document.getElementById(`quest-card-${quest.id}`);
             if (card) {
@@ -1103,17 +1106,12 @@
                 if (!zeusAnimationLock) els.spinBtn.disabled = false;
             };
 
-            const alreadyDone = state.completedList.some(c => c.id === quest.id);
-            if (alreadyDone) {
-                // Защита – на всякий случай, если вдруг выпал выполненный, перезапускаем
-                els.spinBtn.onclick();
-                return;
-            }
-
             if (Math.random() < 0.25) {
                 triggerZeusEvent(quest, (isSkipped) => {
                     if (!isSkipped) triggerModal(false);
-                    else closeAndSync();
+                    else {
+                        closeAndSync();
+                    }
                 });
             } else {
                 triggerModal(false);
@@ -1135,7 +1133,6 @@
                 let doneClass = '';
                 if (comp) doneClass = comp.status === 'win' ? 'done-win' : 'done-lose';
                 card.className = `quest-card ${doneClass}`;
-                
                 let badge = `<div class="buy-badge" style="${isBlitzed ? 'color: var(--gold); border-color: var(--gold);' : ''}">Цена: ${q.buy.toLocaleString()} ₽</div>`;
                 if (comp) {
                     const multiplier = (comp.payout / q.buy).toFixed(1);
@@ -1188,11 +1185,11 @@
             }, 1000);
         }
 
-        // === КНОПКА ВРАЩЕНИЯ (ВЫБИРАЕТ ТОЛЬКО НЕВЫПОЛНЕННЫЕ) ===
+        // ОБРАБОТЧИК КНОПКИ ВРАЩЕНИЯ – выбираем случайный незакрытый контракт и крутим на его сектор
         els.spinBtn.onclick = function() {
             if (isSpinning || zeusAnimationLock || isFinalEnding) return;
             const available = QUEST_DATABASE.filter(q => !state.completedList.some(c => c.id === q.id));
-            if (!available.length) {
+            if (available.length === 0) {
                 writeLog("🎉 Все контракты уже выполнены!");
                 return;
             }
@@ -1278,6 +1275,7 @@
             els.spinBtn.disabled = false;
         }
 
+        // Ручное изменение баланса
         function openBalanceModal() {
             els.newBalanceInput.value = state.balance;
             els.balanceModal.classList.remove('hidden');
