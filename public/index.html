@@ -17,20 +17,20 @@
         }
 
         :root {
-            --bg-main: #06020f;
-            --bg-panel: rgba(22, 11, 41, 0.75);
-            --bg-card: rgba(37, 18, 69, 0.6);
-            --bg-card-hover: rgba(53, 26, 99, 0.8);
+            --bg-main: #05020c;
+            --bg-panel: rgba(18, 9, 36, 0.8);
+            --bg-card: rgba(31, 15, 61, 0.5);
+            --bg-card-hover: rgba(48, 23, 94, 0.7);
             --pink: #ff007f;
             --cyan: #00ffff;
             --gold: #ffcc00;
             --purple-glow: #bd00ff;
             --text-main: #f1ebfa;
-            --text-muted: #9d8db5;
+            --text-muted: #8e7fa6;
             
-            --neon-pink: 0 0 15px rgba(255, 0, 127, 0.5), inset 0 0 15px rgba(255, 0, 127, 0.3);
-            --neon-cyan: 0 0 15px rgba(0, 255, 255, 0.5), inset 0 0 15px rgba(0, 255, 255, 0.3);
-            --glass-blur: backdrop-filter: blur(14px);
+            --neon-pink: 0 0 15px rgba(255, 0, 127, 0.4), inset 0 0 15px rgba(255, 0, 127, 0.2);
+            --neon-cyan: 0 0 15px rgba(0, 255, 255, 0.4), inset 0 0 15px rgba(0, 255, 255, 0.2);
+            --glass-blur: backdrop-filter: blur(16px);
         }
 
         body {
@@ -42,11 +42,10 @@
             display: flex;
             flex-direction: column;
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(255, 0, 127, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(0, 255, 255, 0.08) 0%, transparent 40%);
+                radial-gradient(circle at 15% 15%, rgba(255, 0, 127, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 85% 85%, rgba(0, 255, 255, 0.08) 0%, transparent 50%);
         }
 
-        /* ИСПРАВЛЕНО: Стилизуем конкретно фоновый Canvas, не трогая колесо */
         canvas#memePragmaticCanvas {
             position: fixed;
             top: 0; left: 0;
@@ -59,95 +58,87 @@
         .app-container {
             position: relative;
             z-index: 2;
-            max-width: 1600px;
+            max-width: 1650px;
             width: 100%;
             margin: 0 auto;
-            padding: 30px;
+            padding: 25px;
             display: flex;
             flex-direction: column;
             gap: 25px;
             flex: 1;
         }
 
-        /* Верхняя панель утилит */
         .top-utils {
             display: flex;
             justify-content: flex-end;
             gap: 12px;
         }
 
-        /* Премиальные кнопки */
         .action-btn {
             background: linear-gradient(135deg, var(--pink), #99004c);
             color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             padding: 12px 24px;
-            border-radius: 12px;
+            border-radius: 14px;
             font-family: 'Rajdhani', sans-serif;
             font-size: 1.1rem;
             font-weight: 700;
             letter-spacing: 1px;
             cursor: pointer;
             box-shadow: var(--neon-pink);
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease-in-out;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .action-btn:hover:not(:disabled) {
             transform: translateY(-2px);
             filter: brightness(1.2);
-            box-shadow: 0 0 25px rgba(255, 0, 127, 0.8);
-        }
-
-        .action-btn:active:not(:disabled) {
-            transform: translateY(1px);
+            box-shadow: 0 0 25px rgba(255, 0, 127, 0.7);
         }
 
         .action-btn:disabled {
-            background: #251b33;
-            border-color: #3d2f52;
+            background: #1a1326;
+            border-color: #2b203a;
             color: var(--text-muted);
             box-shadow: none;
             cursor: not-allowed;
-            opacity: 0.4;
+            opacity: 0.5;
         }
 
         .btn-cyan {
             background: linear-gradient(135deg, var(--cyan), #007788);
-            color: #06020f;
+            color: #05020c;
             box-shadow: var(--neon-cyan);
-            border-color: rgba(0, 255, 255, 0.4);
+            border-color: rgba(0, 255, 255, 0.3);
         }
 
         .btn-cyan:hover:not(:disabled) {
-            box-shadow: 0 0 25px rgba(0, 255, 255, 0.8);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.7);
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             color: var(--text-main);
             box-shadow: none;
         }
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 0 15px rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        /* Стрим-Панель (Шапка) */
+        /* Шапка Табло */
         .header-panel {
             background: var(--bg-panel);
             --glass-blur;
-            border: 1px solid rgba(255, 0, 127, 0.3);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(189, 0, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
             border-radius: 24px;
             padding: 24px 35px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
             gap: 25px;
         }
 
@@ -158,60 +149,44 @@
         }
 
         .logo-strawberry {
-            font-size: 3.5rem;
+            font-size: 3.2rem;
             filter: drop-shadow(0 0 15px var(--pink));
-            animation: strawberryDance 0.8s infinite alternate cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        @keyframes strawberryDance {
-            0% { transform: scale(1) rotate(-6deg); }
-            100% { transform: scale(1.12) rotate(6deg); }
         }
 
         .header-title-box h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
+            font-size: 1.9rem;
             font-weight: 900;
             background: linear-gradient(90deg, #fff, #ff007f, #00ffff);
-            background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: textGradientFlow 4s linear infinite;
-        }
-
-        @keyframes textGradientFlow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
         }
 
         .header-title-box p {
             font-family: 'Rajdhani', sans-serif;
             color: var(--cyan);
-            font-size: 1rem;
+            font-size: 1.05rem;
             font-weight: 600;
-            letter-spacing: 3px;
+            letter-spacing: 4px;
         }
 
         .stats-row {
             display: flex;
             gap: 20px;
-            flex-wrap: wrap;
         }
 
         .stat-badge {
-            background: rgba(13, 6, 26, 0.8);
-            border: 1px solid rgba(0, 255, 255, 0.2);
-            padding: 14px 28px;
+            background: rgba(8, 4, 18, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 14px 24px;
             border-radius: 16px;
             font-family: 'Rajdhani', sans-serif;
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             font-weight: 600;
-            letter-spacing: 0.5px;
             color: var(--text-muted);
             display: flex;
             flex-direction: column;
-            min-width: 160px;
+            min-width: 170px;
         }
 
         .stat-badge strong {
@@ -222,33 +197,28 @@
             margin-top: 4px;
         }
 
-        .stat-badge.balance strong { color: var(--gold); text-shadow: 0 0 10px rgba(255,204,0,0.3); }
-        .stat-badge.progress strong { color: var(--cyan); text-shadow: 0 0 10px rgba(0,255,255,0.3); }
-        .stat-badge.profit strong { color: #00ff66; text-shadow: 0 0 10px rgba(0,255,102,0.3); }
+        .stat-badge.balance strong { color: var(--gold); }
+        .stat-badge.progress strong { color: var(--cyan); }
+        .stat-badge.profit strong { color: #00ff66; }
 
-        /* Главный контейнер сетки */
+        /* Главная сетка */
         .main-layout {
             display: grid;
-            grid-template-columns: 450px 1fr;
+            grid-template-columns: 460px 1fr;
             gap: 30px;
             flex: 1;
-        }
-
-        @media (max-width: 1150px) {
-            .main-layout { grid-template-columns: 1fr; }
         }
 
         .show-box {
             background: var(--bg-panel);
             --glass-blur;
             border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             padding: 30px;
             display: flex;
             flex-direction: column;
-            gap: 22px;
-            position: relative;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            gap: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
         }
 
         .box-title {
@@ -256,93 +226,88 @@
             font-weight: 700;
             font-size: 1.2rem;
             letter-spacing: 1px;
-            text-align: center;
             text-transform: uppercase;
         }
 
-        /* Фиксированная и изолированная обертка Колеса */
+        /* Обертка Колеса */
         .wheel-wrapper {
             position: relative;
             width: 360px;
             height: 360px;
-            margin: 15px auto;
+            margin: 10px auto;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* Контейнер Canvas колеса с жесткими размерами */
         .wheel-canvas-container {
-            width: 360px !important;
-            height: 360px !important;
+            width: 360px;
+            height: 360px;
             border-radius: 50%;
-            border: 6px solid #110724;
-            box-shadow: 0 0 30px rgba(189, 0, 255, 0.25), var(--neon-pink);
-            background: #0f051c;
+            border: 6px solid #0e051a;
+            box-shadow: 0 0 35px rgba(189, 0, 255, 0.2);
+            background: #090312;
             position: relative;
-            z-index: 5;
+            overflow: hidden;
         }
 
-        /* Точный селектор для холста рулетки */
         canvas#wheelCanvas {
-            position: relative !important;
-            width: 100% !important;
-            height: 100% !important;
-            z-index: 6;
-            pointer-events: auto !important;
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
         }
 
         .wheel-pointer {
             position: absolute;
-            top: -12px;
+            top: -14px;
             left: 50%;
             transform: translateX(-50%);
             width: 0; height: 0;
-            border-left: 16px solid transparent;
-            border-right: 16px solid transparent;
-            border-top: 32px solid var(--cyan);
-            filter: drop-shadow(0 0 12px var(--cyan));
-            z-index: 100;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid var(--cyan);
+            filter: drop-shadow(0 0 10px var(--cyan));
+            z-index: 10;
         }
         
         .wheel-center-pin {
             position: absolute;
-            width: 24px;
-            height: 24px;
-            background: var(--cyan);
-            border: 4px solid #fff;
+            width: 26px;
+            height: 26px;
+            background: #110624;
+            border: 4px solid var(--cyan);
             border-radius: 50%;
             box-shadow: 0 0 15px var(--cyan);
-            z-index: 110;
+            z-index: 12;
         }
 
-        /* Список Квестов - Прокачанный скролл-бокс */
+        /* Список Квестов */
         .quests-container-box {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            max-height: 680px;
+            gap: 14px;
+            max-height: 690px;
             overflow-y: auto;
-            padding-right: 12px;
+            padding-right: 10px;
         }
 
-        .quests-container-box::-webkit-scrollbar { width: 8px; }
-        .quests-container-box::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; }
-        .quests-container-box::-webkit-scrollbar-thumb { background: linear-gradient(var(--pink), var(--purple-glow)); border-radius: 10px; }
+        .quests-container-box::-webkit-scrollbar { width: 6px; }
+        .quests-container-box::-webkit-scrollbar-track { background: transparent; }
+        .quests-container-box::-webkit-scrollbar-thumb { background: rgba(189,0,255,0.4); border-radius: 10px; }
 
-        /* Люкс Карточки Квестов */
+        /* Карточки квестов */
         .quest-card {
             background: var(--bg-card);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 16px;
-            padding: 20px;
+            padding: 18px 22px;
             display: grid;
             grid-template-columns: auto 1fr auto;
             align-items: center;
             gap: 20px;
             position: relative;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            overflow: hidden;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .quest-card::before {
@@ -350,115 +315,106 @@
             position: absolute;
             left: 0; top: 0; width: 4px; height: 100%;
             background: transparent;
-            transition: background 0.3s;
+            border-radius: 16px 0 0 16px;
         }
 
         .quest-card:hover {
             background: var(--bg-card-hover);
-            border-color: rgba(189, 0, 255, 0.2);
-            transform: translateX(4px);
+            border-color: rgba(189, 0, 255, 0.15);
         }
 
         .quest-card.selected-anim {
             border-color: var(--cyan);
             box-shadow: var(--neon-cyan);
-            background: rgba(0, 255, 255, 0.05);
+            background: rgba(0, 255, 255, 0.03);
         }
         .quest-card.selected-anim::before { background: var(--cyan); }
 
         .quest-card.done-win {
-            border-color: rgba(0, 255, 102, 0.3);
-            background: linear-gradient(90deg, rgba(5, 41, 18, 0.4) 0%, var(--bg-card) 100%);
+            border-color: rgba(0, 255, 102, 0.2);
+            background: linear-gradient(90deg, rgba(0, 255, 102, 0.03) 0%, var(--bg-card) 100%);
         }
         .quest-card.done-win::before { background: #00ff66; }
-        .quest-card.done-win .slot-title { color: #00ff66 !important; }
+        .quest-card.done-win .slot-title { color: #00ff66; }
 
         .quest-card.done-lose {
-            border-color: rgba(255, 51, 51, 0.3);
-            background: linear-gradient(90deg, rgba(46, 8, 8, 0.4) 0%, var(--bg-card) 100%);
+            border-color: rgba(255, 51, 51, 0.2);
+            background: linear-gradient(90deg, rgba(255, 51, 51, 0.03) 0%, var(--bg-card) 100%);
         }
         .quest-card.done-lose::before { background: #ff3333; }
-        .quest-card.done-lose .slot-title { color: #ff3333 !important; opacity: 0.6; text-decoration: line-through; }
+        .quest-card.done-lose .slot-title { color: #ff5555; text-decoration: line-through; opacity: 0.7; }
 
         .quest-index {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 700;
             color: var(--text-muted);
-            background: rgba(0,0,0,0.2);
-            width: 36px; height: 36px;
+            background: rgba(0,0,0,0.25);
+            width: 34px; height: 34px;
             display: flex; align-items: center; justify-content: center;
             border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .quest-main-details {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
+            border: 1px solid rgba(255,255,255,0.03);
         }
 
         .slot-title {
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: #fff;
         }
 
         .quest-type-label {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--pink);
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            margin-top: 2px;
         }
 
         .quest-description {
             font-size: 0.95rem;
             color: var(--text-muted);
-            margin-top: 4px;
+            margin-top: 5px;
             line-height: 1.4;
         }
 
         .buy-badge {
-            background: rgba(255, 204, 0, 0.08);
-            border: 1px solid rgba(255, 204, 0, 0.4);
+            background: rgba(255, 204, 0, 0.05);
+            border: 1px solid rgba(255, 204, 0, 0.3);
             color: var(--gold);
             padding: 8px 14px;
             border-radius: 10px;
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 700;
-            text-align: right;
             white-space: nowrap;
         }
 
-        /* Консоль Логов */
         .stream-logs {
-            background: rgba(5, 2, 13, 0.9);
-            border: 1px solid rgba(189, 0, 255, 0.15);
+            background: #04010a;
+            border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 14px;
             padding: 15px;
-            width: 100%;
-            height: 140px;
+            height: 130px;
             overflow-y: auto;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            color: #c9bedb;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #9285a8;
         }
 
-        /* Премиальные модальные окна */
+        /* Модальные окна */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(4, 1, 10, 0.85);
-            backdrop-filter: blur(10px);
+            background: rgba(3, 1, 8, 0.85);
+            backdrop-filter: blur(8px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 1000;
-            transition: all 0.3s;
+            opacity: 1;
+            transition: opacity 0.2s ease;
         }
 
         .modal-overlay.hidden {
@@ -467,53 +423,43 @@
         }
 
         .modal-window {
-            background: linear-gradient(145deg, #180c2b, #0e051c);
+            background: #110721;
             border: 2px solid var(--cyan);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.7), var(--neon-cyan);
-            border-radius: 28px;
-            padding: 40px;
-            max-width: 580px;
-            width: 92%;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), var(--neon-cyan);
+            border-radius: 24px;
+            padding: 35px;
+            max-width: 540px;
+            width: 90%;
             text-align: center;
             display: flex;
             flex-direction: column;
-            gap: 22px;
-            transform: scale(1);
-            transition: transform 0.3s;
+            gap: 20px;
+            transform: translateY(0);
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .modal-overlay.hidden .modal-window {
-            transform: scale(0.9);
+            transform: translateY(30px);
         }
 
         .input-money {
-            background: #090314;
-            border: 2px solid rgba(255, 0, 127, 0.4);
-            padding: 16px;
-            border-radius: 14px;
+            background: #06020d;
+            border: 2px solid rgba(255, 0, 127, 0.3);
+            padding: 14px;
+            border-radius: 12px;
             color: white;
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: 700;
             text-align: center;
             width: 100%;
             outline: none;
-            transition: border-color 0.3s, box-shadow 0.3s;
         }
 
         .input-money:focus {
             border-color: var(--pink);
             box-shadow: var(--neon-pink);
         }
-
-        .rules-text {
-            text-align: left;
-            font-size: 1rem;
-            line-height: 1.6;
-            color: #d1c7e0;
-        }
-        .rules-text strong { color: var(--gold); }
-        .rules-text ul li { margin-bottom: 8px; }
     </style>
 </head>
 <body>
@@ -523,21 +469,21 @@
     <div class="app-container">
         
         <div class="top-utils">
-            <button id="rulesBtn" class="action-btn btn-secondary"><i class="fas fa-book-open"></i> ПРАВИЛА ШОУ</button>
+            <button id="rulesBtn" class="action-btn btn-secondary"><i class="fas fa-file-invoice-dollar"></i> ПРАВИЛА</button>
             <button id="soundToggle" class="action-btn btn-cyan"><i class="fas fa-volume-up"></i> ЗВУК: ВКЛ</button>
-            <button id="fullResetBtn" class="action-btn btn-secondary" style="color: #ff5555;"><i class="fas fa-trash-alt"></i> СБРОСИТЬ ВСЁ</button>
+            <button id="fullResetBtn" class="action-btn btn-secondary" style="color: #ff4444;"><i class="fas fa-sync-alt"></i> RESET</button>
         </div>
 
         <div class="header-panel">
             <div class="streamer-info">
                 <div class="logo-strawberry">🍓</div>
                 <div class="header-title-box">
-                    <h1>PRAGMATIC WHEEL</h1>
-                    <p>EXCLUSIVE STREAM INTERACTIVE</p>
+                    <h1>PRAGMATIC CAROUSEL</h1>
+                    <p>ULTIMATE STREAM MECHANIC</p>
                 </div>
             </div>
             <div class="stats-row">
-                <div class="stat-badge balance">Текущая фикса <strong id="balanceDisplay">100 000 ₽</strong></div>
+                <div class="stat-badge balance">Баланс марафона <strong id="balanceDisplay">100 000 ₽</strong></div>
                 <div class="stat-badge progress">Контракты <strong id="progressDisplay">0 / 20</strong></div>
                 <div class="stat-badge profit">Чистый профит <strong id="profitDisplay">0 ₽</strong></div>
             </div>
@@ -546,8 +492,7 @@
         <div class="main-layout">
             
             <div class="show-box">
-                <div class="box-title" style="color: var(--gold); text-shadow: 0 0 10px rgba(255,204,0,0.2);"><i class="fas fa-dice"></i> РАНДОМАЙЗЕР КОНТРАКТОВ</div>
-                <p style="font-size: 0.95rem; text-align: center; color: var(--text-muted); margin-top: -10px;">Запуск рандома для выбора следующей покупки</p>
+                <div class="box-title" style="color: var(--gold);"><i class="fas fa-circle-notch fa-spin"></i> SELECTION WHEEL</div>
                 
                 <div class="wheel-wrapper">
                     <div class="wheel-pointer"></div>
@@ -557,16 +502,16 @@
                     </div>
                 </div>
 
-                <button id="spinWheelBtn" class="action-btn" style="width: 100%; padding: 18px; font-size: 1.3rem;"><i class="fas fa-play"></i> КРУТИТЬ КАРУСЕЛЬ</button>
+                <button id="spinWheelBtn" class="action-btn" style="width: 100%; padding: 16px; font-size: 1.25rem; justify-content: center;"><i class="fas fa-dice"></i> ВРАЩАТЬ БАРАБАН</button>
 
-                <div style="width: 100%; margin-top: auto;">
-                    <h5 style="color: var(--pink); font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; font-weight:700; margin-bottom: 8px; letter-spacing:1px;">🔥 ХРОНИКА СОБЫТИЙ:</h5>
+                <div style="margin-top: 10px;">
+                    <h5 style="color: var(--pink); font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; margin-bottom: 6px;">📋 ХРОНОЛОГИЯ:</h5>
                     <div class="stream-logs" id="logBox"></div>
                 </div>
             </div>
 
             <div class="show-box">
-                <div class="box-title" style="color: var(--cyan); text-shadow: 0 0 10px rgba(0,255,255,0.2); text-align: left;"><i class="fas fa-layer-group"></i> МАТРИЦА КВЕСТОВ (20 КОНТРАКТОВ)</div>
+                <div class="box-title" style="color: var(--cyan);"><i class="fas fa-list-ol"></i> КОНТРАКТЫ НА СТРИМ</div>
                 <div class="quests-container-box" id="questsContainer"></div>
             </div>
 
@@ -576,32 +521,29 @@
     <div id="resultModal" class="modal-overlay hidden">
         <div class="modal-window">
             <h2 id="modalSlotTitle" style="color: var(--gold); font-family: 'Orbitron', sans-serif;">Slot Name</h2>
-            <h3 id="modalQuestName" style="color: var(--pink); font-family: 'Rajdhani', sans-serif; font-size: 1.4rem;">Квест</h3>
-            <p id="modalQuestDesc" style="color: var(--text-muted); font-size: 1rem; line-height:1.5; padding: 0 10px;"></p>
+            <h3 id="modalQuestName" style="color: var(--pink); font-family: 'Rajdhani', sans-serif; font-size: 1.3rem;">Квест</h3>
+            <p id="modalQuestDesc" style="color: var(--text-muted); font-size: 0.95rem;"></p>
             
-            <div style="margin: 10px 0; text-align: left;">
-                <label style="display: block; margin-bottom: 10px; font-weight: 600; color: var(--text-main); font-size: 1.05rem;"><i class="fas fa-coins" style="color:var(--gold);"></i> Итоговый выигрыш с бонуски (₽):</label>
-                <input type="number" id="payoutValue" class="input-money" placeholder="Введи сумму...">
+            <div style="text-align: left; margin: 10px 0;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">💰 Полный выигрыш с бонуски (₽):</label>
+                <input type="number" id="payoutValue" class="input-money" placeholder="0">
             </div>
 
-            <div style="display: flex; gap: 15px; margin-top: 10px;">
-                <button id="winConfirmBtn" class="action-btn btn-cyan" style="flex: 1; padding: 16px;"><i class="fas fa-check-circle"></i> КВЕСТ ВЫПОЛНЕН</button>
-                <button id="loseConfirmBtn" class="action-btn" style="flex: 1; background: linear-gradient(135deg, #ff3333, #aa0000); box-shadow: 0 0 20px rgba(255,51,51,0.3); border-color: rgba(255,51,51,0.3); padding: 16px;"><i class="fas fa-times-circle"></i> СЛИВ КВЕСТА</button>
+            <div style="display: flex; gap: 12px;">
+                <button id="winConfirmBtn" class="action-btn btn-cyan" style="flex: 1; justify-content: center;"><i class="fas fa-check"></i> ВЫПОЛНЕН</button>
+                <button id="loseConfirmBtn" class="action-btn" style="flex: 1; background: #cc0033; border-color:#990022; justify-content: center;"><i class="fas fa-times"></i> СЛИВ</button>
             </div>
-            <button id="cancelModalBtn" style="background: none; border: none; color: var(--text-muted); cursor: pointer; text-decoration: underline; font-size: 0.95rem; margin-top: 5px;">Вернуться назад</button>
+            <button id="cancelModalBtn" style="background:none; border:none; color:var(--text-muted); text-decoration:underline; cursor:pointer;">Закрыть</button>
         </div>
     </div>
 
     <div id="rulesModal" class="modal-overlay hidden">
-        <div class="modal-window" style="max-width:650px;">
-            <h2 style="color: var(--gold); font-family: 'Orbitron', sans-serif; letter-spacing:1px;"><i class="fas fa-star"></i> ПРАВИЛА СТРИМ ШОУ</h2>
-            <div class="rules-text">
-                <ul style="list-style: none; padding-left: 0;">
-                    <li><strong style="color:var(--cyan);">1. Выбор слота:</strong> Нажимайте кнопку карусели. Интерактивное колесо определит случайный контракт. Страница автоматически сфокусируется на выбранной карточке.</li>
-                    <li><strong style="color:var(--cyan);">2. Покупка:</strong> На балансе автоматически резервируется фиксированная цена бонуски. Стример открывает данный слот и покупает бонусную игру по указанной ставке.</li>
-                    <li><strong style="color:var(--cyan);">3. Фиксация Win:</strong> Если цель квеста достигнута, введите точную выплату бонуски. Программа сама вычтет расход, высчитает чистый профит и добавит выигрыш на баланс.</li>
-                    <li><strong style="color:var(--cyan);">4. Фиксация Lose:</strong> Если квест провален или бонуска слита в ноль, нажмите кнопку «Слив». Баланс уменьшится на стоимость покупки, а квест пометится красной матрицей.</li>
-                </ul>
+        <div class="modal-window">
+            <h2 style="color: var(--gold); font-family: 'Orbitron', sans-serif;">ПРАВИЛА МАРАФОНА</h2>
+            <div style="text-align: left; font-size: 0.95rem; line-height: 1.6; color: #b1a4c4; display:flex; flex-direction:column; gap: 10px;">
+                <p>1. Нажимаем <strong>ВРАЩАТЬ БАРАБАН</strong>. Алгоритм выбирает случайный незакрытый контракт.</p>
+                <p>2. Стример покупает бонусную игру в выбранном слоте по указанной цене (БУЙ).</p>
+                <p>3. По итогам бонуски вносим результат: при победе — полную сумму выплаты, при сливе — фиксируем минус.</p>
             </div>
             <button id="closeRulesBtn" class="action-btn btn-cyan" style="width:100%; justify-content:center;">ПОНЯТНО</button>
         </div>
@@ -632,18 +574,16 @@
             { id: 20, slot: "Слот на выбор Чата", type: "Финальный Аккорд", desc: "Взять бонуску за 10к в любом слоте и закрыть её в чистый плюс.", buy: 10000 }
         ];
 
-        let state = {
-            balance: 100000,
-            progress: 0,
-            profit: 0,
-            completedList: []
-        };
-
-        let soundOn = true;
-        let isSpinning = false;
-        let currentActiveQuest = null;
+        let state = { balance: 100000, progress: 0, profit: 0, completedList: [] };
+        let soundOn = true, isSpinning = false, currentActiveQuest = null;
         let audioCtx = null;
-        let spinInterval = null;
+        let isModalOpen = false; // флаг, чтобы не открывать модалку повторно
+
+        // Физика Canvas-колеса
+        let wheelAngle = 0;
+        let wheelSpeed = 0;
+        const friction = 0.982;
+        let lastSectorTriggered = -1;
 
         const els = {
             balance: document.getElementById('balanceDisplay'),
@@ -656,134 +596,221 @@
             payoutInput: document.getElementById('payoutValue')
         };
 
-        // ========== ФОНОВЫЕ ПЕРСОНАЖИ ==========
+        // Сохранение угла колеса
+        function saveWheelAngle() {
+            localStorage.setItem('pragmatic_wheel_angle', wheelAngle);
+        }
+
+        function loadWheelAngle() {
+            const saved = localStorage.getItem('pragmatic_wheel_angle');
+            if (saved !== null) wheelAngle = parseFloat(saved) || 0;
+        }
+
+        // Извлечение CSS-переменных
+        function getStyleColor(varName) {
+            return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+        }
+
+        // Бэкграунд
         const bgCanvas = document.getElementById('memePragmaticCanvas');
         const bgCtx = bgCanvas.getContext('2d');
         let backgroundMemes = [];
-        const memeEmojis = ["🍓", "⚡", "🐶", "🍬", "🤠", "👑", "🔱", "🦁", "🔮"];
+        const emojis = ["🍓", "⚡", "🐶", "🍬", "👑", "🔮"];
 
-        function initBackgroundEffects() {
-            bgCanvas.width = window.innerWidth;
-            bgCanvas.height = window.innerHeight;
-            backgroundMemes = [];
-            for(let i = 0; i < 25; i++) {
-                backgroundMemes.push({
-                    x: Math.random() * bgCanvas.width,
-                    y: Math.random() * bgCanvas.height,
-                    r: 20 + Math.random() * 20,
-                    txt: memeEmojis[Math.floor(Math.random() * memeEmojis.length)],
-                    sX: (Math.random() - 0.5) * 1.5,
-                    sY: (Math.random() - 0.5) * 1.5
-                });
-            }
+        function initBg() {
+            bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight;
+            backgroundMemes = Array.from({length: 20}, () => ({
+                x: Math.random() * bgCanvas.width, y: Math.random() * bgCanvas.height,
+                r: 15 + Math.random() * 20, txt: emojis[Math.floor(Math.random() * emojis.length)],
+                sX: (Math.random() - 0.5) * 1.2, sY: (Math.random() - 0.5) * 1.2
+            }));
         }
 
-        function drawBackground() {
-            if (!bgCtx) return;
-            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+        function drawBg() {
+            bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
             backgroundMemes.forEach(m => {
-                bgCtx.save();
-                bgCtx.font = `${m.r}px "Segoe UI Emoji", "Apple Color Emoji", sans-serif`;
-                bgCtx.shadowBlur = 15;
-                bgCtx.shadowColor = "rgba(189, 0, 255, 0.3)";
-                bgCtx.globalAlpha = 0.15;
-                bgCtx.fillText(m.txt, m.x, m.y);
-                bgCtx.restore();
-
-                let speedMultiplier = isSpinning ? 4 : 1;
-                m.x += m.sX * speedMultiplier; 
-                m.y += m.sY * speedMultiplier;
-
-                if(m.x < -40 || m.x > bgCanvas.width + 40) m.sX *= -1;
-                if(m.y < -40 || m.y > bgCanvas.height + 40) m.sY *= -1;
+                bgCtx.save(); bgCtx.font = `${m.r}px "Segoe UI Emoji", "Apple Color Emoji", sans-serif`; bgCtx.globalAlpha = 0.12;
+                bgCtx.fillText(m.txt, m.x, m.y); bgCtx.restore();
+                m.x += m.sX * (isSpinning ? 3 : 1); m.y += m.sY * (isSpinning ? 3 : 1);
+                if(m.x < -30 || m.x > bgCanvas.width + 30) m.sX *= -1;
+                if(m.y < -30 || m.y > bgCanvas.height + 30) m.sY *= -1;
             });
-            requestAnimationFrame(drawBackground);
+            requestAnimationFrame(drawBg);
         }
 
-        window.addEventListener('resize', () => {
-            bgCanvas.width = window.innerWidth;
-            bgCanvas.height = window.innerHeight;
-            initBackgroundEffects();
-        });
-
-        // ========== АУДИО ==========
+        // Аудио
         function initAudio() {
             if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                try {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                } catch(e) { console.warn("Audio not supported"); return; }
             }
             if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
+                audioCtx.resume().catch(e => console.warn("Audio resume failed", e));
             }
         }
 
         function playTone(freq, duration, type = 'sine') {
-            if (!soundOn || !audioCtx) return;
+            if (!soundOn) return;
             try {
+                initAudio();
+                if (!audioCtx) return;
                 const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
+                const gainNode = audioCtx.createGain();
                 osc.type = type;
                 osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch(e) {}
+                gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                osc.connect(gainNode); gainNode.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + duration);
+                setTimeout(() => { osc.disconnect(); gainNode.disconnect(); }, duration * 1000 + 50);
+            } catch(e) { console.warn("playTone error", e); }
         }
 
-        // ========== ОТРИСОВКА КОЛЕСА ==========
+        // Колесо
         const wheelCanvas = document.getElementById('wheelCanvas');
         const wCtx = wheelCanvas.getContext('2d');
 
-        function drawWheel() {
-            if (!wCtx) return;
+        function updateWheelPhysics() {
+            if (!isSpinning) return;
+
+            wheelAngle += wheelSpeed;
+            wheelSpeed *= friction;
+
             const sectors = QUEST_DATABASE.length;
-            const angle = (2 * Math.PI) / sectors;
+            const anglePerSector = (2 * Math.PI) / sectors;
+            const normalizedAngle = (2 * Math.PI - (wheelAngle % (2 * Math.PI))) % (2 * Math.PI);
+            const currentSector = Math.floor(normalizedAngle / anglePerSector) % sectors;
+
+            if (currentSector !== lastSectorTriggered) {
+                playTone(550, 0.03, 'triangle');
+                lastSectorTriggered = currentSector;
+            }
+
+            if (wheelSpeed < 0.002) {
+                isSpinning = false;
+                wheelSpeed = 0;
+                saveWheelAngle();
+                handleSpinEnd(currentSector);
+            }
+        }
+
+        function drawWheel() {
+            updateWheelPhysics();
+
+            const sectors = QUEST_DATABASE.length;
+            const anglePerSector = (2 * Math.PI) / sectors;
             const radius = 180;
             wCtx.clearRect(0, 0, 360, 360);
 
             for (let i = 0; i < sectors; i++) {
-                const quest = QUEST_DATABASE[i];
-                const isCompleted = state.completedList.find(c => c.id === quest.id);
-                
+                const q = QUEST_DATABASE[i];
+                const comp = state.completedList.find(c => c.id === q.id);
+
                 wCtx.save();
                 wCtx.translate(180, 180);
-                wCtx.rotate(i * angle);
+                wCtx.rotate(wheelAngle + i * anglePerSector);
 
-                wCtx.beginPath();
-                wCtx.moveTo(0, 0);
-                wCtx.arc(0, 0, radius, 0, angle);
-                wCtx.closePath();
-
-                if (isCompleted) {
-                    wCtx.fillStyle = isCompleted.status === 'win' ? '#033616' : '#420b11';
+                wCtx.beginPath(); wCtx.moveTo(0,0);
+                wCtx.arc(0, 0, radius, 0, anglePerSector); wCtx.closePath();
+                
+                if (comp) {
+                    wCtx.fillStyle = comp.status === 'win' ? '#063015' : '#3d0a11';
                 } else {
-                    wCtx.fillStyle = i % 2 === 0 ? '#1f0d3d' : '#2d1454';
+                    wCtx.fillStyle = i % 2 === 0 ? '#140826' : '#1d0c36';
                 }
                 wCtx.fill();
 
-                wCtx.strokeStyle = 'rgba(189, 0, 255, 0.2)';
-                wCtx.lineWidth = 1.5;
-                wCtx.stroke();
+                wCtx.strokeStyle = 'rgba(189, 0, 255, 0.15)'; wCtx.lineWidth = 1; wCtx.stroke();
 
-                // номер контракта на секторе
+                // Номера
                 wCtx.save();
-                wCtx.rotate(angle / 2);
-                wCtx.fillStyle = isCompleted ? 'rgba(255,255,255,0.4)' : (i % 2 === 0 ? '#00ffff' : '#ff007f');
-                wCtx.font = "bold 11px 'Orbitron', sans-serif";
-                wCtx.textAlign = "right";
-                wCtx.fillText(quest.id, radius - 20, 4);
+                wCtx.rotate(anglePerSector / 2);
+                wCtx.fillStyle = comp ? 'rgba(255,255,255,0.3)' : (i % 2 === 0 ? getStyleColor('--cyan') : getStyleColor('--pink'));
+                wCtx.font = "bold 11px 'Orbitron', sans-serif"; wCtx.textAlign = "right";
+                wCtx.fillText(q.id, radius - 22, 4);
                 wCtx.restore();
 
                 wCtx.restore();
             }
+
+            requestAnimationFrame(drawWheel);
         }
 
-        // ========== UI ОБНОВЛЕНИЕ ==========
-        function writeLog(text) {
-            const time = new Date().toLocaleTimeString();
-            els.logBox.innerHTML = `<div>[${time}] ${text}</div>` + els.logBox.innerHTML;
+        // Поиск ближайшего незакрытого контракта по углу
+        function findNearestAvailableSector(currentSector) {
+            const sectors = QUEST_DATABASE.length;
+            for (let offset = 0; offset < sectors; offset++) {
+                let idx = (currentSector + offset) % sectors;
+                let quest = QUEST_DATABASE[idx];
+                if (!state.completedList.some(c => c.id === quest.id)) {
+                    return idx;
+                }
+            }
+            return -1; // все контракты закрыты
+        }
+
+        function handleSpinEnd(sectorIndex) {
+            if (!isSpinning && wheelSpeed === 0) {
+                // уже обработано
+            }
+            // Проверяем, не закрыт ли уже выпавший контракт
+            let targetSector = sectorIndex;
+            let targetQuest = QUEST_DATABASE[targetSector];
+            if (state.completedList.some(c => c.id === targetQuest.id)) {
+                // Доворачиваем до ближайшего доступного
+                const newSector = findNearestAvailableSector(sectorIndex);
+                if (newSector !== -1) {
+                    targetSector = newSector;
+                    targetQuest = QUEST_DATABASE[targetSector];
+                    // Корректируем угол колеса, чтобы оно физически довернулось
+                    const sectors = QUEST_DATABASE.length;
+                    const anglePerSector = (2 * Math.PI) / sectors;
+                    const targetAngle = (2 * Math.PI) - (targetSector * anglePerSector) - anglePerSector/2;
+                    // Плавно докручиваем (добавляем небольшой импульс)
+                    wheelAngle = targetAngle;
+                    saveWheelAngle();
+                    // Звук фиксации
+                    playTone(900, 0.15, 'sine');
+                    setTimeout(() => playTone(1200, 0.2, 'sine'), 80);
+                } else {
+                    // Все контракты пройдены – ничего не делаем
+                    return;
+                }
+            }
+
+            currentActiveQuest = targetQuest;
+
+            // Снимаем блокировку кнопки
+            els.spinBtn.disabled = false;
+            // Возвращаем исходный текст кнопки
+            const spinBtnIcon = els.spinBtn.querySelector('i');
+            if (spinBtnIcon) spinBtnIcon.className = 'fas fa-dice';
+            els.spinBtn.innerHTML = '<i class="fas fa-dice"></i> ВРАЩАТЬ БАРАБАН';
+
+            const card = document.getElementById(`quest-card-${currentActiveQuest.id}`);
+            if (card) {
+                card.classList.add('selected-anim');
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            writeLog(`🎯 Выбран слот: ${currentActiveQuest.slot} (Контракт №${currentActiveQuest.id})`);
+
+            // Открываем модалку
+            if (!isModalOpen && !els.resultModal.classList.contains('hidden')) {
+                // уже открыта
+                return;
+            }
+            isModalOpen = true;
+            document.getElementById('modalSlotTitle').innerText = currentActiveQuest.slot;
+            document.getElementById('modalQuestName').innerText = `Контракт №${currentActiveQuest.id}: ${currentActiveQuest.type}`;
+            document.getElementById('modalQuestDesc').innerText = currentActiveQuest.desc;
+            els.payoutInput.value = '';
+            els.resultModal.classList.remove('hidden');
+        }
+
+        function writeLog(t) {
+            els.logBox.innerHTML = `<div>[${new Date().toLocaleTimeString()}] ${t}</div>` + els.logBox.innerHTML;
         }
 
         function renderQuests() {
@@ -792,15 +819,12 @@
                 const comp = state.completedList.find(c => c.id === q.id);
                 const card = document.createElement('div');
                 card.id = `quest-card-${q.id}`;
-                card.className = 'quest-card';
-                if (comp) {
-                    card.classList.add(comp.status === 'win' ? 'done-win' : 'done-lose');
-                }
+                card.className = `quest-card ${comp ? (comp.status === 'win' ? 'done-win' : 'done-lose') : ''}`;
 
-                let badgeHtml = `<div class="buy-badge">БУЙ: ${q.buy.toLocaleString()} ₽</div>`;
+                let badge = `<div class="buy-badge">БУЙ: ${q.buy.toLocaleString()} ₽</div>`;
                 if (comp) {
-                    badgeHtml = `<div class="buy-badge" style="border-color:${comp.status === 'win' ? '#00ff66':'#ff3333'}; color:${comp.status === 'win' ? '#00ff66':'#ff3333'};">
-                        ${comp.status === 'win' ? 'WIN +' + comp.payout.toLocaleString() : 'SLIV'} ₽
+                    badge = `<div class="buy-badge" style="color:${comp.status==='win'?'#00ff66':'#ff3333'}; border-color:${comp.status==='win'?'#00ff66':'#ff3333'};">
+                        ${comp.status === 'win' ? '+' + comp.payout.toLocaleString() : 'СЛИВ'} ₽
                     </div>`;
                 }
 
@@ -811,167 +835,114 @@
                         <div class="quest-type-label">${q.type}</div>
                         <div class="quest-description">${q.desc}</div>
                     </div>
-                    ${badgeHtml}
+                    ${badge}
                 `;
                 els.questsContainer.appendChild(card);
             });
         }
 
-        function updateTopBar() {
-            els.balance.innerText = state.balance.toLocaleString();
+        function updateUI() {
+            els.balance.innerText = state.balance.toLocaleString() + " ₽";
             els.progress.innerText = `${state.completedList.length} / ${QUEST_DATABASE.length}`;
-            
-            let computedProfit = 0;
-            state.completedList.forEach(c => {
-                const meta = QUEST_DATABASE.find(q => q.id === c.id);
-                if(meta) computedProfit += (c.payout - meta.buy);
-            });
-            state.profit = computedProfit;
-            els.profit.innerText = (state.profit >= 0 ? '+' : '') + state.profit.toLocaleString();
+            let prof = state.completedList.reduce((acc, c) => {
+                const q = QUEST_DATABASE.find(q => q.id === c.id);
+                return acc + (c.payout - (q ? q.buy : 0));
+            }, 0);
+            els.profit.innerText = (prof >= 0 ? '+' : '') + prof.toLocaleString() + " ₽";
         }
 
-        function saveGame() {
-            localStorage.setItem('pragmatic_carousel_save', JSON.stringify(state));
-        }
-
-        function loadGame() {
-            const saved = localStorage.getItem('pragmatic_carousel_save');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    if (parsed && typeof parsed.balance === 'number') {
-                        state = parsed;
-                        if (!state.completedList) state.completedList = [];
-                    }
-                } catch(e) {}
-            }
-        }
-
-        // ========== ЛОГИКА ВРАЩЕНИЯ И ОБРАБОТКИ ==========
+        // Кнопка вращения
         els.spinBtn.onclick = function() {
-            if (isSpinning) return;
-            initAudio();
+            if (isSpinning || currentActiveQuest || isModalOpen) return;
+
             const available = QUEST_DATABASE.filter(q => !state.completedList.some(c => c.id === q.id));
-            if (available.length === 0) {
-                alert("🎉 Все контракты пройдены! Великолепное шоу!");
+            if (!available.length) {
+                alert("Марафон завершен! Все контракты закрыты.");
                 return;
             }
 
+            document.querySelectorAll('.quest-card').forEach(c => c.classList.remove('selected-anim'));
+            
             isSpinning = true;
             els.spinBtn.disabled = true;
-            document.querySelectorAll('.quest-card').forEach(c => c.classList.remove('selected-anim'));
+            // Меняем текст на индикацию вращения
+            els.spinBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> ВРАЩАЕТСЯ...';
 
-            const targetQuest = available[Math.floor(Math.random() * available.length)];
-            currentActiveQuest = targetQuest;
-
-            const sectors = QUEST_DATABASE.length;
-            const targetSectorIndex = QUEST_DATABASE.findIndex(q => q.id === targetQuest.id);
-            const sectorAngle = 360 / sectors;
-            const extraSpins = 4 * 360;
-            const targetAngleDegrees = extraSpins + (360 - (targetSectorIndex * sectorAngle)) - (sectorAngle / 2);
-            
-            const wheelContainer = document.querySelector('.wheel-canvas-container');
-            wheelContainer.style.transform = `rotate(${targetAngleDegrees}deg)`;
-
-            // треск рулетки
-            let step = 0;
-            spinInterval = setInterval(() => {
-                step++;
-                if (step % 3 === 0) playTone(650, 0.04, 'triangle');
-            }, 50);
-
-            setTimeout(() => {
-                clearInterval(spinInterval);
-                isSpinning = false;
-                els.spinBtn.disabled = false;
-                playTone(880, 0.2, 'sine');
-                playTone(1200, 0.25, 'sine');
-
-                const card = document.getElementById(`quest-card-${targetQuest.id}`);
-                if (card) {
-                    card.classList.add('selected-anim');
-                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-                writeLog(`🎯 Рулетка выбрала: Слот [${targetQuest.slot}] | Квест: ${targetQuest.type}`);
-
-                setTimeout(() => {
-                    document.getElementById('modalSlotTitle').innerText = targetQuest.slot;
-                    document.getElementById('modalQuestName').innerText = `Контракт №${targetQuest.id}: ${targetQuest.type}`;
-                    document.getElementById('modalQuestDesc').innerText = targetQuest.desc;
-                    els.payoutInput.value = '';
-                    els.resultModal.classList.remove('hidden');
-                }, 1200);
-            }, 4000);
+            // Импульс вращения (рандом)
+            wheelSpeed = 0.35 + Math.random() * 0.15;
         };
 
+        // Обработка результата
         document.getElementById('winConfirmBtn').onclick = function() {
-            let winSum = parseFloat(els.payoutInput.value);
-            if (isNaN(winSum) || winSum < 0) {
-                alert("Введите корректную сумму выплаты! Если бонуска пустая — введите 0 или нажмите 'СЛИВ КВЕСТА'");
-                return;
-            }
-            state.completedList.push({
-                id: currentActiveQuest.id,
-                status: 'win',
-                payout: winSum
-            });
-            state.balance = state.balance - currentActiveQuest.buy + winSum;
-            writeLog(`✅ Квест пройден! Слот: ${currentActiveQuest.slot}. Куплено за: ${currentActiveQuest.buy} ₽, Выплатило: ${winSum} ₽. Профит: ${winSum - currentActiveQuest.buy} ₽`);
-            closeModal();
-            syncGame();
+            if (!currentActiveQuest) return;
+            let p = parseFloat(els.payoutInput.value);
+            if (isNaN(p) || p < 0) p = 0;
+
+            state.completedList.push({ id: currentActiveQuest.id, status: 'win', payout: p });
+            state.balance = state.balance - currentActiveQuest.buy + p;
+            
+            writeLog(`✅ Контракт выполнен! Выплата: ${p} ₽. Профит: ${p - currentActiveQuest.buy} ₽`);
+            closeAndSync();
         };
 
         document.getElementById('loseConfirmBtn').onclick = function() {
-            state.completedList.push({
-                id: currentActiveQuest.id,
-                status: 'lose',
-                payout: 0
-            });
-            state.balance = state.balance - currentActiveQuest.buy;
-            writeLog(`❌ Слив контракта в ${currentActiveQuest.slot}. Минус ${currentActiveQuest.buy} ₽ фиксы.`);
-            closeModal();
-            syncGame();
+            if (!currentActiveQuest) return;
+            state.completedList.push({ id: currentActiveQuest.id, status: 'lose', payout: 0 });
+            state.balance -= currentActiveQuest.buy;
+            
+            writeLog(`❌ Контракт слит в ${currentActiveQuest.slot}. Убыток: -${currentActiveQuest.buy} ₽`);
+            closeAndSync();
         };
 
-        function closeModal() {
+        function closeAndSync() {
+            currentActiveQuest = null;
+            isModalOpen = false;
             els.resultModal.classList.add('hidden');
+            updateUI(); renderQuests();
+            localStorage.setItem('pragmatic_carousel_save', JSON.stringify(state));
         }
-        document.getElementById('cancelModalBtn').onclick = closeModal;
 
-        function syncGame() {
-            updateTopBar();
-            drawWheel();
-            renderQuests();
-            saveGame();
-        }
+        document.getElementById('cancelModalBtn').onclick = () => {
+            currentActiveQuest = null;
+            isModalOpen = false;
+            els.resultModal.classList.add('hidden');
+        };
 
         document.getElementById('fullResetBtn').onclick = function() {
-            if(confirm("Вы уверены, что хотите полностью перезапустить шоу и обнулить баланс до 100 000 ₽?")) {
+            if(confirm("Сбросить весь прогресс марафона?")) {
                 localStorage.removeItem('pragmatic_carousel_save');
+                localStorage.removeItem('pragmatic_wheel_angle');
                 state = { balance: 100000, progress: 0, profit: 0, completedList: [] };
-                document.querySelector('.wheel-canvas-container').style.transform = `rotate(0deg)`;
-                writeLog("♻️ Всё шоу полностью сброшено! Баланс обновлён.");
-                syncGame();
+                wheelAngle = 0; wheelSpeed = 0; currentActiveQuest = null;
+                isModalOpen = false;
+                els.resultModal.classList.add('hidden');
+                updateUI(); renderQuests(); writeLog("♻️ Марафон полностью сброшен.");
+                saveWheelAngle();
             }
         };
 
-        // Правила и звук
-        const rulesModal = document.getElementById('rulesModal');
-        document.getElementById('rulesBtn').onclick = () => rulesModal.classList.remove('hidden');
-        document.getElementById('closeRulesBtn').onclick = () => rulesModal.classList.add('hidden');
-        
+        document.getElementById('rulesBtn').onclick = () => document.getElementById('rulesModal').classList.remove('hidden');
+        document.getElementById('closeRulesBtn').onclick = () => document.getElementById('rulesModal').classList.add('hidden');
         document.getElementById('soundToggle').onclick = function() {
             soundOn = !soundOn;
             this.innerHTML = soundOn ? `<i class="fas fa-volume-up"></i> ЗВУК: ВКЛ` : `<i class="fas fa-volume-mute"></i> ЗВУК: ВЫКЛ`;
-            if (soundOn && audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
         };
 
-        // Запуск
-        document.body.addEventListener('click', () => { initAudio(); }, { once: true });
-        loadGame();
-        initBackgroundEffects();
-        drawBackground();
-        syncGame();
+        window.addEventListener('resize', initBg);
+        document.body.addEventListener('click', () => initAudio(), { once: true });
+
+        // Загрузка сохранений
+        const save = localStorage.getItem('pragmatic_carousel_save');
+        if (save) {
+            try {
+                const parsed = JSON.parse(save);
+                if (parsed && typeof parsed.balance === 'number') state = parsed;
+                if (!state.completedList) state.completedList = [];
+            } catch(e) {}
+        }
+        loadWheelAngle();
+
+        initBg(); drawBg(); updateUI(); renderQuests(); drawWheel();
     })();
     </script>
 </body>
