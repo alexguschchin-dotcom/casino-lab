@@ -568,10 +568,10 @@
         <div class="modal-window">
             <h2 style="color: var(--gold); font-family: 'Orbitron', sans-serif;">ПРАВИЛА МАРАФОНА</h2>
             <div style="text-align: left; font-size: 0.95rem; line-height: 1.6; color: #b1a4c4; display:flex; flex-direction:column; gap: 10px;">
-                <p>1. Нажимаем <strong>ВРАЩАТЬ БАРАБАН</strong>. Алгоритм выбирает случайный незакрытый контракт.</p>
-                <p>2. Стример покупает бонусную игру в слоте по указанной цене (от 4 800 до 10 000 ₽).</p>
+                <p>1. Нажимаем <strong>ВРАЩАТЬ БАРАБАН</strong>. Колесо останавливается только на ещё не пройденных контрактах.</p>
+                <p>2. Стример покупает бонусную игру в слоте по указанной цене (4800–11200 ₽).</p>
                 <p>3. По итогам бонуски вносим результат: при победе — сумму выплаты, при сливе — фиксируем минус.</p>
-                <p>4. <strong>Зевс (⚡👴)</strong> иногда вмешивается: может снизить цену на 30% или удвоить её (делая задание сложнее).</p>
+                <p>4. <strong>Зевс (⚡👴)</strong> может вмешаться: изменить цену (x2, /2, x1.5), заставить выполнить задание дважды или вовсе пропустить его.</p>
             </div>
             <button id="closeRulesBtn" class="action-btn btn-cyan" style="width:100%; justify-content:center;">ПОНЯТНО</button>
         </div>
@@ -579,32 +579,33 @@
 
     <script>
     (function(){
-        // БАЗА КВЕСТОВ с распределением по сложности (цена от 4800 до 10000)
+        // НОВЫЕ ЦЕНЫ: 4800, 6400, 8000, 9600, 11200 (равномерное распределение)
+        const PRICE_TIERS = [4800, 6400, 8000, 9600, 11200];
         const BASE_QUEST_DATABASE = [
-            { id: 1, slot: "Gates of Olympus", type: "Дедовские Капли", desc: "Поймать суммарный множитель больше x12 за один спин.", baseBuy: 4800, ico: "⚡", difficulty: "easy" },
-            { id: 2, slot: "The Dog House Megaways", type: "Пёсий Созвон", desc: "Поймать хотя бы 4 диких символа на одном барабане бонуски.", baseBuy: 6000, ico: "🐶", difficulty: "medium" },
-            { id: 3, slot: "Sugar Rush", type: "Диабет Отменяется", desc: "Раскачать хотя бы одну ячейку поля до множителя x16.", baseBuy: 6000, ico: "🍬", difficulty: "medium" },
-            { id: 4, slot: "Juicy Fruits", type: "Витаминный Бум", desc: "Вырастить дикий Скаттер-квадрат до размера 2x2 или выше.", baseBuy: 4800, ico: "🍋", difficulty: "easy" },
-            { id: 5, slot: "Sweet Bonanza", type: "Заворот Кишок", desc: "Поймать спин в бонуске, где одновременно упадут сразу 3 леденца.", baseBuy: 6000, ico: "🍭", difficulty: "medium" },
-            { id: 6, slot: "Big Bass Splash", type: "Рыбалка на Живца", desc: "Дойти минимум до 2-го уровня (множитель x2) на шкале рыбака.", baseBuy: 4800, ico: "🐟", difficulty: "easy" },
-            { id: 7, slot: "Starlight Princess", type: "Аниме-Синдром", desc: "Засейвить и зафиксировать общий множитель x20 к концу бонуски.", baseBuy: 8000, ico: "⭐", difficulty: "hard" },
-            { id: 8, slot: "Cleocatra", type: "Кошачий Лоток", desc: "Поймать полноценную линию из кошек с активным диким множителем.", baseBuy: 6000, ico: "🐱", difficulty: "medium" },
-            { id: 9, slot: "Zeus vs Hades", type: "Семейные Разборки", desc: "Играть строго за Аида. Выбить хотя бы один расширяющийся барабан x5+.", baseBuy: 6000, ico: "🔥", difficulty: "medium" },
-            { id: 10, slot: "Wild West Gold", type: "Ковбойский Занос", desc: "Заполнить три центральных барабана звездами-вилдами.", baseBuy: 6000, ico: "🤠", difficulty: "medium" },
-            { id: 11, slot: "Madame Destiny Megaways", type: "Гадание по Руке", desc: "На стартовом колесе фортуны выбить множитель не менее x8.", baseBuy: 8000, ico: "🔮", difficulty: "hard" },
-            { id: 12, slot: "Buffalo King Megaways", type: "Стадо Бешеных", desc: "Получить более 40 фриспинов суммарно за счет ретриггеров.", baseBuy: 7500, ico: "🦬", difficulty: "hard" },
-            { id: 13, slot: "Big Bass Amazon Xtreme", type: "Амазонский Монстр", desc: "Угадать на стартовом выборе в аквариумах не менее 3 модификаторов.", baseBuy: 8000, ico: "🐊", difficulty: "hard" },
-            { id: 14, slot: "Sugar Rush 1000", type: "Сахарная Кома", desc: "Получить общую окупаемость бонуски ровно в x1.5 или выше.", baseBuy: 10000, ico: "🍩", difficulty: "hard" },
-            { id: 15, slot: "Wisdom of Athena", type: "Щит и Меч", desc: "Открыть самый верхний заблокированный ряд ячеек полностью за бонуску.", baseBuy: 10000, ico: "🛡️", difficulty: "hard" },
-            { id: 16, slot: "Gems Bonanza", type: "Золотая Лихорадка", desc: "Успешно перейти на 3-й уровень прогресса карты (Gold Fever).", baseBuy: 10000, ico: "💎", difficulty: "hard" },
-            { id: 17, slot: "The Dog House Multihold", type: "Будка на Прокачку", desc: "Открыть хотя бы 3 активных экрана с собаками одновременно.", baseBuy: 10000, ico: "🐾", difficulty: "hard" },
-            { id: 18, slot: "Gates of Olympus 1000", type: "Гнев Деда x1000", desc: "Поймать анимацию, где Зевс кидает на поле шар с множителем x50+.", baseBuy: 10000, ico: "👑", difficulty: "hard" },
-            { id: 19, slot: "Fruit Party 2", type: "Праздник Живота", desc: "Словить дикий размножающийся множитель x64 на одной ягоде.", baseBuy: 10000, ico: "🍇", difficulty: "hard" },
-            { id: 20, slot: "Слот на выбор Чата", type: "Финальный Аккорд", desc: "Взять бонуску за 10к в любом слоте и закрыть её в чистый плюс.", baseBuy: 10000, ico: "💬", difficulty: "hard" }
+            { id: 1, slot: "Gates of Olympus", type: "Дедовские Капли", desc: "Поймать суммарный множитель больше x12 за один спин.", baseBuy: PRICE_TIERS[0], ico: "⚡", difficulty: "easy" },
+            { id: 2, slot: "The Dog House Megaways", type: "Пёсий Созвон", desc: "Поймать хотя бы 4 диких символа на одном барабане бонуски.", baseBuy: PRICE_TIERS[1], ico: "🐶", difficulty: "medium" },
+            { id: 3, slot: "Sugar Rush", type: "Диабет Отменяется", desc: "Раскачать хотя бы одну ячейку поля до множителя x16.", baseBuy: PRICE_TIERS[1], ico: "🍬", difficulty: "medium" },
+            { id: 4, slot: "Juicy Fruits", type: "Витаминный Бум", desc: "Вырастить дикий Скаттер-квадрат до размера 2x2 или выше.", baseBuy: PRICE_TIERS[0], ico: "🍋", difficulty: "easy" },
+            { id: 5, slot: "Sweet Bonanza", type: "Заворот Кишок", desc: "Поймать спин в бонуске, где одновременно упадут сразу 3 леденца.", baseBuy: PRICE_TIERS[1], ico: "🍭", difficulty: "medium" },
+            { id: 6, slot: "Big Bass Splash", type: "Рыбалка на Живца", desc: "Дойти минимум до 2-го уровня (множитель x2) на шкале рыбака.", baseBuy: PRICE_TIERS[0], ico: "🐟", difficulty: "easy" },
+            { id: 7, slot: "Starlight Princess", type: "Аниме-Синдром", desc: "Засейвить и зафиксировать общий множитель x20 к концу бонуски.", baseBuy: PRICE_TIERS[2], ico: "⭐", difficulty: "hard" },
+            { id: 8, slot: "Cleocatra", type: "Кошачий Лоток", desc: "Поймать полноценную линию из кошек с активным диким множителем.", baseBuy: PRICE_TIERS[1], ico: "🐱", difficulty: "medium" },
+            { id: 9, slot: "Zeus vs Hades", type: "Семейные Разборки", desc: "Играть строго за Аида. Выбить хотя бы один расширяющийся барабан x5+.", baseBuy: PRICE_TIERS[1], ico: "🔥", difficulty: "medium" },
+            { id: 10, slot: "Wild West Gold", type: "Ковбойский Занос", desc: "Заполнить три центральных барабана звездами-вилдами.", baseBuy: PRICE_TIERS[1], ico: "🤠", difficulty: "medium" },
+            { id: 11, slot: "Madame Destiny Megaways", type: "Гадание по Руке", desc: "На стартовом колесе фортуны выбить множитель не менее x8.", baseBuy: PRICE_TIERS[2], ico: "🔮", difficulty: "hard" },
+            { id: 12, slot: "Buffalo King Megaways", type: "Стадо Бешеных", desc: "Получить более 40 фриспинов суммарно за счет ретриггеров.", baseBuy: PRICE_TIERS[2], ico: "🦬", difficulty: "hard" },
+            { id: 13, slot: "Big Bass Amazon Xtreme", type: "Амазонский Монстр", desc: "Угадать на стартовом выборе в аквариумах не менее 3 модификаторов.", baseBuy: PRICE_TIERS[2], ico: "🐊", difficulty: "hard" },
+            { id: 14, slot: "Sugar Rush 1000", type: "Сахарная Кома", desc: "Получить общую окупаемость бонуски ровно в x1.5 или выше.", baseBuy: PRICE_TIERS[3], ico: "🍩", difficulty: "hard" },
+            { id: 15, slot: "Wisdom of Athena", type: "Щит и Меч", desc: "Открыть самый верхний заблокированный ряд ячеек полностью за бонуску.", baseBuy: PRICE_TIERS[3], ico: "🛡️", difficulty: "hard" },
+            { id: 16, slot: "Gems Bonanza", type: "Золотая Лихорадка", desc: "Успешно перейти на 3-й уровень прогресса карты (Gold Fever).", baseBuy: PRICE_TIERS[3], ico: "💎", difficulty: "hard" },
+            { id: 17, slot: "The Dog House Multihold", type: "Будка на Прокачку", desc: "Открыть хотя бы 3 активных экрана с собаками одновременно.", baseBuy: PRICE_TIERS[3], ico: "🐾", difficulty: "hard" },
+            { id: 18, slot: "Gates of Olympus 1000", type: "Гнев Деда x1000", desc: "Поймать анимацию, где Зевс кидает на поле шар с множителем x50+.", baseBuy: PRICE_TIERS[4], ico: "👑", difficulty: "hard" },
+            { id: 19, slot: "Fruit Party 2", type: "Праздник Живота", desc: "Словить дикий размножающийся множитель x64 на одной ягоде.", baseBuy: PRICE_TIERS[4], ico: "🍇", difficulty: "hard" },
+            { id: 20, slot: "Слот на выбор Чата", type: "Финальный Аккорд", desc: "Взять бонуску за 10к в любом слоте и закрыть её в чистый плюс.", baseBuy: PRICE_TIERS[4], ico: "💬", difficulty: "hard" }
         ];
 
         let QUEST_DATABASE = [];
-        let state = { balance: 100000, profit: 0, completedList: [], modifiedBuys: {} };
+        let state = { balance: 100000, profit: 0, completedList: [], modifiedBuys: {}, repeatCounts: {} };
         let soundOn = true, isSpinning = false, currentActiveQuest = null, isFinalEnding = false;
         let zeusAnimationLock = false;
         let audioCtx = null;
@@ -738,7 +739,8 @@
         function rebuildQuestDatabase() {
             QUEST_DATABASE = BASE_QUEST_DATABASE.map(q => ({
                 ...q,
-                buy: state.modifiedBuys[q.id] !== undefined ? state.modifiedBuys[q.id] : q.baseBuy
+                buy: state.modifiedBuys[q.id] !== undefined ? state.modifiedBuys[q.id] : q.baseBuy,
+                repeatCount: state.repeatCounts[q.id] !== undefined ? state.repeatCounts[q.id] : 1
             }));
         }
 
@@ -747,7 +749,8 @@
                 balance: state.balance,
                 profit: state.profit,
                 completedList: state.completedList,
-                modifiedBuys: state.modifiedBuys
+                modifiedBuys: state.modifiedBuys,
+                repeatCounts: state.repeatCounts
             };
             localStorage.setItem('pragmatic_carousel_save', JSON.stringify(save));
         }
@@ -761,6 +764,7 @@
                     state.profit = data.profit ?? 0;
                     state.completedList = data.completedList ?? [];
                     state.modifiedBuys = data.modifiedBuys ?? {};
+                    state.repeatCounts = data.repeatCounts ?? {};
                 } catch(e) {}
             }
             rebuildQuestDatabase();
@@ -878,7 +882,7 @@
             requestAnimationFrame(drawEffectsLoop);
         }
 
-        // === ОТРИСОВКА КОЛЕСА С ЦЕНОЙ ===
+        // === ОТРИСОВКА КОЛЕСА С УЧЁТОМ ВЫПОЛНЕННЫХ ЗАДАНИЙ ===
         const wheelCanvas = document.getElementById('wheelCanvas');
         const wCtx = wheelCanvas.getContext('2d');
 
@@ -892,7 +896,7 @@
             wCtx.clearRect(0, 0, 340, 340);
             for (let i = 0; i < totalSectors; i++) {
                 const q = QUEST_DATABASE[i];
-                const comp = state.completedList.find(c => c.id === q.id);
+                const isDone = state.completedList.some(c => c.id === q.id);
                 const start = wheelAngle + i * sectorAngleRad - Math.PI / 2;
                 wCtx.save();
                 wCtx.translate(170, 170);
@@ -901,8 +905,8 @@
                 wCtx.moveTo(0,0);
                 wCtx.arc(0, 0, radius, 0, sectorAngleRad);
                 wCtx.closePath();
-                if (comp) {
-                    wCtx.fillStyle = comp.status === 'win' ? '#072b14' : '#33080e';
+                if (isDone) {
+                    wCtx.fillStyle = '#0a0515';
                 } else {
                     wCtx.fillStyle = i % 2 === 0 ? '#130724' : '#1b0b30';
                 }
@@ -916,15 +920,15 @@
                 // Иконка слота
                 wCtx.font = "14px 'Segoe UI Emoji'";
                 wCtx.textAlign = "center";
-                wCtx.fillStyle = comp ? 'rgba(255,255,255,0.2)' : '#fff';
+                wCtx.fillStyle = isDone ? 'rgba(255,255,255,0.15)' : '#fff';
                 wCtx.fillText(q.ico || "🎰", radius - 50, 0);
-                // Цена (в тысячах)
+                // Цена
                 wCtx.font = "bold 9px 'Orbitron', sans-serif";
-                wCtx.fillStyle = comp ? 'rgba(255,255,255,0.2)' : (i % 2 === 0 ? getStyleColor('--cyan') : getStyleColor('--pink'));
+                wCtx.fillStyle = isDone ? 'rgba(255,255,255,0.15)' : (i % 2 === 0 ? getStyleColor('--cyan') : getStyleColor('--pink'));
                 wCtx.fillText(formatPrice(q.buy), radius - 50, 16);
                 // Номер контракта
                 wCtx.font = "bold 10px 'Orbitron', sans-serif";
-                wCtx.fillStyle = comp ? 'rgba(255,255,255,0.15)' : (i % 2 === 0 ? getStyleColor('--cyan') : getStyleColor('--pink'));
+                wCtx.fillStyle = isDone ? 'rgba(255,255,255,0.1)' : (i % 2 === 0 ? getStyleColor('--cyan') : getStyleColor('--pink'));
                 wCtx.textAlign = "right";
                 wCtx.fillText(q.id, radius - 12, 4);
                 wCtx.restore();
@@ -949,10 +953,48 @@
             els.lightningPath.setAttribute('d', pathD);
         }
 
+        // НОВЫЕ ЭФФЕКТЫ ЗЕВСА
+        function applyZeusEffect(quest, callback) {
+            const effects = [
+                { name: "x2", desc: "удвоил стоимость контракта", modifier: (val) => val * 2, isSkip: false, isDoubleWork: false },
+                { name: "/2", desc: "уменьшил стоимость вдвое", modifier: (val) => Math.round(val / 2), isSkip: false, isDoubleWork: false },
+                { name: "x1.5", desc: "увеличил стоимость в полтора раза", modifier: (val) => Math.round(val * 1.5), isSkip: false, isDoubleWork: false },
+                { name: "Двойная работа", desc: "теперь этот контракт нужно выполнить дважды", modifier: (val) => val, isSkip: false, isDoubleWork: true },
+                { name: "Пропуск", desc: "задание автоматически засчитано! Баланс не меняется", modifier: (val) => val, isSkip: true, isDoubleWork: false }
+            ];
+            const effect = effects[Math.floor(Math.random() * effects.length)];
+            
+            writeLog(`⚡ Зевс применил "${effect.name}" к контракту №${quest.id}: ${effect.desc}`);
+            showToast(`Зевс: ${effect.desc}`, effect.name === "Пропуск" ? false : true);
+            
+            if (effect.isSkip) {
+                // Автоматически засчитываем контракт без изменения баланса
+                state.completedList.push({ id: quest.id, status: 'win', payout: 0 });
+                writeLog(`✨ Контракт №${quest.id} пропущен по воле Зевса!`);
+                callback(true); // true = пропущен, не открываем модалку
+                return;
+            }
+            
+            if (effect.isDoubleWork) {
+                // Устанавливаем счётчик повторений (2)
+                state.repeatCounts[quest.id] = 2;
+                quest.repeatCount = 2;
+                writeLog(`⚠️ Теперь контракт №${quest.id} нужно выполнить дважды!`);
+                callback(false);
+                return;
+            }
+            
+            // Изменяем цену
+            const newBuy = effect.modifier(quest.buy);
+            quest.buy = newBuy;
+            state.modifiedBuys[quest.id] = newBuy;
+            writeLog(`💰 Новая стоимость: ${newBuy} ₽`);
+            callback(false);
+        }
+
         function triggerZeusEvent(targetQuest, onComplete) {
             zeusAnimationLock = true;
             els.spinBtn.disabled = true;
-            writeLog(`⚡ Зевс заметил контракт №${targetQuest.id}! Вмешательство богов...`);
             playEffect('thunder');
             els.zeus.classList.add('active');
 
@@ -974,41 +1016,25 @@
                 cardEl.classList.add('zeus-blitzed');
                 playEffect('thunder');
 
-                const isBuff = Math.random() > 0.4;
-                if (isBuff) {
-                    const newBuy = Math.round((targetQuest.buy * 0.7) / 100) * 100;
-                    targetQuest.buy = newBuy;
-                    state.modifiedBuys[targetQuest.id] = newBuy;
-                    targetQuest.type += " ⚡ [СКИДКА]";
-                    targetQuest.desc = "🔥 ЗЕВС СНИЗИЛ ЦЕНУ! " + targetQuest.desc;
-                    writeLog(`⚡ БЛАГОСЛОВЕНИЕ: стоимость снижена на 30%! Новая цена: ${targetQuest.buy} ₽`);
-                    showToast(`✨ Зевс сбросил цену контракта №${targetQuest.id} до ${targetQuest.buy} ₽!`);
-                } else {
-                    const newBuy = targetQuest.baseBuy * 2;
-                    targetQuest.buy = newBuy;
-                    state.modifiedBuys[targetQuest.id] = newBuy;
-                    targetQuest.type += " 💀 [ГНЕВ]";
-                    targetQuest.desc = "💀 УСЛОЖНЁННЫЙ РЕЖИМ! Цена удвоена, но занос принесёт x3 от базовой цены!";
-                    writeLog(`⚡ ГНЕВ ЗЕВСА: цена удвоена до ${targetQuest.buy} ₽, задание становится хардкорным!`);
-                    showToast(`⚡ ГНЕВ ЗЕВСА! Цена контракта №${targetQuest.id} удвоена до ${targetQuest.buy} ₽`, true);
-                }
-
-                setTimeout(() => {
-                    els.lightningSvg.style.opacity = '0';
-                    cardEl.classList.remove('zeus-blitzed');
-                    renderQuests();
-                    saveAll();
-                }, 300);
-
-                setTimeout(() => {
-                    els.zeus.classList.remove('active');
-                    zeusAnimationLock = false;
-                    if (onComplete) onComplete();
-                }, 1000);
+                // Применяем эффект
+                applyZeusEffect(targetQuest, (isSkipped) => {
+                    setTimeout(() => {
+                        els.lightningSvg.style.opacity = '0';
+                        cardEl.classList.remove('zeus-blitzed');
+                        renderQuests();
+                        saveAll();
+                    }, 300);
+                    
+                    setTimeout(() => {
+                        els.zeus.classList.remove('active');
+                        zeusAnimationLock = false;
+                        if (onComplete) onComplete(isSkipped);
+                    }, 1000);
+                });
             }, 1200);
         }
 
-        // === АНИМАЦИЯ ВРАЩЕНИЯ ===
+        // === АНИМАЦИЯ ВРАЩЕНИЯ (только на доступные сектора) ===
         function startSpinAnimation(targetSectorIndex) {
             if (isSpinning || zeusAnimationLock) return;
             playEffect('spin');
@@ -1016,7 +1042,7 @@
             els.spinBtn.disabled = true;
             
             const targetRaw = (Math.PI * 2) - (targetSectorIndex * sectorAngleRad);
-            const totalDelta = (Math.PI * 2) * 4 + targetRaw;
+            const totalDelta = (Math.PI * 2) * 5 + targetRaw;
             const startWheelAngle = wheelAngle;
             const targetAngleRad = startWheelAngle + totalDelta;
             const spinStartTime = performance.now();
@@ -1056,9 +1082,16 @@
             }
             writeLog(`🎯 Колесо выбрало контракт №${quest.id} — ${quest.slot} (цена: ${quest.buy} ₽)`);
 
-            const triggerModal = () => {
+            const triggerModal = (isSkipped) => {
+                if (isSkipped) {
+                    // Если Зевс пропустил задание, просто закрываем
+                    closeAndSync();
+                    return;
+                }
                 document.getElementById('modalSlotTitle').innerText = quest.slot + " " + quest.ico;
-                document.getElementById('modalQuestName').innerText = `Задание: ${quest.type}`;
+                let taskText = `Задание: ${quest.type}`;
+                if (quest.repeatCount > 1) taskText += ` (${quest.repeatCount} раз)`;
+                document.getElementById('modalQuestName').innerHTML = taskText;
                 document.getElementById('modalQuestDesc').innerHTML = `${quest.desc}<br><span style="color: var(--gold);">💰 Цена бонусы: ${quest.buy.toLocaleString()} ₽</span>`;
                 els.payoutInput.value = '';
                 els.resultModal.classList.remove('hidden');
@@ -1066,12 +1099,23 @@
                 if (!zeusAnimationLock) els.spinBtn.disabled = false;
             };
 
-            if (Math.random() < 0.25 && !state.completedList.some(c => c.id === quest.id)) {
-                triggerZeusEvent(quest, () => {
-                    triggerModal();
+            const alreadyDone = state.completedList.some(c => c.id === quest.id);
+            if (alreadyDone) {
+                // На всякий случай, если вдруг выпал выполненный – перезапускаем вращение
+                els.spinBtn.onclick();
+                return;
+            }
+
+            if (Math.random() < 0.25) {
+                triggerZeusEvent(quest, (isSkipped) => {
+                    if (!isSkipped) triggerModal(false);
+                    else {
+                        // Пропуск – ничего не делаем, контракт уже закрыт внутри эффекта
+                        closeAndSync();
+                    }
                 });
             } else {
-                triggerModal();
+                triggerModal(false);
                 if (!zeusAnimationLock) els.spinBtn.disabled = false;
             }
         }
@@ -1086,21 +1130,24 @@
                 const comp = state.completedList.find(c => c.id === q.id);
                 const card = document.createElement('div');
                 card.id = `quest-card-${q.id}`;
-                card.className = `quest-card ${comp ? (comp.status === 'win' ? 'done-win' : 'done-lose') : ''}`;
-                
                 const isBlitzed = q.type.includes("⚡") || q.type.includes("💀");
-                const badgeStyle = isBlitzed ? 'color: var(--gold); border-color: var(--gold);' : '';
-                let badge = `<div class="buy-badge" style="${badgeStyle}">Цена: ${q.buy.toLocaleString()} ₽</div>`;
+                let doneClass = '';
+                if (comp) doneClass = comp.status === 'win' ? 'done-win' : 'done-lose';
+                card.className = `quest-card ${doneClass}`;
+                
+                let badge = `<div class="buy-badge" style="${isBlitzed ? 'color: var(--gold); border-color: var(--gold);' : ''}">Цена: ${q.buy.toLocaleString()} ₽</div>`;
                 if (comp) {
                     const multiplier = (comp.payout / q.buy).toFixed(1);
                     badge = `<div class="buy-badge" style="color:${comp.status==='win'?'#00ff66':'#ff3333'}; border-color:${comp.status==='win'?'#00ff66':'#ff3333'};">
                         ${comp.status === 'win' ? '+' + comp.payout.toLocaleString() + ' ₽' : 'СЛИВ'} ${comp.status === 'win' ? ` (x${multiplier})` : ''}
                     </div>`;
                 }
+                let repeatInfo = '';
+                if (q.repeatCount > 1 && !comp) repeatInfo = `<span style="color: var(--gold); font-size: 0.8rem;"> (нужно ${q.repeatCount} раза)</span>`;
                 card.innerHTML = `
                     <div class="quest-index">${q.ico}</div>
                     <div class="quest-main-details">
-                        <div class="slot-title">${q.slot} <span style="color: var(--text-muted); font-size:0.9rem;">(#${q.id})</span></div>
+                        <div class="slot-title">${q.slot} <span style="color: var(--text-muted); font-size:0.9rem;">(#${q.id})</span>${repeatInfo}</div>
                         <div class="quest-type-label">${q.type}</div>
                         <div class="quest-description">${q.desc}</div>
                     </div>
@@ -1112,7 +1159,8 @@
 
         function updateUI() {
             els.balance.innerText = state.balance.toLocaleString() + " ₽";
-            els.progress.innerText = `${state.completedList.length} / ${QUEST_DATABASE.length}`;
+            const completedCount = state.completedList.length;
+            els.progress.innerText = `${completedCount} / ${QUEST_DATABASE.length}`;
             let prof = state.completedList.reduce((acc, c) => {
                 const q = QUEST_DATABASE.find(q => q.id === c.id);
                 return acc + (c.payout - (q ? q.buy : 0));
@@ -1120,7 +1168,7 @@
             state.profit = prof;
             els.profit.innerText = (prof >= 0 ? '+' : '') + prof.toLocaleString() + " ₽";
 
-            if (state.completedList.length === QUEST_DATABASE.length && !isFinalEnding) {
+            if (completedCount === QUEST_DATABASE.length && !isFinalEnding) {
                 executeMassiveEnding(prof);
             }
         }
@@ -1139,11 +1187,14 @@
             }, 1000);
         }
 
-        // === ОБРАБОТЧИКИ ===
+        // === ОБРАБОТЧИК ВРАЩЕНИЯ (выбираем ТОЛЬКО НЕЗАКРЫТЫЕ) ===
         els.spinBtn.onclick = function() {
-            if (isSpinning || currentActiveQuest || isFinalEnding || zeusAnimationLock) return;
+            if (isSpinning || zeusAnimationLock || isFinalEnding) return;
             const available = QUEST_DATABASE.filter(q => !state.completedList.some(c => c.id === q.id));
-            if (!available.length) return;
+            if (!available.length) {
+                writeLog("🎉 Все контракты уже выполнены!");
+                return;
+            }
             document.querySelectorAll('.quest-card').forEach(c => c.classList.remove('selected-anim'));
             const chosenQuest = available[Math.floor(Math.random() * available.length)];
             const chosenIndex = QUEST_DATABASE.findIndex(x => x.id === chosenQuest.id);
@@ -1154,6 +1205,21 @@
             if (!currentActiveQuest) return;
             let p = parseFloat(els.payoutInput.value);
             if (isNaN(p) || p < 0) p = 0;
+            
+            // Обработка двойного выполнения
+            let repeat = currentActiveQuest.repeatCount || 1;
+            if (repeat > 1) {
+                currentActiveQuest.repeatCount = repeat - 1;
+                state.repeatCounts[currentActiveQuest.id] = currentActiveQuest.repeatCount;
+                writeLog(`⚠️ Контракт №${currentActiveQuest.id} выполнен! Осталось ещё ${currentActiveQuest.repeatCount} раз.`);
+                showToast(`Двойная работа: осталось ${currentActiveQuest.repeatCount} выполнений!`);
+                currentActiveQuest = null;
+                els.resultModal.classList.add('hidden');
+                updateUI(); renderQuests(); drawWheel();
+                saveAll();
+                return;
+            }
+            
             state.completedList.push({ id: currentActiveQuest.id, status: 'win', payout: p });
             state.balance = state.balance - currentActiveQuest.buy + p;
             const multiplier = (p / currentActiveQuest.buy).toFixed(1);
@@ -1167,6 +1233,20 @@
 
         function confirmLose() {
             if (!currentActiveQuest) return;
+            
+            let repeat = currentActiveQuest.repeatCount || 1;
+            if (repeat > 1) {
+                currentActiveQuest.repeatCount = repeat - 1;
+                state.repeatCounts[currentActiveQuest.id] = currentActiveQuest.repeatCount;
+                writeLog(`❌ Контракт №${currentActiveQuest.id} провален! Осталось ещё ${currentActiveQuest.repeatCount} попыток.`);
+                showToast(`Двойная работа: осталось ${currentActiveQuest.repeatCount} выполнений!`, true);
+                currentActiveQuest = null;
+                els.resultModal.classList.add('hidden');
+                updateUI(); renderQuests(); drawWheel();
+                saveAll();
+                return;
+            }
+            
             state.completedList.push({ id: currentActiveQuest.id, status: 'lose', payout: 0 });
             state.balance -= currentActiveQuest.buy;
             writeLog(`❌ Контракт №${currentActiveQuest.id} провален: ${currentActiveQuest.slot}. Потеряно: -${currentActiveQuest.buy} ₽`);
@@ -1233,7 +1313,7 @@
         document.getElementById('fullResetBtn').onclick = function() {
             if(confirm("Сбросить весь прогресс марафона и вернуть исходные цены?")) {
                 localStorage.removeItem('pragmatic_carousel_save');
-                state = { balance: 100000, profit: 0, completedList: [], modifiedBuys: {} };
+                state = { balance: 100000, profit: 0, completedList: [], modifiedBuys: {}, repeatCounts: {} };
                 rebuildQuestDatabase();
                 wheelAngle = 0; 
                 isSpinning = false;
