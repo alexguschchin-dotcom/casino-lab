@@ -70,6 +70,7 @@
             display: flex;
             justify-content: flex-end;
             gap: 12px;
+            flex-wrap: wrap;
         }
 
         .action-btn {
@@ -250,6 +251,7 @@
             max-height: 680px;
             overflow-y: auto;
             padding-right: 10px;
+            position: relative;
         }
 
         .quests-container-box::-webkit-scrollbar { width: 6px; }
@@ -275,13 +277,25 @@
         .quest-card.selected-anim { border-color: var(--cyan); box-shadow: var(--neon-cyan); background: rgba(0, 255, 255, 0.03); }
         .quest-card.selected-anim::before { background: var(--cyan); }
 
-        .quest-card.done-win { border-color: rgba(0, 255, 102, 0.2); }
+        .quest-card.done-win { border-color: rgba(0, 255, 102, 0.2); background: rgba(0, 255, 102, 0.02); }
         .quest-card.done-win::before { background: #00ff66; }
         .quest-card.done-win .slot-title { color: #00ff66; }
 
-        .quest-card.done-lose { border-color: rgba(255, 51, 51, 0.2); }
+        .quest-card.done-lose { border-color: rgba(255, 51, 51, 0.2); background: rgba(255, 51, 51, 0.02); }
         .quest-card.done-lose::before { background: #ff3333; }
         .quest-card.done-lose .slot-title { color: #ff5555; text-decoration: line-through; opacity: 0.6; }
+
+        .quest-card.zeus-blitzed {
+            border-color: var(--gold) !important;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.4) !important;
+            animation: lightningPulse 0.4s ease-in-out 3;
+        }
+
+        @keyframes lightningPulse {
+            0% { filter: brightness(1); }
+            50% { filter: brightness(1.8); background: rgba(255, 204, 0, 0.1); }
+            100% { filter: brightness(1); }
+        }
 
         .quest-index {
             font-family: 'Orbitron', sans-serif;
@@ -326,7 +340,7 @@
             background: rgba(3, 1, 8, 0.85);
             backdrop-filter: blur(8px);
             display: flex; align-items: center; justify-content: center;
-            z-index: 1000; opacity: 1; transition: opacity 0.2s ease;
+            z-index: 1000; opacity: 1; transition: opacity 0.15s ease;
         }
         .modal-overlay.hidden { opacity: 0; pointer-events: none; }
 
@@ -337,9 +351,9 @@
             border-radius: 24px; padding: 35px;
             max-width: 540px; width: 90%; text-align: center;
             display: flex; flex-direction: column; gap: 20px;
-            transform: translateY(0); transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: translateY(0); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.2);
         }
-        .modal-overlay.hidden .modal-window { transform: translateY(30px); }
+        .modal-overlay.hidden .modal-window { transform: translateY(20px); }
 
         .input-money {
             background: #06020d;
@@ -360,7 +374,7 @@
             font-weight: 900; font-size: 4.5rem;
             text-align: center; text-transform: uppercase;
             letter-spacing: 5px; opacity: 0;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.5);
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.3);
         }
         #winCelebrationBanner.active {
             transform: translate(-50%, -50%) scale(1);
@@ -369,6 +383,76 @@
         .banner-win { color: #00ff66; text-shadow: 0 0 30px #00ff66; }
         .banner-bigwin { color: var(--pink); text-shadow: 0 0 40px var(--pink), 0 0 10px #fff; }
         .banner-megawin { color: var(--gold); text-shadow: 0 0 50px var(--gold), 0 0 20px #ff5500; }
+
+        /* АНИМАЦИЯ ЗЕВСА НА ОБЛАКЕ */
+        #zeusCharacter {
+            position: fixed;
+            right: -250px;
+            top: 30%;
+            width: 220px;
+            height: 220px;
+            z-index: 995;
+            pointer-events: none;
+            transition: right 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #zeusCharacter.active {
+            right: 40px;
+        }
+        .zeus-cloud {
+            font-size: 6rem;
+            position: absolute;
+            bottom: 10px;
+            filter: drop-shadow(0 10px 15px rgba(0, 255, 255, 0.6));
+            animation: floatCloud 2s ease-in-out infinite alternate;
+        }
+        .zeus-god {
+            font-size: 5.5rem;
+            z-index: 2;
+            position: relative;
+            transform: translateY(-15px);
+            animation: floatZeus 2s ease-in-out infinite alternate;
+        }
+        @keyframes floatCloud { 0% { transform: translateY(0); filter: drop-shadow(0 10px 15px rgba(0, 255, 255, 0.5)); } 100% { transform: translateY(-10px); filter: drop-shadow(0 15px 25px rgba(255, 0, 127, 0.6)); } }
+        @keyframes floatZeus { 0% { transform: translateY(-15px) scale(1); } 100% { transform: translateY(-22px) scale(1.05); } }
+
+        /* ЛИНЕЙКА МИТИЧЕСКОЙ МОЛНИИ ДЛЯ ХОЛСТА */
+        #lightningBoltSvg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 996; pointer-events: none;
+            opacity: 0; filter: drop-shadow(0 0 20px #fff) drop-shadow(0 0 40px var(--gold));
+        }
+
+        /* TOAST-УВЕДОМЛЕНИЯ */
+        .toast-notification {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #110721;
+            border: 2px solid var(--gold);
+            border-radius: 30px;
+            padding: 12px 28px;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: bold;
+            font-size: 1rem;
+            color: var(--gold);
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.4);
+            z-index: 1010;
+            backdrop-filter: blur(8px);
+            white-space: nowrap;
+            animation: toastFade 3s ease-in-out forwards;
+        }
+        @keyframes toastFade {
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); visibility: hidden; }
+        }
     </style>
 </head>
 <body>
@@ -376,8 +460,18 @@
     <canvas id="bgMemeCanvas"></canvas>
     <div id="winCelebrationBanner">BIG WIN</div>
 
+    <div id="zeusCharacter">
+        <div class="zeus-god">⚡👴⚡</div>
+        <div class="zeus-cloud">☁️</div>
+    </div>
+
+    <svg id="lightningBoltSvg">
+        <path id="lightningPath" d="" stroke="#ffcc00" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+
     <div class="app-container">
         <div class="top-utils">
+            <button id="editBalanceBtn" class="action-btn btn-secondary"><i class="fas fa-coins"></i> ИЗМЕНИТЬ БАЛАНС</button>
             <button id="rulesBtn" class="action-btn btn-secondary"><i class="fas fa-file-invoice-dollar"></i> ПРАВИЛА</button>
             <button id="soundToggle" class="action-btn btn-cyan"><i class="fas fa-volume-up"></i> ЗВУК: ВКЛ</button>
             <button id="fullResetBtn" class="action-btn btn-secondary" style="color: #ff4444;"><i class="fas fa-sync-alt"></i> RESET</button>
@@ -425,6 +519,19 @@
         </div>
     </div>
 
+    <!-- Модалка изменения баланса -->
+    <div id="balanceModal" class="modal-overlay hidden">
+        <div class="modal-window">
+            <h2 style="color: var(--gold); font-family: 'Orbitron', sans-serif;">💰 ИЗМЕНЕНИЕ БАЛАНСА</h2>
+            <p style="color: var(--text-muted);">Введи актуальную сумму фиксы (в рублях):</p>
+            <input type="number" id="newBalanceInput" class="input-money" placeholder="0">
+            <div style="display: flex; gap: 12px;">
+                <button id="applyBalanceBtn" class="action-btn btn-cyan" style="flex:1;">ПРИМЕНИТЬ</button>
+                <button id="cancelBalanceBtn" class="action-btn btn-secondary" style="flex:1;">ОТМЕНА</button>
+            </div>
+        </div>
+    </div>
+
     <div id="resultModal" class="modal-overlay hidden">
         <div class="modal-window">
             <h2 id="modalSlotTitle" style="color: var(--gold); font-family: 'Orbitron', sans-serif;">Slot Name</h2>
@@ -449,8 +556,9 @@
             <h2 style="color: var(--gold); font-family: 'Orbitron', sans-serif;">ПРАВИЛА МАРАФОНА</h2>
             <div style="text-align: left; font-size: 0.95rem; line-height: 1.6; color: #b1a4c4; display:flex; flex-direction:column; gap: 10px;">
                 <p>1. Нажимаем <strong>ВРАЩАТЬ БАРАБАН</strong>. Алгоритм выбирает случайный незакрытый контракт.</p>
-                <p>2. Стример покупает бонусную игру в слоте по указанной цене (БУЙ).</p>
+                <p>2. Стример покупает бонусную игру в слоте по указанной цене.</p>
                 <p>3. По итогам бонуски вносим результат: при победе — сумму выплаты, при сливе — фиксируем минус.</p>
+                <p>4. <strong>Зевс (⚡👴)</strong> иногда вмешивается: может снизить цену на 30% или удвоить её, но умножить множитель.</p>
             </div>
             <button id="closeRulesBtn" class="action-btn btn-cyan" style="width:100%; justify-content:center;">ПОНЯТНО</button>
         </div>
@@ -458,46 +566,40 @@
 
     <script>
     (function(){
-        // БАЗА КВЕСТОВ (20 шт) с иконками для колеса
-        const QUEST_DATABASE = [
-            { id: 1, slot: "Gates of Olympus", type: "Дедовские Капли", desc: "Поймать суммарный множитель больше x12 за один спин.", buy: 4800, ico: "⚡" },
-            { id: 2, slot: "The Dog House Megaways", type: "Пёсий Созвон", desc: "Поймать хотя бы 4 диких символа на одном барабане бонуски.", buy: 6000, ico: "🐶" },
-            { id: 3, slot: "Sugar Rush", type: "Диабет Отменяется", desc: "Раскачать хотя бы одну ячейку поля до множителя x16.", buy: 6000, ico: "🍬" },
-            { id: 4, slot: "Juicy Fruits", type: "Витаминный Бум", desc: "Вырастить дикий Скаттер-квадрат до размера 2x2 или выше.", buy: 4800, ico: "🍋" },
-            { id: 5, slot: "Sweet Bonanza", type: "Заворот Кишок", desc: "Поймать спин в бонуске, где одновременно упадут сразу 3 леденца.", buy: 6000, ico: "🍭" },
-            { id: 6, slot: "Big Bass Splash", type: "Рыбалка на Живца", desc: "Дойти минимум до 2-го уровня (множитель x2) на шкале рыбака.", buy: 4800, ico: "🐟" },
-            { id: 7, slot: "Starlight Princess", type: "Аниме-Синдром", desc: "Засейвить и зафиксировать общий множитель x20 к концу бонуски.", buy: 8000, ico: "⭐" },
-            { id: 8, slot: "Cleocatra", type: "Кошачий Лоток", desc: "Поймать полноценную линию из кошек с активным диким множителем.", buy: 6000, ico: "🐱" },
-            { id: 9, slot: "Zeus vs Hades", type: "Семейные Разборки", desc: "Играть строго за Аида. Выбить хотя бы один расширяющийся барабан x5+.", buy: 6000, ico: "🔥" },
-            { id: 10, slot: "Wild West Gold", type: "Ковбойский Занос", desc: "Заполнить три центральных барабана звездами-вилдами.", buy: 6000, ico: "🤠" },
-            { id: 11, slot: "Madame Destiny Megaways", type: "Гадание по Руке", desc: "На стартовом колесе фортуны выбить множитель не менее x8.", buy: 8000, ico: "🔮" },
-            { id: 12, slot: "Buffalo King Megaways", type: "Стадо Бешеных", desc: "Получить более 40 фриспинов суммарно за счет ретриггеров.", buy: 7500, ico: "🦬" },
-            { id: 13, slot: "Big Bass Amazon Xtreme", type: "Амазонский Монстр", desc: "Угадать на стартовом выборе в аквариумах не менее 3 модификаторов.", buy: 8000, ico: "🐊" },
-            { id: 14, slot: "Sugar Rush 1000", type: "Сахарная Кома", desc: "Получить общую окупаемость бонуски ровно в x1.5 или выше.", buy: 10000, ico: "🍩" },
-            { id: 15, slot: "Wisdom of Athena", type: "Щит и Меч", desc: "Открыть самый верхний заблокированный ряд ячеек полностью за бонуску.", buy: 10000, ico: "🛡️" },
-            { id: 16, slot: "Gems Bonanza", type: "Золотая Лихорадка", desc: "Успешно перейти на 3-й уровень прогресса карты (Gold Fever).", buy: 10000, ico: "💎" },
-            { id: 17, slot: "The Dog House Multihold", type: "Будка на Прокачку", desc: "Открыть хотя бы 3 активных экрана с собаками одновременно.", buy: 10000, ico: "🐾" },
-            { id: 18, slot: "Gates of Olympus 1000", type: "Гнев Деда x1000", desc: "Поймать анимацию, где Зевс кидает на поле шар с множителем x50+.", buy: 10000, ico: "👑" },
-            { id: 19, slot: "Fruit Party 2", type: "Праздник Живота", desc: "Словить дикий размножающийся множитель x64 на одной ягоде.", buy: 10000, ico: "🍇" },
-            { id: 20, slot: "Слот на выбор Чата", type: "Финальный Аккорд", desc: "Взять бонуску за 10к в любом слоте и закрыть её в чистый плюс.", buy: 10000, ico: "💬" }
+        const BASE_QUEST_DATABASE = [
+            { id: 1, slot: "Gates of Olympus", type: "Дедовские Капли", desc: "Поймать суммарный множитель больше x12 за один спин.", baseBuy: 4800, ico: "⚡" },
+            { id: 2, slot: "The Dog House Megaways", type: "Пёсий Созвон", desc: "Поймать хотя бы 4 диких символа на одном барабане бонуски.", baseBuy: 6000, ico: "🐶" },
+            { id: 3, slot: "Sugar Rush", type: "Диабет Отменяется", desc: "Раскачать хотя бы одну ячейку поля до множителя x16.", baseBuy: 6000, ico: "🍬" },
+            { id: 4, slot: "Juicy Fruits", type: "Витаминный Бум", desc: "Вырастить дикий Скаттер-квадрат до размера 2x2 или выше.", baseBuy: 4800, ico: "🍋" },
+            { id: 5, slot: "Sweet Bonanza", type: "Заворот Кишок", desc: "Поймать спин в бонуске, где одновременно упадут сразу 3 леденца.", baseBuy: 6000, ico: "🍭" },
+            { id: 6, slot: "Big Bass Splash", type: "Рыбалка на Живца", desc: "Дойти минимум до 2-го уровня (множитель x2) на шкале рыбака.", baseBuy: 4800, ico: "🐟" },
+            { id: 7, slot: "Starlight Princess", type: "Аниме-Синдром", desc: "Засейвить и зафиксировать общий множитель x20 к концу бонуски.", baseBuy: 8000, ico: "⭐" },
+            { id: 8, slot: "Cleocatra", type: "Кошачий Лоток", desc: "Поймать полноценную линию из кошек с активным диким множителем.", baseBuy: 6000, ico: "🐱" },
+            { id: 9, slot: "Zeus vs Hades", type: "Семейные Разборки", desc: "Играть строго за Аида. Выбить хотя бы один расширяющийся барабан x5+.", baseBuy: 6000, ico: "🔥" },
+            { id: 10, slot: "Wild West Gold", type: "Ковбойский Занос", desc: "Заполнить три центральных барабана звездами-вилдами.", baseBuy: 6000, ico: "🤠" },
+            { id: 11, slot: "Madame Destiny Megaways", type: "Гадание по Руке", desc: "На стартовом колесе фортуны выбить множитель не менее x8.", baseBuy: 8000, ico: "🔮" },
+            { id: 12, slot: "Buffalo King Megaways", type: "Стадо Бешеных", desc: "Получить более 40 фриспинов суммарно за счет ретриггеров.", baseBuy: 7500, ico: "🦬" },
+            { id: 13, slot: "Big Bass Amazon Xtreme", type: "Амазонский Монстр", desc: "Угадать на стартовом выборе в аквариумах не менее 3 модификаторов.", baseBuy: 8000, ico: "🐊" },
+            { id: 14, slot: "Sugar Rush 1000", type: "Сахарная Кома", desc: "Получить общую окупаемость бонуски ровно в x1.5 или выше.", baseBuy: 10000, ico: "🍩" },
+            { id: 15, slot: "Wisdom of Athena", type: "Щит и Меч", desc: "Открыть самый верхний заблокированный ряд ячеек полностью за бонуску.", baseBuy: 10000, ico: "🛡️" },
+            { id: 16, slot: "Gems Bonanza", type: "Золотая Лихорадка", desc: "Успешно перейти на 3-й уровень прогресса карты (Gold Fever).", baseBuy: 10000, ico: "💎" },
+            { id: 17, slot: "The Dog House Multihold", type: "Будка на Прокачку", desc: "Открыть хотя бы 3 активных экрана с собаками одновременно.", baseBuy: 10000, ico: "🐾" },
+            { id: 18, slot: "Gates of Olympus 1000", type: "Гнев Деда x1000", desc: "Поймать анимацию, где Зевс кидает на поле шар с множителем x50+.", baseBuy: 10000, ico: "👑" },
+            { id: 19, slot: "Fruit Party 2", type: "Праздник Живота", desc: "Словить дикий размножающийся множитель x64 на одной ягоде.", baseBuy: 10000, ico: "🍇" },
+            { id: 20, slot: "Слот на выбор Чата", type: "Финальный Аккорд", desc: "Взять бонуску за 10к в любом слоте и закрыть её в чистый плюс.", baseBuy: 10000, ico: "💬" }
         ];
 
-        let state = { balance: 100000, progress: 0, profit: 0, completedList: [] };
-        let soundOn = true, isSpinning = false, currentActiveQuest = null;
+        // Загружаем сохранённые модификации цен
+        let QUEST_DATABASE = [];
+        let state = { balance: 100000, profit: 0, completedList: [], modifiedBuys: {} };
+        let soundOn = true, isSpinning = false, currentActiveQuest = null, isFinalEnding = false;
         let audioCtx = null;
 
-        // === НОВАЯ ПЛАВНАЯ ФИЗИКА КОЛЕСА (Delta Time) ===
         let wheelAngle = 0;
-        let animFrame = null;
-        let spinStartTime = 0;
-        let spinDuration = 0; // длительность анимации в секундах
-        let startAngle = 0;
-        let targetAngleRad = 0;
         let lastSectorTriggered = -1;
-        const totalSectors = QUEST_DATABASE.length;
+        const totalSectors = 20;
         const sectorAngleRad = (Math.PI * 2) / totalSectors;
 
-        // Для фоновых частиц и взрывов
         let bgParticles = [];
         let winExplosionParticles = [];
         const slotMemeIcons = ["🍓", "🍭", "🍬", "⚡", "👑", "🍒", "💰", "💎", "💵"];
@@ -511,60 +613,54 @@
             logBox: document.getElementById('logBox'),
             resultModal: document.getElementById('resultModal'),
             payoutInput: document.getElementById('payoutValue'),
-            banner: document.getElementById('winCelebrationBanner')
+            banner: document.getElementById('winCelebrationBanner'),
+            zeus: document.getElementById('zeusCharacter'),
+            lightningSvg: document.getElementById('lightningBoltSvg'),
+            lightningPath: document.getElementById('lightningPath'),
+            balanceModal: document.getElementById('balanceModal'),
+            newBalanceInput: document.getElementById('newBalanceInput')
         };
 
         function getStyleColor(varName) {
             return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
         }
 
-        // === НОВЫЙ ПРОФЕССИОНАЛЬНЫЙ ЗВУКОВОЙ ДВИЖОК ===
         function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
 
         function playEffect(type) {
             if (!soundOn) return;
             initAudio();
             if (audioCtx.state === 'suspended') audioCtx.resume();
-
             const now = audioCtx.currentTime;
 
             switch (type) {
                 case 'click': {
                     const osc = audioCtx.createOscillator();
                     const gainNode = audioCtx.createGain();
-                    const filter = audioCtx.createBiquadFilter();
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(280, now);
-                    osc.frequency.exponentialRampToValueAtTime(80, now + 0.04);
-                    filter.type = 'lowpass';
-                    filter.frequency.setValueAtTime(1200, now);
-                    gainNode.gain.setValueAtTime(0.25, now);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
-                    osc.connect(filter);
-                    filter.connect(gainNode);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(320, now);
+                    osc.frequency.exponentialRampToValueAtTime(120, now + 0.03);
+                    gainNode.gain.setValueAtTime(0.15, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+                    osc.connect(gainNode);
                     gainNode.connect(audioCtx.destination);
-                    osc.start(now);
-                    osc.stop(now + 0.05);
+                    osc.start(now); osc.stop(now + 0.04);
                     break;
                 }
                 case 'win': {
-                    const notes = [261.63, 329.63, 392.00, 523.25];
-                    notes.forEach((freq, index) => {
+                    const notes = [440, 554.37, 659.25, 880];
+                    notes.forEach((freq, i) => {
                         const osc = audioCtx.createOscillator();
                         const gainNode = audioCtx.createGain();
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(freq, now + index * 0.06);
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + i * 0.05);
                         gainNode.gain.setValueAtTime(0, now);
-                        gainNode.gain.linearRampToValueAtTime(0.15, now + index * 0.06 + 0.02);
-                        gainNode.gain.exponentialRampToValueAtTime(0.001, now + index * 0.06 + 0.6);
-                        osc.connect(gainNode);
-                        gainNode.connect(audioCtx.destination);
-                        osc.start(now + index * 0.06);
-                        osc.stop(now + index * 0.06 + 0.6);
+                        gainNode.gain.linearRampToValueAtTime(0.2, now + i * 0.05 + 0.01);
+                        gainNode.gain.exponentialRampToValueAtTime(0.001, now + i * 0.05 + 0.4);
+                        osc.connect(gainNode); gainNode.connect(audioCtx.destination);
+                        osc.start(now + i * 0.05); osc.stop(now + i * 0.05 + 0.4);
                     });
                     break;
                 }
@@ -572,73 +668,151 @@
                     const osc = audioCtx.createOscillator();
                     const gainNode = audioCtx.createGain();
                     osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(180, now);
-                    osc.frequency.linearRampToValueAtTime(70, now + 0.4);
-                    const filter = audioCtx.createBiquadFilter();
-                    filter.type = 'lowpass';
-                    filter.frequency.setValueAtTime(600, now);
-                    gainNode.gain.setValueAtTime(0.15, now);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-                    osc.connect(filter);
-                    filter.connect(gainNode);
-                    gainNode.connect(audioCtx.destination);
-                    osc.start(now);
-                    osc.stop(now + 0.4);
+                    osc.frequency.setValueAtTime(140, now);
+                    osc.frequency.linearRampToValueAtTime(60, now + 0.35);
+                    gainNode.gain.setValueAtTime(0.2, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                    osc.connect(gainNode); gainNode.connect(audioCtx.destination);
+                    osc.start(now); osc.stop(now + 0.35);
                     break;
                 }
                 case 'spin': {
                     const osc = audioCtx.createOscillator();
                     const gainNode = audioCtx.createGain();
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(150, now);
-                    osc.frequency.exponentialRampToValueAtTime(450, now + 0.3);
-                    gainNode.gain.setValueAtTime(0.12, now);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-                    osc.connect(gainNode);
-                    gainNode.connect(audioCtx.destination);
-                    osc.start(now);
-                    osc.stop(now + 0.3);
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.exponentialRampToValueAtTime(380, now + 0.25);
+                    gainNode.gain.setValueAtTime(0.1, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                    osc.connect(gainNode); gainNode.connect(audioCtx.destination);
+                    osc.start(now); osc.stop(now + 0.25);
+                    break;
+                }
+                case 'thunder': {
+                    const bufferSize = audioCtx.sampleRate * 1.5;
+                    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        data[i] = Math.random() * 2 - 1;
+                    }
+                    const noise = audioCtx.createBufferSource();
+                    noise.buffer = buffer;
+                    const filter = audioCtx.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(300, now);
+                    filter.frequency.exponentialRampToValueAtTime(40, now + 1.2);
+                    const gainNode = audioCtx.createGain();
+                    gainNode.gain.setValueAtTime(0.4, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 1.4);
+                    noise.connect(filter); filter.connect(gainNode); gainNode.connect(audioCtx.destination);
+                    noise.start(now); noise.stop(now + 1.5);
                     break;
                 }
             }
         }
 
-        // === ФОНОВЫЕ ЧАСТИЦЫ И ВЗРЫВЫ ===
+        function showToast(message, isError = false) {
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.textContent = message;
+            if (isError) toast.style.borderColor = '#ff3366';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // === ЗАГРУЗКА / СОХРАНЕНИЕ ===
+        function rebuildQuestDatabase() {
+            QUEST_DATABASE = BASE_QUEST_DATABASE.map(q => ({
+                ...q,
+                buy: state.modifiedBuys[q.id] !== undefined ? state.modifiedBuys[q.id] : q.baseBuy
+            }));
+        }
+
+        function saveAll() {
+            const save = {
+                balance: state.balance,
+                profit: state.profit,
+                completedList: state.completedList,
+                modifiedBuys: state.modifiedBuys
+            };
+            localStorage.setItem('pragmatic_carousel_save', JSON.stringify(save));
+        }
+
+        function loadAll() {
+            const saved = localStorage.getItem('pragmatic_carousel_save');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    state.balance = data.balance ?? 100000;
+                    state.profit = data.profit ?? 0;
+                    state.completedList = data.completedList ?? [];
+                    state.modifiedBuys = data.modifiedBuys ?? {};
+                } catch(e) {}
+            }
+            rebuildQuestDatabase();
+        }
+
+        // === ФОНОВЫЕ ЭФФЕКТЫ ===
         const bgCanvas = document.getElementById('bgMemeCanvas');
         const bgCtx = bgCanvas.getContext('2d');
 
         function initBg() {
             bgCanvas.width = window.innerWidth; 
             bgCanvas.height = window.innerHeight;
-            bgParticles = Array.from({length: 25}, () => ({
+            bgParticles = Array.from({length: 20}, () => ({
                 x: Math.random() * bgCanvas.width, 
                 y: Math.random() * bgCanvas.height,
-                r: 18 + Math.random() * 20, 
+                r: 20 + Math.random() * 15, 
                 txt: slotMemeIcons[Math.floor(Math.random() * slotMemeIcons.length)],
-                sX: (Math.random() - 0.5) * 0.9, 
-                sY: (Math.random() - 0.5) * 0.9,
+                sX: (Math.random() - 0.5) * 0.6, 
+                sY: (Math.random() - 0.5) * 0.6,
                 angle: Math.random() * Math.PI * 2,
-                rotSpeed: (Math.random() - 0.5) * 0.02
+                rotSpeed: (Math.random() - 0.5) * 0.01
             }));
         }
 
         function triggerWinExplosion() {
             winExplosionParticles = [];
-            const count = 75;
+            const count = 40;
             for(let i=0; i<count; i++) {
                 winExplosionParticles.push({
                     x: bgCanvas.width / 2,
                     y: bgCanvas.height / 2,
                     txt: slotMemeIcons[Math.floor(Math.random() * slotMemeIcons.length)],
-                    size: 20 + Math.random() * 25,
-                    vx: (Math.random() - 0.5) * 16,
-                    vy: -5 - Math.random() * 18,
-                    gravity: 0.45,
+                    size: 24 + Math.random() * 20,
+                    vx: (Math.random() - 0.5) * 22,
+                    vy: -6 - Math.random() * 20,
+                    gravity: 0.5,
                     alpha: 1,
                     rot: Math.random() * Math.PI * 2,
-                    rotSp: (Math.random() - 0.5) * 0.2
+                    rotSp: (Math.random() - 0.5) * 0.15
                 });
             }
+        }
+
+        let finalSaluteInterval = null;
+        function startFinalSalute() {
+            if (finalSaluteInterval) clearInterval(finalSaluteInterval);
+            finalSaluteInterval = setInterval(() => {
+                if (!isFinalEnding) {
+                    clearInterval(finalSaluteInterval);
+                    return;
+                }
+                for(let i=0; i<8; i++) {
+                    winExplosionParticles.push({
+                        x: Math.random() * bgCanvas.width,
+                        y: Math.random() * bgCanvas.height * 0.7,
+                        txt: ["🍓","👑","💎","✨","💰","🔥"][Math.floor(Math.random() * 6)],
+                        size: 25 + Math.random() * 30,
+                        vx: (Math.random() - 0.5) * 12,
+                        vy: (Math.random() - 0.5) * 12,
+                        gravity: 0.1,
+                        alpha: 1,
+                        rot: Math.random() * Math.PI * 2,
+                        rotSp: (Math.random() - 0.5) * 0.1
+                    });
+                }
+            }, 350);
         }
 
         function drawEffectsLoop() {
@@ -648,14 +822,14 @@
                 bgCtx.save();
                 bgCtx.translate(m.x, m.y);
                 bgCtx.rotate(m.angle);
-                bgCtx.font = `${m.r}px "Segoe UI Emoji", "Apple Color Emoji", sans-serif`;
-                bgCtx.globalAlpha = isSpinning ? 0.18 : 0.08;
+                bgCtx.font = `${m.r}px "Segoe UI Emoji", "Apple Color Emoji"`;
+                bgCtx.globalAlpha = isSpinning ? 0.22 : 0.07;
                 bgCtx.textAlign = "center";
                 bgCtx.textBaseline = "middle";
                 bgCtx.fillText(m.txt, 0, 0);
                 bgCtx.restore();
 
-                let speedMultiplier = isSpinning ? 4 : 1;
+                let speedMultiplier = isSpinning ? 5 : 1;
                 m.x += m.sX * speedMultiplier; 
                 m.y += m.sY * speedMultiplier;
                 m.angle += m.rotSpeed * speedMultiplier;
@@ -666,9 +840,13 @@
 
             for (let i = winExplosionParticles.length - 1; i >= 0; i--) {
                 let p = winExplosionParticles[i];
+                if (p.alpha <= 0) {
+                    winExplosionParticles.splice(i, 1);
+                    continue;
+                }
                 bgCtx.save();
                 bgCtx.globalAlpha = p.alpha;
-                bgCtx.font = `${p.size}px "Segoe UI Emoji", "Apple Color Emoji", sans-serif`;
+                bgCtx.font = `${p.size}px "Segoe UI Emoji"`;
                 bgCtx.translate(p.x, p.y);
                 bgCtx.rotate(p.rot);
                 bgCtx.textAlign = "center";
@@ -680,9 +858,7 @@
                 p.y += p.vy;
                 p.vy += p.gravity;
                 p.rot += p.rotSp;
-                p.alpha -= 0.012;
-
-                if (p.alpha <= 0) winExplosionParticles.splice(i, 1);
+                p.alpha -= 0.025;
             }
 
             requestAnimationFrame(drawEffectsLoop);
@@ -698,9 +874,7 @@
             for (let i = 0; i < totalSectors; i++) {
                 const q = QUEST_DATABASE[i];
                 const comp = state.completedList.find(c => c.id === q.id);
-                const start = wheelAngle + i * sectorAngleRad;
-                const end = start + sectorAngleRad;
-
+                const start = wheelAngle + i * sectorAngleRad - Math.PI / 2;
                 wCtx.save();
                 wCtx.translate(170, 170);
                 wCtx.rotate(start);
@@ -709,22 +883,23 @@
                 wCtx.arc(0, 0, radius, 0, sectorAngleRad);
                 wCtx.closePath();
                 if (comp) {
-                    wCtx.fillStyle = comp.status === 'win' ? '#052410' : '#29060b';
+                    wCtx.fillStyle = comp.status === 'win' ? '#072b14' : '#33080e';
                 } else {
                     wCtx.fillStyle = i % 2 === 0 ? '#130724' : '#1b0b30';
                 }
                 wCtx.fill();
-                wCtx.strokeStyle = 'rgba(189, 0, 255, 0.12)';
-                wCtx.lineWidth = 1;
+                wCtx.strokeStyle = 'rgba(189, 0, 255, 0.25)';
+                wCtx.lineWidth = 1.5;
                 wCtx.stroke();
 
                 wCtx.save();
                 wCtx.rotate(sectorAngleRad / 2);
-                wCtx.font = "14px 'Segoe UI Emoji', 'Apple Color Emoji'";
+                wCtx.font = "14px 'Segoe UI Emoji'";
                 wCtx.textAlign = "center";
+                wCtx.fillStyle = comp ? 'rgba(255,255,255,0.2)' : '#fff';
                 wCtx.fillText(q.ico || "🎰", radius - 45, 5);
-                wCtx.fillStyle = comp ? 'rgba(255,255,255,0.2)' : (i % 2 === 0 ? getStyleColor('--cyan') : getStyleColor('--pink'));
-                wCtx.font = "bold 10px 'Orbitron', sans-serif"; 
+                wCtx.fillStyle = comp ? 'rgba(255,255,255,0.15)' : (i % 2 === 0 ? getStyleColor('--cyan') : getStyleColor('--pink'));
+                wCtx.font = "bold 11px 'Orbitron', sans-serif"; 
                 wCtx.textAlign = "right";
                 wCtx.fillText(q.id, radius - 15, 4);
                 wCtx.restore();
@@ -732,96 +907,139 @@
             }
         }
 
-        // === НОВАЯ АНИМАЦИЯ ВРАЩЕНИЯ С DELTA TIME ===
+        // === ГЕНЕРАЦИЯ МОЛНИИ ===
+        function drawLightningPath(startX, startY, endX, endY) {
+            let steps = 6;
+            let pathD = `M ${startX} ${startY}`;
+            for (let i = 1; i <= steps; i++) {
+                let t = i / steps;
+                let targetX = startX + (endX - startX) * t;
+                let targetY = startY + (endY - startY) * t;
+                if (i < steps) {
+                    targetX += (Math.random() - 0.5) * 60;
+                    targetY += (Math.random() - 0.5) * 60;
+                }
+                pathD += ` L ${targetX} ${targetY}`;
+            }
+            els.lightningPath.setAttribute('d', pathD);
+        }
+
+        function triggerZeusEvent(targetQuest, callback) {
+            writeLog(`⚡ Зевс заметил контракт №${targetQuest.id}! Вмешательство богов...`);
+            playEffect('thunder');
+            els.zeus.classList.add('active');
+
+            setTimeout(() => {
+                const zeusBox = els.zeus.getBoundingClientRect();
+                const cardEl = document.getElementById(`quest-card-${targetQuest.id}`);
+                if (!cardEl) { callback(); return; }
+                const cardBox = cardEl.getBoundingClientRect();
+                const sX = zeusBox.left + 30;
+                const sY = zeusBox.top + 50;
+                const eX = cardBox.left + cardBox.width / 2;
+                const eY = cardBox.top + cardBox.height / 2;
+                drawLightningPath(sX, sY, eX, eY);
+                els.lightningSvg.style.opacity = '1';
+                cardEl.classList.add('zeus-blitzed');
+                playEffect('thunder');
+
+                const isBuff = Math.random() > 0.4;
+                if (isBuff) {
+                    const newBuy = Math.round((targetQuest.buy * 0.7) / 100) * 100;
+                    targetQuest.buy = newBuy;
+                    state.modifiedBuys[targetQuest.id] = newBuy;
+                    targetQuest.type += " ⚡ [СКИДКА]";
+                    targetQuest.desc = "🔥 ЗЕВС СНИЗИЛ ЦЕНУ! " + targetQuest.desc;
+                    writeLog(`⚡ БЛАГОСЛОВЕНИЕ: стоимость снижена на 30%! Новая цена: ${targetQuest.buy} ₽`);
+                    showToast(`✨ Зевс сбросил цену контракта №${targetQuest.id} до ${targetQuest.buy} ₽!`);
+                } else {
+                    const newBuy = targetQuest.baseBuy * 2;
+                    targetQuest.buy = newBuy;
+                    state.modifiedBuys[targetQuest.id] = newBuy;
+                    targetQuest.type += " 💀 [ГНЕВ]";
+                    targetQuest.desc = "💀 УСЛОЖНЁННЫЙ РЕЖИМ! Цена удвоена, но занос принесёт x3 от базовой цены!";
+                    writeLog(`⚡ ГНЕВ ЗЕВСА: цена удвоена до ${targetQuest.buy} ₽, задание становится хардкорным!`);
+                    showToast(`⚡ ГНЕВ ЗЕВСА! Цена контракта №${targetQuest.id} удвоена до ${targetQuest.buy} ₽`, true);
+                }
+
+                setTimeout(() => {
+                    els.lightningSvg.style.opacity = '0';
+                    cardEl.classList.remove('zeus-blitzed');
+                    renderQuests();
+                    saveAll();
+                }, 300);
+
+                setTimeout(() => {
+                    els.zeus.classList.remove('active');
+                    callback();
+                }, 1000);
+            }, 1200);
+        }
+
+        // === АНИМАЦИЯ ВРАЩЕНИЯ ===
         function startSpinAnimation(targetSectorIndex) {
             if (isSpinning) return;
             playEffect('spin');
             isSpinning = true;
             els.spinBtn.disabled = true;
             
-            // Вычисляем целевой угол в радианах (центр сектора должен оказаться под стрелкой)
-            const targetRaw = (Math.PI * 2) - (targetSectorIndex * sectorAngleRad) - (sectorAngleRad / 2);
-            // Добавляем 5 полных оборотов (10π)
-            const totalDelta = (Math.PI * 2) * 5 + targetRaw;
-            startAngle = wheelAngle;
-            targetAngleRad = startAngle + totalDelta;
-            
-            spinStartTime = performance.now();
-            spinDuration = 3.2; // секунды вращения + затухание
-            
-            // Предыдущее время для delta time
-            let lastTimestamp = spinStartTime;
+            const targetRaw = (Math.PI * 2) - (targetSectorIndex * sectorAngleRad);
+            const totalDelta = (Math.PI * 2) * 4 + targetRaw;
             const startWheelAngle = wheelAngle;
+            const targetAngleRad = startWheelAngle + totalDelta;
+            const spinStartTime = performance.now();
+            const spinDuration = 2.6;
             
             function animateSpin(currentTime) {
                 const elapsed = (currentTime - spinStartTime) / 1000;
                 if (elapsed >= spinDuration) {
-                    // Завершаем анимацию
                     wheelAngle = targetAngleRad % (Math.PI * 2);
                     drawWheel();
                     isSpinning = false;
                     els.spinBtn.disabled = false;
-                    // Уведомляем об окончании вращения
-                    setTimeout(() => handleSpinEnd(targetSectorIndex), 200);
+                    setTimeout(() => handleSpinEnd(targetSectorIndex), 150);
                     return;
                 }
-                
-                // Прогресс от 0 до 1
                 let t = elapsed / spinDuration;
-                // Кубическое easing: плавное замедление
-                const easeOut = 1 - Math.pow(1 - t, 3);
+                const easeOut = 1 - Math.pow(1 - t, 4);
                 wheelAngle = startWheelAngle + totalDelta * easeOut;
-                wheelAngle = wheelAngle % (Math.PI * 2);
-                
-                // Звуковые щелчки при смене сектора (используем текущий угол)
-                const currentAngleForCheck = (Math.PI * 2 - wheelAngle) % (Math.PI * 2);
-                const currentSector = Math.floor(currentAngleForCheck / sectorAngleRad) % totalSectors;
-                if (currentSector !== lastSectorTriggered) {
+                const currentSector = Math.floor(((Math.PI * 2) - (wheelAngle % (Math.PI * 2))) / sectorAngleRad) % totalSectors;
+                if (currentSector !== lastSectorTriggered && currentSector >= 0) {
                     playEffect('click');
                     lastSectorTriggered = currentSector;
                 }
-                
                 drawWheel();
                 requestAnimationFrame(animateSpin);
             }
-            
             requestAnimationFrame(animateSpin);
         }
 
         function handleSpinEnd(sectorIndex) {
             const quest = QUEST_DATABASE[sectorIndex];
-            // Проверяем, что контракт ещё не закрыт (на случай, если во время анимации состояние не изменилось)
-            if (state.completedList.some(c => c.id === quest.id)) {
-                // Повторяем вращение заново, выбрав другой доступный контракт
-                const available = QUEST_DATABASE.filter(q => !state.completedList.some(c => c.id === q.id));
-                if (available.length === 0) {
-                    alert("Все контракты выполнены!");
-                    return;
-                }
-                const newQuest = available[Math.floor(Math.random() * available.length)];
-                const newIndex = QUEST_DATABASE.findIndex(q => q.id === newQuest.id);
-                startSpinAnimation(newIndex);
-                return;
-            }
             currentActiveQuest = quest;
-            playEffect('win');
             const card = document.getElementById(`quest-card-${quest.id}`);
             if (card) {
                 card.classList.add('selected-anim');
                 card.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
-            writeLog(`🎯 Колесо выбрало: [${quest.slot}] (Контракт №${quest.id})`);
-            setTimeout(() => {
+            writeLog(`🎯 Колесо выбрало контракт №${quest.id} — ${quest.slot}`);
+
+            const triggerModal = () => {
                 document.getElementById('modalSlotTitle').innerText = quest.slot + " " + quest.ico;
                 document.getElementById('modalQuestName').innerText = `Задание: ${quest.type}`;
                 document.getElementById('modalQuestDesc').innerText = quest.desc;
                 els.payoutInput.value = '';
                 els.resultModal.classList.remove('hidden');
-                setTimeout(() => els.payoutInput.focus(), 60);
-            }, 750);
+                setTimeout(() => els.payoutInput.focus(), 50);
+            };
+
+            if (Math.random() < 0.25 && !state.completedList.some(c => c.id === quest.id)) {
+                triggerZeusEvent(quest, triggerModal);
+            } else {
+                setTimeout(triggerModal, 400);
+            }
         }
 
-        // === ОБЩИЕ ФУНКЦИИ ===
         function writeLog(text) {
             els.logBox.innerHTML = `<div>[${new Date().toLocaleTimeString()}] ${text}</div>` + els.logBox.innerHTML;
         }
@@ -833,7 +1051,10 @@
                 const card = document.createElement('div');
                 card.id = `quest-card-${q.id}`;
                 card.className = `quest-card ${comp ? (comp.status === 'win' ? 'done-win' : 'done-lose') : ''}`;
-                let badge = `<div class="buy-badge">БУЙ: ${q.buy.toLocaleString()} ₽</div>`;
+                
+                const isBlitzed = q.type.includes("⚡") || q.type.includes("💀");
+                const badgeStyle = isBlitzed ? 'color: var(--gold); border-color: var(--gold);' : '';
+                let badge = `<div class="buy-badge" style="${badgeStyle}">Цена: ${q.buy.toLocaleString()} ₽</div>`;
                 if (comp) {
                     badge = `<div class="buy-badge" style="color:${comp.status==='win'?'#00ff66':'#ff3333'}; border-color:${comp.status==='win'?'#00ff66':'#ff3333'};">
                         ${comp.status === 'win' ? '+' + comp.payout.toLocaleString() : 'СЛИВ'} ₽
@@ -859,31 +1080,38 @@
                 const q = QUEST_DATABASE.find(q => q.id === c.id);
                 return acc + (c.payout - (q ? q.buy : 0));
             }, 0);
+            state.profit = prof;
             els.profit.innerText = (prof >= 0 ? '+' : '') + prof.toLocaleString() + " ₽";
+
+            if (state.completedList.length === QUEST_DATABASE.length && !isFinalEnding) {
+                executeMassiveEnding(prof);
+            }
         }
 
-        // === ЗАПУСК ВРАЩЕНИЯ ПО КНОПКЕ ===
+        function executeMassiveEnding(finalProfit) {
+            isFinalEnding = true;
+            els.spinBtn.disabled = true;
+            els.spinBtn.innerText = "👑 МАРАФОН ЗАВЕРШЁН! 👑";
+            writeLog(`🏆 ТРИУМФ! Все 20 контрактов закрыты! Итоговый профит: ${finalProfit} ₽!`);
+            startFinalSalute();
+            setTimeout(() => {
+                els.banner.innerText = finalProfit >= 0 ? "👑 КОРОЛЕВА СЛОТОВ 👑" : "💀 СЛИВ ЗАЩИТАН 💀";
+                els.banner.className = finalProfit >= 0 ? "banner-megawin" : "banner-bigwin";
+                els.banner.style.fontSize = "3.5rem";
+                els.banner.classList.add('active');
+            }, 1000);
+        }
+
+        // === ОБРАБОТЧИКИ ===
         els.spinBtn.onclick = function() {
-            if (isSpinning || currentActiveQuest) return;
+            if (isSpinning || currentActiveQuest || isFinalEnding) return;
             const available = QUEST_DATABASE.filter(q => !state.completedList.some(c => c.id === q.id));
-            if (!available.length) {
-                alert("Все контракты выполнены!");
-                return;
-            }
+            if (!available.length) return;
             document.querySelectorAll('.quest-card').forEach(c => c.classList.remove('selected-anim'));
             const chosenQuest = available[Math.floor(Math.random() * available.length)];
             const chosenIndex = QUEST_DATABASE.findIndex(x => x.id === chosenQuest.id);
             startSpinAnimation(chosenIndex);
         };
-
-        // === ОБРАБОТКА РЕЗУЛЬТАТА ===
-        function showCelebrationBanner(typeText, className) {
-            els.banner.innerText = typeText;
-            els.banner.className = className;
-            els.banner.classList.add('active');
-            playEffect('win');
-            setTimeout(() => els.banner.classList.remove('active'), 3500);
-        }
 
         function confirmWin() {
             if (!currentActiveQuest) return;
@@ -891,8 +1119,8 @@
             if (isNaN(p) || p < 0) p = 0;
             state.completedList.push({ id: currentActiveQuest.id, status: 'win', payout: p });
             state.balance = state.balance - currentActiveQuest.buy + p;
-            writeLog(`✅ Контракт выполнен! Слот: ${currentActiveQuest.slot} | Выигрыш: ${p} ₽.`);
-            let multiplier = p / currentActiveQuest.buy;
+            writeLog(`✅ Контракт №${currentActiveQuest.id} выполнен! Слот: ${currentActiveQuest.slot} | Выплата: ${p} ₽.`);
+            const multiplier = p / currentActiveQuest.buy;
             triggerWinExplosion();
             if (multiplier >= 3) showCelebrationBanner("💎 MEGA WIN 💎", "banner-megawin");
             else if (multiplier >= 1.5) showCelebrationBanner("🍇 BIG WIN 🍇", "banner-bigwin");
@@ -904,7 +1132,7 @@
             if (!currentActiveQuest) return;
             state.completedList.push({ id: currentActiveQuest.id, status: 'lose', payout: 0 });
             state.balance -= currentActiveQuest.buy;
-            writeLog(`❌ Не повезло: ${currentActiveQuest.slot} ушел в минус. Потеряно: -${currentActiveQuest.buy} ₽`);
+            writeLog(`❌ Контракт №${currentActiveQuest.id} провален: ${currentActiveQuest.slot}. Потеряно: -${currentActiveQuest.buy} ₽`);
             playEffect('lose');
             closeAndSync();
         }
@@ -915,9 +1143,48 @@
             document.querySelectorAll('.quest-card').forEach(c => c.classList.remove('selected-anim'));
         }
 
+        function showCelebrationBanner(typeText, className) {
+            els.banner.innerText = typeText;
+            els.banner.className = className;
+            els.banner.classList.add('active');
+            playEffect('win');
+            setTimeout(() => els.banner.classList.remove('active'), 2500);
+        }
+
+        function closeAndSync() {
+            currentActiveQuest = null;
+            els.resultModal.classList.add('hidden');
+            updateUI(); renderQuests(); drawWheel();
+            saveAll();
+        }
+
+        // === РУЧНОЕ ИЗМЕНЕНИЕ БАЛАНСА ===
+        function openBalanceModal() {
+            els.newBalanceInput.value = state.balance;
+            els.balanceModal.classList.remove('hidden');
+        }
+        function closeBalanceModal() {
+            els.balanceModal.classList.add('hidden');
+        }
+        function applyBalanceChange() {
+            let newBalance = parseFloat(els.newBalanceInput.value);
+            if (isNaN(newBalance) || newBalance < 0) {
+                showToast("Введите корректную сумму", true);
+                return;
+            }
+            state.balance = newBalance;
+            writeLog(`💰 Баланс скорректирован вручную. Новая фикса: ${state.balance.toLocaleString()} ₽`);
+            closeBalanceModal();
+            updateUI();
+            saveAll();
+        }
+
         document.getElementById('winConfirmBtn').onclick = confirmWin;
         document.getElementById('loseConfirmBtn').onclick = confirmLose;
         document.getElementById('cancelModalBtn').onclick = closeModal;
+        document.getElementById('editBalanceBtn').onclick = openBalanceModal;
+        document.getElementById('applyBalanceBtn').onclick = applyBalanceChange;
+        document.getElementById('cancelBalanceBtn').onclick = closeBalanceModal;
 
         window.addEventListener('keydown', function(e) {
             if (els.resultModal.classList.contains('hidden')) return;
@@ -925,23 +1192,21 @@
             else if (e.key === 'Escape') { closeModal(); }
         });
 
-        function closeAndSync() {
-            currentActiveQuest = null;
-            els.resultModal.classList.add('hidden');
-            updateUI(); renderQuests();
-            localStorage.setItem('pragmatic_carousel_save', JSON.stringify(state));
-        }
-
         document.getElementById('fullResetBtn').onclick = function() {
-            if(confirm("Сбросить весь прогресс марафона?")) {
+            if(confirm("Сбросить весь прогресс марафона и вернуть исходные цены?")) {
                 localStorage.removeItem('pragmatic_carousel_save');
-                state = { balance: 100000, progress: 0, profit: 0, completedList: [] };
+                state = { balance: 100000, profit: 0, completedList: [], modifiedBuys: {} };
+                rebuildQuestDatabase();
                 wheelAngle = 0; 
-                if (animFrame) cancelAnimationFrame(animFrame);
                 isSpinning = false;
                 currentActiveQuest = null;
-                drawWheel();
-                updateUI(); renderQuests(); writeLog("♻️ Марафон полностью сброшен.");
+                isFinalEnding = false;
+                if (finalSaluteInterval) clearInterval(finalSaluteInterval);
+                els.spinBtn.disabled = false;
+                els.spinBtn.innerHTML = `<i class="fas fa-dice"></i> ВРАЩАТЬ БАРАБАН`;
+                els.banner.classList.remove('active');
+                drawWheel(); updateUI(); renderQuests(); writeLog("♻️ Марафон полностью сброшен.");
+                saveAll();
             }
         };
 
@@ -955,9 +1220,7 @@
         window.addEventListener('resize', initBg);
         document.body.addEventListener('click', () => initAudio(), { once: true });
 
-        const save = localStorage.getItem('pragmatic_carousel_save');
-        if (save) { try { state = JSON.parse(save); } catch(e){} }
-
+        loadAll();
         initBg(); drawEffectsLoop(); updateUI(); renderQuests(); drawWheel();
     })();
     </script>
