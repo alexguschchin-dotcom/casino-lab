@@ -486,11 +486,16 @@
         let soundOn = true, isSpinning = false, currentActiveQuest = null;
         let audioCtx = null;
 
+        // === НОВАЯ ПЛАВНАЯ ФИЗИКА КОЛЕСА (Delta Time) ===
         let wheelAngle = 0;
-        let wheelSpeed = 0;
-        let targetAngle = null; 
-        const friction = 0.982;
+        let animFrame = null;
+        let spinStartTime = 0;
+        let spinDuration = 0; // длительность анимации в секундах
+        let startAngle = 0;
+        let targetAngleRad = 0;
         let lastSectorTriggered = -1;
+        const totalSectors = QUEST_DATABASE.length;
+        const sectorAngleRad = (Math.PI * 2) / totalSectors;
 
         // Для фоновых частиц и взрывов
         let bgParticles = [];
@@ -511,6 +516,91 @@
 
         function getStyleColor(varName) {
             return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+        }
+
+        // === НОВЫЙ ПРОФЕССИОНАЛЬНЫЙ ЗВУКОВОЙ ДВИЖОК ===
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playEffect(type) {
+            if (!soundOn) return;
+            initAudio();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const now = audioCtx.currentTime;
+
+            switch (type) {
+                case 'click': {
+                    const osc = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    const filter = audioCtx.createBiquadFilter();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(280, now);
+                    osc.frequency.exponentialRampToValueAtTime(80, now + 0.04);
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(1200, now);
+                    gainNode.gain.setValueAtTime(0.25, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+                    osc.connect(filter);
+                    filter.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                    break;
+                }
+                case 'win': {
+                    const notes = [261.63, 329.63, 392.00, 523.25];
+                    notes.forEach((freq, index) => {
+                        const osc = audioCtx.createOscillator();
+                        const gainNode = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + index * 0.06);
+                        gainNode.gain.setValueAtTime(0, now);
+                        gainNode.gain.linearRampToValueAtTime(0.15, now + index * 0.06 + 0.02);
+                        gainNode.gain.exponentialRampToValueAtTime(0.001, now + index * 0.06 + 0.6);
+                        osc.connect(gainNode);
+                        gainNode.connect(audioCtx.destination);
+                        osc.start(now + index * 0.06);
+                        osc.stop(now + index * 0.06 + 0.6);
+                    });
+                    break;
+                }
+                case 'lose': {
+                    const osc = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.linearRampToValueAtTime(70, now + 0.4);
+                    const filter = audioCtx.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(600, now);
+                    gainNode.gain.setValueAtTime(0.15, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                    osc.connect(filter);
+                    filter.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                    break;
+                }
+                case 'spin': {
+                    const osc = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(450, now + 0.3);
+                    gainNode.gain.setValueAtTime(0.12, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                    osc.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                    break;
+                }
+            }
         }
 
         // === ФОНОВЫЕ ЧАСТИЦЫ И ВЗРЫВЫ ===
@@ -554,7 +644,6 @@
         function drawEffectsLoop() {
             bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
             
-            // Фоновые частицы
             bgParticles.forEach(m => {
                 bgCtx.save();
                 bgCtx.translate(m.x, m.y);
@@ -575,7 +664,6 @@
                 if(m.y < -40 || m.y > bgCanvas.height + 40) m.sY *= -1;
             });
 
-            // Взрывные частицы
             for (let i = winExplosionParticles.length - 1; i >= 0; i--) {
                 let p = winExplosionParticles[i];
                 bgCtx.save();
@@ -600,106 +688,38 @@
             requestAnimationFrame(drawEffectsLoop);
         }
 
-        // === АУДИО ===
-        function initAudio() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-        }
-
-        function playTone(freq, duration, type = 'sine') {
-            if (!soundOn) return;
-            try {
-                initAudio();
-                const osc = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                let volume = isSpinning && wheelSpeed > 0.15 ? 0.02 : 0.06;
-                gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-                osc.connect(gainNode); gainNode.connect(audioCtx.destination);
-                osc.start(); osc.stop(audioCtx.currentTime + duration);
-                setTimeout(() => { osc.disconnect(); gainNode.disconnect(); }, duration * 1000 + 40);
-            } catch(e){}
-        }
-
-        // === КОЛЕСО (ФИЗИКА И ОТРИСОВКА) ===
+        // === ОТРИСОВКА КОЛЕСА ===
         const wheelCanvas = document.getElementById('wheelCanvas');
         const wCtx = wheelCanvas.getContext('2d');
 
-        function updateWheelPhysics() {
-            if (!isSpinning) return;
-
-            if (targetAngle !== null && wheelSpeed < 0.04) {
-                let diff = targetAngle - wheelAngle;
-                diff = Math.atan2(Math.sin(diff), Math.cos(diff));
-                if (Math.abs(diff) < 0.008) {
-                    wheelAngle = targetAngle;
-                    isSpinning = false; wheelSpeed = 0; targetAngle = null;
-                    handleSpinEnd();
-                    return;
-                }
-                wheelAngle += diff * 0.14;
-                const sectors = QUEST_DATABASE.length;
-                const anglePerSector = (2 * Math.PI) / sectors;
-                const normalizedAngle = (2 * Math.PI - (wheelAngle % (2 * Math.PI))) % (2 * Math.PI);
-                const currentSector = Math.floor(normalizedAngle / anglePerSector) % sectors;
-                if (currentSector !== lastSectorTriggered) {
-                    playTone(390, 0.04, 'triangle');
-                    lastSectorTriggered = currentSector;
-                }
-                return;
-            }
-
-            wheelAngle += wheelSpeed;
-            wheelSpeed *= friction;
-
-            const sectors = QUEST_DATABASE.length;
-            const anglePerSector = (2 * Math.PI) / sectors;
-            const normalizedAngle = (2 * Math.PI - (wheelAngle % (2 * Math.PI))) % (2 * Math.PI);
-            const currentSector = Math.floor(normalizedAngle / anglePerSector) % sectors;
-
-            if (currentSector !== lastSectorTriggered) {
-                let dynamicFreq = 380 + (wheelSpeed * 550);
-                playTone(dynamicFreq, 0.03, 'triangle');
-                lastSectorTriggered = currentSector;
-            }
-
-            if (wheelSpeed < 0.015 && targetAngle === null) {
-                isSpinning = false; wheelSpeed = 0;
-                handleSpinEnd();
-            }
-        }
-
         function drawWheel() {
-            updateWheelPhysics();
-            const sectors = QUEST_DATABASE.length;
-            const anglePerSector = (2 * Math.PI) / sectors;
             const radius = 170;
             wCtx.clearRect(0, 0, 340, 340);
-
-            for (let i = 0; i < sectors; i++) {
+            for (let i = 0; i < totalSectors; i++) {
                 const q = QUEST_DATABASE[i];
                 const comp = state.completedList.find(c => c.id === q.id);
+                const start = wheelAngle + i * sectorAngleRad;
+                const end = start + sectorAngleRad;
 
                 wCtx.save();
                 wCtx.translate(170, 170);
-                wCtx.rotate(wheelAngle + i * anglePerSector);
-
-                wCtx.beginPath(); wCtx.moveTo(0,0);
-                wCtx.arc(0, 0, radius, 0, anglePerSector); wCtx.closePath();
+                wCtx.rotate(start);
+                wCtx.beginPath();
+                wCtx.moveTo(0,0);
+                wCtx.arc(0, 0, radius, 0, sectorAngleRad);
+                wCtx.closePath();
                 if (comp) {
                     wCtx.fillStyle = comp.status === 'win' ? '#052410' : '#29060b';
                 } else {
                     wCtx.fillStyle = i % 2 === 0 ? '#130724' : '#1b0b30';
                 }
                 wCtx.fill();
-                wCtx.strokeStyle = 'rgba(189, 0, 255, 0.12)'; 
-                wCtx.lineWidth = 1; 
+                wCtx.strokeStyle = 'rgba(189, 0, 255, 0.12)';
+                wCtx.lineWidth = 1;
                 wCtx.stroke();
 
                 wCtx.save();
-                wCtx.rotate(anglePerSector / 2);
+                wCtx.rotate(sectorAngleRad / 2);
                 wCtx.font = "14px 'Segoe UI Emoji', 'Apple Color Emoji'";
                 wCtx.textAlign = "center";
                 wCtx.fillText(q.ico || "🎰", radius - 45, 5);
@@ -710,7 +730,95 @@
                 wCtx.restore();
                 wCtx.restore();
             }
-            requestAnimationFrame(drawWheel);
+        }
+
+        // === НОВАЯ АНИМАЦИЯ ВРАЩЕНИЯ С DELTA TIME ===
+        function startSpinAnimation(targetSectorIndex) {
+            if (isSpinning) return;
+            playEffect('spin');
+            isSpinning = true;
+            els.spinBtn.disabled = true;
+            
+            // Вычисляем целевой угол в радианах (центр сектора должен оказаться под стрелкой)
+            const targetRaw = (Math.PI * 2) - (targetSectorIndex * sectorAngleRad) - (sectorAngleRad / 2);
+            // Добавляем 5 полных оборотов (10π)
+            const totalDelta = (Math.PI * 2) * 5 + targetRaw;
+            startAngle = wheelAngle;
+            targetAngleRad = startAngle + totalDelta;
+            
+            spinStartTime = performance.now();
+            spinDuration = 3.2; // секунды вращения + затухание
+            
+            // Предыдущее время для delta time
+            let lastTimestamp = spinStartTime;
+            const startWheelAngle = wheelAngle;
+            
+            function animateSpin(currentTime) {
+                const elapsed = (currentTime - spinStartTime) / 1000;
+                if (elapsed >= spinDuration) {
+                    // Завершаем анимацию
+                    wheelAngle = targetAngleRad % (Math.PI * 2);
+                    drawWheel();
+                    isSpinning = false;
+                    els.spinBtn.disabled = false;
+                    // Уведомляем об окончании вращения
+                    setTimeout(() => handleSpinEnd(targetSectorIndex), 200);
+                    return;
+                }
+                
+                // Прогресс от 0 до 1
+                let t = elapsed / spinDuration;
+                // Кубическое easing: плавное замедление
+                const easeOut = 1 - Math.pow(1 - t, 3);
+                wheelAngle = startWheelAngle + totalDelta * easeOut;
+                wheelAngle = wheelAngle % (Math.PI * 2);
+                
+                // Звуковые щелчки при смене сектора (используем текущий угол)
+                const currentAngleForCheck = (Math.PI * 2 - wheelAngle) % (Math.PI * 2);
+                const currentSector = Math.floor(currentAngleForCheck / sectorAngleRad) % totalSectors;
+                if (currentSector !== lastSectorTriggered) {
+                    playEffect('click');
+                    lastSectorTriggered = currentSector;
+                }
+                
+                drawWheel();
+                requestAnimationFrame(animateSpin);
+            }
+            
+            requestAnimationFrame(animateSpin);
+        }
+
+        function handleSpinEnd(sectorIndex) {
+            const quest = QUEST_DATABASE[sectorIndex];
+            // Проверяем, что контракт ещё не закрыт (на случай, если во время анимации состояние не изменилось)
+            if (state.completedList.some(c => c.id === quest.id)) {
+                // Повторяем вращение заново, выбрав другой доступный контракт
+                const available = QUEST_DATABASE.filter(q => !state.completedList.some(c => c.id === q.id));
+                if (available.length === 0) {
+                    alert("Все контракты выполнены!");
+                    return;
+                }
+                const newQuest = available[Math.floor(Math.random() * available.length)];
+                const newIndex = QUEST_DATABASE.findIndex(q => q.id === newQuest.id);
+                startSpinAnimation(newIndex);
+                return;
+            }
+            currentActiveQuest = quest;
+            playEffect('win');
+            const card = document.getElementById(`quest-card-${quest.id}`);
+            if (card) {
+                card.classList.add('selected-anim');
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            writeLog(`🎯 Колесо выбрало: [${quest.slot}] (Контракт №${quest.id})`);
+            setTimeout(() => {
+                document.getElementById('modalSlotTitle').innerText = quest.slot + " " + quest.ico;
+                document.getElementById('modalQuestName').innerText = `Задание: ${quest.type}`;
+                document.getElementById('modalQuestDesc').innerText = quest.desc;
+                els.payoutInput.value = '';
+                els.resultModal.classList.remove('hidden');
+                setTimeout(() => els.payoutInput.focus(), 60);
+            }, 750);
         }
 
         // === ОБЩИЕ ФУНКЦИИ ===
@@ -754,55 +862,26 @@
             els.profit.innerText = (prof >= 0 ? '+' : '') + prof.toLocaleString() + " ₽";
         }
 
-        // === ВРАЩЕНИЕ (TARGETED SPIN) ===
+        // === ЗАПУСК ВРАЩЕНИЯ ПО КНОПКЕ ===
         els.spinBtn.onclick = function() {
             if (isSpinning || currentActiveQuest) return;
             const available = QUEST_DATABASE.filter(q => !state.completedList.some(c => c.id === q.id));
             if (!available.length) {
-                alert("Все контракты выполнены!"); return;
+                alert("Все контракты выполнены!");
+                return;
             }
             document.querySelectorAll('.quest-card').forEach(c => c.classList.remove('selected-anim'));
             const chosenQuest = available[Math.floor(Math.random() * available.length)];
             const chosenIndex = QUEST_DATABASE.findIndex(x => x.id === chosenQuest.id);
-            currentActiveQuest = chosenQuest;
-            const sectors = QUEST_DATABASE.length;
-            const anglePerSector = (2 * Math.PI) / sectors;
-            let targetSectorCenterAngle = 2 * Math.PI - (chosenIndex * anglePerSector + anglePerSector / 2);
-            let currentBaseAngle = wheelAngle - (wheelAngle % (2 * Math.PI));
-            targetAngle = currentBaseAngle + 4 * Math.PI + targetSectorCenterAngle;
-            isSpinning = true;
-            els.spinBtn.disabled = true;
-            wheelSpeed = 0.35 + Math.random() * 0.08;
+            startSpinAnimation(chosenIndex);
         };
-
-        function handleSpinEnd() {
-            els.spinBtn.disabled = false;
-            playTone(880, 0.12, 'sine');
-            setTimeout(() => playTone(1200, 0.18, 'sine'), 70);
-            const card = document.getElementById(`quest-card-${currentActiveQuest.id}`);
-            if (card) {
-                card.classList.add('selected-anim');
-                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-            writeLog(`🎯 Колесо выбрало: [${currentActiveQuest.slot}] (Контракт №${currentActiveQuest.id})`);
-            setTimeout(() => {
-                document.getElementById('modalSlotTitle').innerText = currentActiveQuest.slot + " " + currentActiveQuest.ico;
-                document.getElementById('modalQuestName').innerText = `Задание: ${currentActiveQuest.type}`;
-                document.getElementById('modalQuestDesc').innerText = currentActiveQuest.desc;
-                els.payoutInput.value = '';
-                els.resultModal.classList.remove('hidden');
-                setTimeout(() => els.payoutInput.focus(), 60);
-            }, 750);
-        }
 
         // === ОБРАБОТКА РЕЗУЛЬТАТА ===
         function showCelebrationBanner(typeText, className) {
             els.banner.innerText = typeText;
             els.banner.className = className;
             els.banner.classList.add('active');
-            playTone(523.25, 0.15, 'sine');
-            setTimeout(() => playTone(659.25, 0.15, 'sine'), 100);
-            setTimeout(() => playTone(783.99, 0.3, 'sine'), 200);
+            playEffect('win');
             setTimeout(() => els.banner.classList.remove('active'), 3500);
         }
 
@@ -826,7 +905,7 @@
             state.completedList.push({ id: currentActiveQuest.id, status: 'lose', payout: 0 });
             state.balance -= currentActiveQuest.buy;
             writeLog(`❌ Не повезло: ${currentActiveQuest.slot} ушел в минус. Потеряно: -${currentActiveQuest.buy} ₽`);
-            playTone(220, 0.4, 'sawtooth');
+            playEffect('lose');
             closeAndSync();
         }
 
@@ -857,7 +936,11 @@
             if(confirm("Сбросить весь прогресс марафона?")) {
                 localStorage.removeItem('pragmatic_carousel_save');
                 state = { balance: 100000, progress: 0, profit: 0, completedList: [] };
-                wheelAngle = 0; wheelSpeed = 0; currentActiveQuest = null; targetAngle = null;
+                wheelAngle = 0; 
+                if (animFrame) cancelAnimationFrame(animFrame);
+                isSpinning = false;
+                currentActiveQuest = null;
+                drawWheel();
                 updateUI(); renderQuests(); writeLog("♻️ Марафон полностью сброшен.");
             }
         };
