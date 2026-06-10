@@ -552,7 +552,7 @@
             <p id="modalQuestDesc" style="color: var(--text-muted); font-size: 0.95rem;"></p>
             
             <div style="text-align: left; margin: 10px 0;">
-                <label style="display: block; margin-bottom: 8px; font-weight: 600;">💰 Полный выигрыш с бонуски (₽):</label>
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">💰 Полный выигрыш с бонуса (₽):</label>
                 <input type="number" id="payoutValue" class="input-money" placeholder="0">
             </div>
 
@@ -570,7 +570,7 @@
             <div style="text-align: left; font-size: 0.95rem; line-height: 1.6; color: #b1a4c4; display:flex; flex-direction:column; gap: 10px;">
                 <p>1. Нажимаем <strong>ВРАЩАТЬ БАРАБАН</strong>. Колесо останавливается только на ещё не пройденных контрактах.</p>
                 <p>2. Стример покупает бонусную игру в слоте по указанной цене (4800–11200 ₽).</p>
-                <p>3. По итогам бонуски вносим результат: при победе — сумму выплаты, при сливе — фиксируем минус.</p>
+                <p>3. По итогам бонуса вносим результат: при победе — сумму выплаты, при сливе — фиксируем минус.</p>
                 <p>4. <strong>Зевс (⚡👴)</strong> может вмешаться: изменить цену (x2, /2, x1.5), заставить выполнить задание дважды или вовсе пропустить его.</p>
             </div>
             <button id="closeRulesBtn" class="action-btn btn-cyan" style="width:100%; justify-content:center;">ПОНЯТНО</button>
@@ -583,25 +583,25 @@
         const PRICE_TIERS = [4800, 6400, 8000, 9600, 11200];
         const BASE_QUEST_DATABASE = [
             { id: 1, slot: "Gates of Olympus", type: "Дедовские Капли", desc: "Поймать суммарный множитель больше x12 за один спин.", baseBuy: PRICE_TIERS[0], ico: "⚡", difficulty: "easy" },
-            { id: 2, slot: "The Dog House Megaways", type: "Пёсий Созвон", desc: "Поймать хотя бы 4 диких символа на одном барабане бонуски.", baseBuy: PRICE_TIERS[1], ico: "🐶", difficulty: "medium" },
+            { id: 2, slot: "The Dog House Megaways", type: "Пёсий Созвон", desc: "Поймать хотя бы 4 диких символа на одном барабане бонуса.", baseBuy: PRICE_TIERS[1], ico: "🐶", difficulty: "medium" },
             { id: 3, slot: "Sugar Rush", type: "Диабет Отменяется", desc: "Раскачать хотя бы одну ячейку поля до множителя x16.", baseBuy: PRICE_TIERS[1], ico: "🍬", difficulty: "medium" },
             { id: 4, slot: "Juicy Fruits", type: "Витаминный Бум", desc: "Вырастить дикий Скаттер-квадрат до размера 2x2 или выше.", baseBuy: PRICE_TIERS[0], ico: "🍋", difficulty: "easy" },
-            { id: 5, slot: "Sweet Bonanza", type: "Заворот Кишок", desc: "Поймать спин в бонуске, где одновременно упадут сразу 3 леденца.", baseBuy: PRICE_TIERS[1], ico: "🍭", difficulty: "medium" },
+            { id: 5, slot: "Sweet Bonanza", type: "Заворот Кишок", desc: "Поймать спин в бонусе, где одновременно упадут сразу 3 леденца.", baseBuy: PRICE_TIERS[1], ico: "🍭", difficulty: "medium" },
             { id: 6, slot: "Big Bass Splash", type: "Рыбалка на Живца", desc: "Дойти минимум до 2-го уровня (множитель x2) на шкале рыбака.", baseBuy: PRICE_TIERS[0], ico: "🐟", difficulty: "easy" },
-            { id: 7, slot: "Starlight Princess", type: "Аниме-Синдром", desc: "Засейвить и зафиксировать общий множитель x20 к концу бонуски.", baseBuy: PRICE_TIERS[2], ico: "⭐", difficulty: "hard" },
+            { id: 7, slot: "Starlight Princess", type: "Аниме-Синдром", desc: "Засейвить и зафиксировать общий множитель x20 к концу бонуса.", baseBuy: PRICE_TIERS[2], ico: "⭐", difficulty: "hard" },
             { id: 8, slot: "Cleocatra", type: "Кошачий Лоток", desc: "Поймать полноценную линию из кошек с активным диким множителем.", baseBuy: PRICE_TIERS[1], ico: "🐱", difficulty: "medium" },
             { id: 9, slot: "Zeus vs Hades", type: "Семейные Разборки", desc: "Играть строго за Аида. Выбить хотя бы один расширяющийся барабан x5+.", baseBuy: PRICE_TIERS[1], ico: "🔥", difficulty: "medium" },
             { id: 10, slot: "Wild West Gold", type: "Ковбойский Занос", desc: "Заполнить три центральных барабана звездами-вилдами.", baseBuy: PRICE_TIERS[1], ico: "🤠", difficulty: "medium" },
             { id: 11, slot: "Madame Destiny Megaways", type: "Гадание по Руке", desc: "На стартовом колесе фортуны выбить множитель не менее x8.", baseBuy: PRICE_TIERS[2], ico: "🔮", difficulty: "hard" },
-            { id: 12, slot: "Buffalo King Megaways", type: "Стадо Бешеных", desc: "Получить более 40 фриспинов суммарно за счет ретриггеров.", baseBuy: PRICE_TIERS[2], ico: "🦬", difficulty: "hard" },
+            { id: 12, slot: "Buffalo King Megaways", type: "Стадо Бешеных", desc: "Получить более 40 фриспинов суммарно за счёт ретриггеров.", baseBuy: PRICE_TIERS[2], ico: "🦬", difficulty: "hard" },
             { id: 13, slot: "Big Bass Amazon Xtreme", type: "Амазонский Монстр", desc: "Угадать на стартовом выборе в аквариумах не менее 3 модификаторов.", baseBuy: PRICE_TIERS[2], ico: "🐊", difficulty: "hard" },
-            { id: 14, slot: "Sugar Rush 1000", type: "Сахарная Кома", desc: "Получить общую окупаемость бонуски ровно в x1.5 или выше.", baseBuy: PRICE_TIERS[3], ico: "🍩", difficulty: "hard" },
-            { id: 15, slot: "Wisdom of Athena", type: "Щит и Меч", desc: "Открыть самый верхний заблокированный ряд ячеек полностью за бонуску.", baseBuy: PRICE_TIERS[3], ico: "🛡️", difficulty: "hard" },
+            { id: 14, slot: "Sugar Rush 1000", type: "Сахарная Кома", desc: "Получить общую окупаемость бонуса ровно в x1.5 или выше.", baseBuy: PRICE_TIERS[3], ico: "🍩", difficulty: "hard" },
+            { id: 15, slot: "Wisdom of Athena", type: "Щит и Меч", desc: "Открыть самый верхний заблокированный ряд ячеек полностью за бонус.", baseBuy: PRICE_TIERS[3], ico: "🛡️", difficulty: "hard" },
             { id: 16, slot: "Gems Bonanza", type: "Золотая Лихорадка", desc: "Успешно перейти на 3-й уровень прогресса карты (Gold Fever).", baseBuy: PRICE_TIERS[3], ico: "💎", difficulty: "hard" },
             { id: 17, slot: "The Dog House Multihold", type: "Будка на Прокачку", desc: "Открыть хотя бы 3 активных экрана с собаками одновременно.", baseBuy: PRICE_TIERS[3], ico: "🐾", difficulty: "hard" },
             { id: 18, slot: "Gates of Olympus 1000", type: "Гнев Деда x1000", desc: "Поймать анимацию, где Зевс кидает на поле шар с множителем x50+.", baseBuy: PRICE_TIERS[4], ico: "👑", difficulty: "hard" },
             { id: 19, slot: "Fruit Party 2", type: "Праздник Живота", desc: "Словить дикий размножающийся множитель x64 на одной ягоде.", baseBuy: PRICE_TIERS[4], ico: "🍇", difficulty: "hard" },
-            { id: 20, slot: "Слот на выбор Чата", type: "Финальный Аккорд", desc: "Взять бонуску за 10к в любом слоте и закрыть её в чистый плюс.", baseBuy: PRICE_TIERS[4], ico: "💬", difficulty: "hard" }
+            { id: 20, slot: "Слот на выбор Чата", type: "Финальный Аккорд", desc: "Взять бонус за 11 200 ₽ в любом слоте и закрыть его в чистый плюс.", baseBuy: PRICE_TIERS[4], ico: "💬", difficulty: "hard" }
         ];
 
         let QUEST_DATABASE = [];
@@ -968,15 +968,13 @@
             showToast(`Зевс: ${effect.desc}`, effect.name === "Пропуск" ? false : true);
             
             if (effect.isSkip) {
-                // Автоматически засчитываем контракт без изменения баланса
                 state.completedList.push({ id: quest.id, status: 'win', payout: 0 });
                 writeLog(`✨ Контракт №${quest.id} пропущен по воле Зевса!`);
-                callback(true); // true = пропущен, не открываем модалку
+                callback(true);
                 return;
             }
             
             if (effect.isDoubleWork) {
-                // Устанавливаем счётчик повторений (2)
                 state.repeatCounts[quest.id] = 2;
                 quest.repeatCount = 2;
                 writeLog(`⚠️ Теперь контракт №${quest.id} нужно выполнить дважды!`);
@@ -984,7 +982,6 @@
                 return;
             }
             
-            // Изменяем цену
             const newBuy = effect.modifier(quest.buy);
             quest.buy = newBuy;
             state.modifiedBuys[quest.id] = newBuy;
@@ -1016,7 +1013,6 @@
                 cardEl.classList.add('zeus-blitzed');
                 playEffect('thunder');
 
-                // Применяем эффект
                 applyZeusEffect(targetQuest, (isSkipped) => {
                     setTimeout(() => {
                         els.lightningSvg.style.opacity = '0';
@@ -1041,7 +1037,8 @@
             isSpinning = true;
             els.spinBtn.disabled = true;
             
-            const targetRaw = (Math.PI * 2) - (targetSectorIndex * sectorAngleRad);
+            // Исправленная формула: угол поворота, чтобы центр целевого сектора оказался точно под стрелкой (угол -PI/2)
+            const targetRaw = (Math.PI * 2) - (targetSectorIndex * sectorAngleRad + sectorAngleRad / 2);
             const totalDelta = (Math.PI * 2) * 5 + targetRaw;
             const startWheelAngle = wheelAngle;
             const targetAngleRad = startWheelAngle + totalDelta;
@@ -1080,11 +1077,10 @@
                 card.classList.add('selected-anim');
                 card.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
-            writeLog(`🎯 Колесо выбрало контракт №${quest.id} — ${quest.slot} (цена: ${quest.buy} ₽)`);
+            writeLog(`🎯 Колесо выбрало контракт №${quest.id} — ${quest.slot} (цена: ${quest.buy.toLocaleString()} ₽)`);
 
             const triggerModal = (isSkipped) => {
                 if (isSkipped) {
-                    // Если Зевс пропустил задание, просто закрываем
                     closeAndSync();
                     return;
                 }
@@ -1092,7 +1088,7 @@
                 let taskText = `Задание: ${quest.type}`;
                 if (quest.repeatCount > 1) taskText += ` (${quest.repeatCount} раз)`;
                 document.getElementById('modalQuestName').innerHTML = taskText;
-                document.getElementById('modalQuestDesc').innerHTML = `${quest.desc}<br><span style="color: var(--gold);">💰 Цена бонусы: ${quest.buy.toLocaleString()} ₽</span>`;
+                document.getElementById('modalQuestDesc').innerHTML = `${quest.desc}<br><span style="color: var(--gold);">💰 Цена бонуса: ${quest.buy.toLocaleString()} ₽</span>`;
                 els.payoutInput.value = '';
                 els.resultModal.classList.remove('hidden');
                 setTimeout(() => els.payoutInput.focus(), 50);
@@ -1101,7 +1097,7 @@
 
             const alreadyDone = state.completedList.some(c => c.id === quest.id);
             if (alreadyDone) {
-                // На всякий случай, если вдруг выпал выполненный – перезапускаем вращение
+                // Защита – если вдруг выпал выполненный, перезапускаем вращение
                 els.spinBtn.onclick();
                 return;
             }
@@ -1110,7 +1106,6 @@
                 triggerZeusEvent(quest, (isSkipped) => {
                     if (!isSkipped) triggerModal(false);
                     else {
-                        // Пропуск – ничего не делаем, контракт уже закрыт внутри эффекта
                         closeAndSync();
                     }
                 });
@@ -1206,7 +1201,6 @@
             let p = parseFloat(els.payoutInput.value);
             if (isNaN(p) || p < 0) p = 0;
             
-            // Обработка двойного выполнения
             let repeat = currentActiveQuest.repeatCount || 1;
             if (repeat > 1) {
                 currentActiveQuest.repeatCount = repeat - 1;
