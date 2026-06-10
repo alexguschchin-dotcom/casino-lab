@@ -1000,6 +1000,7 @@
                 const cardEl = document.getElementById(`quest-card-${targetQuest.id}`);
                 if (!cardEl) { 
                     zeusAnimationLock = false;
+                    els.spinBtn.disabled = false;
                     if (onComplete) onComplete();
                     return; 
                 }
@@ -1019,13 +1020,23 @@
                         cardEl.classList.remove('zeus-blitzed');
                         renderQuests();
                         saveAll();
+                        // Если задание пропущено, снимаем блокировку сразу после завершения анимации молнии
+                        if (isSkipped) {
+                            zeusAnimationLock = false;
+                            els.spinBtn.disabled = false;
+                            els.zeus.classList.remove('active');
+                        }
+                        if (onComplete) onComplete(isSkipped);
                     }, 300);
                     
-                    setTimeout(() => {
-                        els.zeus.classList.remove('active');
-                        zeusAnimationLock = false;
-                        if (onComplete) onComplete(isSkipped);
-                    }, 1000);
+                    // Если не пропуск, то через 1000 мс снимаем блокировку и убираем Зевса
+                    if (!isSkipped) {
+                        setTimeout(() => {
+                            els.zeus.classList.remove('active');
+                            zeusAnimationLock = false;
+                            els.spinBtn.disabled = false;
+                        }, 1000);
+                    }
                 });
             }, 1200);
         }
@@ -1037,7 +1048,6 @@
             isSpinning = true;
             els.spinBtn.disabled = true;
             
-            // Исправленная формула: угол поворота, чтобы центр целевого сектора оказался точно под стрелкой (угол -PI/2)
             const targetRaw = (Math.PI * 2) - (targetSectorIndex * sectorAngleRad + sectorAngleRad / 2);
             const totalDelta = (Math.PI * 2) * 5 + targetRaw;
             const startWheelAngle = wheelAngle;
@@ -1097,7 +1107,6 @@
 
             const alreadyDone = state.completedList.some(c => c.id === quest.id);
             if (alreadyDone) {
-                // Защита – если вдруг выпал выполненный, перезапускаем вращение
                 els.spinBtn.onclick();
                 return;
             }
@@ -1268,6 +1277,9 @@
             els.resultModal.classList.add('hidden');
             updateUI(); renderQuests(); drawWheel();
             saveAll();
+            // Принудительный сброс блокировки на случай, если она осталась
+            zeusAnimationLock = false;
+            els.spinBtn.disabled = false;
         }
 
         // === РУЧНОЕ ИЗМЕНЕНИЕ БАЛАНСА ===
