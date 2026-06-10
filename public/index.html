@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>🍓 PRAGMATIC КРУТИЛКА | СТРИМ ШОУ</title>
+    <title>🍓 PRAGMATIC КРУТИЛКА | STREAM PREMIER SHOW</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         * {
             margin: 0;
@@ -13,33 +17,41 @@
         }
 
         :root {
-            --bg-main: #0b0214;
-            --bg-panel: #1b0a2e;
-            --bg-card: #2c144d;
+            --bg-main: #06020f;
+            --bg-panel: rgba(22, 11, 41, 0.75);
+            --bg-card: rgba(37, 18, 69, 0.6);
+            --bg-card-hover: rgba(53, 26, 99, 0.8);
             --pink: #ff007f;
             --cyan: #00ffff;
             --gold: #ffcc00;
-            --text: #ffffff;
-            --glow-pink: 0 0 20px rgba(255, 0, 127, 0.6);
-            --glow-cyan: 0 0 20px rgba(0, 255, 255, 0.6);
+            --purple-glow: #bd00ff;
+            --text-main: #f1ebfa;
+            --text-muted: #9d8db5;
+            
+            --neon-pink: 0 0 15px rgba(255, 0, 127, 0.5), inset 0 0 15px rgba(255, 0, 127, 0.3);
+            --neon-cyan: 0 0 15px rgba(0, 255, 255, 0.5), inset 0 0 15px rgba(0, 255, 255, 0.3);
+            --glass-blur: backdrop-filter: blur(14px);
         }
 
         body {
-            font-family: 'Comfortaa', 'Segoe UI', sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg-main);
-            color: var(--text);
+            color: var(--text-main);
             min-height: 100vh;
             overflow-x: hidden;
             display: flex;
             flex-direction: column;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 0, 127, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 255, 255, 0.08) 0%, transparent 40%);
         }
 
-        /* Анимированный бэкграунд с персонажами Pragmatic */
-        canvas {
+        /* ИСПРАВЛЕНО: Стилизуем конкретно фоновый Canvas, не трогая колесо */
+        canvas#memePragmaticCanvas {
             position: fixed;
             top: 0; left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100% !important;
+            height: 100% !important;
             pointer-events: none;
             z-index: 1;
         }
@@ -47,290 +59,461 @@
         .app-container {
             position: relative;
             z-index: 2;
-            max-width: 1500px;
+            max-width: 1600px;
             width: 100%;
             margin: 0 auto;
-            padding: 25px;
+            padding: 30px;
             display: flex;
             flex-direction: column;
             gap: 25px;
             flex: 1;
         }
 
-        /* Шапка с балансом */
+        /* Верхняя панель утилит */
+        .top-utils {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Премиальные кнопки */
+        .action-btn {
+            background: linear-gradient(135deg, var(--pink), #99004c);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: var(--neon-pink);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            filter: brightness(1.2);
+            box-shadow: 0 0 25px rgba(255, 0, 127, 0.8);
+        }
+
+        .action-btn:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+
+        .action-btn:disabled {
+            background: #251b33;
+            border-color: #3d2f52;
+            color: var(--text-muted);
+            box-shadow: none;
+            cursor: not-allowed;
+            opacity: 0.4;
+        }
+
+        .btn-cyan {
+            background: linear-gradient(135deg, var(--cyan), #007788);
+            color: #06020f;
+            box-shadow: var(--neon-cyan);
+            border-color: rgba(0, 255, 255, 0.4);
+        }
+
+        .btn-cyan:hover:not(:disabled) {
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.8);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            box-shadow: none;
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 15px rgba(255,255,255,0.1);
+        }
+
+        /* Стрим-Панель (Шапка) */
         .header-panel {
-            background: linear-gradient(135deg, var(--bg-panel), #130524);
-            border: 3px solid var(--pink);
-            box-shadow: var(--glow-pink);
-            border-radius: 20px;
-            padding: 20px;
+            background: var(--bg-panel);
+            --glass-blur;
+            border: 1px solid rgba(255, 0, 127, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(189, 0, 255, 0.1);
+            border-radius: 24px;
+            padding: 24px 35px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 25px;
         }
 
         .streamer-info {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
         }
 
         .logo-strawberry {
-            font-size: 3rem;
-            animation: strawberryDance 0.6s infinite alternate cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 3.5rem;
+            filter: drop-shadow(0 0 15px var(--pink));
+            animation: strawberryDance 0.8s infinite alternate cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         @keyframes strawberryDance {
-            0% { transform: scale(1) rotate(-5deg); }
-            100% { transform: scale(1.1) rotate(5deg); }
+            0% { transform: scale(1) rotate(-6deg); }
+            100% { transform: scale(1.12) rotate(6deg); }
+        }
+
+        .header-title-box h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, #fff, #ff007f, #00ffff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: textGradientFlow 4s linear infinite;
+        }
+
+        @keyframes textGradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .header-title-box p {
+            font-family: 'Rajdhani', sans-serif;
+            color: var(--cyan);
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 3px;
         }
 
         .stats-row {
             display: flex;
-            gap: 15px;
+            gap: 20px;
             flex-wrap: wrap;
         }
 
         .stat-badge {
-            background: var(--bg-card);
-            border: 2px solid var(--cyan);
-            box-shadow: var(--glow-cyan);
-            padding: 12px 25px;
-            border-radius: 12px;
+            background: rgba(13, 6, 26, 0.8);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            padding: 14px 28px;
+            border-radius: 16px;
+            font-family: 'Rajdhani', sans-serif;
             font-size: 1.2rem;
-            font-weight: bold;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            min-width: 160px;
         }
 
-        .stat-badge span {
-            color: var(--gold);
-            text-shadow: 0 0 10px var(--gold);
+        .stat-badge strong {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-top: 4px;
         }
 
-        /* Основная разметка */
+        .stat-badge.balance strong { color: var(--gold); text-shadow: 0 0 10px rgba(255,204,0,0.3); }
+        .stat-badge.progress strong { color: var(--cyan); text-shadow: 0 0 10px rgba(0,255,255,0.3); }
+        .stat-badge.profit strong { color: #00ff66; text-shadow: 0 0 10px rgba(0,255,102,0.3); }
+
+        /* Главный контейнер сетки */
         .main-layout {
             display: grid;
-            grid-template-columns: 1.2fr 1.5fr;
-            gap: 25px;
+            grid-template-columns: 450px 1fr;
+            gap: 30px;
             flex: 1;
         }
 
-        @media (max-width: 1024px) {
+        @media (max-width: 1150px) {
             .main-layout { grid-template-columns: 1fr; }
         }
 
         .show-box {
             background: var(--bg-panel);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 25px;
+            --glass-blur;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 30px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            align-items: center;
-            justify-content: flex-start;
+            gap: 22px;
             position: relative;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
         }
 
-        /* Интерактивное колесо - фиксированный размер */
+        .box-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        /* Фиксированная и изолированная обертка Колеса */
         .wheel-wrapper {
             position: relative;
-            width: 320px;
-            height: 320px;
-            margin: 0 auto;
+            width: 360px;
+            height: 360px;
+            margin: 15px auto;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
+        /* Контейнер Canvas колеса с жесткими размерами */
         .wheel-canvas-container {
-            width: 320px !important;
-            height: 320px !important;
+            width: 360px !important;
+            height: 360px !important;
             border-radius: 50%;
-            border: 8px solid var(--pink);
-            box-shadow: var(--glow-pink);
-            transition: transform 4s cubic-bezier(0.1, 0.8, 0.1, 1);
-            background: #250f3e;
+            border: 6px solid #110724;
+            box-shadow: 0 0 30px rgba(189, 0, 255, 0.25), var(--neon-pink);
+            background: #0f051c;
+            position: relative;
+            z-index: 5;
         }
 
+        /* Точный селектор для холста рулетки */
         canvas#wheelCanvas {
+            position: relative !important;
             width: 100% !important;
             height: 100% !important;
+            z-index: 6;
+            pointer-events: auto !important;
         }
 
         .wheel-pointer {
             position: absolute;
-            top: -15px;
+            top: -12px;
             left: 50%;
             transform: translateX(-50%);
             width: 0; height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 30px solid var(--cyan);
-            filter: drop-shadow(0 0 8px var(--cyan));
-            z-index: 10;
+            border-left: 16px solid transparent;
+            border-right: 16px solid transparent;
+            border-top: 32px solid var(--cyan);
+            filter: drop-shadow(0 0 12px var(--cyan));
+            z-index: 100;
+        }
+        
+        .wheel-center-pin {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: var(--cyan);
+            border: 4px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--cyan);
+            z-index: 110;
         }
 
-        /* Список квестов */
-        .quests-list {
+        /* Список Квестов - Прокачанный скролл-бокс */
+        .quests-container-box {
             display: flex;
             flex-direction: column;
             gap: 15px;
-            max-height: 650px;
+            max-height: 680px;
             overflow-y: auto;
-            width: 100%;
-            padding-right: 10px;
+            padding-right: 12px;
         }
 
-        .quests-list::-webkit-scrollbar { width: 8px; }
-        .quests-list::-webkit-scrollbar-thumb { background: var(--cyan); border-radius: 10px; }
+        .quests-container-box::-webkit-scrollbar { width: 8px; }
+        .quests-container-box::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; }
+        .quests-container-box::-webkit-scrollbar-thumb { background: linear-gradient(var(--pink), var(--purple-glow)); border-radius: 10px; }
 
+        /* Люкс Карточки Квестов */
         .quest-card {
             background: var(--bg-card);
-            border: 2px solid transparent;
+            border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 16px;
-            padding: 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 20px;
             position: relative;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            overflow: hidden;
+        }
+
+        .quest-card::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; width: 4px; height: 100%;
+            background: transparent;
+            transition: background 0.3s;
+        }
+
+        .quest-card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(189, 0, 255, 0.2);
+            transform: translateX(4px);
         }
 
         .quest-card.selected-anim {
             border-color: var(--cyan);
-            box-shadow: var(--glow-cyan);
-            transform: scale(1.02);
+            box-shadow: var(--neon-cyan);
+            background: rgba(0, 255, 255, 0.05);
+        }
+        .quest-card.selected-anim::before { background: var(--cyan); }
+
+        .quest-card.done-win {
+            border-color: rgba(0, 255, 102, 0.3);
+            background: linear-gradient(90deg, rgba(5, 41, 18, 0.4) 0%, var(--bg-card) 100%);
+        }
+        .quest-card.done-win::before { background: #00ff66; }
+        .quest-card.done-win .slot-title { color: #00ff66 !important; }
+
+        .quest-card.done-lose {
+            border-color: rgba(255, 51, 51, 0.3);
+            background: linear-gradient(90deg, rgba(46, 8, 8, 0.4) 0%, var(--bg-card) 100%);
+        }
+        .quest-card.done-lose::before { background: #ff3333; }
+        .quest-card.done-lose .slot-title { color: #ff3333 !important; opacity: 0.6; text-decoration: line-through; }
+
+        .quest-index {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: rgba(0,0,0,0.2);
+            width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
-        .quest-card.done-win { border-color: #00ff66; background: linear-gradient(135deg, var(--bg-card), #052912); }
-        .quest-card.done-lose { border-color: #ff3333; background: linear-gradient(135deg, var(--bg-card), #2e0808); }
-
-        .quest-top {
+        .quest-main-details {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 4px;
         }
 
         .slot-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--cyan);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .quest-type-label {
+            font-size: 0.9rem;
+            color: var(--pink);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .quest-description {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            line-height: 1.4;
         }
 
         .buy-badge {
-            background: rgba(255, 204, 0, 0.15);
-            border: 1px solid var(--gold);
+            background: rgba(255, 204, 0, 0.08);
+            border: 1px solid rgba(255, 204, 0, 0.4);
             color: var(--gold);
-            padding: 4px 10px;
-            border-radius: 8px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        /* Консоль Логов */
+        .stream-logs {
+            background: rgba(5, 2, 13, 0.9);
+            border: 1px solid rgba(189, 0, 255, 0.15);
+            border-radius: 14px;
+            padding: 15px;
+            width: 100%;
+            height: 140px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
             font-size: 0.9rem;
-            font-weight: bold;
+            line-height: 1.5;
+            color: #c9bedb;
         }
 
-        /* Кнопки */
-        .action-btn {
-            background: linear-gradient(135deg, var(--pink), #b30059);
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: var(--glow-pink);
-            transition: transform 0.2s, filter 0.2s;
-        }
-
-        .action-btn:hover:not(:disabled) {
-            transform: scale(1.05);
-            filter: brightness(1.2);
-        }
-
-        .action-btn:disabled {
-            background: #443c4d;
-            box-shadow: none;
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-
-        .btn-cyan {
-            background: linear-gradient(135deg, var(--cyan), #009999);
-            color: #0b0214;
-            box-shadow: var(--glow-cyan);
-        }
-
-        /* Модальные окна */
+        /* Премиальные модальные окна */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(11, 2, 20, 0.85);
-            backdrop-filter: blur(8px);
+            background: rgba(4, 1, 10, 0.85);
+            backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 1000;
+            transition: all 0.3s;
         }
 
-        .modal-overlay.hidden { display: none; }
+        .modal-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
 
         .modal-window {
-            background: var(--bg-panel);
-            border: 3px solid var(--cyan);
-            box-shadow: var(--glow-cyan);
-            border-radius: 24px;
-            padding: 35px;
-            max-width: 550px;
-            width: 90%;
+            background: linear-gradient(145deg, #180c2b, #0e051c);
+            border: 2px solid var(--cyan);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7), var(--neon-cyan);
+            border-radius: 28px;
+            padding: 40px;
+            max-width: 580px;
+            width: 92%;
             text-align: center;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 22px;
+            transform: scale(1);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.hidden .modal-window {
+            transform: scale(0.9);
         }
 
         .input-money {
-            background: var(--bg-main);
-            border: 2px solid var(--pink);
-            padding: 12px;
-            border-radius: 10px;
+            background: #090314;
+            border: 2px solid rgba(255, 0, 127, 0.4);
+            padding: 16px;
+            border-radius: 14px;
             color: white;
-            font-size: 1.3rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
             text-align: center;
             width: 100%;
             outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
 
-        /* Логгер стрима */
-        .stream-logs {
-            background: #05010a;
-            border: 1px solid #2d174d;
-            border-radius: 12px;
-            padding: 12px;
-            width: 100%;
-            height: 120px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 0.85rem;
-            text-align: left;
-            color: #c0b2d6;
+        .input-money:focus {
+            border-color: var(--pink);
+            box-shadow: var(--neon-pink);
         }
 
-        .top-utils {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-        
         .rules-text {
             text-align: left;
-            font-size: 0.95rem;
-            line-height: 1.5;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #d1c7e0;
         }
-        .rules-text strong {
-            color: var(--gold);
-        }
+        .rules-text strong { color: var(--gold); }
+        .rules-text ul li { margin-bottom: 8px; }
     </style>
 </head>
 <body>
@@ -338,102 +521,99 @@
     <canvas id="memePragmaticCanvas"></canvas>
 
     <div class="app-container">
+        
         <div class="top-utils">
-            <button id="rulesBtn" class="action-btn btn-cyan" style="padding: 8px 15px; font-size: 0.9rem;">📜 ПРАВИЛА</button>
-            <button id="soundToggle" class="action-btn btn-cyan" style="padding: 8px 15px; font-size: 0.9rem;">🔊 ЗВУК: ВКЛ</button>
-            <button id="fullResetBtn" class="action-btn" style="padding: 8px 15px; font-size: 0.9rem; background: #444;">♻️ СБРОСИТЬ ШОУ</button>
+            <button id="rulesBtn" class="action-btn btn-secondary"><i class="fas fa-book-open"></i> ПРАВИЛА ШОУ</button>
+            <button id="soundToggle" class="action-btn btn-cyan"><i class="fas fa-volume-up"></i> ЗВУК: ВКЛ</button>
+            <button id="fullResetBtn" class="action-btn btn-secondary" style="color: #ff5555;"><i class="fas fa-trash-alt"></i> СБРОСИТЬ ВСЁ</button>
         </div>
 
         <div class="header-panel">
             <div class="streamer-info">
                 <div class="logo-strawberry">🍓</div>
-                <div>
-                    <h1 style="color: var(--pink); text-shadow: var(--glow-pink); font-size: 1.6rem;">PRAGMATIC-КАРУСЕЛЬ КЛУБНИЧКИ</h1>
-                    <p style="color: var(--cyan); font-size: 0.85rem; letter-spacing: 1px;">ЖИВОЙ ИНТЕРАКТИВ НА СТРИМЕ</p>
+                <div class="header-title-box">
+                    <h1>PRAGMATIC WHEEL</h1>
+                    <p>EXCLUSIVE STREAM INTERACTIVE</p>
                 </div>
             </div>
             <div class="stats-row">
-                <div class="stat-badge">Фикса: <span id="balanceDisplay">100 000</span> ₽</div>
-                <div class="stat-badge">Пройдено: <span id="progressDisplay">0 / 20</span></div>
-                <div class="stat-badge">Чистый Профит: <span id="profitDisplay">0</span> ₽</div>
+                <div class="stat-badge balance">Текущая фикса <strong id="balanceDisplay">100 000 ₽</strong></div>
+                <div class="stat-badge progress">Контракты <strong id="progressDisplay">0 / 20</strong></div>
+                <div class="stat-badge profit">Чистый профит <strong id="profitDisplay">0 ₽</strong></div>
             </div>
         </div>
 
         <div class="main-layout">
+            
             <div class="show-box">
-                <h3 style="color: var(--gold); text-shadow: 0 0 10px var(--gold); text-align: center;">🎰 РАНДОМАЙЗЕР КОНТРАКТОВ</h3>
-                <p style="font-size: 0.9rem; text-align: center; color: var(--cyan);">Крути карусель, чтобы выбрать следующий слот!</p>
+                <div class="box-title" style="color: var(--gold); text-shadow: 0 0 10px rgba(255,204,0,0.2);"><i class="fas fa-dice"></i> РАНДОМАЙЗЕР КОНТРАКТОВ</div>
+                <p style="font-size: 0.95rem; text-align: center; color: var(--text-muted); margin-top: -10px;">Запуск рандома для выбора следующей покупки</p>
                 
                 <div class="wheel-wrapper">
                     <div class="wheel-pointer"></div>
-                    <canvas id="wheelCanvas" width="320" height="320" class="wheel-canvas-container"></canvas>
+                    <div class="wheel-center-pin"></div>
+                    <div class="wheel-canvas-container">
+                        <canvas id="wheelCanvas" width="360" height="360"></canvas>
+                    </div>
                 </div>
 
-                <button id="spinWheelBtn" class="action-btn" style="width: 100%; padding: 16px;">КРУТИТЬ КАРУСЕЛЬ</button>
+                <button id="spinWheelBtn" class="action-btn" style="width: 100%; padding: 18px; font-size: 1.3rem;"><i class="fas fa-play"></i> КРУТИТЬ КАРУСЕЛЬ</button>
 
-                <div style="width: 100%; margin-top: 10px;">
-                    <h5 style="color: var(--pink); margin-bottom: 5px;">🔥 События шоу:</h5>
+                <div style="width: 100%; margin-top: auto;">
+                    <h5 style="color: var(--pink); font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; font-weight:700; margin-bottom: 8px; letter-spacing:1px;">🔥 ХРОНИКА СОБЫТИЙ:</h5>
                     <div class="stream-logs" id="logBox"></div>
                 </div>
             </div>
 
-            <div class="show-box" style="justify-content: flex-start; align-items: stretch;">
-                <h3 style="color: var(--cyan); border-bottom: 2px solid var(--bg-card); padding-bottom: 10px;">📋 Матрица Доступных Квестов (20 шт)</h3>
-                <div class="quests-list" id="questsContainer"></div>
+            <div class="show-box">
+                <div class="box-title" style="color: var(--cyan); text-shadow: 0 0 10px rgba(0,255,255,0.2); text-align: left;"><i class="fas fa-layer-group"></i> МАТРИЦА КВЕСТОВ (20 КОНТРАКТОВ)</div>
+                <div class="quests-container-box" id="questsContainer"></div>
             </div>
+
         </div>
     </div>
 
-    <!-- Модалка для ввода выигрыша -->
     <div id="resultModal" class="modal-overlay hidden">
         <div class="modal-window">
-            <h2 id="modalSlotTitle" style="color: var(--gold);">Название слота</h2>
-            <h4 id="modalQuestName" style="color: var(--pink);">Квест: Текст</h4>
-            <p id="modalQuestDesc" style="color: var(--cyan); font-size: 0.95rem;"></p>
+            <h2 id="modalSlotTitle" style="color: var(--gold); font-family: 'Orbitron', sans-serif;">Slot Name</h2>
+            <h3 id="modalQuestName" style="color: var(--pink); font-family: 'Rajdhani', sans-serif; font-size: 1.4rem;">Квест</h3>
+            <p id="modalQuestDesc" style="color: var(--text-muted); font-size: 1rem; line-height:1.5; padding: 0 10px;"></p>
             
-            <div style="margin: 15px 0;">
-                <label style="display: block; margin-bottom: 8px; font-weight: bold;">Сколько выплатила бонуска? (₽)</label>
-                <input type="number" id="payoutValue" class="input-money" placeholder="0">
+            <div style="margin: 10px 0; text-align: left;">
+                <label style="display: block; margin-bottom: 10px; font-weight: 600; color: var(--text-main); font-size: 1.05rem;"><i class="fas fa-coins" style="color:var(--gold);"></i> Итоговый выигрыш с бонуски (₽):</label>
+                <input type="number" id="payoutValue" class="input-money" placeholder="Введи сумму...">
             </div>
 
-            <div style="display: flex; gap: 15px;">
-                <button id="winConfirmBtn" class="action-btn btn-cyan" style="flex: 1;">✅ КВЕСТ ВЫПОЛНЕН</button>
-                <button id="loseConfirmBtn" class="action-btn" style="flex: 1; background: #ff3333; box-shadow: 0 0 15px rgba(255,51,51,0.4);">❌ СЛИВ КВЕСТА</button>
+            <div style="display: flex; gap: 15px; margin-top: 10px;">
+                <button id="winConfirmBtn" class="action-btn btn-cyan" style="flex: 1; padding: 16px;"><i class="fas fa-check-circle"></i> КВЕСТ ВЫПОЛНЕН</button>
+                <button id="loseConfirmBtn" class="action-btn" style="flex: 1; background: linear-gradient(135deg, #ff3333, #aa0000); box-shadow: 0 0 20px rgba(255,51,51,0.3); border-color: rgba(255,51,51,0.3); padding: 16px;"><i class="fas fa-times-circle"></i> СЛИВ КВЕСТА</button>
             </div>
-            <button id="cancelModalBtn" style="background: none; border: none; color: #aaa; cursor: pointer; text-decoration: underline;">Закрыть окно</button>
+            <button id="cancelModalBtn" style="background: none; border: none; color: var(--text-muted); cursor: pointer; text-decoration: underline; font-size: 0.95rem; margin-top: 5px;">Вернуться назад</button>
         </div>
     </div>
 
-    <!-- Модалка с правилами -->
     <div id="rulesModal" class="modal-overlay hidden">
-        <div class="modal-window">
-            <h2 style="color: var(--gold);">🍓 ПРАВИЛА ШОУ</h2>
+        <div class="modal-window" style="max-width:650px;">
+            <h2 style="color: var(--gold); font-family: 'Orbitron', sans-serif; letter-spacing:1px;"><i class="fas fa-star"></i> ПРАВИЛА СТРИМ ШОУ</h2>
             <div class="rules-text">
-                <p><strong>🎡 Как играть:</strong></p>
-                <ul style="margin-left: 20px; margin-bottom: 15px;">
-                    <li>Нажми <strong>«КРУТИТЬ КАРУСЕЛЬ»</strong> – колесо выберет случайный слот и задание.</li>
-                    <li>Перейди в казино, купи бонуску за указанную сумму (от 4 800 до 10 000 ₽).</li>
-                    <li>Выполни условие квеста (например, поймать множитель x12).</li>
-                    <li>Введи сумму, которую дала бонуска, и нажми <strong>«КВЕСТ ВЫПОЛНЕН»</strong>.</li>
-                    <li>Если задание не выполнено – нажми <strong>«СЛИВ КВЕСТА»</strong> (инпут игнорируется).</li>
+                <ul style="list-style: none; padding-left: 0;">
+                    <li><strong style="color:var(--cyan);">1. Выбор слота:</strong> Нажимайте кнопку карусели. Интерактивное колесо определит случайный контракт. Страница автоматически сфокусируется на выбранной карточке.</li>
+                    <li><strong style="color:var(--cyan);">2. Покупка:</strong> На балансе автоматически резервируется фиксированная цена бонуски. Стример открывает данный слот и покупает бонусную игру по указанной ставке.</li>
+                    <li><strong style="color:var(--cyan);">3. Фиксация Win:</strong> Если цель квеста достигнута, введите точную выплату бонуски. Программа сама вычтет расход, высчитает чистый профит и добавит выигрыш на баланс.</li>
+                    <li><strong style="color:var(--cyan);">4. Фиксация Lose:</strong> Если квест провален или бонуска слита в ноль, нажмите кнопку «Слив». Баланс уменьшится на стоимость покупки, а квест пометится красной матрицей.</li>
                 </ul>
-                <p><strong>💰 Баланс и профит:</strong><br>
-                Стартовая фикса: 100 000 ₽. Каждая покупка списывается, выигрыш прибавляется. Чистый профит обновляется автоматически.</p>
-                <p><strong>🎯 Цель:</strong> Пройти все 20 квестов, набрав максимальный профит. Шоу сохраняется в браузере – можно продолжить после перезагрузки.</p>
-                <p><strong>⚡ Звук и эффекты:</strong> Персонажи на фоне ускоряются при вращении колеса, во время кручения слышны «щелчки» рулетки.</p>
             </div>
-            <button id="closeRulesBtn" class="action-btn btn-cyan" style="margin-top: 10px;">ЗАКРЫТЬ</button>
+            <button id="closeRulesBtn" class="action-btn btn-cyan" style="width:100%; justify-content:center;">ПОНЯТНО</button>
         </div>
     </div>
 
     <script>
     (function(){
-        // Четкий список из 20 весёлых квестов по Pragmatic Play
         const QUEST_DATABASE = [
             { id: 1, slot: "Gates of Olympus", type: "Дедовские Капли", desc: "Поймать суммарный множитель больше x12 за один спин.", buy: 4800 },
-            { id: 2, slot: "The Dog House Megaways", type: "Пёсий Созвон", desc: "Поймать хотя бы 4 собаки (диких символа) на одном барабане бонуски.", buy: 6000 },
+            { id: 2, slot: "The Dog House Megaways", type: "Пёсий Созвон", desc: "Поймать хотя бы 4 диких символа на одном барабане бонуски.", buy: 6000 },
             { id: 3, slot: "Sugar Rush", type: "Диабет Отменяется", desc: "Раскачать хотя бы одну ячейку поля до множителя x16.", buy: 6000 },
-            { id: 4, slot: "Juicy Fruits", type: "Витаминный Бум", desc: "Вырастить дикий Скаттер-квадрат до максимального размера 2x2 или выше.", buy: 4800 },
+            { id: 4, slot: "Juicy Fruits", type: "Витаминный Бум", desc: "Вырастить дикий Скаттер-квадрат до размера 2x2 или выше.", buy: 4800 },
             { id: 5, slot: "Sweet Bonanza", type: "Заворот Кишок", desc: "Поймать спин в бонуске, где одновременно упадут сразу 3 леденца.", buy: 6000 },
             { id: 6, slot: "Big Bass Splash", type: "Рыбалка на Живца", desc: "Дойти минимум до 2-го уровня (множитель x2) на шкале рыбака.", buy: 4800 },
             { id: 7, slot: "Starlight Princess", type: "Аниме-Синдром", desc: "Засейвить и зафиксировать общий множитель x20 к концу бонуски.", buy: 8000 },
@@ -456,272 +636,342 @@
             balance: 100000,
             progress: 0,
             profit: 0,
-            completedList: [],
+            completedList: []
         };
 
         let soundOn = true;
-        let audioCtx = null;
+        let isSpinning = false;
         let currentActiveQuest = null;
+        let audioCtx = null;
         let spinInterval = null;
 
-        function initAudio() { if(!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)(); }
-        function playTone(freq, dur, type='sine') {
-            if(!soundOn) return; initAudio(); if(audioCtx.state === 'suspended') audioCtx.resume();
-            let osc = audioCtx.createOscillator(); let g = audioCtx.createGain();
-            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            g.gain.setValueAtTime(0.1, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
-            osc.connect(g); g.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime+dur);
+        const els = {
+            balance: document.getElementById('balanceDisplay'),
+            progress: document.getElementById('progressDisplay'),
+            profit: document.getElementById('profitDisplay'),
+            questsContainer: document.getElementById('questsContainer'),
+            spinBtn: document.getElementById('spinWheelBtn'),
+            logBox: document.getElementById('logBox'),
+            resultModal: document.getElementById('resultModal'),
+            payoutInput: document.getElementById('payoutValue')
+        };
+
+        // ========== ФОНОВЫЕ ПЕРСОНАЖИ ==========
+        const bgCanvas = document.getElementById('memePragmaticCanvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        let backgroundMemes = [];
+        const memeEmojis = ["🍓", "⚡", "🐶", "🍬", "🤠", "👑", "🔱", "🦁", "🔮"];
+
+        function initBackgroundEffects() {
+            bgCanvas.width = window.innerWidth;
+            bgCanvas.height = window.innerHeight;
+            backgroundMemes = [];
+            for(let i = 0; i < 25; i++) {
+                backgroundMemes.push({
+                    x: Math.random() * bgCanvas.width,
+                    y: Math.random() * bgCanvas.height,
+                    r: 20 + Math.random() * 20,
+                    txt: memeEmojis[Math.floor(Math.random() * memeEmojis.length)],
+                    sX: (Math.random() - 0.5) * 1.5,
+                    sY: (Math.random() - 0.5) * 1.5
+                });
+            }
         }
 
-        function startSpinSound() {
-            if(spinInterval) clearInterval(spinInterval);
-            spinInterval = setInterval(() => {
-                if(!soundOn) return;
-                initAudio(); if(audioCtx.state === 'suspended') audioCtx.resume();
-                let osc = audioCtx.createOscillator(); let g = audioCtx.createGain();
-                osc.type = 'square'; osc.frequency.value = 800 + Math.random() * 200;
-                g.gain.setValueAtTime(0.03, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
-                osc.connect(g); g.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime+0.08);
-            }, 80);
-        }
-        function stopSpinSound() { if(spinInterval) { clearInterval(spinInterval); spinInterval = null; } }
+        function drawBackground() {
+            if (!bgCtx) return;
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+            backgroundMemes.forEach(m => {
+                bgCtx.save();
+                bgCtx.font = `${m.r}px "Segoe UI Emoji", "Apple Color Emoji", sans-serif`;
+                bgCtx.shadowBlur = 15;
+                bgCtx.shadowColor = "rgba(189, 0, 255, 0.3)";
+                bgCtx.globalAlpha = 0.15;
+                bgCtx.fillText(m.txt, m.x, m.y);
+                bgCtx.restore();
 
+                let speedMultiplier = isSpinning ? 4 : 1;
+                m.x += m.sX * speedMultiplier; 
+                m.y += m.sY * speedMultiplier;
+
+                if(m.x < -40 || m.x > bgCanvas.width + 40) m.sX *= -1;
+                if(m.y < -40 || m.y > bgCanvas.height + 40) m.sY *= -1;
+            });
+            requestAnimationFrame(drawBackground);
+        }
+
+        window.addEventListener('resize', () => {
+            bgCanvas.width = window.innerWidth;
+            bgCanvas.height = window.innerHeight;
+            initBackgroundEffects();
+        });
+
+        // ========== АУДИО ==========
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playTone(freq, duration, type = 'sine') {
+            if (!soundOn || !audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        // ========== ОТРИСОВКА КОЛЕСА ==========
+        const wheelCanvas = document.getElementById('wheelCanvas');
+        const wCtx = wheelCanvas.getContext('2d');
+
+        function drawWheel() {
+            if (!wCtx) return;
+            const sectors = QUEST_DATABASE.length;
+            const angle = (2 * Math.PI) / sectors;
+            const radius = 180;
+            wCtx.clearRect(0, 0, 360, 360);
+
+            for (let i = 0; i < sectors; i++) {
+                const quest = QUEST_DATABASE[i];
+                const isCompleted = state.completedList.find(c => c.id === quest.id);
+                
+                wCtx.save();
+                wCtx.translate(180, 180);
+                wCtx.rotate(i * angle);
+
+                wCtx.beginPath();
+                wCtx.moveTo(0, 0);
+                wCtx.arc(0, 0, radius, 0, angle);
+                wCtx.closePath();
+
+                if (isCompleted) {
+                    wCtx.fillStyle = isCompleted.status === 'win' ? '#033616' : '#420b11';
+                } else {
+                    wCtx.fillStyle = i % 2 === 0 ? '#1f0d3d' : '#2d1454';
+                }
+                wCtx.fill();
+
+                wCtx.strokeStyle = 'rgba(189, 0, 255, 0.2)';
+                wCtx.lineWidth = 1.5;
+                wCtx.stroke();
+
+                // номер контракта на секторе
+                wCtx.save();
+                wCtx.rotate(angle / 2);
+                wCtx.fillStyle = isCompleted ? 'rgba(255,255,255,0.4)' : (i % 2 === 0 ? '#00ffff' : '#ff007f');
+                wCtx.font = "bold 11px 'Orbitron', sans-serif";
+                wCtx.textAlign = "right";
+                wCtx.fillText(quest.id, radius - 20, 4);
+                wCtx.restore();
+
+                wCtx.restore();
+            }
+        }
+
+        // ========== UI ОБНОВЛЕНИЕ ==========
         function writeLog(text) {
-            const box = document.getElementById('logBox');
-            let p = document.createElement('p');
-            p.innerHTML = `<span style="color:var(--cyan)">[ШОУ]</span> ${text}`;
-            box.appendChild(p); box.scrollTop = box.scrollHeight;
+            const time = new Date().toLocaleTimeString();
+            els.logBox.innerHTML = `<div>[${time}] ${text}</div>` + els.logBox.innerHTML;
         }
 
         function renderQuests() {
-            const container = document.getElementById('questsContainer');
-            container.innerHTML = '';
+            els.questsContainer.innerHTML = '';
             QUEST_DATABASE.forEach(q => {
-                let report = state.completedList.find(item => item.id === q.id);
-                let card = document.createElement('div');
-                card.className = 'quest-card';
+                const comp = state.completedList.find(c => c.id === q.id);
+                const card = document.createElement('div');
                 card.id = `quest-card-${q.id}`;
-                if(report) card.classList.add(report.status === 'win' ? 'done-win' : 'done-lose');
+                card.className = 'quest-card';
+                if (comp) {
+                    card.classList.add(comp.status === 'win' ? 'done-win' : 'done-lose');
+                }
+
+                let badgeHtml = `<div class="buy-badge">БУЙ: ${q.buy.toLocaleString()} ₽</div>`;
+                if (comp) {
+                    badgeHtml = `<div class="buy-badge" style="border-color:${comp.status === 'win' ? '#00ff66':'#ff3333'}; color:${comp.status === 'win' ? '#00ff66':'#ff3333'};">
+                        ${comp.status === 'win' ? 'WIN +' + comp.payout.toLocaleString() : 'SLIV'} ₽
+                    </div>`;
+                }
+
                 card.innerHTML = `
-                    <div class="quest-top">
-                        <span class="slot-title">🎰 ${q.slot}</span>
-                        <span class="buy-badge">${q.buy.toLocaleString()} ₽</span>
+                    <div class="quest-index">${q.id}</div>
+                    <div class="quest-main-details">
+                        <div class="slot-title">${q.slot}</div>
+                        <div class="quest-type-label">${q.type}</div>
+                        <div class="quest-description">${q.desc}</div>
                     </div>
-                    <div style="font-weight:bold; color:var(--gold); font-size:0.95rem;">Задание: ${q.type}</div>
-                    <div style="font-size:0.85rem; color:#b1a2c7;">${q.desc}</div>
-                    ${report ? `<div style="font-size:0.85rem; font-weight:bold; text-align:right;">Результат: ${report.profit >= 0 ? '+' : ''}${report.profit.toLocaleString()} ₽</div>` : ''}
+                    ${badgeHtml}
                 `;
-                container.appendChild(card);
+                els.questsContainer.appendChild(card);
             });
         }
 
         function updateTopBar() {
-            document.getElementById('balanceDisplay').innerText = state.balance.toLocaleString();
-            document.getElementById('progressDisplay').innerText = `${state.progress} / 20`;
-            let pDisp = document.getElementById('profitDisplay');
-            pDisp.innerText = (state.profit >= 0 ? '+' : '') + state.profit.toLocaleString();
-            pDisp.style.color = state.profit >= 0 ? '#00ff66' : '#ff3333';
-        }
-
-        // Отрисовка колеса
-        const wCanvas = document.getElementById('wheelCanvas');
-        const wCtx = wCanvas.getContext('2d');
-        function drawWheel() {
-            wCtx.clearRect(0, 0, 320, 320);
-            let sections = QUEST_DATABASE.length;
-            let angle = (Math.PI * 2) / sections;
-            for(let i=0; i<sections; i++) {
-                wCtx.beginPath();
-                wCtx.moveTo(160, 160);
-                wCtx.arc(160, 160, 150, i*angle, (i+1)*angle);
-                wCtx.fillStyle = state.completedList.some(item=>item.id === QUEST_DATABASE[i].id) ? '#3d255a' : (i % 2 === 0 ? '#ff007f' : '#00ffff');
-                wCtx.fill();
-                wCtx.lineWidth = 1;
-                wCtx.strokeStyle = '#1b0a2e';
-                wCtx.stroke();
-                // Номер квеста
-                wCtx.save();
-                wCtx.translate(160, 160);
-                wCtx.rotate(i * angle + angle / 2);
-                wCtx.fillStyle = "#ffffff";
-                wCtx.font = "bold 12px 'Comfortaa', 'Segoe UI'";
-                wCtx.shadowBlur = 0;
-                wCtx.fillText(QUEST_DATABASE[i].id, 105, 5);
-                wCtx.restore();
-            }
-            wCtx.beginPath(); wCtx.arc(160, 160, 25, 0, Math.PI*2); wCtx.fillStyle = '#fff'; wCtx.fill();
-        }
-
-        let isSpinning = false;
-        let originalMemesSpeed = null;
-        function setMemesSpeed(multiplier) {
-            if(!originalMemesSpeed) originalMemesSpeed = memes.map(m => ({ sX: m.sX, sY: m.sY }));
-            memes.forEach((m, idx) => {
-                if(originalMemesSpeed) {
-                    m.sX = originalMemesSpeed[idx].sX * multiplier;
-                    m.sY = originalMemesSpeed[idx].sY * multiplier;
-                }
+            els.balance.innerText = state.balance.toLocaleString();
+            els.progress.innerText = `${state.completedList.length} / ${QUEST_DATABASE.length}`;
+            
+            let computedProfit = 0;
+            state.completedList.forEach(c => {
+                const meta = QUEST_DATABASE.find(q => q.id === c.id);
+                if(meta) computedProfit += (c.payout - meta.buy);
             });
+            state.profit = computedProfit;
+            els.profit.innerText = (state.profit >= 0 ? '+' : '') + state.profit.toLocaleString();
         }
 
-        document.getElementById('spinWheelBtn').onclick = function() {
-            if(isSpinning) return;
-            let available = QUEST_DATABASE.filter(q => !state.completedList.some(item => item.id === q.id));
-            if(available.length === 0) {
-                writeLog("🎉 Ура! Все 20 квестов пройдены! Шоу завершено. Нажми сброс для новой игры.");
-                playTone(600, 0.6, 'sine');
+        function saveGame() {
+            localStorage.setItem('pragmatic_carousel_save', JSON.stringify(state));
+        }
+
+        function loadGame() {
+            const saved = localStorage.getItem('pragmatic_carousel_save');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    if (parsed && typeof parsed.balance === 'number') {
+                        state = parsed;
+                        if (!state.completedList) state.completedList = [];
+                    }
+                } catch(e) {}
+            }
+        }
+
+        // ========== ЛОГИКА ВРАЩЕНИЯ И ОБРАБОТКИ ==========
+        els.spinBtn.onclick = function() {
+            if (isSpinning) return;
+            initAudio();
+            const available = QUEST_DATABASE.filter(q => !state.completedList.some(c => c.id === q.id));
+            if (available.length === 0) {
+                alert("🎉 Все контракты пройдены! Великолепное шоу!");
                 return;
             }
+
             isSpinning = true;
-            playTone(400, 0.5, 'triangle');
-            startSpinSound();
-            setMemesSpeed(3);
-            let randomPick = available[Math.floor(Math.random() * available.length)];
-            let index = QUEST_DATABASE.findIndex(q => q.id === randomPick.id);
-            let sections = QUEST_DATABASE.length;
-            let secAngle = 360 / sections;
-            let targetAngle = 360 - (index * secAngle) - (secAngle / 2);
-            let totalRotation = 1440 + targetAngle;
+            els.spinBtn.disabled = true;
+            document.querySelectorAll('.quest-card').forEach(c => c.classList.remove('selected-anim'));
+
+            const targetQuest = available[Math.floor(Math.random() * available.length)];
+            currentActiveQuest = targetQuest;
+
+            const sectors = QUEST_DATABASE.length;
+            const targetSectorIndex = QUEST_DATABASE.findIndex(q => q.id === targetQuest.id);
+            const sectorAngle = 360 / sectors;
+            const extraSpins = 4 * 360;
+            const targetAngleDegrees = extraSpins + (360 - (targetSectorIndex * sectorAngle)) - (sectorAngle / 2);
+            
             const wheelContainer = document.querySelector('.wheel-canvas-container');
-            wheelContainer.style.transition = 'transform 4s cubic-bezier(0.1, 0.8, 0.1, 1)';
-            wheelContainer.style.transform = `rotate(${totalRotation}deg)`;
+            wheelContainer.style.transform = `rotate(${targetAngleDegrees}deg)`;
+
+            // треск рулетки
+            let step = 0;
+            spinInterval = setInterval(() => {
+                step++;
+                if (step % 3 === 0) playTone(650, 0.04, 'triangle');
+            }, 50);
+
             setTimeout(() => {
+                clearInterval(spinInterval);
                 isSpinning = false;
-                stopSpinSound();
-                setMemesSpeed(1);
-                wheelContainer.style.transition = 'none';
-                wheelContainer.style.transform = `rotate(${targetAngle}deg)`;
-                setTimeout(() => { wheelContainer.style.transition = 'transform 4s cubic-bezier(0.1, 0.8, 0.1, 1)'; }, 50);
-                document.querySelectorAll('.quest-card').forEach(c => c.classList.remove('selected-anim'));
-                let targetCard = document.getElementById(`quest-card-${randomPick.id}`);
-                targetCard.classList.add('selected-anim');
-                targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                currentActiveQuest = randomPick;
-                openModal(randomPick);
+                els.spinBtn.disabled = false;
+                playTone(880, 0.2, 'sine');
+                playTone(1200, 0.25, 'sine');
+
+                const card = document.getElementById(`quest-card-${targetQuest.id}`);
+                if (card) {
+                    card.classList.add('selected-anim');
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                writeLog(`🎯 Рулетка выбрала: Слот [${targetQuest.slot}] | Квест: ${targetQuest.type}`);
+
+                setTimeout(() => {
+                    document.getElementById('modalSlotTitle').innerText = targetQuest.slot;
+                    document.getElementById('modalQuestName').innerText = `Контракт №${targetQuest.id}: ${targetQuest.type}`;
+                    document.getElementById('modalQuestDesc').innerText = targetQuest.desc;
+                    els.payoutInput.value = '';
+                    els.resultModal.classList.remove('hidden');
+                }, 1200);
             }, 4000);
         };
 
-        function openModal(q) {
-            document.getElementById('modalSlotTitle').innerText = `🎰 ${q.slot}`;
-            document.getElementById('modalQuestName').innerText = `Квест: ${q.type}`;
-            document.getElementById('modalQuestDesc').innerHTML = `<strong>Условие:</strong> ${q.desc}<br><span style="color: var(--gold);">Покупка бонусы: ${q.buy.toLocaleString()} ₽</span>`;
-            document.getElementById('payoutValue').value = '';
-            document.getElementById('resultModal').classList.remove('hidden');
-            playTone(550, 0.2);
-        }
-
-        function resolveQuest(status) {
-            if(!currentActiveQuest) return;
-            let payout = 0;
-            if(status === 'win') {
-                payout = parseFloat(document.getElementById('payoutValue').value);
-                if(isNaN(payout)) payout = 0;
-            } else {
-                payout = 0;
-                document.getElementById('payoutValue').value = '0';
+        document.getElementById('winConfirmBtn').onclick = function() {
+            let winSum = parseFloat(els.payoutInput.value);
+            if (isNaN(winSum) || winSum < 0) {
+                alert("Введите корректную сумму выплаты! Если бонуска пустая — введите 0 или нажмите 'СЛИВ КВЕСТА'");
+                return;
             }
-            let profit = payout - currentActiveQuest.buy;
-            state.balance = state.balance - currentActiveQuest.buy + payout;
-            state.profit += profit;
-            state.progress++;
-            state.completedList.push({ id: currentActiveQuest.id, status: status, profit: profit });
-            writeLog(`${status === 'win' ? '✅ Квест ВЗЛОМАН' : '❌ СЛИВ КВЕСТА'}: ${currentActiveQuest.slot} | Бонуска дала: ${payout.toLocaleString()} ₽ (Итог: ${profit >= 0 ? '+' : ''}${profit.toLocaleString()} ₽)`);
-            if(status === 'win') playTone(700, 0.4, 'sine');
-            else playTone(250, 0.5, 'sawtooth');
-            document.getElementById('resultModal').classList.add('hidden');
+            state.completedList.push({
+                id: currentActiveQuest.id,
+                status: 'win',
+                payout: winSum
+            });
+            state.balance = state.balance - currentActiveQuest.buy + winSum;
+            writeLog(`✅ Квест пройден! Слот: ${currentActiveQuest.slot}. Куплено за: ${currentActiveQuest.buy} ₽, Выплатило: ${winSum} ₽. Профит: ${winSum - currentActiveQuest.buy} ₽`);
+            closeModal();
+            syncGame();
+        };
+
+        document.getElementById('loseConfirmBtn').onclick = function() {
+            state.completedList.push({
+                id: currentActiveQuest.id,
+                status: 'lose',
+                payout: 0
+            });
+            state.balance = state.balance - currentActiveQuest.buy;
+            writeLog(`❌ Слив контракта в ${currentActiveQuest.slot}. Минус ${currentActiveQuest.buy} ₽ фиксы.`);
+            closeModal();
+            syncGame();
+        };
+
+        function closeModal() {
+            els.resultModal.classList.add('hidden');
+        }
+        document.getElementById('cancelModalBtn').onclick = closeModal;
+
+        function syncGame() {
             updateTopBar();
             drawWheel();
             renderQuests();
             saveGame();
-            currentActiveQuest = null;
         }
 
-        document.getElementById('winConfirmBtn').onclick = () => resolveQuest('win');
-        document.getElementById('loseConfirmBtn').onclick = () => resolveQuest('lose');
-        document.getElementById('cancelModalBtn').onclick = () => document.getElementById('resultModal').classList.add('hidden');
-
-        function saveGame() { localStorage.setItem('pragmatic_carousel_save', JSON.stringify(state)); }
-        function loadGame() {
-            let raw = localStorage.getItem('pragmatic_carousel_save');
-            if(raw) {
-                state = JSON.parse(raw);
-                if(!state.completedList) state.completedList = [];
-                if(!state.profit) state.profit = 0;
-            }
-        }
-
-        // Анимированные персонажи
-        const canvas = document.getElementById('memePragmaticCanvas');
-        const ctx = canvas.getContext('2d');
-        let memes = [];
-        function initMemes() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            memes = [
-                { x: 100, y: 150, r: 40, sX: 0.8, sY: 0.5, txt: "⚡👴", name: "Зевс", col: "#00ffff" },
-                { x: 300, y: 400, r: 45, sX: -0.6, sY: 0.8, txt: "🐶🦴", name: "Собакен", col: "#ffcc00" },
-                { x: 600, y: 200, r: 35, sX: 0.5, sY: -0.7, txt: "🍬🍭", name: "Конфета", col: "#ff007f" },
-                { x: 800, y: 500, r: 40, sX: -0.4, sY: -0.4, txt: "👑👸", name: "Принцесса", col: "#e0b0ff" }
-            ];
-            originalMemesSpeed = memes.map(m => ({ sX: m.sX, sY: m.sY }));
-        }
-        function drawMemesAnimation() {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            memes.forEach(m => {
-                ctx.save();
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = m.col;
-                ctx.fillStyle = "rgba(44, 20, 77, 0.4)";
-                ctx.strokeStyle = m.col;
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(m.x, m.y, m.r, 0, Math.PI*2);
-                ctx.fill(); ctx.stroke();
-                ctx.fillStyle = "#fff";
-                ctx.font = "24px Arial";
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                ctx.fillText(m.txt, m.x, m.y);
-                ctx.restore();
-                m.x += m.sX; m.y += m.sY;
-                if(m.x - m.r < 0 || m.x + m.r > canvas.width) m.sX *= -1;
-                if(m.y - m.r < 0 || m.y + m.r > canvas.height) m.sY *= -1;
-            });
-            requestAnimationFrame(drawMemesAnimation);
-        }
-        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
-
-        // Управление звуком и сброс
-        document.getElementById('soundToggle').onclick = function() {
-            soundOn = !soundOn;
-            this.innerText = soundOn ? "🔊 ЗВУК: ВКЛ" : "🔇 ЗВУК: ВЫКЛ";
-            if(!soundOn && spinInterval) stopSpinSound();
-        };
         document.getElementById('fullResetBtn').onclick = function() {
-            if(confirm("Сбросить всё шоу и начать фиксу 100 000 ₽ заново?")) {
+            if(confirm("Вы уверены, что хотите полностью перезапустить шоу и обнулить баланс до 100 000 ₽?")) {
                 localStorage.removeItem('pragmatic_carousel_save');
                 state = { balance: 100000, progress: 0, profit: 0, completedList: [] };
-                updateTopBar();
-                drawWheel();
-                renderQuests();
-                writeLog("♻️ Шоу перезапущено! Баланс обновлён до 100 000 ₽.");
-                playTone(300, 0.3, 'sine');
+                document.querySelector('.wheel-canvas-container').style.transform = `rotate(0deg)`;
+                writeLog("♻️ Всё шоу полностью сброшено! Баланс обновлён.");
+                syncGame();
             }
         };
-        // Правила
+
+        // Правила и звук
         const rulesModal = document.getElementById('rulesModal');
         document.getElementById('rulesBtn').onclick = () => rulesModal.classList.remove('hidden');
         document.getElementById('closeRulesBtn').onclick = () => rulesModal.classList.add('hidden');
-        rulesModal.onclick = (e) => { if(e.target === rulesModal) rulesModal.classList.add('hidden'); };
+        
+        document.getElementById('soundToggle').onclick = function() {
+            soundOn = !soundOn;
+            this.innerHTML = soundOn ? `<i class="fas fa-volume-up"></i> ЗВУК: ВКЛ` : `<i class="fas fa-volume-mute"></i> ЗВУК: ВЫКЛ`;
+            if (soundOn && audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        };
 
         // Запуск
+        document.body.addEventListener('click', () => { initAudio(); }, { once: true });
         loadGame();
-        updateTopBar();
-        drawWheel();
-        renderQuests();
-        initMemes();
-        drawMemesAnimation();
-        writeLog("🍓 Карусель Pragmatic успешно загружена! Ждём прокрутки от Клубнички.");
+        initBackgroundEffects();
+        drawBackground();
+        syncGame();
     })();
     </script>
 </body>
