@@ -133,22 +133,30 @@
             position: relative;
         }
 
-        /* Интерактивное колесо */
+        /* Интерактивное колесо - фиксированный размер */
         .wheel-wrapper {
             position: relative;
             width: 320px;
             height: 320px;
             margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .wheel-canvas-container {
-            width: 100%;
-            height: 100%;
+            width: 320px !important;
+            height: 320px !important;
             border-radius: 50%;
             border: 8px solid var(--pink);
             box-shadow: var(--glow-pink);
             transition: transform 4s cubic-bezier(0.1, 0.8, 0.1, 1);
             background: #250f3e;
+        }
+
+        canvas#wheelCanvas {
+            width: 100% !important;
+            height: 100% !important;
         }
 
         .wheel-pointer {
@@ -314,6 +322,15 @@
             justify-content: flex-end;
             gap: 10px;
         }
+        
+        .rules-text {
+            text-align: left;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .rules-text strong {
+            color: var(--gold);
+        }
     </style>
 </head>
 <body>
@@ -322,6 +339,7 @@
 
     <div class="app-container">
         <div class="top-utils">
+            <button id="rulesBtn" class="action-btn btn-cyan" style="padding: 8px 15px; font-size: 0.9rem;">📜 ПРАВИЛА</button>
             <button id="soundToggle" class="action-btn btn-cyan" style="padding: 8px 15px; font-size: 0.9rem;">🔊 ЗВУК: ВКЛ</button>
             <button id="fullResetBtn" class="action-btn" style="padding: 8px 15px; font-size: 0.9rem; background: #444;">♻️ СБРОСИТЬ ШОУ</button>
         </div>
@@ -366,6 +384,7 @@
         </div>
     </div>
 
+    <!-- Модалка для ввода выигрыша -->
     <div id="resultModal" class="modal-overlay hidden">
         <div class="modal-window">
             <h2 id="modalSlotTitle" style="color: var(--gold);">Название слота</h2>
@@ -382,6 +401,28 @@
                 <button id="loseConfirmBtn" class="action-btn" style="flex: 1; background: #ff3333; box-shadow: 0 0 15px rgba(255,51,51,0.4);">❌ СЛИВ КВЕСТА</button>
             </div>
             <button id="cancelModalBtn" style="background: none; border: none; color: #aaa; cursor: pointer; text-decoration: underline;">Закрыть окно</button>
+        </div>
+    </div>
+
+    <!-- Модалка с правилами -->
+    <div id="rulesModal" class="modal-overlay hidden">
+        <div class="modal-window">
+            <h2 style="color: var(--gold);">🍓 ПРАВИЛА ШОУ</h2>
+            <div class="rules-text">
+                <p><strong>🎡 Как играть:</strong></p>
+                <ul style="margin-left: 20px; margin-bottom: 15px;">
+                    <li>Нажми <strong>«КРУТИТЬ КАРУСЕЛЬ»</strong> – колесо выберет случайный слот и задание.</li>
+                    <li>Перейди в казино, купи бонуску за указанную сумму (от 4 800 до 10 000 ₽).</li>
+                    <li>Выполни условие квеста (например, поймать множитель x12).</li>
+                    <li>Введи сумму, которую дала бонуска, и нажми <strong>«КВЕСТ ВЫПОЛНЕН»</strong>.</li>
+                    <li>Если задание не выполнено – нажми <strong>«СЛИВ КВЕСТА»</strong> (инпут игнорируется).</li>
+                </ul>
+                <p><strong>💰 Баланс и профит:</strong><br>
+                Стартовая фикса: 100 000 ₽. Каждая покупка списывается, выигрыш прибавляется. Чистый профит обновляется автоматически.</p>
+                <p><strong>🎯 Цель:</strong> Пройти все 20 квестов, набрав максимальный профит. Шоу сохраняется в браузере – можно продолжить после перезагрузки.</p>
+                <p><strong>⚡ Звук и эффекты:</strong> Персонажи на фоне ускоряются при вращении колеса, во время кручения слышны «щелчки» рулетки.</p>
+            </div>
+            <button id="closeRulesBtn" class="action-btn btn-cyan" style="margin-top: 10px;">ЗАКРЫТЬ</button>
         </div>
     </div>
 
@@ -415,13 +456,13 @@
             balance: 100000,
             progress: 0,
             profit: 0,
-            completedList: [], // {id, status: 'win'|'lose', profit}
+            completedList: [],
         };
 
         let soundOn = true;
         let audioCtx = null;
         let currentActiveQuest = null;
-        let spinInterval = null; // для звука треска при вращении
+        let spinInterval = null;
 
         function initAudio() { if(!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)(); }
         function playTone(freq, dur, type='sine') {
@@ -455,17 +496,12 @@
         function renderQuests() {
             const container = document.getElementById('questsContainer');
             container.innerHTML = '';
-            
             QUEST_DATABASE.forEach(q => {
                 let report = state.completedList.find(item => item.id === q.id);
                 let card = document.createElement('div');
                 card.className = 'quest-card';
                 card.id = `quest-card-${q.id}`;
-                
-                if(report) {
-                    card.classList.add(report.status === 'win' ? 'done-win' : 'done-lose');
-                }
-
+                if(report) card.classList.add(report.status === 'win' ? 'done-win' : 'done-lose');
                 card.innerHTML = `
                     <div class="quest-top">
                         <span class="slot-title">🎰 ${q.slot}</span>
@@ -487,10 +523,9 @@
             pDisp.style.color = state.profit >= 0 ? '#00ff66' : '#ff3333';
         }
 
-        // Отрисовка колеса выбора с номерами квестов
+        // Отрисовка колеса
         const wCanvas = document.getElementById('wheelCanvas');
         const wCtx = wCanvas.getContext('2d');
-        
         function drawWheel() {
             wCtx.clearRect(0, 0, 320, 320);
             let sections = QUEST_DATABASE.length;
@@ -499,15 +534,12 @@
                 wCtx.beginPath();
                 wCtx.moveTo(160, 160);
                 wCtx.arc(160, 160, 150, i*angle, (i+1)*angle);
-                wCtx.fillStyle = state.completedList.some(item=>item.id === QUEST_DATABASE[i].id) 
-                    ? '#3d255a' 
-                    : (i % 2 === 0 ? '#ff007f' : '#00ffff');
+                wCtx.fillStyle = state.completedList.some(item=>item.id === QUEST_DATABASE[i].id) ? '#3d255a' : (i % 2 === 0 ? '#ff007f' : '#00ffff');
                 wCtx.fill();
                 wCtx.lineWidth = 1;
                 wCtx.strokeStyle = '#1b0a2e';
                 wCtx.stroke();
-                
-                // Рисуем номер квеста на секторе
+                // Номер квеста
                 wCtx.save();
                 wCtx.translate(160, 160);
                 wCtx.rotate(i * angle + angle / 2);
@@ -517,18 +549,13 @@
                 wCtx.fillText(QUEST_DATABASE[i].id, 105, 5);
                 wCtx.restore();
             }
-            // Центральный круг
             wCtx.beginPath(); wCtx.arc(160, 160, 25, 0, Math.PI*2); wCtx.fillStyle = '#fff'; wCtx.fill();
         }
 
-        // Вращение колеса
         let isSpinning = false;
         let originalMemesSpeed = null;
-
         function setMemesSpeed(multiplier) {
-            if(!originalMemesSpeed) {
-                originalMemesSpeed = memes.map(m => ({ sX: m.sX, sY: m.sY }));
-            }
+            if(!originalMemesSpeed) originalMemesSpeed = memes.map(m => ({ sX: m.sX, sY: m.sY }));
             memes.forEach((m, idx) => {
                 if(originalMemesSpeed) {
                     m.sX = originalMemesSpeed[idx].sX * multiplier;
@@ -545,40 +572,30 @@
                 playTone(600, 0.6, 'sine');
                 return;
             }
-
             isSpinning = true;
             playTone(400, 0.5, 'triangle');
             startSpinSound();
-            // Ускоряем мемы в 3 раза
             setMemesSpeed(3);
-            
             let randomPick = available[Math.floor(Math.random() * available.length)];
             let index = QUEST_DATABASE.findIndex(q => q.id === randomPick.id);
-            
             let sections = QUEST_DATABASE.length;
             let secAngle = 360 / sections;
             let targetAngle = 360 - (index * secAngle) - (secAngle / 2);
             let totalRotation = 1440 + targetAngle;
-
             const wheelContainer = document.querySelector('.wheel-canvas-container');
             wheelContainer.style.transition = 'transform 4s cubic-bezier(0.1, 0.8, 0.1, 1)';
             wheelContainer.style.transform = `rotate(${totalRotation}deg)`;
-
             setTimeout(() => {
                 isSpinning = false;
                 stopSpinSound();
-                // Возвращаем мемы к нормальной скорости
                 setMemesSpeed(1);
-                
                 wheelContainer.style.transition = 'none';
                 wheelContainer.style.transform = `rotate(${targetAngle}deg)`;
                 setTimeout(() => { wheelContainer.style.transition = 'transform 4s cubic-bezier(0.1, 0.8, 0.1, 1)'; }, 50);
-
                 document.querySelectorAll('.quest-card').forEach(c => c.classList.remove('selected-anim'));
                 let targetCard = document.getElementById(`quest-card-${randomPick.id}`);
                 targetCard.classList.add('selected-anim');
                 targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
                 currentActiveQuest = randomPick;
                 openModal(randomPick);
             }, 4000);
@@ -600,27 +617,17 @@
                 payout = parseFloat(document.getElementById('payoutValue').value);
                 if(isNaN(payout)) payout = 0;
             } else {
-                // При сливе игнорируем инпут, списываем полную стоимость
                 payout = 0;
                 document.getElementById('payoutValue').value = '0';
             }
             let profit = payout - currentActiveQuest.buy;
-
             state.balance = state.balance - currentActiveQuest.buy + payout;
             state.profit += profit;
             state.progress++;
-
-            state.completedList.push({
-                id: currentActiveQuest.id,
-                status: status,
-                profit: profit
-            });
-
+            state.completedList.push({ id: currentActiveQuest.id, status: status, profit: profit });
             writeLog(`${status === 'win' ? '✅ Квест ВЗЛОМАН' : '❌ СЛИВ КВЕСТА'}: ${currentActiveQuest.slot} | Бонуска дала: ${payout.toLocaleString()} ₽ (Итог: ${profit >= 0 ? '+' : ''}${profit.toLocaleString()} ₽)`);
-            
             if(status === 'win') playTone(700, 0.4, 'sine');
             else playTone(250, 0.5, 'sawtooth');
-
             document.getElementById('resultModal').classList.add('hidden');
             updateTopBar();
             drawWheel();
@@ -643,11 +650,10 @@
             }
         }
 
-        // ---------- ВЕСЁЛЫЕ ПЕРСОНАЖИ PRAGMATIC (CANVAS) ----------
+        // Анимированные персонажи
         const canvas = document.getElementById('memePragmaticCanvas');
         const ctx = canvas.getContext('2d');
         let memes = [];
-
         function initMemes() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -659,47 +665,38 @@
             ];
             originalMemesSpeed = memes.map(m => ({ sX: m.sX, sY: m.sY }));
         }
-
         function drawMemesAnimation() {
             ctx.clearRect(0,0,canvas.width,canvas.height);
-            
             memes.forEach(m => {
                 ctx.save();
                 ctx.shadowBlur = 15;
                 ctx.shadowColor = m.col;
-                
                 ctx.fillStyle = "rgba(44, 20, 77, 0.4)";
                 ctx.strokeStyle = m.col;
                 ctx.lineWidth = 3;
                 ctx.beginPath();
                 ctx.arc(m.x, m.y, m.r, 0, Math.PI*2);
                 ctx.fill(); ctx.stroke();
-
                 ctx.fillStyle = "#fff";
                 ctx.font = "24px Arial";
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
                 ctx.fillText(m.txt, m.x, m.y);
-                
                 ctx.restore();
-
                 m.x += m.sX; m.y += m.sY;
                 if(m.x - m.r < 0 || m.x + m.r > canvas.width) m.sX *= -1;
                 if(m.y - m.r < 0 || m.y + m.r > canvas.height) m.sY *= -1;
             });
-
             requestAnimationFrame(drawMemesAnimation);
         }
-
         window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
 
-        // Утилиты управления
+        // Управление звуком и сброс
         document.getElementById('soundToggle').onclick = function() {
             soundOn = !soundOn;
             this.innerText = soundOn ? "🔊 ЗВУК: ВКЛ" : "🔇 ЗВУК: ВЫКЛ";
             if(!soundOn && spinInterval) stopSpinSound();
         };
-
         document.getElementById('fullResetBtn').onclick = function() {
             if(confirm("Сбросить всё шоу и начать фиксу 100 000 ₽ заново?")) {
                 localStorage.removeItem('pragmatic_carousel_save');
@@ -711,6 +708,11 @@
                 playTone(300, 0.3, 'sine');
             }
         };
+        // Правила
+        const rulesModal = document.getElementById('rulesModal');
+        document.getElementById('rulesBtn').onclick = () => rulesModal.classList.remove('hidden');
+        document.getElementById('closeRulesBtn').onclick = () => rulesModal.classList.add('hidden');
+        rulesModal.onclick = (e) => { if(e.target === rulesModal) rulesModal.classList.add('hidden'); };
 
         // Запуск
         loadGame();
