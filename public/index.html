@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>🍓 Клубничный квест | Спаси урожай и выполни задания в слотах!</title>
+    <title>🍓 PRAGMATIC КРУТИЛКА | СТРИМ ШОУ</title>
     <style>
         * {
             margin: 0;
@@ -13,68 +13,62 @@
         }
 
         :root {
-            --radius-big: 24px;
-            --radius-medium: 16px;
-            --radius-small: 10px;
-            --bg-main: #0c060a;
-            --bg-card: #1f0f19;
-            --bg-surface: #2a1620;
-            --accent: #ff4d6d;
-            --accent-soft: #ff8aa0;
-            --accent-gold: #ffb85e;
-            --text-primary: #fef3e8;
-            --text-secondary: #d9b8a8;
-            --border: #331c26;
-            --shadow: 0 8px 20px rgba(0,0,0,0.5);
-            --shadow-small: 0 2px 6px rgba(0,0,0,0.3);
-            --glow-accent: 0 0 15px rgba(255, 77, 109, 0.4);
+            --bg-main: #0b0214;
+            --bg-panel: #1b0a2e;
+            --bg-card: #2c144d;
+            --pink: #ff007f;
+            --cyan: #00ffff;
+            --gold: #ffcc00;
+            --text: #ffffff;
+            --glow-pink: 0 0 20px rgba(255, 0, 127, 0.6);
+            --glow-cyan: 0 0 20px rgba(0, 255, 255, 0.6);
         }
 
         body {
-            font-family: 'Comfortaa', 'Segoe UI', cursive, sans-serif;
+            font-family: 'Comfortaa', 'Segoe UI', sans-serif;
             background-color: var(--bg-main);
-            color: var(--text-primary);
+            color: var(--text);
             min-height: 100vh;
             overflow-x: hidden;
             display: flex;
             flex-direction: column;
         }
 
+        /* Анимированный бэкграунд с персонажами Pragmatic */
         canvas {
             position: fixed;
-            top: 0;
-            left: 0;
+            top: 0; left: 0;
             width: 100%;
             height: 100%;
             pointer-events: none;
             z-index: 1;
-            opacity: 0.4;
         }
 
-        .container {
+        .app-container {
             position: relative;
             z-index: 2;
-            max-width: 1300px;
+            max-width: 1500px;
             width: 100%;
             margin: 0 auto;
-            padding: 20px;
-            flex: 1;
+            padding: 25px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 25px;
+            flex: 1;
         }
 
+        /* Шапка с балансом */
         .header-panel {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: var(--radius-big);
+            background: linear-gradient(135deg, var(--bg-panel), #130524);
+            border: 3px solid var(--pink);
+            box-shadow: var(--glow-pink);
+            border-radius: 20px;
             padding: 20px;
             display: flex;
-            flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
-            gap: 15px;
-            box-shadow: var(--shadow);
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
         .streamer-info {
@@ -83,263 +77,187 @@
             gap: 15px;
         }
 
-        .avatar-glow {
-            width: 60px;
-            height: 60px;
-            background: radial-gradient(circle, var(--accent-soft), var(--accent));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            box-shadow: var(--glow-accent);
-            animation: pulse 2s infinite alternate;
+        .logo-strawberry {
+            font-size: 3rem;
+            animation: strawberryDance 0.6s infinite alternate cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 77, 109, 0.4); }
-            100% { transform: scale(1.05); box-shadow: 0 0 20px rgba(255, 77, 109, 0.7); }
+        @keyframes strawberryDance {
+            0% { transform: scale(1) rotate(-5deg); }
+            100% { transform: scale(1.1) rotate(5deg); }
         }
 
-        .stats-grid {
+        .stats-row {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             flex-wrap: wrap;
         }
 
         .stat-badge {
-            background: var(--bg-surface);
-            padding: 10px 20px;
-            border-radius: var(--radius-medium);
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            background: var(--bg-card);
+            border: 2px solid var(--cyan);
+            box-shadow: var(--glow-cyan);
+            padding: 12px 25px;
+            border-radius: 12px;
+            font-size: 1.2rem;
             font-weight: bold;
         }
 
-        .progress-container {
-            width: 100%;
-            margin-top: 5px;
+        .stat-badge span {
+            color: var(--gold);
+            text-shadow: 0 0 10px var(--gold);
         }
 
-        .progress-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            margin-bottom: 4px;
-            color: var(--text-secondary);
-        }
-
-        .bar-bg {
-            background: #150810;
-            height: 12px;
-            border-radius: var(--radius-small);
-            overflow: hidden;
-            border: 1px solid var(--border);
-        }
-
-        .bar-fill {
-            height: 100%;
-            width: 0%;
-            transition: width 0.4s ease;
-            border-radius: var(--radius-small);
-        }
-
-        .energy-fill { background: linear-gradient(90deg, var(--accent-soft), var(--accent)); }
-        .danger-fill { background: linear-gradient(90deg, var(--accent-gold), #ff3333); }
-
-        .main-game {
+        /* Основная разметка */
+        .main-layout {
             display: grid;
-            grid-template-columns: 1fr 1.2fr;
-            gap: 20px;
+            grid-template-columns: 1.2fr 1.5fr;
+            gap: 25px;
             flex: 1;
         }
 
-        @media (max-width: 850px) {
-            .main-game { grid-template-columns: 1fr; }
+        @media (max-width: 1024px) {
+            .main-layout { grid-template-columns: 1fr; }
         }
 
-        .panel {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: var(--radius-big);
-            padding: 24px;
-            box-shadow: var(--shadow);
+        .show-box {
+            background: var(--bg-panel);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 25px;
             display: flex;
             flex-direction: column;
             gap: 20px;
-        }
-
-        .panel-title {
-            font-size: 1.25rem;
-            color: var(--accent-soft);
-            display: flex;
             align-items: center;
-            gap: 10px;
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 10px;
+            justify-content: flex-start;
+            position: relative;
         }
 
-        .btn {
-            background: linear-gradient(135deg, var(--accent-soft), var(--accent));
-            color: var(--bg-main);
+        /* Интерактивное колесо */
+        .wheel-wrapper {
+            position: relative;
+            width: 320px;
+            height: 320px;
+        }
+
+        .wheel-canvas-container {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 8px solid var(--pink);
+            box-shadow: var(--glow-pink);
+            transition: transform 4s cubic-bezier(0.1, 0.8, 0.1, 1);
+            background: #250f3e;
+        }
+
+        .wheel-pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0; height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid var(--cyan);
+            filter: drop-shadow(0 0 8px var(--cyan));
+            z-index: 10;
+        }
+
+        /* Список квестов */
+        .quests-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 650px;
+            overflow-y: auto;
+            width: 100%;
+            padding-right: 10px;
+        }
+
+        .quests-list::-webkit-scrollbar { width: 8px; }
+        .quests-list::-webkit-scrollbar-thumb { background: var(--cyan); border-radius: 10px; }
+
+        .quest-card {
+            background: var(--bg-card);
+            border: 2px solid transparent;
+            border-radius: 16px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .quest-card.selected-anim {
+            border-color: var(--cyan);
+            box-shadow: var(--glow-cyan);
+            transform: scale(1.02);
+        }
+
+        .quest-card.done-win { border-color: #00ff66; background: linear-gradient(135deg, var(--bg-card), #052912); }
+        .quest-card.done-lose { border-color: #ff3333; background: linear-gradient(135deg, var(--bg-card), #2e0808); }
+
+        .quest-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slot-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--cyan);
+        }
+
+        .buy-badge {
+            background: rgba(255, 204, 0, 0.15);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        /* Кнопки */
+        .action-btn {
+            background: linear-gradient(135deg, var(--pink), #b30059);
+            color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: var(--radius-medium);
-            font-size: 1rem;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: var(--shadow-small);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            box-shadow: var(--glow-pink);
+            transition: transform 0.2s, filter 0.2s;
         }
 
-        .btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: var(--glow-accent);
-            filter: brightness(1.1);
+        .action-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            filter: brightness(1.2);
         }
 
-        .btn:active:not(:disabled) {
-            transform: translateY(0);
-        }
-
-        .btn:disabled {
-            background: #33222b;
-            color: #664455;
-            cursor: not-allowed;
+        .action-btn:disabled {
+            background: #443c4d;
             box-shadow: none;
+            cursor: not-allowed;
+            opacity: 0.5;
         }
 
-        .btn-secondary {
-            background: var(--bg-surface);
-            color: var(--text-primary);
-            border: 1px solid var(--border);
+        .btn-cyan {
+            background: linear-gradient(135deg, var(--cyan), #009999);
+            color: #0b0214;
+            box-shadow: var(--glow-cyan);
         }
 
-        .btn-gold {
-            background: linear-gradient(135deg, #ffe082, var(--accent-gold));
-            color: #3a2200;
-        }
-
-        .task-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-height: 420px;
-            overflow-y: auto;
-            padding-right: 5px;
-        }
-
-        .task-list::-webkit-scrollbar { width: 6px; }
-        .task-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-
-        .task-item {
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-medium);
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            transition: border-color 0.3s ease;
-            animation: taskSpawn 0.25s ease-out forwards;
-        }
-
-        @keyframes taskSpawn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .task-item.active {
-            border-color: var(--accent);
-            background: linear-gradient(145deg, #2a1620, #1f0f19);
-        }
-
-        .task-header {
-            display: flex;
-            justify-content: space-between;
-            font-weight: bold;
-        }
-
-        .task-rewards {
-            font-size: 0.9rem;
-            color: var(--accent-soft);
-            display: flex;
-            gap: 15px;
-        }
-
-        .craft-zone {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .craft-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-medium);
-            padding: 15px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .log-box {
-            background: #070306;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-medium);
-            padding: 12px;
-            font-family: monospace;
-            font-size: 0.85rem;
-            height: 140px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        #toastContainer {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            pointer-events: none;
-        }
-
-        .toast {
-            background: var(--bg-card);
-            border: 2px solid var(--accent);
-            color: var(--text-primary);
-            padding: 12px 20px;
-            border-radius: var(--radius-medium);
-            box-shadow: var(--shadow);
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: slideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(120%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .modal {
+        /* Модальные окна */
+        .modal-overlay {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(12, 6, 10, 0.9);
+            background: rgba(11, 2, 20, 0.85);
             backdrop-filter: blur(8px);
             display: flex;
             align-items: center;
@@ -347,768 +265,406 @@
             z-index: 1000;
         }
 
-        .modal.hidden {
-            display: none;
-        }
+        .modal-overlay.hidden { display: none; }
 
-        .modal-content {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: var(--radius-big);
-            padding: 32px;
+        .modal-window {
+            background: var(--bg-panel);
+            border: 3px solid var(--cyan);
+            box-shadow: var(--glow-cyan);
+            border-radius: 24px;
+            padding: 35px;
             max-width: 550px;
             width: 90%;
-            max-height: 85vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow);
             text-align: center;
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
 
-        .modal-title {
-            font-size: 1.6rem;
-            color: var(--accent-soft);
+        .input-money {
+            background: var(--bg-main);
+            border: 2px solid var(--pink);
+            padding: 12px;
+            border-radius: 10px;
+            color: white;
+            font-size: 1.3rem;
+            text-align: center;
+            width: 100%;
+            outline: none;
         }
 
-        .status-bar-top {
+        /* Логгер стрима */
+        .stream-logs {
+            background: #05010a;
+            border: 1px solid #2d174d;
+            border-radius: 12px;
+            padding: 12px;
+            width: 100%;
+            height: 120px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+            text-align: left;
+            color: #c0b2d6;
+        }
+
+        .top-utils {
             display: flex;
             justify-content: flex-end;
             gap: 10px;
         }
-
-        /* Стили для мини-игры */
-        .mini-game-modal {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(12, 6, 10, 0.95);
-            backdrop-filter: blur(12px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-        }
-        .game-window {
-            background: linear-gradient(145deg, #2a1620, #1a0d14);
-            border-radius: var(--radius-big);
-            padding: 24px;
-            width: 90%;
-            max-width: 700px;
-            border: 2px solid var(--accent);
-            text-align: center;
-        }
-        .game-area {
-            position: relative;
-            background: #2e1620;
-            border-radius: var(--radius-medium);
-            padding: 20px;
-            min-height: 380px;
-            margin: 20px 0;
-            overflow: hidden;
-            cursor: crosshair;
-        }
-        .flying-berry {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            background: radial-gradient(circle at 30% 30%, #ff4d6d, #c2185b);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            cursor: pointer;
-            transition: transform 0.05s;
-            box-shadow: 0 6px 12px black;
-            animation: berryPop 0.1s;
-        }
-        @keyframes berryPop {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        .game-stats {
-            font-size: 1.2rem;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <canvas id="berryCanvas"></canvas>
-    <div id="toastContainer"></div>
 
-    <div class="container">
-        <div class="status-bar-top">
-            <button id="toggleSoundBtn" class="btn btn-secondary"><i class="fas fa-volume-up"></i> Звук: ВКЛ</button>
-            <button id="rulesBtn" class="btn btn-secondary"><i class="fas fa-book"></i> Правила</button>
-            <button id="achievementsInfoBtn" class="btn btn-secondary"><i class="fas fa-trophy"></i> Прогресс</button>
-            <button id="resetGameBtn" class="btn btn-secondary"><i class="fas fa-trash-alt"></i> Сброс</button>
+    <canvas id="memePragmaticCanvas"></canvas>
+
+    <div class="app-container">
+        <div class="top-utils">
+            <button id="soundToggle" class="action-btn btn-cyan" style="padding: 8px 15px; font-size: 0.9rem;">🔊 ЗВУК: ВКЛ</button>
+            <button id="fullResetBtn" class="action-btn" style="padding: 8px 15px; font-size: 0.9rem; background: #444;">♻️ СБРОСИТЬ ШОУ</button>
         </div>
 
         <div class="header-panel">
             <div class="streamer-info">
-                <div class="avatar-glow">🍓</div>
+                <div class="logo-strawberry">🍓</div>
                 <div>
-                    <h2>Клубничка Стрим</h2>
-                    <div class="progress-container" style="width: 200px;">
-                        <div class="progress-label"><span>Энергия:</span><span id="energyText">100/100</span></div>
-                        <div class="bar-bg"><div id="energyBar" class="bar-fill energy-fill"></div></div>
-                    </div>
+                    <h1 style="color: var(--pink); text-shadow: var(--glow-pink); font-size: 1.6rem;">PRAGMATIC-КАРУСЕЛЬ КЛУБНИЧКИ</h1>
+                    <p style="color: var(--cyan); font-size: 0.85rem; letter-spacing: 1px;">ЖИВОЙ ИНТЕРАКТИВ НА СТРИМЕ</p>
                 </div>
             </div>
-            <div class="stats-grid">
-                <div class="stat-badge"><i class="fas fa-seedling"></i> Ягоды: <span id="berriesText">0</span></div>
-                <div class="stat-badge"><i class="fas fa-wine-bottle"></i> Варенье: <span id="jamText">0</span></div>
-                <div class="stat-badge"><i class="fas fa-users"></i> Донаты: <span id="donationsText">0</span> ₽</div>
-            </div>
-            <div class="progress-container" style="max-width: 300px;">
-                <div class="progress-label"><span><i class="fas fa-bug"></i> Угроза вредителей:</span><span id="dangerText">0%</span></div>
-                <div class="bar-bg"><div id="dangerBar" class="bar-fill danger-fill"></div></div>
+            <div class="stats-row">
+                <div class="stat-badge">Фикса: <span id="balanceDisplay">100 000</span> ₽</div>
+                <div class="stat-badge">Пройдено: <span id="progressDisplay">0 / 20</span></div>
+                <div class="stat-badge">Чистый Профит: <span id="profitDisplay">0</span> ₽</div>
             </div>
         </div>
 
-        <div class="main-game">
-            <div class="panel">
-                <div class="panel-title"><i class="fas fa-tasks"></i> Задания в казино (Pragmatic Play) <span id="taskCounter">(0/15)</span></div>
-                <div style="display: flex; gap: 10px;">
-                    <button id="pickTaskBtn" class="btn" style="flex: 1;"><i class="fas fa-plus-circle"></i> Взять задание</button>
-                    <button id="buyEnergyBtn" class="btn btn-gold"><i class="fas fa-bolt"></i> Купить Энергию (-500₽)</button>
+        <div class="main-layout">
+            <div class="show-box">
+                <h3 style="color: var(--gold); text-shadow: 0 0 10px var(--gold); text-align: center;">🎰 РАНДОМАЙЗЕР КОНТРАКТОВ</h3>
+                <p style="font-size: 0.9rem; text-align: center; color: var(--cyan);">Крути карусель, чтобы выбрать следующий слот!</p>
+                
+                <div class="wheel-wrapper">
+                    <div class="wheel-pointer"></div>
+                    <canvas id="wheelCanvas" width="320" height="320" class="wheel-canvas-container"></canvas>
                 </div>
-                <div class="task-list" id="taskListContainer"></div>
+
+                <button id="spinWheelBtn" class="action-btn" style="width: 100%; padding: 16px;">КРУТИТЬ КАРУСЕЛЬ</button>
+
+                <div style="width: 100%; margin-top: 10px;">
+                    <h5 style="color: var(--pink); margin-bottom: 5px;">🔥 События шоу:</h5>
+                    <div class="stream-logs" id="logBox"></div>
+                </div>
             </div>
-            <div class="panel">
-                <div class="panel-title"><i class="fas fa-blender"></i> Ферма и Интерактив</div>
-                <div class="craft-zone">
-                    <div class="craft-card">
-                        <h4><i class="fas fa-mortar-pestle"></i> Варить варенье</h4>
-                        <p style="font-size: 0.85rem;">15 ягод + 10 энергии → 1 банка (+1200₽)</p>
-                        <button id="craftJamBtn" class="btn btn-secondary"><i class="fas fa-fire"></i> Сварить</button>
-                    </div>
-                    <div class="craft-card">
-                        <h4><i class="fas fa-bullhorn"></i> Борьба с жуками</h4>
-                        <p style="font-size: 0.85rem;">Чат помогает снизить угрозу на 15–30%</p>
-                        <button id="bonusChatBtn" class="btn btn-secondary"><i class="fas fa-comments"></i> Позвать модераторов</button>
-                    </div>
-                </div>
-                <div class="craft-card" style="background: linear-gradient(135deg, #2a121d, var(--bg-surface));">
-                    <h4><i class="fas fa-gamepad"></i> Мини-игра «Лови клубнику»</h4>
-                    <p style="font-size: 0.85rem;">За 12 секунд лови ягоды (перезарядка 2 мин)</p>
-                    <button id="minigameBtn" class="btn btn-gold"><i class="fas fa-star"></i> Играть</button>
-                </div>
-                <div class="panel-title" style="font-size: 1rem; border: none; padding: 0;"><i class="fas fa-history"></i> Журнал событий</div>
-                <div class="log-box" id="logBoxContainer"></div>
+
+            <div class="show-box" style="justify-content: flex-start; align-items: stretch;">
+                <h3 style="color: var(--cyan); border-bottom: 2px solid var(--bg-card); padding-bottom: 10px;">📋 Матрица Доступных Квестов (20 шт)</h3>
+                <div class="quests-list" id="questsContainer"></div>
             </div>
         </div>
     </div>
 
-    <div id="rulesModal" class="modal hidden">
-        <div class="modal-content">
-            <h3 class="modal-title">🍓 Правила квеста</h3>
-            <div style="text-align: left; font-size: 0.9rem; line-height: 1.5; color: var(--text-secondary);">
-                <p><strong>🎯 Цель:</strong> Выполнить <strong>все 15 заданий</strong> (слоты Pragmatic Play) <strong>и наварить 10 банок варенья</strong>. Квест рассчитан примерно на <strong>1.5 часа</strong> активной игры.</p>
-                <p><strong>🍓 Задания:</strong> Нажимай «Взять задание» – оно выбирается случайно из пула (без повторов). Каждое задание требует <strong>30 энергии</strong> и даёт ягоды и донаты.</p>
-                <p><strong>⚡ Энергия:</strong> тратится на выполнение заданий (30), варку варенья (10) и мини-игру (5). Восстанавливается <strong>+1 каждые 15 секунд</strong> (~4 в минуту). Можно купить за 500 донатов (+40 энергии).</p>
-                <p><strong>💰 Донаты:</strong> даются за задания и варку варенья. Покупай энергию, если не хватает.</p>
-                <p><strong>🍯 Варенье:</strong> 15 ягод + 10 энергии → 1 банка варенья + 1200 донатов. <strong>Нужно 10 банок.</strong></p>
-                <p><strong>🐛 Угроза вредителей:</strong> растёт сама (+1.5% каждые 8 сек). При 100% — жуки съедают 30% ягод. Чат может снизить угрозу на 15–30% (кнопка «Позвать модераторов»).</p>
-                <p><strong>🎮 Мини-игра:</strong> «Лови клубнику» — за 12 секунд лови падающие ягоды. <strong>Перезарядка 2 минуты</strong> (чтобы не фармить). Награда: ягоды = пойманные × 2 + бонус комбо, энергия +5.</p>
-                <p><strong>🏆 Прогресс:</strong> Кнопка «Прогресс» покажет, сколько заданий выполнено и банок сварено.</p>
-                <p><em>Игра сохраняется автоматически. Удачи!</em></p>
+    <div id="resultModal" class="modal-overlay hidden">
+        <div class="modal-window">
+            <h2 id="modalSlotTitle" style="color: var(--gold);">Название слота</h2>
+            <h4 id="modalQuestName" style="color: var(--pink);">Квест: Текст</h4>
+            <p id="modalQuestDesc" style="color: var(--cyan); font-size: 0.95rem;"></p>
+            
+            <div style="margin: 15px 0;">
+                <label style="display: block; margin-bottom: 8px; font-weight: bold;">Сколько выплатила бонуска? (₽)</label>
+                <input type="number" id="payoutValue" class="input-money" placeholder="0">
             </div>
-            <button id="closeRulesModalBtn" class="btn btn-secondary">Понятно, погнали!</button>
-        </div>
-    </div>
 
-    <div id="progressModal" class="modal hidden">
-        <div class="modal-content">
-            <h3 class="modal-title">🏆 Прогресс квеста</h3>
-            <div style="font-size: 1.1rem;">
-                <p><i class="fas fa-tasks"></i> Заданий выполнено: <span id="progressTasks">0</span> / 15</p>
-                <p><i class="fas fa-wine-bottle"></i> Банок варенья: <span id="progressJam">0</span> / 10</p>
-                <p><span id="victoryMessage" style="color: #ffd966;"></span></p>
+            <div style="display: flex; gap: 15px;">
+                <button id="winConfirmBtn" class="action-btn btn-cyan" style="flex: 1;">✅ КВЕСТ ВЫПОЛНЕН</button>
+                <button id="loseConfirmBtn" class="action-btn" style="flex: 1; background: #ff3333; box-shadow: 0 0 15px rgba(255,51,51,0.4);">❌ СЛИВ КВЕСТА</button>
             </div>
-            <button id="closeProgressBtn" class="btn btn-secondary">Закрыть</button>
+            <button id="cancelModalBtn" style="background: none; border: none; color: #aaa; cursor: pointer; text-decoration: underline;">Закрыть окно</button>
         </div>
     </div>
 
     <script>
     (function(){
-        // --- Пул заданий (15 штук) ---
-        const TASKS_POOL = [
-            { id: 0, slot: "Wisdom of Athena", desc: "Достигни множителя x15 в бонусе за 100$", rewardBerries: 35, rewardCash: 400, energyCost: 30 },
-            { id: 1, slot: "Big Bass Trophy Catch", desc: "Выбить бонус по ставке 2.5$", rewardBerries: 38, rewardCash: 450, energyCost: 30 },
-            { id: 2, slot: "Starlight Princess Super Scatter", desc: "Окупить топовую бонуску в х2", rewardBerries: 42, rewardCash: 500, energyCost: 30 },
-            { id: 3, slot: "Juicy Fruits", desc: "Купить 3 бонуса за 75$", rewardBerries: 30, rewardCash: 350, energyCost: 30 },
-            { id: 4, slot: "Bigger Barn House Bonanza", desc: "Выбить два бонуса в одном сеансе", rewardBerries: 50, rewardCash: 600, energyCost: 30 },
-            { id: 5, slot: "Lobster House", desc: "Поймать линию вилдов в бонуске за 60$", rewardBerries: 45, rewardCash: 550, energyCost: 30 },
-            { id: 6, slot: "3 Buzzing Wilds", desc: "2 пчелки в правой бонуске по любой ставке", rewardBerries: 40, rewardCash: 480, energyCost: 30 },
-            { id: 7, slot: "The Dog House Megaways", desc: "Выбить 4 лапы в бонусе", rewardBerries: 32, rewardCash: 380, energyCost: 30 },
-            { id: 8, slot: "Buffalo King", desc: "Играть пока не надоест Алексею :)", rewardBerries: 35, rewardCash: 400, energyCost: 30 },
-            { id: 9, slot: "Wild West Gold", desc: "Сделать х250 в бонуске за 60$", rewardBerries: 55, rewardCash: 700, energyCost: 30 },
-            { id: 10, slot: "Sugar Rush 1000", desc: "Купить топовый бонус по ставке чата", rewardBerries: 60, rewardCash: 800, energyCost: 30 },
-            { id: 11, slot: "Gates of Olympus Super Scatter", desc: "Выбить Суперскаттер в бонуске за 80$", rewardBerries: 52, rewardCash: 650, energyCost: 30 },
-            { id: 12, slot: "Zeus vs Hades", desc: "Поймать две шторы в топовой бонуске", rewardBerries: 48, rewardCash: 580, energyCost: 30 },
-            { id: 13, slot: "Sugar Rush", desc: "Выбить ретриггер в бонусе", rewardBerries: 28, rewardCash: 320, energyCost: 30 },
-            { id: 14, slot: "Madam Destiny Megaways", desc: "Поймать 8х и больше в бонуске за 60$", rewardBerries: 50, rewardCash: 620, energyCost: 30 }
+        // Четкий список из 20 весёлых квестов по Pragmatic Play
+        const QUEST_DATABASE = [
+            { id: 1, slot: "Gates of Olympus", type: "Дедовские Капли", desc: "Поймать суммарный множитель больше x12 за один спин.", buy: 4800 },
+            { id: 2, slot: "The Dog House Megaways", type: "Пёсий Созвон", desc: "Поймать хотя бы 4 собаки (диких символа) на одном барабане бонуски.", buy: 6000 },
+            { id: 3, slot: "Sugar Rush", type: "Диабет Отменяется", desc: "Раскачать хотя бы одну ячейку поля до множителя x16.", buy: 6000 },
+            { id: 4, slot: "Juicy Fruits", type: "Витаминный Бум", desc: "Вырастить дикий Скаттер-квадрат до максимального размера 2x2 или выше.", buy: 4800 },
+            { id: 5, slot: "Sweet Bonanza", type: "Заворот Кишок", desc: "Поймать спин в бонуске, где одновременно упадут сразу 3 леденца.", buy: 6000 },
+            { id: 6, slot: "Big Bass Splash", type: "Рыбалка на Живца", desc: "Дойти минимум до 2-го уровня (множитель x2) на шкале рыбака.", buy: 4800 },
+            { id: 7, slot: "Starlight Princess", type: "Аниме-Синдром", desc: "Засейвить и зафиксировать общий множитель x20 к концу бонуски.", buy: 8000 },
+            { id: 8, slot: "Cleocatra", type: "Кошачий Лоток", desc: "Поймать полноценную линию из кошек с активным диким множителем.", buy: 6000 },
+            { id: 9, slot: "Zeus vs Hades", type: "Семейные Разборки", desc: "Играть строго за Аида. Выбить хотя бы один расширяющийся барабан x5+.", buy: 6000 },
+            { id: 10, slot: "Wild West Gold", type: "Ковбойский Занос", desc: "Заполнить три центральных барабана звездами-вилдами.", buy: 6000 },
+            { id: 11, slot: "Madame Destiny Megaways", type: "Гадание по Руке", desc: "На стартовом колесе фортуны выбить множитель не менее x8.", buy: 8000 },
+            { id: 12, slot: "Buffalo King Megaways", type: "Стадо Бешеных", desc: "Получить более 40 фриспинов суммарно за счет ретриггеров.", buy: 7500 },
+            { id: 13, slot: "Big Bass Amazon Xtreme", type: "Амазонский Монстр", desc: "Угадать на стартовом выборе в аквариумах не менее 3 модификаторов.", buy: 8000 },
+            { id: 14, slot: "Sugar Rush 1000", type: "Сахарная Кома", desc: "Получить общую окупаемость бонуски ровно в x1.5 или выше.", buy: 10000 },
+            { id: 15, slot: "Wisdom of Athena", type: "Щит и Меч", desc: "Открыть самый верхний заблокированный ряд ячеек полностью за бонуску.", buy: 10000 },
+            { id: 16, slot: "Gems Bonanza", type: "Золотая Лихорадка", desc: "Успешно перейти на 3-й уровень прогресса карты (Gold Fever).", buy: 10000 },
+            { id: 17, slot: "The Dog House Multihold", type: "Будка на Прокачку", desc: "Открыть хотя бы 3 активных экрана с собаками одновременно.", buy: 10000 },
+            { id: 18, slot: "Gates of Olympus 1000", type: "Гнев Деда x1000", desc: "Поймать анимацию, где Зевс кидает на поле шар с множителем x50+.", buy: 10000 },
+            { id: 19, slot: "Fruit Party 2", type: "Праздник Живота", desc: "Словить дикий размножающийся множитель x64 на одной ягоде.", buy: 10000 },
+            { id: 20, slot: "Слот на выбор Чата", type: "Финальный Аккорд", desc: "Взять бонуску за 10к в любом слоте и закрыть её в чистый плюс.", buy: 10000 }
         ];
 
-        let gameState = {
-            berries: 0,
-            jam: 0,
-            donations: 1000,
-            energy: 100,
-            danger: 0,
-            activeTasks: [],
-            remainingPoolIds: [],
-            completedTaskIds: [],
-            gameActive: true,
-            victory: false,
-            lastMiniGameTime: 0
+        let state = {
+            balance: 100000,
+            progress: 0,
+            profit: 0,
+            completedList: [], // {id, status: 'win'|'lose', profit}
         };
 
-        let isSoundEnabled = true;
+        let soundOn = true;
         let audioCtx = null;
-        let visualDanger = 0;
-        let intervals = { energy: null, danger: null };
+        let currentActiveQuest = null;
 
-        // --- Звук ---
-        function initAudio() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        function playSound(type) {
-            if (!isSoundEnabled) return;
-            initAudio();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            const now = audioCtx.currentTime;
-            if (type === 'click') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(500, now);
-                osc.frequency.exponentialRampToValueAtTime(150, now + 0.1);
-                gainNode.gain.setValueAtTime(0.1, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                osc.start(now); osc.stop(now + 0.1);
-            } else if (type === 'success') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(260, now);
-                osc.frequency.setValueAtTime(390, now + 0.08);
-                osc.frequency.setValueAtTime(520, now + 0.16);
-                gainNode.gain.setValueAtTime(0.15, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
-                osc.start(now); osc.stop(now + 0.35);
-            } else if (type === 'alarm') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(120, now);
-                osc.frequency.linearRampToValueAtTime(220, now + 0.2);
-                gainNode.gain.setValueAtTime(0.08, now);
-                gainNode.gain.linearRampToValueAtTime(0.01, now + 0.2);
-                osc.start(now); osc.stop(now + 0.2);
-            }
+        function initAudio() { if(!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)(); }
+        function playTone(freq, dur, type='sine') {
+            if(!soundOn) return; initAudio(); if(audioCtx.state === 'suspended') audioCtx.resume();
+            let osc = audioCtx.createOscillator(); let g = audioCtx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            g.gain.setValueAtTime(0.1, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+            osc.connect(g); g.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime+dur);
         }
 
-        function showToast(text, emoji = "✨") {
-            const container = document.getElementById('toastContainer');
-            if (!container) return;
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = `<span>${emoji}</span> <span>${text}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateY(-10px)';
-                toast.style.transition = 'all 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
-            }, 2800);
+        function writeLog(text) {
+            const box = document.getElementById('logBox');
+            let p = document.createElement('p');
+            p.innerHTML = `<span style="color:var(--cyan)">[ШОУ]</span> ${text}`;
+            box.appendChild(p); box.scrollTop = box.scrollHeight;
         }
 
-        function addLog(msg, type = 'normal') {
-            const logBox = document.getElementById('logBoxContainer');
-            const p = document.createElement('p');
-            const now = new Date();
-            const timeStr = now.toTimeString().split(' ')[0];
-            p.innerText = `[${timeStr}] ${msg}`;
-            if (type === 'success') p.style.color = '#81c784';
-            if (type === 'warning') p.style.color = '#ffd54f';
-            if (type === 'system') p.style.color = '#64b5f6';
-            logBox.appendChild(p);
-            logBox.scrollTop = logBox.scrollHeight;
-            if (logBox.children.length > 50) logBox.removeChild(logBox.children[0]);
-        }
-
-        // --- Проверка победы ---
-        function checkVictory() {
-            if (gameState.victory) return true;
-            const tasksDone = gameState.completedTaskIds.length;
-            if (tasksDone >= 15 && gameState.jam >= 10) {
-                gameState.victory = true;
-                gameState.gameActive = false;
-                playSound('success');
-                showToast("🏆 ПОБЕДА! Ты спасла урожай и наварила варенья! 🎉", "🏆");
-                addLog("🏆 КВЕСТ ВЫПОЛНЕН! 15 заданий и 10 банок варенья!", 'success');
-                // отключаем кнопки
-                document.getElementById('pickTaskBtn').disabled = true;
-                document.getElementById('buyEnergyBtn').disabled = true;
-                document.getElementById('craftJamBtn').disabled = true;
-                document.getElementById('bonusChatBtn').disabled = true;
-                document.getElementById('minigameBtn').disabled = true;
-                return true;
-            }
-            return false;
-        }
-
-        // --- Инициализация пула заданий ---
-        function initPool() {
-            const allIds = TASKS_POOL.map(t => t.id);
-            gameState.remainingPoolIds = allIds.filter(id => !gameState.completedTaskIds.includes(id) && !gameState.activeTasks.some(t => t.id === id));
-        }
-
-        // --- Взять случайное задание ---
-        function pickRandomTask() {
-            if (!gameState.gameActive || gameState.victory) return;
-            if (gameState.activeTasks.length >= 3) {
-                showToast("Очередь полна! Максимум 3 задания.", "⚠️");
-                return;
-            }
-            if (gameState.remainingPoolIds.length === 0) {
-                showToast("Все задания уже взяты! Выполняй оставшиеся.", "📋");
-                return;
-            }
-            const randomIndex = Math.floor(Math.random() * gameState.remainingPoolIds.length);
-            const taskId = gameState.remainingPoolIds[randomIndex];
-            const taskData = TASKS_POOL.find(t => t.id === taskId);
-            if (!taskData) return;
-            gameState.activeTasks.push({ ...taskData });
-            gameState.remainingPoolIds.splice(randomIndex, 1);
-            addLog(`🎲 Взято новое задание: ${taskData.slot}`, 'system');
-            updateUI();
-            saveGame();
-        }
-
-        // --- Выполнить задание ---
-        function executeTask(taskId) {
-            if (!gameState.gameActive || gameState.victory) return;
-            const index = gameState.activeTasks.findIndex(t => t.id === taskId);
-            if (index === -1) return;
-            const task = gameState.activeTasks[index];
-            if (gameState.energy < task.energyCost) {
-                showToast("Не хватает энергии! Купи или подожди.", "⚡");
-                return;
-            }
-            gameState.energy -= task.energyCost;
-            gameState.berries += task.rewardBerries;
-            gameState.donations += task.rewardCash;
-            gameState.completedTaskIds.push(task.id);
-            gameState.activeTasks.splice(index, 1);
-            playSound('success');
-            showToast(`Задание выполнено! +${task.rewardCash}₽`, "💰");
-            addLog(`✅ Выполнено: ${task.slot} (+${task.rewardBerries} ягод, +${task.rewardCash}₽)`, 'success');
-            updateUI();
-            saveGame();
-            checkVictory();
-        }
-
-        // --- Варка варенья ---
-        function craftJam() {
-            if (!gameState.gameActive || gameState.victory) return;
-            if (gameState.berries >= 15 && gameState.energy >= 10) {
-                gameState.berries -= 15;
-                gameState.energy -= 10;
-                gameState.jam++;
-                gameState.donations += 1200;
-                playSound('success');
-                showToast("Фирменное варенье готово! +1200₽", "🍯");
-                addLog(`🍓 Сварена банка варенья! (+${gameState.jam}/10)`, 'success');
-                updateUI();
-                saveGame();
-                checkVictory();
-            } else {
-                showToast("Не хватает ягод (15) или энергии (10)!", "❌");
-            }
-        }
-
-        // --- Помощь чата (снижение угрозы) ---
-        function cleanPestsByChat() {
-            if (!gameState.gameActive || gameState.victory) return;
-            if (gameState.danger <= 0) {
-                showToast("Грядки чистые, жуков нет!", "🌿");
-                return;
-            }
-            const reduction = 15 + Math.floor(Math.random() * 16);
-            gameState.danger = Math.max(0, gameState.danger - reduction);
-            showToast(`Угроза снижена на ${reduction}%!`, "🛡️");
-            addLog(`🐞 Модераторы прогнали жуков! Угроза -${reduction}%`, 'system');
-            updateUI();
-            saveGame();
-        }
-
-        // --- Покупка энергии ---
-        function buyEnergy() {
-            if (!gameState.gameActive || gameState.victory) return;
-            if (gameState.donations >= 500 && gameState.energy < 100) {
-                gameState.donations -= 500;
-                gameState.energy = Math.min(100, gameState.energy + 40);
-                playSound('success');
-                showToast("Энергия +40!", "⚡");
-                addLog(`⚡ Куплена энергия за 500₽. Энергия: ${gameState.energy}/100`);
-                updateUI();
-                saveGame();
-            } else {
-                showToast("Недостаточно донатов (500) или энергия полна!", "❌");
-            }
-        }
-
-        // --- МИНИ-ИГРА с кулдауном 2 минуты ---
-        function startMiniGame() {
-            if (!gameState.gameActive || gameState.victory) return;
-            const now = Date.now();
-            if (gameState.lastMiniGameTime && (now - gameState.lastMiniGameTime) < 120000) {
-                const remain = Math.ceil((120000 - (now - gameState.lastMiniGameTime)) / 1000);
-                showToast(`Мини-игра перезаряжается: ${remain} сек`, "⏳");
-                return;
-            }
-            if (gameState.energy < 5) {
-                showToast("Не хватает энергии для мини-игры (нужно 5)", "⚡");
-                return;
-            }
-            gameState.energy -= 5;
-            gameState.lastMiniGameTime = now;
-            updateUI();
-            // создаём модалку мини-игры
-            const modal = document.createElement('div');
-            modal.className = 'mini-game-modal';
-            let timeLeft = 12;
-            let score = 0;
-            let combo = 1;
-            let lastHit = 0;
-            let intervalId, spawnId;
-
-            modal.innerHTML = `
-                <div class="game-window">
-                    <h2><i class="fas fa-gamepad"></i> Лови клубнику!</h2>
-                    <div class="game-stats">
-                        <span>🍓 Поймано: <span id="gameScore">0</span></span>
-                        <span>🔥 Комбо: x<span id="gameCombo">1</span></span>
-                        <span>⏱️ <span id="gameTimer">12</span> сек</span>
-                    </div>
-                    <div id="gameArea" class="game-area"></div>
-                    <button id="closeMiniGame" class="btn btn-secondary">Закрыть</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            const area = modal.querySelector('#gameArea');
-            const scoreSpan = modal.querySelector('#gameScore');
-            const comboSpan = modal.querySelector('#gameCombo');
-            const timerSpan = modal.querySelector('#gameTimer');
-            const closeBtn = modal.querySelector('#closeMiniGame');
-
-            function createBerry() {
-                const berry = document.createElement('div');
-                berry.className = 'flying-berry';
-                const left = Math.random() * (area.clientWidth - 70);
-                const top = Math.random() * (area.clientHeight - 70);
-                berry.style.left = left + 'px';
-                berry.style.top = top + 'px';
-                berry.innerHTML = '🍓';
-                berry.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const now = Date.now();
-                    if (now - lastHit < 800) combo = Math.min(5, combo + 1);
-                    else combo = 1;
-                    lastHit = now;
-                    score++;
-                    scoreSpan.innerText = score;
-                    comboSpan.innerText = combo;
-                    berry.remove();
-                    const pop = document.createElement('div');
-                    pop.innerText = `+${combo}`;
-                    pop.style.position = 'absolute';
-                    pop.style.left = e.clientX - modal.offsetLeft - 20 + 'px';
-                    pop.style.top = e.clientY - modal.offsetTop - 30 + 'px';
-                    pop.style.color = '#ffd966';
-                    pop.style.fontSize = '1.3rem';
-                    pop.style.fontWeight = 'bold';
-                    pop.style.pointerEvents = 'none';
-                    pop.style.animation = 'toastUp 0.3s forwards';
-                    area.appendChild(pop);
-                    setTimeout(() => pop.remove(), 400);
-                });
-                area.appendChild(berry);
-                setTimeout(() => { if (berry.parentNode) berry.remove(); }, 1600);
-            }
-
-            intervalId = setInterval(() => {
-                if (timeLeft <= 0) {
-                    clearInterval(intervalId);
-                    clearInterval(spawnId);
-                    endGame();
-                    return;
-                }
-                timeLeft--;
-                timerSpan.innerText = timeLeft;
-                if (timeLeft <= 3) timerSpan.style.color = '#ff8888';
-            }, 1000);
-
-            spawnId = setInterval(() => {
-                if (timeLeft > 0) createBerry();
-            }, 500);
-
-            function endGame() {
-                clearInterval(intervalId);
-                clearInterval(spawnId);
-                const berryReward = score * 2;
-                const energyReward = 5;
-                const comboBonus = Math.floor(combo * 2);
-                const totalBerries = berryReward + comboBonus;
-                gameState.berries += totalBerries;
-                gameState.energy = Math.min(100, gameState.energy + energyReward);
-                showToast(`Мини-игра: +${totalBerries} ягод, +${energyReward} энергии!`, "🍓");
-                addLog(`🎮 Мини-игра: поймано ${score} ягод, комбо x${combo} → +${totalBerries} ягод, +${energyReward} энергии`, 'success');
-                updateUI();
-                saveGame();
-                modal.remove();
-            }
-            closeBtn.onclick = () => {
-                clearInterval(intervalId);
-                clearInterval(spawnId);
-                modal.remove();
-            };
-        }
-
-        // --- UI обновление ---
-        function updateUI() {
-            document.getElementById('energyText').innerText = `${Math.floor(gameState.energy)}/100`;
-            document.getElementById('energyBar').style.width = `${gameState.energy}%`;
-            document.getElementById('berriesText').innerText = gameState.berries;
-            document.getElementById('jamText').innerText = gameState.jam;
-            document.getElementById('donationsText').innerText = gameState.donations.toLocaleString();
-            document.getElementById('dangerText').innerText = `${Math.round(gameState.danger)}%`;
-            document.getElementById('dangerBar').style.width = `${gameState.danger}%`;
-            document.getElementById('taskCounter').innerText = `(${gameState.completedTaskIds.length}/15)`;
-
-            const container = document.getElementById('taskListContainer');
+        function renderQuests() {
+            const container = document.getElementById('questsContainer');
             container.innerHTML = '';
-            if (gameState.activeTasks.length === 0) {
-                container.innerHTML = '<p style="color: var(--text-secondary); text-align:center; padding: 20px;">Нет активных заданий. Нажмите «Взять задание»!</p>';
-            } else {
-                gameState.activeTasks.forEach(task => {
-                    const div = document.createElement('div');
-                    div.className = 'task-item active';
-                    div.innerHTML = `
-                        <div class="task-header">
-                            <span>🎰 ${task.slot}</span>
-                            <span style="color: var(--accent-soft);">-${task.energyCost} 🔋</span>
-                        </div>
-                        <div style="font-size:0.85rem;">${task.desc}</div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px; border-top: 1px dashed var(--border); padding-top: 5px;">
-                            <div class="task-rewards">
-                                <span>🍓 +${task.rewardBerries}</span>
-                                <span>💰 +${task.rewardCash}₽</span>
-                            </div>
-                            <button class="btn btn-execute" style="padding: 6px 12px; font-size:0.8rem;">Выполнить</button>
-                        </div>
-                    `;
-                    div.querySelector('.btn-execute').addEventListener('click', () => executeTask(task.id));
-                    container.appendChild(div);
-                });
-            }
+            
+            QUEST_DATABASE.forEach(q => {
+                let report = state.completedList.find(item => item.id === q.id);
+                let card = document.createElement('div');
+                card.className = 'quest-card';
+                card.id = `quest-card-${q.id}`;
+                
+                if(report) {
+                    card.classList.add(report.status === 'win' ? 'done-win' : 'done-lose');
+                }
 
-            document.getElementById('buyEnergyBtn').disabled = (!gameState.gameActive || gameState.victory || gameState.donations < 500 || gameState.energy >= 100);
-            document.getElementById('craftJamBtn').disabled = (!gameState.gameActive || gameState.victory || gameState.berries < 15 || gameState.energy < 10);
-            document.getElementById('bonusChatBtn').disabled = (!gameState.gameActive || gameState.victory);
-            document.getElementById('minigameBtn').disabled = (!gameState.gameActive || gameState.victory || gameState.energy < 5);
-            if (gameState.victory) {
-                document.getElementById('pickTaskBtn').disabled = true;
-            }
+                card.innerHTML = `
+                    <div class="quest-top">
+                        <span class="slot-title">🎰 ${q.slot}</span>
+                        <span class="buy-badge">${q.buy.toLocaleString()} ₽</span>
+                    </div>
+                    <div style="font-weight:bold; color:var(--gold); font-size:0.95rem;">Задание: ${q.type}</div>
+                    <div style="font-size:0.85rem; color:#b1a2c7;">${q.desc}</div>
+                    ${report ? `<div style="font-size:0.85rem; font-weight:bold; text-align:right;">Результат: ${report.profit >= 0 ? '+' : ''}${report.profit.toLocaleString()} ₽</div>` : ''}
+                `;
+                container.appendChild(card);
+            });
         }
 
-        // --- Сохранение / загрузка ---
-        function saveGame() {
-            try {
-                localStorage.setItem('strawberry_quest_v3', JSON.stringify({
-                    berries: gameState.berries,
-                    jam: gameState.jam,
-                    donations: gameState.donations,
-                    energy: gameState.energy,
-                    danger: gameState.danger,
-                    activeTasks: gameState.activeTasks,
-                    completedTaskIds: gameState.completedTaskIds,
-                    remainingPoolIds: gameState.remainingPoolIds,
-                    gameActive: gameState.gameActive,
-                    victory: gameState.victory,
-                    lastMiniGameTime: gameState.lastMiniGameTime
-                }));
-            } catch(e) {}
+        function updateTopBar() {
+            document.getElementById('balanceDisplay').innerText = state.balance.toLocaleString();
+            document.getElementById('progressDisplay').innerText = `${state.progress} / 20`;
+            let pDisp = document.getElementById('profitDisplay');
+            pDisp.innerText = (state.profit >= 0 ? '+' : '') + state.profit.toLocaleString();
+            pDisp.style.color = state.profit >= 0 ? '#00ff66' : '#ff3333';
         }
 
-        function loadGame() {
-            const raw = localStorage.getItem('strawberry_quest_v3');
-            if (!raw) {
-                initPool();
+        // Отрисовка колеса выбора
+        const wCanvas = document.getElementById('wheelCanvas');
+        const wCtx = wCanvas.getContext('2d');
+        
+        function drawWheel() {
+            wCtx.clearRect(0, 0, 320, 320);
+            let sections = QUEST_DATABASE.length;
+            let angle = (Math.PI * 2) / sections;
+            for(let i=0; i<sections; i++) {
+                wCtx.beginPath();
+                wCtx.moveTo(160, 160);
+                wCtx.arc(160, 160, 150, i*angle, (i+1)*angle);
+                wCtx.fillStyle = state.completedList.some(item=>item.id === QUEST_DATABASE[i].id) 
+                    ? '#3d255a' 
+                    : (i % 2 === 0 ? '#ff007f' : '#00ffff');
+                wCtx.fill();
+                wCtx.lineWidth = 1;
+                wCtx.strokeStyle = '#1b0a2e';
+                wCtx.stroke();
+            }
+            // Центральный круг
+            wCtx.beginPath(); wCtx.arc(160, 160, 25, 0, Math.PI*2); wCtx.fillStyle = '#fff'; wCtx.fill();
+        }
+
+        // Вращение колеса
+        let isSpinning = false;
+        document.getElementById('spinWheelBtn').onclick = function() {
+            if(isSpinning) return;
+            let available = QUEST_DATABASE.filter(q => !state.completedList.some(item => item.id === q.id));
+            if(available.length === 0) {
+                writeLog("🎉 Ура! Все 20 квестов пройдены! Шоу завершено. Нажми сброс для новой игры.");
+                playTone(600, 0.6, 'sine');
                 return;
             }
-            try {
-                const data = JSON.parse(raw);
-                gameState.berries = data.berries ?? 0;
-                gameState.jam = data.jam ?? 0;
-                gameState.donations = data.donations ?? 1000;
-                gameState.energy = data.energy ?? 100;
-                gameState.danger = data.danger ?? 0;
-                gameState.activeTasks = Array.isArray(data.activeTasks) ? data.activeTasks : [];
-                gameState.completedTaskIds = Array.isArray(data.completedTaskIds) ? data.completedTaskIds : [];
-                gameState.remainingPoolIds = Array.isArray(data.remainingPoolIds) ? data.remainingPoolIds : [];
-                gameState.gameActive = data.gameActive !== undefined ? data.gameActive : true;
-                gameState.victory = data.victory || false;
-                gameState.lastMiniGameTime = data.lastMiniGameTime || 0;
-                if (gameState.victory) gameState.gameActive = false;
-                const allIds = TASKS_POOL.map(t => t.id);
-                if (gameState.remainingPoolIds.length === 0 && gameState.completedTaskIds.length < TASKS_POOL.length) {
-                    gameState.remainingPoolIds = allIds.filter(id => !gameState.completedTaskIds.includes(id) && !gameState.activeTasks.some(t => t.id === id));
-                }
-            } catch(e) { initPool(); }
+
+            isSpinning = true;
+            playTone(400, 0.5, 'triangle');
+            
+            let randomPick = available[Math.floor(Math.random() * available.length)];
+            let index = QUEST_DATABASE.findIndex(q => q.id === randomPick.id);
+            
+            let sections = QUEST_DATABASE.length;
+            let secAngle = 360 / sections;
+            let targetAngle = 360 - (index * secAngle) - (secAngle / 2);
+            let totalRotation = 1440 + targetAngle;
+
+            const wheelContainer = document.querySelector('.wheel-canvas-container');
+            wheelContainer.style.transition = 'transform 4s cubic-bezier(0.1, 0.8, 0.1, 1)';
+            wheelContainer.style.transform = `rotate(${totalRotation}deg)`;
+
+            setTimeout(() => {
+                isSpinning = false;
+                wheelContainer.style.transition = 'none';
+                wheelContainer.style.transform = `rotate(${targetAngle}deg)`;
+                setTimeout(() => { wheelContainer.style.transition = 'transform 4s cubic-bezier(0.1, 0.8, 0.1, 1)'; }, 50);
+
+                document.querySelectorAll('.quest-card').forEach(c => c.classList.remove('selected-anim'));
+                let targetCard = document.getElementById(`quest-card-${randomPick.id}`);
+                targetCard.classList.add('selected-anim');
+                targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                currentActiveQuest = randomPick;
+                openModal(randomPick);
+            }, 4000);
+        };
+
+        function openModal(q) {
+            document.getElementById('modalSlotTitle').innerText = `🎰 ${q.slot}`;
+            document.getElementById('modalQuestName').innerText = `Квест: ${q.type}`;
+            document.getElementById('modalQuestDesc').innerHTML = `<strong>Условие:</strong> ${q.desc}<br><span style="color: var(--gold);">Покупка бонусы: ${q.buy.toLocaleString()} ₽</span>`;
+            document.getElementById('payoutValue').value = '';
+            document.getElementById('resultModal').classList.remove('hidden');
+            playTone(550, 0.2);
         }
 
-        function resetGame() {
-            if (confirm("Сбросить весь прогресс? Все ягоды, варенье и задания будут удалены.")) {
-                localStorage.removeItem('strawberry_quest_v3');
-                location.reload();
+        function resolveQuest(status) {
+            if(!currentActiveQuest) return;
+            let payout = parseFloat(document.getElementById('payoutValue').value);
+            if(isNaN(payout)) payout = 0;
+            let profit = payout - currentActiveQuest.buy;
+
+            state.balance = state.balance - currentActiveQuest.buy + payout;
+            state.profit += profit;
+            state.progress++;
+
+            state.completedList.push({
+                id: currentActiveQuest.id,
+                status: status,
+                profit: profit
+            });
+
+            writeLog(`${status === 'win' ? '✅ Квест ВЗЛОМАН' : '❌ СЛИВ КВЕСТА'}: ${currentActiveQuest.slot} | Бонуска дала: ${payout.toLocaleString()} ₽ (Итог: ${profit >= 0 ? '+' : ''}${profit.toLocaleString()} ₽)`);
+            
+            if(status === 'win') playTone(700, 0.4, 'sine');
+            else playTone(250, 0.5, 'sawtooth');
+
+            document.getElementById('resultModal').classList.add('hidden');
+            updateTopBar();
+            drawWheel();
+            renderQuests();
+            saveGame();
+            currentActiveQuest = null;
+        }
+
+        document.getElementById('winConfirmBtn').onclick = () => resolveQuest('win');
+        document.getElementById('loseConfirmBtn').onclick = () => resolveQuest('lose');
+        document.getElementById('cancelModalBtn').onclick = () => document.getElementById('resultModal').classList.add('hidden');
+
+        function saveGame() { localStorage.setItem('pragmatic_carousel_save', JSON.stringify(state)); }
+        function loadGame() {
+            let raw = localStorage.getItem('pragmatic_carousel_save');
+            if(raw) {
+                state = JSON.parse(raw);
+                if(!state.completedList) state.completedList = [];
+                if(!state.profit) state.profit = 0;
             }
         }
 
-        // --- Canvas фон (падающие ягоды) ---
-        const canvas = document.getElementById('berryCanvas');
-        let ctx = canvas.getContext('2d');
-        let berriesArray = [];
-        function resizeCanvas() {
+        // ---------- ВЕСЁЛЫЕ ПАРАЗИТЫ И ПЕРСОНАЖИ PRAGMATIC (CANVAS) ----------
+        const canvas = document.getElementById('memePragmaticCanvas');
+        const ctx = canvas.getContext('2d');
+        let memes = [];
+
+        function initMemes() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+            memes = [
+                { x: 100, y: 150, r: 40, sX: 0.8, sY: 0.5, txt: "⚡👴", name: "Зевс", col: "#00ffff" },
+                { x: 300, y: 400, r: 45, sX: -0.6, sY: 0.8, txt: "🐶🦴", name: "Собакен", col: "#ffcc00" },
+                { x: 600, y: 200, r: 35, sX: 0.5, sY: -0.7, txt: "🍬🍭", name: "Конфета", col: "#ff007f" },
+                { x: 800, y: 500, r: 40, sX: -0.4, sY: -0.4, txt: "👑👸", name: "Принцесса", col: "#e0b0ff" }
+            ];
         }
-        function drawCanvas() {
-            if (!ctx) return;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.shadowBlur = 6;
-            visualDanger += (gameState.danger - visualDanger) * 0.05;
-            for (let b of berriesArray) {
+
+        function drawMemesAnimation() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            
+            memes.forEach(m => {
+                ctx.save();
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = m.col;
+                
+                ctx.fillStyle = "rgba(44, 20, 77, 0.4)";
+                ctx.strokeStyle = m.col;
+                ctx.lineWidth = 3;
                 ctx.beginPath();
-                ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-                ctx.fillStyle = b.col;
-                ctx.shadowColor = b.col;
-                ctx.fill();
-                let speed = b.sp + (visualDanger / 40);
-                b.y += speed;
-                if (b.y > canvas.height + 20) {
-                    b.y = -b.r;
-                    b.x = Math.random() * canvas.width;
-                }
-            }
-            ctx.shadowBlur = 0;
-            requestAnimationFrame(drawCanvas);
-        }
-        function initCanvas() {
-            resizeCanvas();
-            for (let i = 0; i < 50; i++) {
-                berriesArray.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    r: 4 + Math.random() * 8,
-                    sp: 0.4 + Math.random() * 1.2,
-                    col: `hsl(${340 + Math.random() * 20}, 80%, 65%)`
-                });
-            }
-            drawCanvas();
-        }
-        window.addEventListener('resize', resizeCanvas);
+                ctx.arc(m.x, m.y, m.r, 0, Math.PI*2);
+                ctx.fill(); ctx.stroke();
 
-        // --- Интервалы (энергия +1/15сек, угроза) ---
-        function startIntervals() {
-            if (intervals.energy) clearInterval(intervals.energy);
-            if (intervals.danger) clearInterval(intervals.danger);
-            intervals.energy = setInterval(() => {
-                if (gameState.gameActive && !gameState.victory && gameState.energy < 100) {
-                    gameState.energy = Math.min(100, gameState.energy + 1);
-                    updateUI();
-                    saveGame();
-                }
-            }, 15000); // +1 каждые 15 секунд
-            intervals.danger = setInterval(() => {
-                if (gameState.gameActive && !gameState.victory) {
-                    gameState.danger = Math.min(100, gameState.danger + 1.5);
-                    if (gameState.danger >= 100) {
-                        playSound('alarm');
-                        gameState.danger = 0;
-                        const loss = Math.floor(gameState.berries * 0.3);
-                        gameState.berries = Math.max(0, gameState.berries - loss);
-                        showToast(`Вредители съели ${loss} ягод!`, "🐛");
-                        addLog(`🐛 Вредители атаковали! Потеряно ${loss} ягод.`, 'warning');
-                    }
-                    updateUI();
-                    saveGame();
-                }
-            }, 8000);
+                ctx.fillStyle = "#fff";
+                ctx.font = "24px Arial";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(m.txt, m.x, m.y);
+                
+                ctx.restore();
+
+                m.x += m.sX; m.y += m.sY;
+                if(m.x - m.r < 0 || m.x + m.r > canvas.width) m.sX *= -1;
+                if(m.y - m.r < 0 || m.y + m.r > canvas.height) m.sY *= -1;
+            });
+
+            requestAnimationFrame(drawMemesAnimation);
         }
 
-        // --- Инициализация ---
-        function init() {
-            loadGame();
-            initCanvas();
-            startIntervals();
-            updateUI();
+        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
 
-            document.getElementById('pickTaskBtn').onclick = pickRandomTask;
-            document.getElementById('buyEnergyBtn').onclick = buyEnergy;
-            document.getElementById('craftJamBtn').onclick = craftJam;
-            document.getElementById('bonusChatBtn').onclick = cleanPestsByChat;
-            document.getElementById('minigameBtn').onclick = startMiniGame;
-            document.getElementById('resetGameBtn').onclick = resetGame;
+        // Утилиты управления
+        document.getElementById('soundToggle').onclick = function() {
+            soundOn = !soundOn;
+            this.innerText = soundOn ? "🔊 ЗВУК: ВКЛ" : "🔇 ЗВУК: ВЫКЛ";
+        };
 
-            document.getElementById('toggleSoundBtn').onclick = () => {
-                isSoundEnabled = !isSoundEnabled;
-                initAudio();
-                if (isSoundEnabled) {
-                    document.getElementById('toggleSoundBtn').innerHTML = '<i class="fas fa-volume-up"></i> Звук: ВКЛ';
-                    playSound('click');
-                } else {
-                    document.getElementById('toggleSoundBtn').innerHTML = '<i class="fas fa-volume-mute"></i> Звук: ВЫКЛ';
-                }
-            };
-            document.body.addEventListener('click', () => { initAudio(); }, { once: true });
-
-            // Правила (обязательно при первом запуске)
-            const isFirstRun = !localStorage.getItem('strawberry_quest_v3');
-            if (isFirstRun) {
-                document.getElementById('rulesModal').classList.remove('hidden');
+        document.getElementById('fullResetBtn').onclick = function() {
+            if(confirm("Сбросить всё шоу и начать фиксу 100 000 ₽ заново?")) {
+                localStorage.removeItem('pragmatic_carousel_save');
+                state = { balance: 100000, progress: 0, profit: 0, completedList: [] };
+                updateTopBar();
+                drawWheel();
+                renderQuests();
+                writeLog("♻️ Шоу перезапущено! Баланс обновлён до 100 000 ₽.");
+                playTone(300, 0.3, 'sine');
             }
-            document.getElementById('rulesBtn').onclick = () => document.getElementById('rulesModal').classList.remove('hidden');
-            document.getElementById('closeRulesModalBtn').onclick = () => document.getElementById('rulesModal').classList.add('hidden');
+        };
 
-            // Прогресс
-            document.getElementById('achievementsInfoBtn').onclick = () => {
-                document.getElementById('progressTasks').innerText = gameState.completedTaskIds.length;
-                document.getElementById('progressJam').innerText = gameState.jam;
-                document.getElementById('progressModal').classList.remove('hidden');
-            };
-            document.getElementById('closeProgressBtn').onclick = () => document.getElementById('progressModal').classList.add('hidden');
-
-            if (gameState.victory) {
-                document.getElementById('pickTaskBtn').disabled = true;
-                document.getElementById('buyEnergyBtn').disabled = true;
-                document.getElementById('craftJamBtn').disabled = true;
-                document.getElementById('bonusChatBtn').disabled = true;
-                document.getElementById('minigameBtn').disabled = true;
-            }
-
-            addLog("🍓 Квест запущен! Цель: 15 заданий и 10 банок варенья. Энергия восстанавливается медленно — береги ресурсы!", 'system');
-        }
-
-        init();
+        // Запуск
+        loadGame();
+        updateTopBar();
+        drawWheel();
+        renderQuests();
+        initMemes();
+        drawMemesAnimation();
+        writeLog("🍓 Карусель Pragmatic успешно загружена! Ждём прокрутки от Клубнички.");
     })();
     </script>
 </body>
