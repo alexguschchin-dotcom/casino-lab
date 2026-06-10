@@ -384,7 +384,7 @@
         .banner-bigwin { color: var(--pink); text-shadow: 0 0 40px var(--pink), 0 0 10px #fff; }
         .banner-megawin { color: var(--gold); text-shadow: 0 0 50px var(--gold), 0 0 20px #ff5500; }
 
-        /* АНИМАЦИЯ ЗЕВСА НА ОБЛАКЕ */
+        /* АНИМАЦИЯ ЗЕВСА НА ОБЛАКЕ + АДАПТАЦИЯ ДЛЯ МОБИЛОК */
         #zeusCharacter {
             position: fixed;
             right: -250px;
@@ -401,6 +401,19 @@
         }
         #zeusCharacter.active {
             right: 40px;
+        }
+        @media (max-width: 600px) {
+            #zeusCharacter {
+                right: auto;
+                top: -220px;
+                left: 50%;
+                transform: translateX(-50%);
+                transition: top 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+            }
+            #zeusCharacter.active {
+                top: 10px;
+                right: auto;
+            }
         }
         .zeus-cloud {
             font-size: 6rem;
@@ -556,9 +569,9 @@
             <h2 style="color: var(--gold); font-family: 'Orbitron', sans-serif;">ПРАВИЛА МАРАФОНА</h2>
             <div style="text-align: left; font-size: 0.95rem; line-height: 1.6; color: #b1a4c4; display:flex; flex-direction:column; gap: 10px;">
                 <p>1. Нажимаем <strong>ВРАЩАТЬ БАРАБАН</strong>. Алгоритм выбирает случайный незакрытый контракт.</p>
-                <p>2. Стример покупает бонусную игру в слоте по указанной цене.</p>
+                <p>2. Стример покупает бонусную игру в слоте по указанной цене (от 4 800 до 10 000 ₽).</p>
                 <p>3. По итогам бонуски вносим результат: при победе — сумму выплаты, при сливе — фиксируем минус.</p>
-                <p>4. <strong>Зевс (⚡👴)</strong> иногда вмешивается: может снизить цену на 30% или удвоить её, но умножить множитель.</p>
+                <p>4. <strong>Зевс (⚡👴)</strong> иногда вмешивается: может снизить цену на 30% или удвоить её (делая задание сложнее).</p>
             </div>
             <button id="closeRulesBtn" class="action-btn btn-cyan" style="width:100%; justify-content:center;">ПОНЯТНО</button>
         </div>
@@ -566,33 +579,34 @@
 
     <script>
     (function(){
+        // БАЗА КВЕСТОВ с распределением по сложности (цена от 4800 до 10000)
         const BASE_QUEST_DATABASE = [
-            { id: 1, slot: "Gates of Olympus", type: "Дедовские Капли", desc: "Поймать суммарный множитель больше x12 за один спин.", baseBuy: 4800, ico: "⚡" },
-            { id: 2, slot: "The Dog House Megaways", type: "Пёсий Созвон", desc: "Поймать хотя бы 4 диких символа на одном барабане бонуски.", baseBuy: 6000, ico: "🐶" },
-            { id: 3, slot: "Sugar Rush", type: "Диабет Отменяется", desc: "Раскачать хотя бы одну ячейку поля до множителя x16.", baseBuy: 6000, ico: "🍬" },
-            { id: 4, slot: "Juicy Fruits", type: "Витаминный Бум", desc: "Вырастить дикий Скаттер-квадрат до размера 2x2 или выше.", baseBuy: 4800, ico: "🍋" },
-            { id: 5, slot: "Sweet Bonanza", type: "Заворот Кишок", desc: "Поймать спин в бонуске, где одновременно упадут сразу 3 леденца.", baseBuy: 6000, ico: "🍭" },
-            { id: 6, slot: "Big Bass Splash", type: "Рыбалка на Живца", desc: "Дойти минимум до 2-го уровня (множитель x2) на шкале рыбака.", baseBuy: 4800, ico: "🐟" },
-            { id: 7, slot: "Starlight Princess", type: "Аниме-Синдром", desc: "Засейвить и зафиксировать общий множитель x20 к концу бонуски.", baseBuy: 8000, ico: "⭐" },
-            { id: 8, slot: "Cleocatra", type: "Кошачий Лоток", desc: "Поймать полноценную линию из кошек с активным диким множителем.", baseBuy: 6000, ico: "🐱" },
-            { id: 9, slot: "Zeus vs Hades", type: "Семейные Разборки", desc: "Играть строго за Аида. Выбить хотя бы один расширяющийся барабан x5+.", baseBuy: 6000, ico: "🔥" },
-            { id: 10, slot: "Wild West Gold", type: "Ковбойский Занос", desc: "Заполнить три центральных барабана звездами-вилдами.", baseBuy: 6000, ico: "🤠" },
-            { id: 11, slot: "Madame Destiny Megaways", type: "Гадание по Руке", desc: "На стартовом колесе фортуны выбить множитель не менее x8.", baseBuy: 8000, ico: "🔮" },
-            { id: 12, slot: "Buffalo King Megaways", type: "Стадо Бешеных", desc: "Получить более 40 фриспинов суммарно за счет ретриггеров.", baseBuy: 7500, ico: "🦬" },
-            { id: 13, slot: "Big Bass Amazon Xtreme", type: "Амазонский Монстр", desc: "Угадать на стартовом выборе в аквариумах не менее 3 модификаторов.", baseBuy: 8000, ico: "🐊" },
-            { id: 14, slot: "Sugar Rush 1000", type: "Сахарная Кома", desc: "Получить общую окупаемость бонуски ровно в x1.5 или выше.", baseBuy: 10000, ico: "🍩" },
-            { id: 15, slot: "Wisdom of Athena", type: "Щит и Меч", desc: "Открыть самый верхний заблокированный ряд ячеек полностью за бонуску.", baseBuy: 10000, ico: "🛡️" },
-            { id: 16, slot: "Gems Bonanza", type: "Золотая Лихорадка", desc: "Успешно перейти на 3-й уровень прогресса карты (Gold Fever).", baseBuy: 10000, ico: "💎" },
-            { id: 17, slot: "The Dog House Multihold", type: "Будка на Прокачку", desc: "Открыть хотя бы 3 активных экрана с собаками одновременно.", baseBuy: 10000, ico: "🐾" },
-            { id: 18, slot: "Gates of Olympus 1000", type: "Гнев Деда x1000", desc: "Поймать анимацию, где Зевс кидает на поле шар с множителем x50+.", baseBuy: 10000, ico: "👑" },
-            { id: 19, slot: "Fruit Party 2", type: "Праздник Живота", desc: "Словить дикий размножающийся множитель x64 на одной ягоде.", baseBuy: 10000, ico: "🍇" },
-            { id: 20, slot: "Слот на выбор Чата", type: "Финальный Аккорд", desc: "Взять бонуску за 10к в любом слоте и закрыть её в чистый плюс.", baseBuy: 10000, ico: "💬" }
+            { id: 1, slot: "Gates of Olympus", type: "Дедовские Капли", desc: "Поймать суммарный множитель больше x12 за один спин.", baseBuy: 4800, ico: "⚡", difficulty: "easy" },
+            { id: 2, slot: "The Dog House Megaways", type: "Пёсий Созвон", desc: "Поймать хотя бы 4 диких символа на одном барабане бонуски.", baseBuy: 6000, ico: "🐶", difficulty: "medium" },
+            { id: 3, slot: "Sugar Rush", type: "Диабет Отменяется", desc: "Раскачать хотя бы одну ячейку поля до множителя x16.", baseBuy: 6000, ico: "🍬", difficulty: "medium" },
+            { id: 4, slot: "Juicy Fruits", type: "Витаминный Бум", desc: "Вырастить дикий Скаттер-квадрат до размера 2x2 или выше.", baseBuy: 4800, ico: "🍋", difficulty: "easy" },
+            { id: 5, slot: "Sweet Bonanza", type: "Заворот Кишок", desc: "Поймать спин в бонуске, где одновременно упадут сразу 3 леденца.", baseBuy: 6000, ico: "🍭", difficulty: "medium" },
+            { id: 6, slot: "Big Bass Splash", type: "Рыбалка на Живца", desc: "Дойти минимум до 2-го уровня (множитель x2) на шкале рыбака.", baseBuy: 4800, ico: "🐟", difficulty: "easy" },
+            { id: 7, slot: "Starlight Princess", type: "Аниме-Синдром", desc: "Засейвить и зафиксировать общий множитель x20 к концу бонуски.", baseBuy: 8000, ico: "⭐", difficulty: "hard" },
+            { id: 8, slot: "Cleocatra", type: "Кошачий Лоток", desc: "Поймать полноценную линию из кошек с активным диким множителем.", baseBuy: 6000, ico: "🐱", difficulty: "medium" },
+            { id: 9, slot: "Zeus vs Hades", type: "Семейные Разборки", desc: "Играть строго за Аида. Выбить хотя бы один расширяющийся барабан x5+.", baseBuy: 6000, ico: "🔥", difficulty: "medium" },
+            { id: 10, slot: "Wild West Gold", type: "Ковбойский Занос", desc: "Заполнить три центральных барабана звездами-вилдами.", baseBuy: 6000, ico: "🤠", difficulty: "medium" },
+            { id: 11, slot: "Madame Destiny Megaways", type: "Гадание по Руке", desc: "На стартовом колесе фортуны выбить множитель не менее x8.", baseBuy: 8000, ico: "🔮", difficulty: "hard" },
+            { id: 12, slot: "Buffalo King Megaways", type: "Стадо Бешеных", desc: "Получить более 40 фриспинов суммарно за счет ретриггеров.", baseBuy: 7500, ico: "🦬", difficulty: "hard" },
+            { id: 13, slot: "Big Bass Amazon Xtreme", type: "Амазонский Монстр", desc: "Угадать на стартовом выборе в аквариумах не менее 3 модификаторов.", baseBuy: 8000, ico: "🐊", difficulty: "hard" },
+            { id: 14, slot: "Sugar Rush 1000", type: "Сахарная Кома", desc: "Получить общую окупаемость бонуски ровно в x1.5 или выше.", baseBuy: 10000, ico: "🍩", difficulty: "hard" },
+            { id: 15, slot: "Wisdom of Athena", type: "Щит и Меч", desc: "Открыть самый верхний заблокированный ряд ячеек полностью за бонуску.", baseBuy: 10000, ico: "🛡️", difficulty: "hard" },
+            { id: 16, slot: "Gems Bonanza", type: "Золотая Лихорадка", desc: "Успешно перейти на 3-й уровень прогресса карты (Gold Fever).", baseBuy: 10000, ico: "💎", difficulty: "hard" },
+            { id: 17, slot: "The Dog House Multihold", type: "Будка на Прокачку", desc: "Открыть хотя бы 3 активных экрана с собаками одновременно.", baseBuy: 10000, ico: "🐾", difficulty: "hard" },
+            { id: 18, slot: "Gates of Olympus 1000", type: "Гнев Деда x1000", desc: "Поймать анимацию, где Зевс кидает на поле шар с множителем x50+.", baseBuy: 10000, ico: "👑", difficulty: "hard" },
+            { id: 19, slot: "Fruit Party 2", type: "Праздник Живота", desc: "Словить дикий размножающийся множитель x64 на одной ягоде.", baseBuy: 10000, ico: "🍇", difficulty: "hard" },
+            { id: 20, slot: "Слот на выбор Чата", type: "Финальный Аккорд", desc: "Взять бонуску за 10к в любом слоте и закрыть её в чистый плюс.", baseBuy: 10000, ico: "💬", difficulty: "hard" }
         ];
 
-        // Загружаем сохранённые модификации цен
         let QUEST_DATABASE = [];
         let state = { balance: 100000, profit: 0, completedList: [], modifiedBuys: {} };
         let soundOn = true, isSpinning = false, currentActiveQuest = null, isFinalEnding = false;
+        let zeusAnimationLock = false;
         let audioCtx = null;
 
         let wheelAngle = 0;
@@ -798,7 +812,7 @@
                     clearInterval(finalSaluteInterval);
                     return;
                 }
-                for(let i=0; i<8; i++) {
+                for(let i=0; i<6; i++) {
                     winExplosionParticles.push({
                         x: Math.random() * bgCanvas.width,
                         y: Math.random() * bgCanvas.height * 0.7,
@@ -812,7 +826,7 @@
                         rotSp: (Math.random() - 0.5) * 0.1
                     });
                 }
-            }, 350);
+            }, 400);
         }
 
         function drawEffectsLoop() {
@@ -864,9 +878,14 @@
             requestAnimationFrame(drawEffectsLoop);
         }
 
-        // === ОТРИСОВКА КОЛЕСА ===
+        // === ОТРИСОВКА КОЛЕСА С ЦЕНОЙ ===
         const wheelCanvas = document.getElementById('wheelCanvas');
         const wCtx = wheelCanvas.getContext('2d');
+
+        function formatPrice(price) {
+            if (price >= 1000) return (price / 1000).toFixed(1) + "k";
+            return price.toString();
+        }
 
         function drawWheel() {
             const radius = 170;
@@ -894,14 +913,20 @@
 
                 wCtx.save();
                 wCtx.rotate(sectorAngleRad / 2);
+                // Иконка слота
                 wCtx.font = "14px 'Segoe UI Emoji'";
                 wCtx.textAlign = "center";
                 wCtx.fillStyle = comp ? 'rgba(255,255,255,0.2)' : '#fff';
-                wCtx.fillText(q.ico || "🎰", radius - 45, 5);
+                wCtx.fillText(q.ico || "🎰", radius - 50, 0);
+                // Цена (в тысячах)
+                wCtx.font = "bold 9px 'Orbitron', sans-serif";
+                wCtx.fillStyle = comp ? 'rgba(255,255,255,0.2)' : (i % 2 === 0 ? getStyleColor('--cyan') : getStyleColor('--pink'));
+                wCtx.fillText(formatPrice(q.buy), radius - 50, 16);
+                // Номер контракта
+                wCtx.font = "bold 10px 'Orbitron', sans-serif";
                 wCtx.fillStyle = comp ? 'rgba(255,255,255,0.15)' : (i % 2 === 0 ? getStyleColor('--cyan') : getStyleColor('--pink'));
-                wCtx.font = "bold 11px 'Orbitron', sans-serif"; 
                 wCtx.textAlign = "right";
-                wCtx.fillText(q.id, radius - 15, 4);
+                wCtx.fillText(q.id, radius - 12, 4);
                 wCtx.restore();
                 wCtx.restore();
             }
@@ -924,7 +949,9 @@
             els.lightningPath.setAttribute('d', pathD);
         }
 
-        function triggerZeusEvent(targetQuest, callback) {
+        function triggerZeusEvent(targetQuest, onComplete) {
+            zeusAnimationLock = true;
+            els.spinBtn.disabled = true;
             writeLog(`⚡ Зевс заметил контракт №${targetQuest.id}! Вмешательство богов...`);
             playEffect('thunder');
             els.zeus.classList.add('active');
@@ -932,7 +959,11 @@
             setTimeout(() => {
                 const zeusBox = els.zeus.getBoundingClientRect();
                 const cardEl = document.getElementById(`quest-card-${targetQuest.id}`);
-                if (!cardEl) { callback(); return; }
+                if (!cardEl) { 
+                    zeusAnimationLock = false;
+                    if (onComplete) onComplete();
+                    return; 
+                }
                 const cardBox = cardEl.getBoundingClientRect();
                 const sX = zeusBox.left + 30;
                 const sY = zeusBox.top + 50;
@@ -971,14 +1002,15 @@
 
                 setTimeout(() => {
                     els.zeus.classList.remove('active');
-                    callback();
+                    zeusAnimationLock = false;
+                    if (onComplete) onComplete();
                 }, 1000);
             }, 1200);
         }
 
         // === АНИМАЦИЯ ВРАЩЕНИЯ ===
         function startSpinAnimation(targetSectorIndex) {
-            if (isSpinning) return;
+            if (isSpinning || zeusAnimationLock) return;
             playEffect('spin');
             isSpinning = true;
             els.spinBtn.disabled = true;
@@ -996,7 +1028,7 @@
                     wheelAngle = targetAngleRad % (Math.PI * 2);
                     drawWheel();
                     isSpinning = false;
-                    els.spinBtn.disabled = false;
+                    if (!zeusAnimationLock) els.spinBtn.disabled = false;
                     setTimeout(() => handleSpinEnd(targetSectorIndex), 150);
                     return;
                 }
@@ -1022,21 +1054,25 @@
                 card.classList.add('selected-anim');
                 card.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
-            writeLog(`🎯 Колесо выбрало контракт №${quest.id} — ${quest.slot}`);
+            writeLog(`🎯 Колесо выбрало контракт №${quest.id} — ${quest.slot} (цена: ${quest.buy} ₽)`);
 
             const triggerModal = () => {
                 document.getElementById('modalSlotTitle').innerText = quest.slot + " " + quest.ico;
                 document.getElementById('modalQuestName').innerText = `Задание: ${quest.type}`;
-                document.getElementById('modalQuestDesc').innerText = quest.desc;
+                document.getElementById('modalQuestDesc').innerHTML = `${quest.desc}<br><span style="color: var(--gold);">💰 Цена бонусы: ${quest.buy.toLocaleString()} ₽</span>`;
                 els.payoutInput.value = '';
                 els.resultModal.classList.remove('hidden');
                 setTimeout(() => els.payoutInput.focus(), 50);
+                if (!zeusAnimationLock) els.spinBtn.disabled = false;
             };
 
             if (Math.random() < 0.25 && !state.completedList.some(c => c.id === quest.id)) {
-                triggerZeusEvent(quest, triggerModal);
+                triggerZeusEvent(quest, () => {
+                    triggerModal();
+                });
             } else {
-                setTimeout(triggerModal, 400);
+                triggerModal();
+                if (!zeusAnimationLock) els.spinBtn.disabled = false;
             }
         }
 
@@ -1056,8 +1092,9 @@
                 const badgeStyle = isBlitzed ? 'color: var(--gold); border-color: var(--gold);' : '';
                 let badge = `<div class="buy-badge" style="${badgeStyle}">Цена: ${q.buy.toLocaleString()} ₽</div>`;
                 if (comp) {
+                    const multiplier = (comp.payout / q.buy).toFixed(1);
                     badge = `<div class="buy-badge" style="color:${comp.status==='win'?'#00ff66':'#ff3333'}; border-color:${comp.status==='win'?'#00ff66':'#ff3333'};">
-                        ${comp.status === 'win' ? '+' + comp.payout.toLocaleString() : 'СЛИВ'} ₽
+                        ${comp.status === 'win' ? '+' + comp.payout.toLocaleString() + ' ₽' : 'СЛИВ'} ${comp.status === 'win' ? ` (x${multiplier})` : ''}
                     </div>`;
                 }
                 card.innerHTML = `
@@ -1104,7 +1141,7 @@
 
         // === ОБРАБОТЧИКИ ===
         els.spinBtn.onclick = function() {
-            if (isSpinning || currentActiveQuest || isFinalEnding) return;
+            if (isSpinning || currentActiveQuest || isFinalEnding || zeusAnimationLock) return;
             const available = QUEST_DATABASE.filter(q => !state.completedList.some(c => c.id === q.id));
             if (!available.length) return;
             document.querySelectorAll('.quest-card').forEach(c => c.classList.remove('selected-anim'));
@@ -1119,11 +1156,11 @@
             if (isNaN(p) || p < 0) p = 0;
             state.completedList.push({ id: currentActiveQuest.id, status: 'win', payout: p });
             state.balance = state.balance - currentActiveQuest.buy + p;
-            writeLog(`✅ Контракт №${currentActiveQuest.id} выполнен! Слот: ${currentActiveQuest.slot} | Выплата: ${p} ₽.`);
-            const multiplier = p / currentActiveQuest.buy;
+            const multiplier = (p / currentActiveQuest.buy).toFixed(1);
+            writeLog(`✅ Контракт №${currentActiveQuest.id} выполнен! Слот: ${currentActiveQuest.slot} | Выплата: ${p} ₽ (x${multiplier})`);
             triggerWinExplosion();
-            if (multiplier >= 3) showCelebrationBanner("💎 MEGA WIN 💎", "banner-megawin");
-            else if (multiplier >= 1.5) showCelebrationBanner("🍇 BIG WIN 🍇", "banner-bigwin");
+            if (parseFloat(multiplier) >= 3) showCelebrationBanner("💎 MEGA WIN 💎", "banner-megawin");
+            else if (parseFloat(multiplier) >= 1.5) showCelebrationBanner("🍇 BIG WIN 🍇", "banner-bigwin");
             else showCelebrationBanner("🎉 WIN 🎉", "banner-win");
             closeAndSync();
         }
@@ -1141,6 +1178,7 @@
             currentActiveQuest = null; 
             els.resultModal.classList.add('hidden');
             document.querySelectorAll('.quest-card').forEach(c => c.classList.remove('selected-anim'));
+            if (!zeusAnimationLock) els.spinBtn.disabled = false;
         }
 
         function showCelebrationBanner(typeText, className) {
@@ -1201,6 +1239,7 @@
                 isSpinning = false;
                 currentActiveQuest = null;
                 isFinalEnding = false;
+                zeusAnimationLock = false;
                 if (finalSaluteInterval) clearInterval(finalSaluteInterval);
                 els.spinBtn.disabled = false;
                 els.spinBtn.innerHTML = `<i class="fas fa-dice"></i> ВРАЩАТЬ БАРАБАН`;
