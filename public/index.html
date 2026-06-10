@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>🍓 PRAGMATIC КРУТИЛКА | STREAM PREMIER SHOW</title>
+    <title>🍓 PRAGMATIC КРУТИЛКА | SHOW EDITION</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,19 +18,17 @@
 
         :root {
             --bg-main: #05020c;
-            --bg-panel: rgba(18, 9, 36, 0.8);
-            --bg-card: rgba(31, 15, 61, 0.5);
-            --bg-card-hover: rgba(48, 23, 94, 0.7);
+            --bg-panel: rgba(18, 9, 36, 0.88);
+            --bg-card: rgba(31, 15, 61, 0.4);
+            --bg-card-hover: rgba(53, 26, 102, 0.6);
             --pink: #ff007f;
             --cyan: #00ffff;
             --gold: #ffcc00;
-            --purple-glow: #bd00ff;
             --text-main: #f1ebfa;
             --text-muted: #8e7fa6;
             
             --neon-pink: 0 0 15px rgba(255, 0, 127, 0.4), inset 0 0 15px rgba(255, 0, 127, 0.2);
             --neon-cyan: 0 0 15px rgba(0, 255, 255, 0.4), inset 0 0 15px rgba(0, 255, 255, 0.2);
-            --glass-blur: backdrop-filter: blur(16px);
         }
 
         body {
@@ -46,13 +44,13 @@
                 radial-gradient(circle at 85% 85%, rgba(0, 255, 255, 0.08) 0%, transparent 50%);
         }
 
-        canvas#memePragmaticCanvas {
+        canvas#bgMemeCanvas {
             position: fixed;
             top: 0; left: 0;
             width: 100% !important;
             height: 100% !important;
             pointer-events: none;
-            z-index: 1;
+            z-index: 99;
         }
 
         .app-container {
@@ -113,10 +111,7 @@
             box-shadow: var(--neon-cyan);
             border-color: rgba(0, 255, 255, 0.3);
         }
-
-        .btn-cyan:hover:not(:disabled) {
-            box-shadow: 0 0 25px rgba(0, 255, 255, 0.7);
-        }
+        .btn-cyan:hover:not(:disabled) { box-shadow: 0 0 25px rgba(0, 255, 255, 0.7); }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.04);
@@ -124,14 +119,11 @@
             color: var(--text-main);
             box-shadow: none;
         }
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); }
 
-        /* Шапка Табло */
         .header-panel {
             background: var(--bg-panel);
-            --glass-blur;
+            backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.06);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
             border-radius: 24px;
@@ -140,18 +132,11 @@
             justify-content: space-between;
             align-items: center;
             gap: 25px;
+            flex-wrap: wrap;
         }
 
-        .streamer-info {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .logo-strawberry {
-            font-size: 3.2rem;
-            filter: drop-shadow(0 0 15px var(--pink));
-        }
+        .streamer-info { display: flex; align-items: center; gap: 20px; }
+        .logo-strawberry { font-size: 3.2rem; filter: drop-shadow(0 0 15px var(--pink)); }
 
         .header-title-box h1 {
             font-family: 'Orbitron', sans-serif;
@@ -161,19 +146,9 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        .header-title-box p { font-family: 'Rajdhani', sans-serif; color: var(--cyan); font-size: 1.05rem; font-weight: 600; letter-spacing: 4px; }
 
-        .header-title-box p {
-            font-family: 'Rajdhani', sans-serif;
-            color: var(--cyan);
-            font-size: 1.05rem;
-            font-weight: 600;
-            letter-spacing: 4px;
-        }
-
-        .stats-row {
-            display: flex;
-            gap: 20px;
-        }
+        .stats-row { display: flex; gap: 20px; flex-wrap: wrap; }
 
         .stat-badge {
             background: rgba(8, 4, 18, 0.7);
@@ -196,22 +171,22 @@
             color: var(--text-main);
             margin-top: 4px;
         }
-
         .stat-badge.balance strong { color: var(--gold); }
         .stat-badge.progress strong { color: var(--cyan); }
         .stat-badge.profit strong { color: #00ff66; }
 
-        /* Главная сетка */
         .main-layout {
             display: grid;
-            grid-template-columns: 460px 1fr;
+            grid-template-columns: minmax(360px, 450px) 1fr;
             gap: 30px;
             flex: 1;
         }
 
+        @media (max-width: 950px) { .main-layout { grid-template-columns: 1fr; } }
+
         .show-box {
             background: var(--bg-panel);
-            --glass-blur;
+            backdrop-filter: blur(16px);
             border-radius: 24px;
             border: 1px solid rgba(255, 255, 255, 0.05);
             padding: 30px;
@@ -221,19 +196,12 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.5);
         }
 
-        .box-title {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-            font-size: 1.2rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
+        .box-title { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 1.2rem; letter-spacing: 1px; text-transform: uppercase; }
 
-        /* Обертка Колеса */
         .wheel-wrapper {
             position: relative;
-            width: 360px;
-            height: 360px;
+            width: 340px;
+            height: 340px;
             margin: 10px auto;
             display: flex;
             justify-content: center;
@@ -241,40 +209,33 @@
         }
 
         .wheel-canvas-container {
-            width: 360px;
-            height: 360px;
+            width: 340px;
+            height: 340px;
             border-radius: 50%;
             border: 6px solid #0e051a;
-            box-shadow: 0 0 35px rgba(189, 0, 255, 0.2);
+            box-shadow: 0 0 35px rgba(189, 0, 255, 0.25);
             background: #090312;
             position: relative;
             overflow: hidden;
         }
 
-        canvas#wheelCanvas {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%;
-            height: 100%;
-        }
+        canvas#wheelCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
         .wheel-pointer {
             position: absolute;
-            top: -14px;
-            left: 50%;
+            top: -12px; left: 50%;
             transform: translateX(-50%);
             width: 0; height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 30px solid var(--cyan);
+            border-left: 14px solid transparent;
+            border-right: 14px solid transparent;
+            border-top: 28px solid var(--cyan);
             filter: drop-shadow(0 0 10px var(--cyan));
             z-index: 10;
         }
         
         .wheel-center-pin {
             position: absolute;
-            width: 26px;
-            height: 26px;
+            width: 24px; height: 24px;
             background: #110624;
             border: 4px solid var(--cyan);
             border-radius: 50%;
@@ -282,21 +243,19 @@
             z-index: 12;
         }
 
-        /* Список Квестов */
         .quests-container-box {
             display: flex;
             flex-direction: column;
             gap: 14px;
-            max-height: 690px;
+            max-height: 680px;
             overflow-y: auto;
             padding-right: 10px;
         }
 
         .quests-container-box::-webkit-scrollbar { width: 6px; }
         .quests-container-box::-webkit-scrollbar-track { background: transparent; }
-        .quests-container-box::-webkit-scrollbar-thumb { background: rgba(189,0,255,0.4); border-radius: 10px; }
+        .quests-container-box::-webkit-scrollbar-thumb { background: rgba(189,0,255,0.3); border-radius: 10px; }
 
-        /* Карточки квестов */
         .quest-card {
             background: var(--bg-card);
             border: 1px solid rgba(255, 255, 255, 0.04);
@@ -310,73 +269,34 @@
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .quest-card::before {
-            content: '';
-            position: absolute;
-            left: 0; top: 0; width: 4px; height: 100%;
-            background: transparent;
-            border-radius: 16px 0 0 16px;
-        }
+        .quest-card::before { content: ''; position: absolute; left: 0; top: 0; width: 4px; height: 100%; background: transparent; border-radius: 16px 0 0 16px; }
+        .quest-card:hover { background: var(--bg-card-hover); border-color: rgba(189, 0, 255, 0.15); }
 
-        .quest-card:hover {
-            background: var(--bg-card-hover);
-            border-color: rgba(189, 0, 255, 0.15);
-        }
-
-        .quest-card.selected-anim {
-            border-color: var(--cyan);
-            box-shadow: var(--neon-cyan);
-            background: rgba(0, 255, 255, 0.03);
-        }
+        .quest-card.selected-anim { border-color: var(--cyan); box-shadow: var(--neon-cyan); background: rgba(0, 255, 255, 0.03); }
         .quest-card.selected-anim::before { background: var(--cyan); }
 
-        .quest-card.done-win {
-            border-color: rgba(0, 255, 102, 0.2);
-            background: linear-gradient(90deg, rgba(0, 255, 102, 0.03) 0%, var(--bg-card) 100%);
-        }
+        .quest-card.done-win { border-color: rgba(0, 255, 102, 0.2); }
         .quest-card.done-win::before { background: #00ff66; }
         .quest-card.done-win .slot-title { color: #00ff66; }
 
-        .quest-card.done-lose {
-            border-color: rgba(255, 51, 51, 0.2);
-            background: linear-gradient(90deg, rgba(255, 51, 51, 0.03) 0%, var(--bg-card) 100%);
-        }
+        .quest-card.done-lose { border-color: rgba(255, 51, 51, 0.2); }
         .quest-card.done-lose::before { background: #ff3333; }
-        .quest-card.done-lose .slot-title { color: #ff5555; text-decoration: line-through; opacity: 0.7; }
+        .quest-card.done-lose .slot-title { color: #ff5555; text-decoration: line-through; opacity: 0.6; }
 
         .quest-index {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1rem;
-            font-weight: 700;
+            font-size: 1rem; font-weight: 700;
             color: var(--text-muted);
             background: rgba(0,0,0,0.25);
-            width: 34px; height: 34px;
+            width: 38px; height: 38px;
             display: flex; align-items: center; justify-content: center;
             border-radius: 10px;
             border: 1px solid rgba(255,255,255,0.03);
         }
 
-        .slot-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        .quest-type-label {
-            font-size: 0.85rem;
-            color: var(--pink);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 2px;
-        }
-
-        .quest-description {
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            margin-top: 5px;
-            line-height: 1.4;
-        }
+        .slot-title { font-size: 1.2rem; font-weight: 700; color: #fff; }
+        .quest-type-label { font-size: 0.85rem; color: var(--pink); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+        .quest-description { font-size: 0.95rem; color: var(--text-muted); margin-top: 5px; line-height: 1.4; }
 
         .buy-badge {
             background: rgba(255, 204, 0, 0.05);
@@ -397,77 +317,66 @@
             padding: 15px;
             height: 130px;
             overflow-y: auto;
-            font-family: monospace;
-            font-size: 0.85rem;
-            color: #9285a8;
+            font-family: monospace; font-size: 0.85rem; color: #9285a8;
         }
 
-        /* Модальные окна */
         .modal-overlay {
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(3, 1, 8, 0.85);
             backdrop-filter: blur(8px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 1;
-            transition: opacity 0.2s ease;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000; opacity: 1; transition: opacity 0.2s ease;
         }
-
-        .modal-overlay.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
+        .modal-overlay.hidden { opacity: 0; pointer-events: none; }
 
         .modal-window {
             background: #110721;
             border: 2px solid var(--cyan);
             box-shadow: 0 20px 50px rgba(0,0,0,0.8), var(--neon-cyan);
-            border-radius: 24px;
-            padding: 35px;
-            max-width: 540px;
-            width: 90%;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            transform: translateY(0);
-            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 24px; padding: 35px;
+            max-width: 540px; width: 90%; text-align: center;
+            display: flex; flex-direction: column; gap: 20px;
+            transform: translateY(0); transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
-        .modal-overlay.hidden .modal-window {
-            transform: translateY(30px);
-        }
+        .modal-overlay.hidden .modal-window { transform: translateY(30px); }
 
         .input-money {
             background: #06020d;
             border: 2px solid rgba(255, 0, 127, 0.3);
-            padding: 14px;
-            border-radius: 12px;
-            color: white;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            text-align: center;
-            width: 100%;
-            outline: none;
+            padding: 14px; border-radius: 12px;
+            color: white; font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem; font-weight: 700; text-align: center;
+            width: 100%; outline: none;
         }
+        .input-money:focus { border-color: var(--pink); box-shadow: var(--neon-pink); }
 
-        .input-money:focus {
-            border-color: var(--pink);
-            box-shadow: var(--neon-pink);
+        #winCelebrationBanner {
+            position: fixed;
+            top: 40%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            z-index: 999; pointer-events: none;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900; font-size: 4.5rem;
+            text-align: center; text-transform: uppercase;
+            letter-spacing: 5px; opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.5);
         }
+        #winCelebrationBanner.active {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+        .banner-win { color: #00ff66; text-shadow: 0 0 30px #00ff66; }
+        .banner-bigwin { color: var(--pink); text-shadow: 0 0 40px var(--pink), 0 0 10px #fff; }
+        .banner-megawin { color: var(--gold); text-shadow: 0 0 50px var(--gold), 0 0 20px #ff5500; }
     </style>
 </head>
 <body>
 
-    <canvas id="memePragmaticCanvas"></canvas>
+    <canvas id="bgMemeCanvas"></canvas>
+    <div id="winCelebrationBanner">BIG WIN</div>
 
     <div class="app-container">
-        
         <div class="top-utils">
             <button id="rulesBtn" class="action-btn btn-secondary"><i class="fas fa-file-invoice-dollar"></i> ПРАВИЛА</button>
             <button id="soundToggle" class="action-btn btn-cyan"><i class="fas fa-volume-up"></i> ЗВУК: ВКЛ</button>
@@ -490,7 +399,6 @@
         </div>
 
         <div class="main-layout">
-            
             <div class="show-box">
                 <div class="box-title" style="color: var(--gold);"><i class="fas fa-circle-notch fa-spin"></i> SELECTION WHEEL</div>
                 
@@ -498,7 +406,7 @@
                     <div class="wheel-pointer"></div>
                     <div class="wheel-center-pin"></div>
                     <div class="wheel-canvas-container">
-                        <canvas id="wheelCanvas" width="360" height="360"></canvas>
+                        <canvas id="wheelCanvas" width="340" height="340"></canvas>
                     </div>
                 </div>
 
@@ -514,7 +422,6 @@
                 <div class="box-title" style="color: var(--cyan);"><i class="fas fa-list-ol"></i> КОНТРАКТЫ НА СТРИМ</div>
                 <div class="quests-container-box" id="questsContainer"></div>
             </div>
-
         </div>
     </div>
 
@@ -530,10 +437,10 @@
             </div>
 
             <div style="display: flex; gap: 12px;">
-                <button id="winConfirmBtn" class="action-btn btn-cyan" style="flex: 1; justify-content: center;"><i class="fas fa-check"></i> ВЫПОЛНЕН</button>
+                <button id="winConfirmBtn" class="action-btn btn-cyan" style="flex: 1; justify-content: center;"><i class="fas fa-check"></i> ВЫПОЛНЕН (Enter)</button>
                 <button id="loseConfirmBtn" class="action-btn" style="flex: 1; background: #cc0033; border-color:#990022; justify-content: center;"><i class="fas fa-times"></i> СЛИВ</button>
             </div>
-            <button id="cancelModalBtn" style="background:none; border:none; color:var(--text-muted); text-decoration:underline; cursor:pointer;">Закрыть</button>
+            <button id="cancelModalBtn" style="background:none; border:none; color:var(--text-muted); text-decoration:underline; cursor:pointer;">Закрыть (Esc)</button>
         </div>
     </div>
 
@@ -542,8 +449,8 @@
             <h2 style="color: var(--gold); font-family: 'Orbitron', sans-serif;">ПРАВИЛА МАРАФОНА</h2>
             <div style="text-align: left; font-size: 0.95rem; line-height: 1.6; color: #b1a4c4; display:flex; flex-direction:column; gap: 10px;">
                 <p>1. Нажимаем <strong>ВРАЩАТЬ БАРАБАН</strong>. Алгоритм выбирает случайный незакрытый контракт.</p>
-                <p>2. Стример покупает бонусную игру в выбранном слоте по указанной цене (БУЙ).</p>
-                <p>3. По итогам бонуски вносим результат: при победе — полную сумму выплаты, при сливе — фиксируем минус.</p>
+                <p>2. Стример покупает бонусную игру в слоте по указанной цене (БУЙ).</p>
+                <p>3. По итогам бонуски вносим результат: при победе — сумму выплаты, при сливе — фиксируем минус.</p>
             </div>
             <button id="closeRulesBtn" class="action-btn btn-cyan" style="width:100%; justify-content:center;">ПОНЯТНО</button>
         </div>
@@ -551,39 +458,44 @@
 
     <script>
     (function(){
+        // БАЗА КВЕСТОВ (20 шт) с иконками для колеса
         const QUEST_DATABASE = [
-            { id: 1, slot: "Gates of Olympus", type: "Дедовские Капли", desc: "Поймать суммарный множитель больше x12 за один спин.", buy: 4800 },
-            { id: 2, slot: "The Dog House Megaways", type: "Пёсий Созвон", desc: "Поймать хотя бы 4 диких символа на одном барабане бонуски.", buy: 6000 },
-            { id: 3, slot: "Sugar Rush", type: "Диабет Отменяется", desc: "Раскачать хотя бы одну ячейку поля до множителя x16.", buy: 6000 },
-            { id: 4, slot: "Juicy Fruits", type: "Витаминный Бум", desc: "Вырастить дикий Скаттер-квадрат до размера 2x2 или выше.", buy: 4800 },
-            { id: 5, slot: "Sweet Bonanza", type: "Заворот Кишок", desc: "Поймать спин в бонуске, где одновременно упадут сразу 3 леденца.", buy: 6000 },
-            { id: 6, slot: "Big Bass Splash", type: "Рыбалка на Живца", desc: "Дойти минимум до 2-го уровня (множитель x2) на шкале рыбака.", buy: 4800 },
-            { id: 7, slot: "Starlight Princess", type: "Аниме-Синдром", desc: "Засейвить и зафиксировать общий множитель x20 к концу бонуски.", buy: 8000 },
-            { id: 8, slot: "Cleocatra", type: "Кошачий Лоток", desc: "Поймать полноценную линию из кошек с активным диким множителем.", buy: 6000 },
-            { id: 9, slot: "Zeus vs Hades", type: "Семейные Разборки", desc: "Играть строго за Аида. Выбить хотя бы один расширяющийся барабан x5+.", buy: 6000 },
-            { id: 10, slot: "Wild West Gold", type: "Ковбойский Занос", desc: "Заполнить три центральных барабана звездами-вилдами.", buy: 6000 },
-            { id: 11, slot: "Madame Destiny Megaways", type: "Гадание по Руке", desc: "На стартовом колесе фортуны выбить множитель не менее x8.", buy: 8000 },
-            { id: 12, slot: "Buffalo King Megaways", type: "Стадо Бешеных", desc: "Получить более 40 фриспинов суммарно за счет ретриггеров.", buy: 7500 },
-            { id: 13, slot: "Big Bass Amazon Xtreme", type: "Амазонский Монстр", desc: "Угадать на стартовом выборе в аквариумах не менее 3 модификаторов.", buy: 8000 },
-            { id: 14, slot: "Sugar Rush 1000", type: "Сахарная Кома", desc: "Получить общую окупаемость бонуски ровно в x1.5 или выше.", buy: 10000 },
-            { id: 15, slot: "Wisdom of Athena", type: "Щит и Меч", desc: "Открыть самый верхний заблокированный ряд ячеек полностью за бонуску.", buy: 10000 },
-            { id: 16, slot: "Gems Bonanza", type: "Золотая Лихорадка", desc: "Успешно перейти на 3-й уровень прогресса карты (Gold Fever).", buy: 10000 },
-            { id: 17, slot: "The Dog House Multihold", type: "Будка на Прокачку", desc: "Открыть хотя бы 3 активных экрана с собаками одновременно.", buy: 10000 },
-            { id: 18, slot: "Gates of Olympus 1000", type: "Гнев Деда x1000", desc: "Поймать анимацию, где Зевс кидает на поле шар с множителем x50+.", buy: 10000 },
-            { id: 19, slot: "Fruit Party 2", type: "Праздник Живота", desc: "Словить дикий размножающийся множитель x64 на одной ягоде.", buy: 10000 },
-            { id: 20, slot: "Слот на выбор Чата", type: "Финальный Аккорд", desc: "Взять бонуску за 10к в любом слоте и закрыть её в чистый плюс.", buy: 10000 }
+            { id: 1, slot: "Gates of Olympus", type: "Дедовские Капли", desc: "Поймать суммарный множитель больше x12 за один спин.", buy: 4800, ico: "⚡" },
+            { id: 2, slot: "The Dog House Megaways", type: "Пёсий Созвон", desc: "Поймать хотя бы 4 диких символа на одном барабане бонуски.", buy: 6000, ico: "🐶" },
+            { id: 3, slot: "Sugar Rush", type: "Диабет Отменяется", desc: "Раскачать хотя бы одну ячейку поля до множителя x16.", buy: 6000, ico: "🍬" },
+            { id: 4, slot: "Juicy Fruits", type: "Витаминный Бум", desc: "Вырастить дикий Скаттер-квадрат до размера 2x2 или выше.", buy: 4800, ico: "🍋" },
+            { id: 5, slot: "Sweet Bonanza", type: "Заворот Кишок", desc: "Поймать спин в бонуске, где одновременно упадут сразу 3 леденца.", buy: 6000, ico: "🍭" },
+            { id: 6, slot: "Big Bass Splash", type: "Рыбалка на Живца", desc: "Дойти минимум до 2-го уровня (множитель x2) на шкале рыбака.", buy: 4800, ico: "🐟" },
+            { id: 7, slot: "Starlight Princess", type: "Аниме-Синдром", desc: "Засейвить и зафиксировать общий множитель x20 к концу бонуски.", buy: 8000, ico: "⭐" },
+            { id: 8, slot: "Cleocatra", type: "Кошачий Лоток", desc: "Поймать полноценную линию из кошек с активным диким множителем.", buy: 6000, ico: "🐱" },
+            { id: 9, slot: "Zeus vs Hades", type: "Семейные Разборки", desc: "Играть строго за Аида. Выбить хотя бы один расширяющийся барабан x5+.", buy: 6000, ico: "🔥" },
+            { id: 10, slot: "Wild West Gold", type: "Ковбойский Занос", desc: "Заполнить три центральных барабана звездами-вилдами.", buy: 6000, ico: "🤠" },
+            { id: 11, slot: "Madame Destiny Megaways", type: "Гадание по Руке", desc: "На стартовом колесе фортуны выбить множитель не менее x8.", buy: 8000, ico: "🔮" },
+            { id: 12, slot: "Buffalo King Megaways", type: "Стадо Бешеных", desc: "Получить более 40 фриспинов суммарно за счет ретриггеров.", buy: 7500, ico: "🦬" },
+            { id: 13, slot: "Big Bass Amazon Xtreme", type: "Амазонский Монстр", desc: "Угадать на стартовом выборе в аквариумах не менее 3 модификаторов.", buy: 8000, ico: "🐊" },
+            { id: 14, slot: "Sugar Rush 1000", type: "Сахарная Кома", desc: "Получить общую окупаемость бонуски ровно в x1.5 или выше.", buy: 10000, ico: "🍩" },
+            { id: 15, slot: "Wisdom of Athena", type: "Щит и Меч", desc: "Открыть самый верхний заблокированный ряд ячеек полностью за бонуску.", buy: 10000, ico: "🛡️" },
+            { id: 16, slot: "Gems Bonanza", type: "Золотая Лихорадка", desc: "Успешно перейти на 3-й уровень прогресса карты (Gold Fever).", buy: 10000, ico: "💎" },
+            { id: 17, slot: "The Dog House Multihold", type: "Будка на Прокачку", desc: "Открыть хотя бы 3 активных экрана с собаками одновременно.", buy: 10000, ico: "🐾" },
+            { id: 18, slot: "Gates of Olympus 1000", type: "Гнев Деда x1000", desc: "Поймать анимацию, где Зевс кидает на поле шар с множителем x50+.", buy: 10000, ico: "👑" },
+            { id: 19, slot: "Fruit Party 2", type: "Праздник Живота", desc: "Словить дикий размножающийся множитель x64 на одной ягоде.", buy: 10000, ico: "🍇" },
+            { id: 20, slot: "Слот на выбор Чата", type: "Финальный Аккорд", desc: "Взять бонуску за 10к в любом слоте и закрыть её в чистый плюс.", buy: 10000, ico: "💬" }
         ];
 
         let state = { balance: 100000, progress: 0, profit: 0, completedList: [] };
         let soundOn = true, isSpinning = false, currentActiveQuest = null;
         let audioCtx = null;
-        let isModalOpen = false; // флаг, чтобы не открывать модалку повторно
 
-        // Физика Canvas-колеса
         let wheelAngle = 0;
         let wheelSpeed = 0;
+        let targetAngle = null; 
         const friction = 0.982;
         let lastSectorTriggered = -1;
+
+        // Для фоновых частиц и взрывов
+        let bgParticles = [];
+        let winExplosionParticles = [];
+        const slotMemeIcons = ["🍓", "🍭", "🍬", "⚡", "👑", "🍒", "💰", "💎", "💵"];
 
         const els = {
             balance: document.getElementById('balanceDisplay'),
@@ -593,86 +505,151 @@
             spinBtn: document.getElementById('spinWheelBtn'),
             logBox: document.getElementById('logBox'),
             resultModal: document.getElementById('resultModal'),
-            payoutInput: document.getElementById('payoutValue')
+            payoutInput: document.getElementById('payoutValue'),
+            banner: document.getElementById('winCelebrationBanner')
         };
 
-        // Сохранение угла колеса
-        function saveWheelAngle() {
-            localStorage.setItem('pragmatic_wheel_angle', wheelAngle);
-        }
-
-        function loadWheelAngle() {
-            const saved = localStorage.getItem('pragmatic_wheel_angle');
-            if (saved !== null) wheelAngle = parseFloat(saved) || 0;
-        }
-
-        // Извлечение CSS-переменных
         function getStyleColor(varName) {
             return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
         }
 
-        // Бэкграунд
-        const bgCanvas = document.getElementById('memePragmaticCanvas');
+        // === ФОНОВЫЕ ЧАСТИЦЫ И ВЗРЫВЫ ===
+        const bgCanvas = document.getElementById('bgMemeCanvas');
         const bgCtx = bgCanvas.getContext('2d');
-        let backgroundMemes = [];
-        const emojis = ["🍓", "⚡", "🐶", "🍬", "👑", "🔮"];
 
         function initBg() {
-            bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight;
-            backgroundMemes = Array.from({length: 20}, () => ({
-                x: Math.random() * bgCanvas.width, y: Math.random() * bgCanvas.height,
-                r: 15 + Math.random() * 20, txt: emojis[Math.floor(Math.random() * emojis.length)],
-                sX: (Math.random() - 0.5) * 1.2, sY: (Math.random() - 0.5) * 1.2
+            bgCanvas.width = window.innerWidth; 
+            bgCanvas.height = window.innerHeight;
+            bgParticles = Array.from({length: 25}, () => ({
+                x: Math.random() * bgCanvas.width, 
+                y: Math.random() * bgCanvas.height,
+                r: 18 + Math.random() * 20, 
+                txt: slotMemeIcons[Math.floor(Math.random() * slotMemeIcons.length)],
+                sX: (Math.random() - 0.5) * 0.9, 
+                sY: (Math.random() - 0.5) * 0.9,
+                angle: Math.random() * Math.PI * 2,
+                rotSpeed: (Math.random() - 0.5) * 0.02
             }));
         }
 
-        function drawBg() {
-            bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
-            backgroundMemes.forEach(m => {
-                bgCtx.save(); bgCtx.font = `${m.r}px "Segoe UI Emoji", "Apple Color Emoji", sans-serif`; bgCtx.globalAlpha = 0.12;
-                bgCtx.fillText(m.txt, m.x, m.y); bgCtx.restore();
-                m.x += m.sX * (isSpinning ? 3 : 1); m.y += m.sY * (isSpinning ? 3 : 1);
-                if(m.x < -30 || m.x > bgCanvas.width + 30) m.sX *= -1;
-                if(m.y < -30 || m.y > bgCanvas.height + 30) m.sY *= -1;
-            });
-            requestAnimationFrame(drawBg);
+        function triggerWinExplosion() {
+            winExplosionParticles = [];
+            const count = 75;
+            for(let i=0; i<count; i++) {
+                winExplosionParticles.push({
+                    x: bgCanvas.width / 2,
+                    y: bgCanvas.height / 2,
+                    txt: slotMemeIcons[Math.floor(Math.random() * slotMemeIcons.length)],
+                    size: 20 + Math.random() * 25,
+                    vx: (Math.random() - 0.5) * 16,
+                    vy: -5 - Math.random() * 18,
+                    gravity: 0.45,
+                    alpha: 1,
+                    rot: Math.random() * Math.PI * 2,
+                    rotSp: (Math.random() - 0.5) * 0.2
+                });
+            }
         }
 
-        // Аудио
+        function drawEffectsLoop() {
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+            
+            // Фоновые частицы
+            bgParticles.forEach(m => {
+                bgCtx.save();
+                bgCtx.translate(m.x, m.y);
+                bgCtx.rotate(m.angle);
+                bgCtx.font = `${m.r}px "Segoe UI Emoji", "Apple Color Emoji", sans-serif`;
+                bgCtx.globalAlpha = isSpinning ? 0.18 : 0.08;
+                bgCtx.textAlign = "center";
+                bgCtx.textBaseline = "middle";
+                bgCtx.fillText(m.txt, 0, 0);
+                bgCtx.restore();
+
+                let speedMultiplier = isSpinning ? 4 : 1;
+                m.x += m.sX * speedMultiplier; 
+                m.y += m.sY * speedMultiplier;
+                m.angle += m.rotSpeed * speedMultiplier;
+
+                if(m.x < -40 || m.x > bgCanvas.width + 40) m.sX *= -1;
+                if(m.y < -40 || m.y > bgCanvas.height + 40) m.sY *= -1;
+            });
+
+            // Взрывные частицы
+            for (let i = winExplosionParticles.length - 1; i >= 0; i--) {
+                let p = winExplosionParticles[i];
+                bgCtx.save();
+                bgCtx.globalAlpha = p.alpha;
+                bgCtx.font = `${p.size}px "Segoe UI Emoji", "Apple Color Emoji", sans-serif`;
+                bgCtx.translate(p.x, p.y);
+                bgCtx.rotate(p.rot);
+                bgCtx.textAlign = "center";
+                bgCtx.textBaseline = "middle";
+                bgCtx.fillText(p.txt, 0, 0);
+                bgCtx.restore();
+
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += p.gravity;
+                p.rot += p.rotSp;
+                p.alpha -= 0.012;
+
+                if (p.alpha <= 0) winExplosionParticles.splice(i, 1);
+            }
+
+            requestAnimationFrame(drawEffectsLoop);
+        }
+
+        // === АУДИО ===
         function initAudio() {
-            if (!audioCtx) {
-                try {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                } catch(e) { console.warn("Audio not supported"); return; }
-            }
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume().catch(e => console.warn("Audio resume failed", e));
-            }
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
         }
 
         function playTone(freq, duration, type = 'sine') {
             if (!soundOn) return;
             try {
                 initAudio();
-                if (!audioCtx) return;
                 const osc = audioCtx.createOscillator();
                 const gainNode = audioCtx.createGain();
                 osc.type = type;
                 osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                let volume = isSpinning && wheelSpeed > 0.15 ? 0.02 : 0.06;
+                gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
                 gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
                 osc.connect(gainNode); gainNode.connect(audioCtx.destination);
                 osc.start(); osc.stop(audioCtx.currentTime + duration);
-                setTimeout(() => { osc.disconnect(); gainNode.disconnect(); }, duration * 1000 + 50);
-            } catch(e) { console.warn("playTone error", e); }
+                setTimeout(() => { osc.disconnect(); gainNode.disconnect(); }, duration * 1000 + 40);
+            } catch(e){}
         }
 
-        // Колесо
+        // === КОЛЕСО (ФИЗИКА И ОТРИСОВКА) ===
         const wheelCanvas = document.getElementById('wheelCanvas');
         const wCtx = wheelCanvas.getContext('2d');
 
         function updateWheelPhysics() {
             if (!isSpinning) return;
+
+            if (targetAngle !== null && wheelSpeed < 0.04) {
+                let diff = targetAngle - wheelAngle;
+                diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+                if (Math.abs(diff) < 0.008) {
+                    wheelAngle = targetAngle;
+                    isSpinning = false; wheelSpeed = 0; targetAngle = null;
+                    handleSpinEnd();
+                    return;
+                }
+                wheelAngle += diff * 0.14;
+                const sectors = QUEST_DATABASE.length;
+                const anglePerSector = (2 * Math.PI) / sectors;
+                const normalizedAngle = (2 * Math.PI - (wheelAngle % (2 * Math.PI))) % (2 * Math.PI);
+                const currentSector = Math.floor(normalizedAngle / anglePerSector) % sectors;
+                if (currentSector !== lastSectorTriggered) {
+                    playTone(390, 0.04, 'triangle');
+                    lastSectorTriggered = currentSector;
+                }
+                return;
+            }
 
             wheelAngle += wheelSpeed;
             wheelSpeed *= friction;
@@ -683,134 +660,62 @@
             const currentSector = Math.floor(normalizedAngle / anglePerSector) % sectors;
 
             if (currentSector !== lastSectorTriggered) {
-                playTone(550, 0.03, 'triangle');
+                let dynamicFreq = 380 + (wheelSpeed * 550);
+                playTone(dynamicFreq, 0.03, 'triangle');
                 lastSectorTriggered = currentSector;
             }
 
-            if (wheelSpeed < 0.002) {
-                isSpinning = false;
-                wheelSpeed = 0;
-                saveWheelAngle();
-                handleSpinEnd(currentSector);
+            if (wheelSpeed < 0.015 && targetAngle === null) {
+                isSpinning = false; wheelSpeed = 0;
+                handleSpinEnd();
             }
         }
 
         function drawWheel() {
             updateWheelPhysics();
-
             const sectors = QUEST_DATABASE.length;
             const anglePerSector = (2 * Math.PI) / sectors;
-            const radius = 180;
-            wCtx.clearRect(0, 0, 360, 360);
+            const radius = 170;
+            wCtx.clearRect(0, 0, 340, 340);
 
             for (let i = 0; i < sectors; i++) {
                 const q = QUEST_DATABASE[i];
                 const comp = state.completedList.find(c => c.id === q.id);
 
                 wCtx.save();
-                wCtx.translate(180, 180);
+                wCtx.translate(170, 170);
                 wCtx.rotate(wheelAngle + i * anglePerSector);
 
                 wCtx.beginPath(); wCtx.moveTo(0,0);
                 wCtx.arc(0, 0, radius, 0, anglePerSector); wCtx.closePath();
-                
                 if (comp) {
-                    wCtx.fillStyle = comp.status === 'win' ? '#063015' : '#3d0a11';
+                    wCtx.fillStyle = comp.status === 'win' ? '#052410' : '#29060b';
                 } else {
-                    wCtx.fillStyle = i % 2 === 0 ? '#140826' : '#1d0c36';
+                    wCtx.fillStyle = i % 2 === 0 ? '#130724' : '#1b0b30';
                 }
                 wCtx.fill();
+                wCtx.strokeStyle = 'rgba(189, 0, 255, 0.12)'; 
+                wCtx.lineWidth = 1; 
+                wCtx.stroke();
 
-                wCtx.strokeStyle = 'rgba(189, 0, 255, 0.15)'; wCtx.lineWidth = 1; wCtx.stroke();
-
-                // Номера
                 wCtx.save();
                 wCtx.rotate(anglePerSector / 2);
-                wCtx.fillStyle = comp ? 'rgba(255,255,255,0.3)' : (i % 2 === 0 ? getStyleColor('--cyan') : getStyleColor('--pink'));
-                wCtx.font = "bold 11px 'Orbitron', sans-serif"; wCtx.textAlign = "right";
-                wCtx.fillText(q.id, radius - 22, 4);
+                wCtx.font = "14px 'Segoe UI Emoji', 'Apple Color Emoji'";
+                wCtx.textAlign = "center";
+                wCtx.fillText(q.ico || "🎰", radius - 45, 5);
+                wCtx.fillStyle = comp ? 'rgba(255,255,255,0.2)' : (i % 2 === 0 ? getStyleColor('--cyan') : getStyleColor('--pink'));
+                wCtx.font = "bold 10px 'Orbitron', sans-serif"; 
+                wCtx.textAlign = "right";
+                wCtx.fillText(q.id, radius - 15, 4);
                 wCtx.restore();
-
                 wCtx.restore();
             }
-
             requestAnimationFrame(drawWheel);
         }
 
-        // Поиск ближайшего незакрытого контракта по углу
-        function findNearestAvailableSector(currentSector) {
-            const sectors = QUEST_DATABASE.length;
-            for (let offset = 0; offset < sectors; offset++) {
-                let idx = (currentSector + offset) % sectors;
-                let quest = QUEST_DATABASE[idx];
-                if (!state.completedList.some(c => c.id === quest.id)) {
-                    return idx;
-                }
-            }
-            return -1; // все контракты закрыты
-        }
-
-        function handleSpinEnd(sectorIndex) {
-            if (!isSpinning && wheelSpeed === 0) {
-                // уже обработано
-            }
-            // Проверяем, не закрыт ли уже выпавший контракт
-            let targetSector = sectorIndex;
-            let targetQuest = QUEST_DATABASE[targetSector];
-            if (state.completedList.some(c => c.id === targetQuest.id)) {
-                // Доворачиваем до ближайшего доступного
-                const newSector = findNearestAvailableSector(sectorIndex);
-                if (newSector !== -1) {
-                    targetSector = newSector;
-                    targetQuest = QUEST_DATABASE[targetSector];
-                    // Корректируем угол колеса, чтобы оно физически довернулось
-                    const sectors = QUEST_DATABASE.length;
-                    const anglePerSector = (2 * Math.PI) / sectors;
-                    const targetAngle = (2 * Math.PI) - (targetSector * anglePerSector) - anglePerSector/2;
-                    // Плавно докручиваем (добавляем небольшой импульс)
-                    wheelAngle = targetAngle;
-                    saveWheelAngle();
-                    // Звук фиксации
-                    playTone(900, 0.15, 'sine');
-                    setTimeout(() => playTone(1200, 0.2, 'sine'), 80);
-                } else {
-                    // Все контракты пройдены – ничего не делаем
-                    return;
-                }
-            }
-
-            currentActiveQuest = targetQuest;
-
-            // Снимаем блокировку кнопки
-            els.spinBtn.disabled = false;
-            // Возвращаем исходный текст кнопки
-            const spinBtnIcon = els.spinBtn.querySelector('i');
-            if (spinBtnIcon) spinBtnIcon.className = 'fas fa-dice';
-            els.spinBtn.innerHTML = '<i class="fas fa-dice"></i> ВРАЩАТЬ БАРАБАН';
-
-            const card = document.getElementById(`quest-card-${currentActiveQuest.id}`);
-            if (card) {
-                card.classList.add('selected-anim');
-                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-
-            writeLog(`🎯 Выбран слот: ${currentActiveQuest.slot} (Контракт №${currentActiveQuest.id})`);
-
-            // Открываем модалку
-            if (!isModalOpen && !els.resultModal.classList.contains('hidden')) {
-                // уже открыта
-                return;
-            }
-            isModalOpen = true;
-            document.getElementById('modalSlotTitle').innerText = currentActiveQuest.slot;
-            document.getElementById('modalQuestName').innerText = `Контракт №${currentActiveQuest.id}: ${currentActiveQuest.type}`;
-            document.getElementById('modalQuestDesc').innerText = currentActiveQuest.desc;
-            els.payoutInput.value = '';
-            els.resultModal.classList.remove('hidden');
-        }
-
-        function writeLog(t) {
-            els.logBox.innerHTML = `<div>[${new Date().toLocaleTimeString()}] ${t}</div>` + els.logBox.innerHTML;
+        // === ОБЩИЕ ФУНКЦИИ ===
+        function writeLog(text) {
+            els.logBox.innerHTML = `<div>[${new Date().toLocaleTimeString()}] ${text}</div>` + els.logBox.innerHTML;
         }
 
         function renderQuests() {
@@ -820,18 +725,16 @@
                 const card = document.createElement('div');
                 card.id = `quest-card-${q.id}`;
                 card.className = `quest-card ${comp ? (comp.status === 'win' ? 'done-win' : 'done-lose') : ''}`;
-
                 let badge = `<div class="buy-badge">БУЙ: ${q.buy.toLocaleString()} ₽</div>`;
                 if (comp) {
                     badge = `<div class="buy-badge" style="color:${comp.status==='win'?'#00ff66':'#ff3333'}; border-color:${comp.status==='win'?'#00ff66':'#ff3333'};">
                         ${comp.status === 'win' ? '+' + comp.payout.toLocaleString() : 'СЛИВ'} ₽
                     </div>`;
                 }
-
                 card.innerHTML = `
-                    <div class="quest-index">${q.id}</div>
+                    <div class="quest-index">${q.ico}</div>
                     <div class="quest-main-details">
-                        <div class="slot-title">${q.slot}</div>
+                        <div class="slot-title">${q.slot} <span style="color: var(--text-muted); font-size:0.9rem;">(#${q.id})</span></div>
                         <div class="quest-type-label">${q.type}</div>
                         <div class="quest-description">${q.desc}</div>
                     </div>
@@ -851,73 +754,111 @@
             els.profit.innerText = (prof >= 0 ? '+' : '') + prof.toLocaleString() + " ₽";
         }
 
-        // Кнопка вращения
+        // === ВРАЩЕНИЕ (TARGETED SPIN) ===
         els.spinBtn.onclick = function() {
-            if (isSpinning || currentActiveQuest || isModalOpen) return;
-
+            if (isSpinning || currentActiveQuest) return;
             const available = QUEST_DATABASE.filter(q => !state.completedList.some(c => c.id === q.id));
             if (!available.length) {
-                alert("Марафон завершен! Все контракты закрыты.");
-                return;
+                alert("Все контракты выполнены!"); return;
             }
-
             document.querySelectorAll('.quest-card').forEach(c => c.classList.remove('selected-anim'));
-            
+            const chosenQuest = available[Math.floor(Math.random() * available.length)];
+            const chosenIndex = QUEST_DATABASE.findIndex(x => x.id === chosenQuest.id);
+            currentActiveQuest = chosenQuest;
+            const sectors = QUEST_DATABASE.length;
+            const anglePerSector = (2 * Math.PI) / sectors;
+            let targetSectorCenterAngle = 2 * Math.PI - (chosenIndex * anglePerSector + anglePerSector / 2);
+            let currentBaseAngle = wheelAngle - (wheelAngle % (2 * Math.PI));
+            targetAngle = currentBaseAngle + 4 * Math.PI + targetSectorCenterAngle;
             isSpinning = true;
             els.spinBtn.disabled = true;
-            // Меняем текст на индикацию вращения
-            els.spinBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> ВРАЩАЕТСЯ...';
-
-            // Импульс вращения (рандом)
-            wheelSpeed = 0.35 + Math.random() * 0.15;
+            wheelSpeed = 0.35 + Math.random() * 0.08;
         };
 
-        // Обработка результата
-        document.getElementById('winConfirmBtn').onclick = function() {
+        function handleSpinEnd() {
+            els.spinBtn.disabled = false;
+            playTone(880, 0.12, 'sine');
+            setTimeout(() => playTone(1200, 0.18, 'sine'), 70);
+            const card = document.getElementById(`quest-card-${currentActiveQuest.id}`);
+            if (card) {
+                card.classList.add('selected-anim');
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            writeLog(`🎯 Колесо выбрало: [${currentActiveQuest.slot}] (Контракт №${currentActiveQuest.id})`);
+            setTimeout(() => {
+                document.getElementById('modalSlotTitle').innerText = currentActiveQuest.slot + " " + currentActiveQuest.ico;
+                document.getElementById('modalQuestName').innerText = `Задание: ${currentActiveQuest.type}`;
+                document.getElementById('modalQuestDesc').innerText = currentActiveQuest.desc;
+                els.payoutInput.value = '';
+                els.resultModal.classList.remove('hidden');
+                setTimeout(() => els.payoutInput.focus(), 60);
+            }, 750);
+        }
+
+        // === ОБРАБОТКА РЕЗУЛЬТАТА ===
+        function showCelebrationBanner(typeText, className) {
+            els.banner.innerText = typeText;
+            els.banner.className = className;
+            els.banner.classList.add('active');
+            playTone(523.25, 0.15, 'sine');
+            setTimeout(() => playTone(659.25, 0.15, 'sine'), 100);
+            setTimeout(() => playTone(783.99, 0.3, 'sine'), 200);
+            setTimeout(() => els.banner.classList.remove('active'), 3500);
+        }
+
+        function confirmWin() {
             if (!currentActiveQuest) return;
             let p = parseFloat(els.payoutInput.value);
             if (isNaN(p) || p < 0) p = 0;
-
             state.completedList.push({ id: currentActiveQuest.id, status: 'win', payout: p });
             state.balance = state.balance - currentActiveQuest.buy + p;
-            
-            writeLog(`✅ Контракт выполнен! Выплата: ${p} ₽. Профит: ${p - currentActiveQuest.buy} ₽`);
+            writeLog(`✅ Контракт выполнен! Слот: ${currentActiveQuest.slot} | Выигрыш: ${p} ₽.`);
+            let multiplier = p / currentActiveQuest.buy;
+            triggerWinExplosion();
+            if (multiplier >= 3) showCelebrationBanner("💎 MEGA WIN 💎", "banner-megawin");
+            else if (multiplier >= 1.5) showCelebrationBanner("🍇 BIG WIN 🍇", "banner-bigwin");
+            else showCelebrationBanner("🎉 WIN 🎉", "banner-win");
             closeAndSync();
-        };
+        }
 
-        document.getElementById('loseConfirmBtn').onclick = function() {
+        function confirmLose() {
             if (!currentActiveQuest) return;
             state.completedList.push({ id: currentActiveQuest.id, status: 'lose', payout: 0 });
             state.balance -= currentActiveQuest.buy;
-            
-            writeLog(`❌ Контракт слит в ${currentActiveQuest.slot}. Убыток: -${currentActiveQuest.buy} ₽`);
+            writeLog(`❌ Не повезло: ${currentActiveQuest.slot} ушел в минус. Потеряно: -${currentActiveQuest.buy} ₽`);
+            playTone(220, 0.4, 'sawtooth');
             closeAndSync();
-        };
+        }
+
+        function closeModal() {
+            currentActiveQuest = null; 
+            els.resultModal.classList.add('hidden');
+            document.querySelectorAll('.quest-card').forEach(c => c.classList.remove('selected-anim'));
+        }
+
+        document.getElementById('winConfirmBtn').onclick = confirmWin;
+        document.getElementById('loseConfirmBtn').onclick = confirmLose;
+        document.getElementById('cancelModalBtn').onclick = closeModal;
+
+        window.addEventListener('keydown', function(e) {
+            if (els.resultModal.classList.contains('hidden')) return;
+            if (e.key === 'Enter') { e.preventDefault(); confirmWin(); } 
+            else if (e.key === 'Escape') { closeModal(); }
+        });
 
         function closeAndSync() {
             currentActiveQuest = null;
-            isModalOpen = false;
             els.resultModal.classList.add('hidden');
             updateUI(); renderQuests();
             localStorage.setItem('pragmatic_carousel_save', JSON.stringify(state));
         }
 
-        document.getElementById('cancelModalBtn').onclick = () => {
-            currentActiveQuest = null;
-            isModalOpen = false;
-            els.resultModal.classList.add('hidden');
-        };
-
         document.getElementById('fullResetBtn').onclick = function() {
             if(confirm("Сбросить весь прогресс марафона?")) {
                 localStorage.removeItem('pragmatic_carousel_save');
-                localStorage.removeItem('pragmatic_wheel_angle');
                 state = { balance: 100000, progress: 0, profit: 0, completedList: [] };
-                wheelAngle = 0; wheelSpeed = 0; currentActiveQuest = null;
-                isModalOpen = false;
-                els.resultModal.classList.add('hidden');
+                wheelAngle = 0; wheelSpeed = 0; currentActiveQuest = null; targetAngle = null;
                 updateUI(); renderQuests(); writeLog("♻️ Марафон полностью сброшен.");
-                saveWheelAngle();
             }
         };
 
@@ -931,18 +872,10 @@
         window.addEventListener('resize', initBg);
         document.body.addEventListener('click', () => initAudio(), { once: true });
 
-        // Загрузка сохранений
         const save = localStorage.getItem('pragmatic_carousel_save');
-        if (save) {
-            try {
-                const parsed = JSON.parse(save);
-                if (parsed && typeof parsed.balance === 'number') state = parsed;
-                if (!state.completedList) state.completedList = [];
-            } catch(e) {}
-        }
-        loadWheelAngle();
+        if (save) { try { state = JSON.parse(save); } catch(e){} }
 
-        initBg(); drawBg(); updateUI(); renderQuests(); drawWheel();
+        initBg(); drawEffectsLoop(); updateUI(); renderQuests(); drawWheel();
     })();
     </script>
 </body>
