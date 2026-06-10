@@ -1023,21 +1023,30 @@
             }, 1200);
         }
 
-        // === ГЛАВНАЯ ЛОГИКА ВРАЩЕНИЯ (СИНХРОНИЗАЦИЯ КОЛЕСА И ЗАДАНИЙ) ===
+        // === ГЛАВНАЯ ЛОГИКА ВРАЩЕНИЯ С АДАПТИВНОЙ ДЛИТЕЛЬНОСТЬЮ ===
         function startSpinAnimation(targetSectorIndex) {
             if (isSpinning || zeusAnimationLock) return;
             playEffect('spin');
             isSpinning = true;
             els.spinBtn.disabled = true;
             
-            // targetSectorIndex – индекс выбранного сектора (0..19), который соответствует QUEST_DATABASE[targetSectorIndex]
-            // Вычисляем угол, чтобы центр этого сектора оказался точно под стрелкой (стрелка вверху, угол -PI/2)
+            // Адаптивные параметры вращения в зависимости от количества оставшихся заданий
+            const remainingCount = QUEST_DATABASE.filter(q => !state.completedList.some(c => c.id === q.id)).length;
+            let extraRotations = 5;
+            let spinDuration = 2.6;
+            if (remainingCount <= 4) {
+                extraRotations = 3;
+                spinDuration = 1.8;
+            } else if (remainingCount <= 10) {
+                extraRotations = 4;
+                spinDuration = 2.2;
+            }
+            
             const targetRaw = (Math.PI * 2) - (targetSectorIndex * sectorAngleRad + sectorAngleRad / 2);
-            const totalDelta = (Math.PI * 2) * 5 + targetRaw;
+            const totalDelta = (Math.PI * 2) * extraRotations + targetRaw;
             const startWheelAngle = wheelAngle;
             const targetAngleRad = startWheelAngle + totalDelta;
             const spinStartTime = performance.now();
-            const spinDuration = 2.6;
             
             function animateSpin(currentTime) {
                 const elapsed = (currentTime - spinStartTime) / 1000;
@@ -1046,7 +1055,6 @@
                     drawWheel();
                     isSpinning = false;
                     if (!zeusAnimationLock) els.spinBtn.disabled = false;
-                    // Теперь определяем сектор, на который указывает стрелка, по итоговому углу
                     const finalSector = Math.floor(((Math.PI * 2) - (wheelAngle % (Math.PI * 2))) / sectorAngleRad) % totalSectors;
                     handleSpinEnd(finalSector);
                     return;
@@ -1070,7 +1078,6 @@
             // Если этот контракт уже выполнен (защита от бага), перезапускаем вращение
             if (state.completedList.some(c => c.id === quest.id)) {
                 writeLog(`⚠️ Сектор ${quest.id} уже выполнен, перезапуск...`);
-                // Выбираем новый доступный квест и вращаем заново
                 const available = QUEST_DATABASE.filter(q => !state.completedList.some(c => c.id === q.id));
                 if (available.length === 0) {
                     writeLog("🎉 Все контракты уже выполнены!");
@@ -1185,7 +1192,7 @@
             }, 1000);
         }
 
-        // ОБРАБОТЧИК КНОПКИ ВРАЩЕНИЯ – выбираем случайный незакрытый контракт и крутим на его сектор
+        // ОБРАБОТЧИК КНОПКИ ВРАЩЕНИЯ
         els.spinBtn.onclick = function() {
             if (isSpinning || zeusAnimationLock || isFinalEnding) return;
             const available = QUEST_DATABASE.filter(q => !state.completedList.some(c => c.id === q.id));
