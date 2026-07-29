@@ -1,1351 +1,817 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>🍓 PRAGMATIC КРУТИЛКА | SHOW EDITION</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Проклятие фараона | Квест для стрима</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Playfair Display', serif;
+      background: #0a0502;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: #e6c04c;
+    }
+    /* Анимированный фон */
+    .background {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(ellipse at center, #2c1a0a 0%, #0a0300 100%);
+      z-index: -2;
+    }
+    .stars {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: transparent;
+      z-index: -1;
+      pointer-events: none;
+    }
+    .star {
+      position: absolute;
+      background: #ffe28c;
+      border-radius: 50%;
+      animation: twinkle 2s infinite alternate;
+      box-shadow: 0 0 6px #ffd700;
+    }
+    @keyframes twinkle {
+      0% { opacity: 0.3; transform: scale(1); }
+      100% { opacity: 1; transform: scale(1.2); }
+    }
+    .pyramid-bg {
+      position: fixed;
+      bottom: 0; left: 10%;
+      width: 300px; height: 200px;
+      background: linear-gradient(135deg, #b8a05e 0%, #594a26 100%);
+      clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+      opacity: 0.2;
+      filter: blur(4px);
+    }
+    .sand {
+      position: fixed;
+      bottom: 0; left: 0; width: 100%; height: 120px;
+      background: linear-gradient(transparent, #1c1204);
+      opacity: 0.5;
+      z-index: -1;
+    }
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-        }
+    .game-container {
+      max-width: 1100px;
+      margin: 20px auto;
+      padding: 30px;
+      background: rgba(12, 7, 3, 0.8);
+      backdrop-filter: blur(20px);
+      border: 2px solid #c29b2e;
+      border-radius: 40px;
+      box-shadow: 0 0 80px rgba(218, 165, 32, 0.4), inset 0 0 30px rgba(0,0,0,0.6);
+      position: relative;
+      z-index: 1;
+    }
+    h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 3.5rem;
+      text-align: center;
+      margin: 0 0 30px;
+      background: linear-gradient(180deg, #f5d76e 0%, #b8860b 80%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px #b8860b, 0 0 10px #000;
+      letter-spacing: 6px;
+      filter: drop-shadow(0 4px 8px black);
+    }
 
-        :root {
-            --bg-main: #05020c;
-            --bg-panel: rgba(18, 9, 36, 0.88);
-            --bg-card: rgba(31, 15, 61, 0.4);
-            --bg-card-hover: rgba(53, 26, 102, 0.6);
-            --pink: #ff007f;
-            --cyan: #00ffff;
-            --gold: #ffcc00;
-            --text-main: #f1ebfa;
-            --text-muted: #8e7fa6;
-            
-            --neon-pink: 0 0 15px rgba(255, 0, 127, 0.4), inset 0 0 15px rgba(255, 0, 127, 0.2);
-            --neon-cyan: 0 0 15px rgba(0, 255, 255, 0.4), inset 0 0 15px rgba(0, 255, 255, 0.2);
-        }
+    .inventory-panel {
+      display: flex;
+      justify-content: flex-end;
+      gap: 20px;
+      margin-bottom: 15px;
+      align-items: center;
+    }
+    .artifact-icon {
+      width: 55px; height: 55px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #3b2e14, #1a1307);
+      border: 3px solid #c29b2e;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      position: relative;
+      opacity: 0.4;
+      box-shadow: 0 0 15px rgba(0,0,0,0.8);
+    }
+    .artifact-icon.active {
+      opacity: 1;
+      box-shadow: 0 0 30px #f5d76e, 0 0 15px #b8860b;
+      animation: artifactPulse 2s infinite;
+    }
+    @keyframes artifactPulse {
+      0% { box-shadow: 0 0 20px #b8860b; }
+      50% { box-shadow: 0 0 45px #ffd700, 0 0 20px #ff8c00; }
+      100% { box-shadow: 0 0 20px #b8860b; }
+    }
+    .artifact-icon[data-tooltip]:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: -45px;
+      background: #000;
+      color: #f5d76e;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      z-index: 10;
+      border: 1px solid gold;
+    }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            min-height: 100vh;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            background-image: 
-                radial-gradient(circle at 15% 15%, rgba(255, 0, 127, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 85% 85%, rgba(0, 255, 255, 0.08) 0%, transparent 50%);
-        }
+    .pyramid-layout {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+      margin-top: 30px;
+    }
+    .level-row {
+      display: flex;
+      gap: 35px;
+      justify-content: center;
+      width: 100%;
+    }
+    .room-card {
+      width: 100px; height: 100px;
+      background: #2b1e0c;
+      border: 3px solid #8b6914;
+      border-radius: 20px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      font-size: 2.4rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23b8860b"><text x="0" y="22" font-size="24">☥</text></svg>');
+      background-size: 50%;
+      background-repeat: no-repeat;
+      background-position: center;
+      color: transparent;
+      user-select: none;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+    }
+    .room-card.locked {
+      background: #0d0802;
+      border-color: #4a3a1e;
+      opacity: 0.6;
+      cursor: not-allowed;
+      background-image: none;
+      color: #4a3a1e;
+    }
+    .room-card.completed {
+      background: #1d4114;
+      border-color: #d4af37;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffd700"><text x="0" y="22" font-size="24">✓</text></svg>');
+      color: transparent;
+    }
+    .room-card.current {
+      border-color: #ffd700;
+      box-shadow: 0 0 40px #ffa500, 0 10px 25px black;
+      animation: roomGlow 1.5s infinite alternate;
+    }
+    @keyframes roomGlow {
+      from { box-shadow: 0 0 25px #ffa500; }
+      to { box-shadow: 0 0 50px #ffd700, 0 0 70px #ff8c00; }
+    }
+    .room-label {
+      position: absolute;
+      bottom: -25px;
+      font-size: 0.8rem;
+      color: #c29b2e;
+      white-space: nowrap;
+      font-weight: bold;
+      text-shadow: 0 0 8px black;
+    }
 
-        canvas#bgMemeCanvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100% !important;
-            height: 100% !important;
-            pointer-events: none;
-            z-index: 99;
-        }
+    /* Модальное окно */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(10px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.3s ease;
+    }
+    .hidden { display: none; }
+    @keyframes fadeIn { from{ opacity:0; } }
 
-        .app-container {
-            position: relative;
-            z-index: 2;
-            max-width: 1650px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-            flex: 1;
-        }
+    .modal-window {
+      background: linear-gradient(145deg, #1f1608, #0c0702);
+      border: 3px solid #c29b2e;
+      border-radius: 40px;
+      padding: 30px;
+      width: 95%;
+      max-width: 650px;
+      box-shadow: 0 0 80px #b8860b, inset 0 0 30px rgba(0,0,0,0.7);
+      position: relative;
+      animation: modalSlide 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      color: #e6c04c;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    @keyframes modalSlide {
+      from { transform: scale(0.7) translateY(40px); opacity: 0; }
+      to { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    .modal-window h2 {
+      font-family: 'Cinzel', serif;
+      font-size: 2.4rem;
+      text-align: center;
+      margin-bottom: 25px;
+      text-shadow: 0 0 20px #daa520;
+    }
 
-        .top-utils {
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
+    .puzzle-wrapper, .task-wrapper {
+      margin: 15px 0;
+    }
+    .btn {
+      background: linear-gradient(180deg, #f3cd4b, #b8860b);
+      border: none;
+      color: #0a0300;
+      font-weight: bold;
+      padding: 14px 28px;
+      border-radius: 40px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-block;
+      margin: 10px 8px;
+      text-transform: uppercase;
+      font-family: 'Cinzel', serif;
+      letter-spacing: 2px;
+      box-shadow: 0 8px 15px rgba(0,0,0,0.5);
+    }
+    .btn:hover {
+      background: linear-gradient(180deg, #ffe484, #daa520);
+      transform: translateY(-3px);
+      box-shadow: 0 15px 25px black;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+      transform: none;
+    }
+    .timer-display {
+      font-size: 2.5rem;
+      font-family: monospace;
+      text-align: center;
+      margin: 15px 0;
+      color: #ffa500;
+      text-shadow: 0 0 20px red;
+    }
+    .task-card {
+      background: #1b1105;
+      padding: 20px;
+      border-radius: 25px;
+      border: 1px solid #8b6914;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      line-height: 1.6;
+    }
+    .reset-btn {
+      position: absolute;
+      top: 20px; right: 25px;
+      background: transparent;
+      border: 2px solid #8b6914;
+      color: #c29b2e;
+      padding: 8px 18px;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .reset-btn:hover { background: #8b6914; color: black; }
 
-        .action-btn {
-            background: linear-gradient(135deg, var(--pink), #99004c);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 12px 24px;
-            border-radius: 14px;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            cursor: pointer;
-            box-shadow: var(--neon-pink);
-            transition: all 0.2s ease-in-out;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
+    /* Головоломка поиска */
+    .find-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 70px);
+      gap: 12px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .find-cell {
+      width: 70px; height: 70px;
+      background: #2c1f0c;
+      border: 2px solid #8b6914;
+      border-radius: 15px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .find-cell:hover { background: #4d3a18; }
+    .find-cell.found {
+      opacity: 0.25;
+      filter: grayscale(1);
+      pointer-events: none;
+    }
 
-        .action-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            filter: brightness(1.2);
-            box-shadow: 0 0 25px rgba(255, 0, 127, 0.7);
-        }
+    /* Пятнашки */
+    .sliding-grid {
+      display: grid;
+      gap: 8px;
+      justify-content: center;
+      margin: 20px auto;
+    }
+    .tile {
+      width: 65px; height: 65px;
+      background: radial-gradient(circle at 30% 30%, #c49b2e, #8b6914);
+      border: 2px solid #f5d76e;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+      font-weight: bold;
+      cursor: pointer;
+      color: #0a0300;
+      box-shadow: 0 5px 10px black;
+      transition: transform 0.15s;
+    }
+    .tile.empty { background: transparent; border: none; box-shadow: none; cursor: default; }
 
-        .action-btn:disabled {
-            background: #1a1326;
-            border-color: #2b203a;
-            color: var(--text-muted);
-            box-shadow: none;
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-
-        .btn-cyan {
-            background: linear-gradient(135deg, var(--cyan), #007788);
-            color: #05020c;
-            box-shadow: var(--neon-cyan);
-            border-color: rgba(0, 255, 255, 0.3);
-        }
-        .btn-cyan:hover:not(:disabled) { box-shadow: 0 0 25px rgba(0, 255, 255, 0.7); }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: var(--text-main);
-            box-shadow: none;
-        }
-        .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); }
-
-        .header-panel {
-            background: var(--bg-panel);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-            border-radius: 24px;
-            padding: 24px 35px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 25px;
-            flex-wrap: wrap;
-        }
-
-        .streamer-info { display: flex; align-items: center; gap: 20px; }
-        .logo-strawberry { font-size: 3.2rem; filter: drop-shadow(0 0 15px var(--pink)); }
-
-        .header-title-box h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.9rem;
-            font-weight: 900;
-            background: linear-gradient(90deg, #fff, #ff007f, #00ffff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .header-title-box p { font-family: 'Rajdhani', sans-serif; color: var(--cyan); font-size: 1.05rem; font-weight: 600; letter-spacing: 4px; }
-
-        .stats-row { display: flex; gap: 20px; flex-wrap: wrap; }
-
-        .stat-badge {
-            background: rgba(8, 4, 18, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 14px 24px;
-            border-radius: 16px;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1.15rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            display: flex;
-            flex-direction: column;
-            min-width: 170px;
-        }
-
-        .stat-badge strong {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-top: 4px;
-        }
-        .stat-badge.balance strong { color: var(--gold); }
-        .stat-badge.progress strong { color: var(--cyan); }
-        .stat-badge.profit strong { color: #00ff66; }
-
-        .main-layout {
-            display: grid;
-            grid-template-columns: minmax(360px, 450px) 1fr;
-            gap: 30px;
-            flex: 1;
-        }
-
-        @media (max-width: 950px) { .main-layout { grid-template-columns: 1fr; } }
-
-        .show-box {
-            background: var(--bg-panel);
-            backdrop-filter: blur(16px);
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-        }
-
-        .box-title { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 1.2rem; letter-spacing: 1px; text-transform: uppercase; }
-
-        .wheel-wrapper {
-            position: relative;
-            width: 340px;
-            height: 340px;
-            margin: 10px auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .wheel-canvas-container {
-            width: 340px;
-            height: 340px;
-            border-radius: 50%;
-            border: 6px solid #0e051a;
-            box-shadow: 0 0 35px rgba(189, 0, 255, 0.25);
-            background: #090312;
-            position: relative;
-            overflow: hidden;
-        }
-
-        canvas#wheelCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-
-        .wheel-pointer {
-            position: absolute;
-            top: -12px; left: 50%;
-            transform: translateX(-50%);
-            width: 0; height: 0;
-            border-left: 14px solid transparent;
-            border-right: 14px solid transparent;
-            border-top: 28px solid var(--cyan);
-            filter: drop-shadow(0 0 10px var(--cyan));
-            z-index: 10;
-        }
-        
-        .wheel-center-pin {
-            position: absolute;
-            width: 24px; height: 24px;
-            background: #110624;
-            border: 4px solid var(--cyan);
-            border-radius: 50%;
-            box-shadow: 0 0 15px var(--cyan);
-            z-index: 12;
-        }
-
-        .quests-container-box {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            max-height: 680px;
-            overflow-y: auto;
-            padding-right: 10px;
-            position: relative;
-        }
-
-        .quests-container-box::-webkit-scrollbar { width: 6px; }
-        .quests-container-box::-webkit-scrollbar-track { background: transparent; }
-        .quests-container-box::-webkit-scrollbar-thumb { background: rgba(189,0,255,0.3); border-radius: 10px; }
-
-        .quest-card {
-            background: var(--bg-card);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 16px;
-            padding: 18px 22px;
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            align-items: center;
-            gap: 20px;
-            position: relative;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .quest-card::before { content: ''; position: absolute; left: 0; top: 0; width: 4px; height: 100%; background: transparent; border-radius: 16px 0 0 16px; }
-        .quest-card:hover { background: var(--bg-card-hover); border-color: rgba(189, 0, 255, 0.15); }
-
-        .quest-card.selected-anim { border-color: var(--cyan); box-shadow: var(--neon-cyan); background: rgba(0, 255, 255, 0.03); }
-        .quest-card.selected-anim::before { background: var(--cyan); }
-
-        .quest-card.done-win { border-color: rgba(0, 255, 102, 0.2); background: rgba(0, 255, 102, 0.02); }
-        .quest-card.done-win::before { background: #00ff66; }
-        .quest-card.done-win .slot-title { color: #00ff66; }
-
-        .quest-card.done-lose { border-color: rgba(255, 51, 51, 0.2); background: rgba(255, 51, 51, 0.02); }
-        .quest-card.done-lose::before { background: #ff3333; }
-        .quest-card.done-lose .slot-title { color: #ff5555; text-decoration: line-through; opacity: 0.6; }
-
-        .quest-card.zeus-blitzed {
-            border-color: var(--gold) !important;
-            box-shadow: 0 0 20px rgba(255, 204, 0, 0.4) !important;
-            animation: lightningPulse 0.4s ease-in-out 3;
-        }
-
-        @keyframes lightningPulse {
-            0% { filter: brightness(1); }
-            50% { filter: brightness(1.8); background: rgba(255, 204, 0, 0.1); }
-            100% { filter: brightness(1); }
-        }
-
-        .quest-index {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1rem; font-weight: 700;
-            color: var(--text-muted);
-            background: rgba(0,0,0,0.25);
-            width: 38px; height: 38px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.03);
-        }
-
-        .slot-title { font-size: 1.2rem; font-weight: 700; color: #fff; }
-        .quest-type-label { font-size: 0.85rem; color: var(--pink); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
-        .quest-description { font-size: 0.95rem; color: var(--text-muted); margin-top: 5px; line-height: 1.4; }
-
-        .buy-badge {
-            background: rgba(255, 204, 0, 0.05);
-            border: 1px solid rgba(255, 204, 0, 0.3);
-            color: var(--gold);
-            padding: 8px 14px;
-            border-radius: 10px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        .stream-logs {
-            background: #04010a;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 14px;
-            padding: 15px;
-            height: 130px;
-            overflow-y: auto;
-            font-family: monospace; font-size: 0.85rem; color: #9285a8;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(3, 1, 8, 0.85);
-            backdrop-filter: blur(8px);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 1000; opacity: 1; transition: opacity 0.15s ease;
-        }
-        .modal-overlay.hidden { opacity: 0; pointer-events: none; }
-
-        .modal-window {
-            background: #110721;
-            border: 2px solid var(--cyan);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8), var(--neon-cyan);
-            border-radius: 24px; padding: 35px;
-            max-width: 540px; width: 90%; text-align: center;
-            display: flex; flex-direction: column; gap: 20px;
-            transform: translateY(0); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.2);
-        }
-        .modal-overlay.hidden .modal-window { transform: translateY(20px); }
-
-        .input-money {
-            background: #06020d;
-            border: 2px solid rgba(255, 0, 127, 0.3);
-            padding: 14px; border-radius: 12px;
-            color: white; font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem; font-weight: 700; text-align: center;
-            width: 100%; outline: none;
-        }
-        .input-money:focus { border-color: var(--pink); box-shadow: var(--neon-pink); }
-
-        #winCelebrationBanner {
-            position: fixed;
-            top: 40%; left: 50%;
-            transform: translate(-50%, -50%) scale(0.5);
-            z-index: 999; pointer-events: none;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900; font-size: 4.5rem;
-            text-align: center; text-transform: uppercase;
-            letter-spacing: 5px; opacity: 0;
-            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.3);
-        }
-        #winCelebrationBanner.active {
-            transform: translate(-50%, -50%) scale(1);
-            opacity: 1;
-        }
-        .banner-win { color: #00ff66; text-shadow: 0 0 30px #00ff66; }
-        .banner-bigwin { color: var(--pink); text-shadow: 0 0 40px var(--pink), 0 0 10px #fff; }
-        .banner-megawin { color: var(--gold); text-shadow: 0 0 50px var(--gold), 0 0 20px #ff5500; }
-
-        #zeusCharacter {
-            position: fixed;
-            right: -250px;
-            top: 30%;
-            width: 220px;
-            height: 220px;
-            z-index: 995;
-            pointer-events: none;
-            transition: right 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.15);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        #zeusCharacter.active {
-            right: 40px;
-        }
-        @media (max-width: 600px) {
-            #zeusCharacter {
-                right: auto;
-                top: -220px;
-                left: 50%;
-                transform: translateX(-50%);
-                transition: top 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.15);
-            }
-            #zeusCharacter.active {
-                top: 10px;
-                right: auto;
-            }
-        }
-        .zeus-cloud {
-            font-size: 6rem;
-            position: absolute;
-            bottom: 10px;
-            filter: drop-shadow(0 10px 15px rgba(0, 255, 255, 0.6));
-            animation: floatCloud 2s ease-in-out infinite alternate;
-        }
-        .zeus-god {
-            font-size: 5.5rem;
-            z-index: 2;
-            position: relative;
-            transform: translateY(-15px);
-            animation: floatZeus 2s ease-in-out infinite alternate;
-        }
-        @keyframes floatCloud { 0% { transform: translateY(0); filter: drop-shadow(0 10px 15px rgba(0, 255, 255, 0.5)); } 100% { transform: translateY(-10px); filter: drop-shadow(0 15px 25px rgba(255, 0, 127, 0.6)); } }
-        @keyframes floatZeus { 0% { transform: translateY(-15px) scale(1); } 100% { transform: translateY(-22px) scale(1.05); } }
-
-        #lightningBoltSvg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 996; pointer-events: none;
-            opacity: 0; filter: drop-shadow(0 0 20px #fff) drop-shadow(0 0 40px var(--gold));
-        }
-
-        .toast-notification {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #110721;
-            border: 2px solid var(--gold);
-            border-radius: 30px;
-            padding: 12px 28px;
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: bold;
-            font-size: 1rem;
-            color: var(--gold);
-            box-shadow: 0 0 20px rgba(255, 204, 0, 0.4);
-            z-index: 1010;
-            backdrop-filter: blur(8px);
-            white-space: nowrap;
-            animation: toastFade 3s ease-in-out forwards;
-        }
-        @keyframes toastFade {
-            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
-            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
-            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
-            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); visibility: hidden; }
-        }
-    </style>
+    .code-lock input {
+      font-size: 2rem;
+      width: 100px;
+      text-align: center;
+      background: #0d0702;
+      border: 2px solid gold;
+      color: gold;
+      border-radius: 15px;
+      margin: 10px;
+      padding: 8px;
+    }
+  </style>
 </head>
 <body>
+<div class="background"></div>
+<div class="stars" id="stars"></div>
+<div class="pyramid-bg"></div>
+<div class="sand"></div>
 
-    <canvas id="bgMemeCanvas"></canvas>
-    <div id="winCelebrationBanner">BIG WIN</div>
+<div class="game-container">
+  <h1>Проклятие фараона</h1>
+  <div class="inventory-panel" id="inventory">
+    <div class="artifact-icon" id="art-amulet" data-tooltip="Амулет переброса">🪬</div>
+    <div class="artifact-icon" id="art-scarab" data-tooltip="Скарабей удачи">🪲</div>
+    <div class="artifact-icon" id="art-eye" data-tooltip="Глаз Ра (подсказка)">👁️</div>
+  </div>
+  <button class="reset-btn" onclick="resetGame()">Сброс</button>
+  <div class="pyramid-layout" id="pyramid"></div>
+</div>
 
-    <div id="zeusCharacter">
-        <div class="zeus-god">⚡👴⚡</div>
-        <div class="zeus-cloud">☁️</div>
+<div class="modal-overlay hidden" id="modal-overlay">
+  <div class="modal-window" id="modal-content"></div>
+</div>
+
+<script>
+// ==================== СОСТОЯНИЕ ИГРЫ ====================
+const STORAGE_KEY = 'pharaoh_quest_save';
+let gameState = {
+  completed: [],
+  inventory: { amulet: 0, scarab: 0, eye: 0 },
+  currentRoomId: null
+};
+
+// ==================== ДАННЫЕ КОМНАТ И ЗАДАНИЙ ====================
+const rooms = [
+  // Ярус 1: Пустыня и вход
+  { id: 1, name: 'Первая ступень', level: 1, puzzle: 'find', puzzleData: { items: ['🪲','🪲','🪲','🪲','🪲'], gridSize: 5 },
+    task: { slot: 'Book of Dead', desc: 'Сделай 15 вращений, получи хотя бы один расширяющийся символ', time: 300 } },
+  { id: 2, name: 'Ловушка с песком', level: 1, puzzle: 'sliding', puzzleData: { size: 3 },
+    task: { slot: 'Rise of Ra', desc: 'За 6 минут собери 3 скаттера и запусти бонусные вращения', time: 360 } },
+  { id: 3, name: 'Страж порога', level: 1, puzzle: 'riddle',
+    puzzleData: { question: 'Я высок, когда молод, и низок, когда стар. Что я?', answer: 'свеча' },
+    task: { slot: 'Legacy of Egypt', desc: 'В бонусной игре набери выигрыш больше x15 от ставки', time: 420 } },
+  // Ярус 2: Зал Кобр
+  { id: 4, name: 'Шёпот кобр', level: 2, puzzle: 'find', puzzleData: { items: ['🐍','🐍','🐍','🐍','🐍'], gridSize: 5 },
+    task: { slot: 'Eye of Horus', desc: 'Дождись, пока дикий символ расширится на весь барабан', time: 400 } },
+  { id: 5, name: 'Ядовитый выбор', level: 2, puzzle: 'code', puzzleData: { equation: '𓀀=3, 𓁿=5, 𓂀=2. 𓀀 + 𓁿 * 𓂀 = ?', answer: 13 },
+    task: { slot: 'Cleopatra', desc: 'Получи выигрышную линию из 5 символов фараона', time: 480 } },
+  { id: 6, name: 'Алтарь кобр', level: 2, puzzle: 'door', puzzleData: { correct: 2 },
+    task: { slot: 'Sphinx Wild', desc: 'Активируй функцию Sphinx Wild 3 раза за 8 минут', time: 480 } },
+  // Ярус 3: Зал Скарабеев
+  { id: 7, name: 'Полёт скарабея', level: 3, puzzle: 'sliding', puzzleData: { size: 3 },
+    task: { slot: 'Book of Dead', desc: 'Получи 2 бонусные игры за 20 вращений', time: 360 } },
+  { id: 8, name: 'Скарабей-хранитель', level: 3, puzzle: 'code', puzzleData: { equation: '𓂀 + 𓀀 = 10, 𓁿=6. 𓂀 * 𓁿 = ?', answer: 24 },
+    task: { slot: 'Rise of Ra', desc: 'Выиграй x30 в бонусной игре', time: 420 } },
+  { id: 9, name: 'Пыль времени', level: 3, puzzle: 'riddle',
+    puzzleData: { question: 'У чего есть глаза, но нет зрения?', answer: 'игла' },
+    task: { slot: 'Legacy of Egypt', desc: 'Активируй функцию Wheel of Gods и выиграй x20', time: 480 } },
+  // Ярус 4: Святилище Бастет
+  { id: 10, name: 'Глаза Бастет', level: 4, puzzle: 'find', puzzleData: { items: ['🐱','🐱','🐱','🐱','🐱'], gridSize: 5 },
+    task: { slot: 'Cleopatra', desc: 'Собери 15 скаттеров за 10 минут', time: 600 } },
+  { id: 11, name: 'Лунный свет', level: 4, puzzle: 'code', puzzleData: { equation: '𓀀=7, 𓁿=2, 𓂀=5. (𓀀 - 𓁿) * 𓂀 = ?', answer: 25 },
+    task: { slot: 'Eye of Horus', desc: 'За 7 минут расширь дикий символ 2 раза', time: 420 } },
+  { id: 12, name: 'Жертвенник', level: 4, puzzle: 'riddle',
+    puzzleData: { question: 'Чем больше из неё берёшь, тем больше она становится. Что это?', answer: 'яма' },
+    task: { slot: 'Sphinx Wild', desc: 'Получи джекпот в функции Sphinx Wild', time: 600 } },
+  // Ярус 5: Тронный зал Фараона
+  { id: 13, name: 'Тень фараона', level: 5, puzzle: 'door', puzzleData: { correct: 1 },
+    task: { slot: 'Book of Dead', desc: 'Выиграй x100 в слоте Book of Dead за 10 минут', time: 600 } },
+  { id: 14, name: 'Печать саркофага', level: 5, puzzle: 'sliding', puzzleData: { size: 4 },
+    task: { slot: 'Legacy of Egypt', desc: 'Выиграй x50 в бонусной игре за 10 минут', time: 600 } },
+  { id: 15, name: 'САРКОФАГ', level: 5, puzzle: null,
+    task: { slot: 'Cleopatra', desc: 'ФИНАЛ: Удвой стартовый баланс ($7000 → $14000) за 15 минут!', time: 900 } }
+];
+
+// ==================== ИНИЦИАЛИЗАЦИЯ ====================
+function loadGame() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    gameState = JSON.parse(saved);
+  } else {
+    gameState = { completed: [], inventory: { amulet: 0, scarab: 0, eye: 0 }, currentRoomId: null };
+  }
+}
+function saveGame() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
+}
+function resetGame() {
+  if (confirm('Точно сбросить весь прогресс?')) {
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  }
+}
+
+// ==================== ОТРИСОВКА КАРТЫ ====================
+function renderPyramid() {
+  const container = document.getElementById('pyramid');
+  container.innerHTML = '';
+  const levels = [1,2,3,4,5];
+  levels.forEach(lvl => {
+    const levelRooms = rooms.filter(r => r.level === lvl);
+    const divLevel = document.createElement('div');
+    divLevel.className = 'level';
+    levelRooms.forEach(room => {
+      const divRoom = document.createElement('div');
+      divRoom.className = 'room';
+      if (gameState.completed.includes(room.id)) {
+        divRoom.classList.add('completed');
+        divRoom.textContent = '✓';
+      } else if (isRoomUnlocked(room.id)) {
+        divRoom.classList.add('current');
+        divRoom.textContent = '☥';
+      } else {
+        divRoom.classList.add('locked');
+        divRoom.textContent = '🔒';
+      }
+      divRoom.addEventListener('click', () => {
+        if (isRoomUnlocked(room.id)) openRoom(room.id);
+      });
+      const label = document.createElement('span');
+      label.textContent = room.name;
+      divRoom.appendChild(label);
+      divLevel.appendChild(divRoom);
+    });
+    container.appendChild(divLevel);
+  });
+}
+
+function isRoomUnlocked(roomId) {
+  const idx = rooms.findIndex(r => r.id === roomId);
+  if (idx === 0) return true;
+  const prevRoom = rooms[idx - 1];
+  return gameState.completed.includes(prevRoom.id);
+}
+
+// ==================== ИНВЕНТАРЬ ====================
+function updateInventoryDisplay() {
+  document.getElementById('art-amulet').classList.toggle('active', gameState.inventory.amulet > 0);
+  document.getElementById('art-scarab').classList.toggle('active', gameState.inventory.scarab > 0);
+  document.getElementById('art-eye').classList.toggle('active', gameState.inventory.eye > 0);
+}
+
+// ==================== ОТКРЫТИЕ КОМНАТЫ ====================
+let activePuzzleSolved = false;
+let activeTaskTimer = null;
+
+function openRoom(roomId) {
+  gameState.currentRoomId = roomId;
+  const room = rooms.find(r => r.id === roomId);
+  const overlay = document.getElementById('modal-overlay');
+  const modal = document.getElementById('modal');
+  overlay.classList.remove('hidden');
+  modal.innerHTML = `<h2>${room.name}</h2><div class="puzzle-wrapper" id="puzzle-container"></div><div class="task-wrapper hidden" id="task-container"></div>`;
+  activePuzzleSolved = false;
+  renderPuzzle(room);
+  document.getElementById('modal-overlay').onclick = function(e) {
+    if (e.target === overlay) closeModal();
+  };
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.add('hidden');
+  if (activeTaskTimer) clearInterval(activeTaskTimer);
+  renderPyramid();
+}
+
+function completeRoom() {
+  const roomId = gameState.currentRoomId;
+  if (!gameState.completed.includes(roomId)) {
+    gameState.completed.push(roomId);
+    if (roomId === 3) gameState.inventory.amulet++;
+    if (roomId === 6) gameState.inventory.scarab++;
+    if (roomId === 9) gameState.inventory.eye++;
+    if (roomId === 12) gameState.inventory.amulet++;
+    saveGame();
+  }
+  updateInventoryDisplay();
+  closeModal();
+  renderPyramid();
+}
+
+// ==================== ГОЛОВОЛОМКИ ====================
+function renderPuzzle(room) {
+  const container = document.getElementById('puzzle-container');
+  container.innerHTML = '';
+  if (room.puzzle === 'find') {
+    renderFindPuzzle(container, room.puzzleData);
+  } else if (room.puzzle === 'code') {
+    renderCodePuzzle(container, room.puzzleData);
+  } else if (room.puzzle === 'sliding') {
+    renderSlidingPuzzle(container, room.puzzleData);
+  } else if (room.puzzle === 'riddle') {
+    renderRiddlePuzzle(container, room.puzzleData);
+  } else if (room.puzzle === 'door') {
+    renderDoorPuzzle(container, room.puzzleData);
+  } else if (room.puzzle === null) {
+    activePuzzleSolved = true;
+    showTask(room);
+  }
+}
+
+function puzzleSolved(room) {
+  activePuzzleSolved = true;
+  showTask(room);
+}
+
+// Поиск предметов
+function renderFindPuzzle(container, data) {
+  const items = data.items;
+  let found = 0;
+  container.innerHTML = '<p style="text-align:center">Найди всех спрятанных существ!</p>';
+  const grid = document.createElement('div');
+  grid.className = 'find-objects';
+  const allIcons = ['🐪','🏜️','☀️','⚱️','📜','🕋','🏺','🧿','🪨','🦂','🐫','🕷️'];
+  const cells = [...items];
+  while (cells.length < 20) cells.push(allIcons[Math.floor(Math.random()*allIcons.length)]);
+  shuffleArray(cells);
+  cells.forEach((icon, idx) => {
+    const el = document.createElement('div');
+    el.className = 'find-item';
+    el.textContent = icon;
+    el.dataset.idx = idx;
+    if (items.includes(icon)) {
+      el.dataset.target = 'true';
+      el.addEventListener('click', function(e) {
+        if (el.classList.contains('found')) return;
+        el.classList.add('found');
+        found++;
+        if (found === items.length) {
+          puzzleSolved(rooms.find(r => r.id === gameState.currentRoomId));
+        }
+      });
+    }
+    grid.appendChild(el);
+  });
+  container.appendChild(grid);
+}
+
+// Кодовый замок
+function renderCodePuzzle(container, data) {
+  container.innerHTML = `<p style="text-align:center; font-size:1.3rem;">${data.equation}</p>`;
+  const inputDiv = document.createElement('div');
+  inputDiv.className = 'code-input';
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.className = 'code-digit';
+  input.style.width = '80px';
+  inputDiv.appendChild(input);
+  const btn = document.createElement('button');
+  btn.className = 'btn';
+  btn.textContent = 'Открыть';
+  btn.onclick = () => {
+    if (parseInt(input.value) === data.answer) {
+      puzzleSolved(rooms.find(r => r.id === gameState.currentRoomId));
+    } else {
+      alert('Неверный код!');
+    }
+  };
+  container.appendChild(inputDiv);
+  container.appendChild(btn);
+}
+
+// Пятнашки
+function renderSlidingPuzzle(container, data) {
+  const size = data.size;
+  const total = size * size;
+  let tiles = Array.from({length: total-1}, (_,i) => i+1).concat(0);
+  do { shuffleArray(tiles); } while (isSolved(tiles, size));
+  let emptyIdx = tiles.indexOf(0);
+  
+  function draw() {
+    container.innerHTML = '';
+    const grid = document.createElement('div');
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = `repeat(${size}, 60px)`;
+    grid.style.gap = '5px';
+    grid.style.justifyContent = 'center';
+    tiles.forEach((val, idx) => {
+      const cell = document.createElement('div');
+      cell.style.width = '60px'; cell.style.height = '60px';
+      cell.style.background = val === 0 ? 'transparent' : '#b8860b';
+      cell.style.border = '2px solid gold';
+      cell.style.borderRadius = '8px';
+      cell.style.display = 'flex'; cell.style.alignItems = 'center'; cell.style.justifyContent = 'center';
+      cell.style.fontSize = '1.5rem';
+      cell.textContent = val === 0 ? '' : val;
+      cell.addEventListener('click', () => moveTile(idx));
+      grid.appendChild(cell);
+    });
+    container.appendChild(grid);
+  }
+  
+  function moveTile(idx) {
+    const row = Math.floor(idx / size), col = idx % size;
+    const eRow = Math.floor(emptyIdx / size), eCol = emptyIdx % size;
+    if ((Math.abs(row - eRow) + Math.abs(col - eCol)) === 1) {
+      [tiles[idx], tiles[emptyIdx]] = [tiles[emptyIdx], tiles[idx]];
+      emptyIdx = idx;
+      draw();
+      if (isSolved(tiles, size)) {
+        puzzleSolved(rooms.find(r => r.id === gameState.currentRoomId));
+      }
+    }
+  }
+  draw();
+}
+
+function isSolved(tiles, size) {
+  return tiles.slice(0, -1).every((v,i) => v === i+1) && tiles[tiles.length-1] === 0;
+}
+
+// Загадка
+function renderRiddlePuzzle(container, data) {
+  container.innerHTML = `<p style="font-size:1.3rem; margin-bottom:15px;">${data.question}</p>`;
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'code-digit';
+  input.style.width = '200px';
+  container.appendChild(input);
+  const btn = document.createElement('button');
+  btn.className = 'btn';
+  btn.textContent = 'Ответить';
+  btn.onclick = () => {
+    if (input.value.trim().toLowerCase() === data.answer.toLowerCase()) {
+      puzzleSolved(rooms.find(r => r.id === gameState.currentRoomId));
+    } else {
+      alert('Неверный ответ, подумай ещё.');
+    }
+  };
+  container.appendChild(btn);
+}
+
+// Выбор двери
+function renderDoorPuzzle(container, data) {
+  container.innerHTML = '<p style="text-align:center">Выбери правильный проход:</p>';
+  const doors = document.createElement('div');
+  doors.style.display = 'flex'; doors.style.justifyContent = 'center'; doors.style.gap = '20px';
+  for (let i = 1; i <= 3; i++) {
+    const door = document.createElement('div');
+    door.className = 'room';
+    door.style.width = '80px'; door.style.height = '100px';
+    door.textContent = i;
+    door.onclick = () => {
+      if (i === data.correct) {
+        puzzleSolved(rooms.find(r => r.id === gameState.currentRoomId));
+      } else {
+        alert('Этот проход замурован, попробуй другой.');
+      }
+    };
+    doors.appendChild(door);
+  }
+  container.appendChild(doors);
+}
+
+// ==================== ЗАДАНИЕ ДЛЯ КАЗИНО ====================
+function showTask(room) {
+  const taskContainer = document.getElementById('task-container');
+  taskContainer.classList.remove('hidden');
+  document.getElementById('puzzle-container').innerHTML = '<p style="text-align:center;color:gold;">✓ Пройдено</p>';
+  
+  const task = room.task;
+  taskContainer.innerHTML = `
+    <div class="task-card">
+      <strong>🎰 Слот: ${task.slot}</strong><br>
+      📋 ${task.desc}
     </div>
-
-    <svg id="lightningBoltSvg">
-        <path id="lightningPath" d="" stroke="#ffcc00" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-
-    <div class="app-container">
-        <div class="top-utils">
-            <button id="editBalanceBtn" class="action-btn btn-secondary"><i class="fas fa-coins"></i> ИЗМЕНИТЬ БАЛАНС</button>
-            <button id="rulesBtn" class="action-btn btn-secondary"><i class="fas fa-file-invoice-dollar"></i> ПРАВИЛА</button>
-            <button id="soundToggle" class="action-btn btn-cyan"><i class="fas fa-volume-up"></i> ЗВУК: ВКЛ</button>
-            <button id="fullResetBtn" class="action-btn btn-secondary" style="color: #ff4444;"><i class="fas fa-sync-alt"></i> RESET</button>
-        </div>
-
-        <div class="header-panel">
-            <div class="streamer-info">
-                <div class="logo-strawberry">🍓</div>
-                <div class="header-title-box">
-                    <h1>PRAGMATIC CAROUSEL</h1>
-                    <p>ULTIMATE STREAM MECHANIC</p>
-                </div>
-            </div>
-            <div class="stats-row">
-                <div class="stat-badge balance">Баланс марафона <strong id="balanceDisplay">100 000 ₽</strong></div>
-                <div class="stat-badge progress">Контракты <strong id="progressDisplay">0 / 20</strong></div>
-                <div class="stat-badge profit">Чистый профит <strong id="profitDisplay">0 ₽</strong></div>
-            </div>
-        </div>
-
-        <div class="main-layout">
-            <div class="show-box">
-                <div class="box-title" style="color: var(--gold);"><i class="fas fa-circle-notch fa-spin"></i> SELECTION WHEEL</div>
-                
-                <div class="wheel-wrapper">
-                    <div class="wheel-pointer"></div>
-                    <div class="wheel-center-pin"></div>
-                    <div class="wheel-canvas-container">
-                        <canvas id="wheelCanvas" width="340" height="340"></canvas>
-                    </div>
-                </div>
-
-                <button id="spinWheelBtn" class="action-btn" style="width: 100%; padding: 16px; font-size: 1.25rem; justify-content: center;"><i class="fas fa-dice"></i> ВРАЩАТЬ БАРАБАН</button>
-
-                <div style="margin-top: 10px;">
-                    <h5 style="color: var(--pink); font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; margin-bottom: 6px;">📋 ХРОНОЛОГИЯ:</h5>
-                    <div class="stream-logs" id="logBox"></div>
-                </div>
-            </div>
-
-            <div class="show-box">
-                <div class="box-title" style="color: var(--cyan);"><i class="fas fa-list-ol"></i> КОНТРАКТЫ НА СТРИМ</div>
-                <div class="quests-container-box" id="questsContainer"></div>
-            </div>
-        </div>
+    <div class="timer-display" id="timer-display">${formatTime(task.time)}</div>
+    <button class="btn" id="start-task-btn">Начать задание</button>
+    <div id="task-buttons" class="hidden">
+      <button class="btn" id="success-btn">✅ Успех</button>
+      <button class="btn" id="fail-btn">❌ Провал</button>
     </div>
+    <button class="btn hidden" id="use-amulet-btn">🪬 Исп. Амулет переброса</button>
+  `;
+  
+  let timerInterval;
+  const timerDisplay = document.getElementById('timer-display');
+  const startBtn = document.getElementById('start-task-btn');
+  const successBtn = document.getElementById('success-btn');
+  const failBtn = document.getElementById('fail-btn');
+  const taskButtons = document.getElementById('task-buttons');
+  const useAmuletBtn = document.getElementById('use-amulet-btn');
+  
+  if (gameState.inventory.amulet > 0) {
+    useAmuletBtn.classList.remove('hidden');
+    useAmuletBtn.onclick = () => {
+      gameState.inventory.amulet--;
+      saveGame();
+      updateInventoryDisplay();
+      const altTasks = [
+        { slot: 'Book of Dead', desc: 'Сделай 10 вращений с любым выигрышем', time: 180 },
+        { slot: 'Rise of Ra', desc: 'Получи 1 бонусную игру', time: 240 },
+      ];
+      const newTask = altTasks[Math.floor(Math.random()*altTasks.length)];
+      room.task = newTask;
+      showTask(room);
+    };
+  }
+  
+  startBtn.onclick = () => {
+    startBtn.disabled = true;
+    let timeLeft = task.time;
+    timerDisplay.textContent = formatTime(timeLeft);
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      timerDisplay.textContent = formatTime(timeLeft);
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        timerDisplay.textContent = '⏰ Время вышло!';
+        startBtn.classList.add('hidden');
+        taskButtons.classList.remove('hidden');
+      }
+    }, 1000);
+    startBtn.textContent = 'Идёт задание...';
+    taskButtons.classList.add('hidden');
+  };
+  
+  successBtn.onclick = () => {
+    if (timerInterval) clearInterval(timerInterval);
+    completeRoom();
+  };
+  failBtn.onclick = () => {
+    if (timerInterval) clearInterval(timerInterval);
+    closeModal();
+    renderPyramid();
+  };
+  
+  activeTaskTimer = timerInterval;
+}
 
-    <div id="balanceModal" class="modal-overlay hidden">
-        <div class="modal-window">
-            <h2 style="color: var(--gold); font-family: 'Orbitron', sans-serif;">💰 ИЗМЕНЕНИЕ БАЛАНСА</h2>
-            <p style="color: var(--text-muted);">Введи актуальную сумму фиксы (в рублях):</p>
-            <input type="number" id="newBalanceInput" class="input-money" placeholder="0">
-            <div style="display: flex; gap: 12px;">
-                <button id="applyBalanceBtn" class="action-btn btn-cyan" style="flex:1;">ПРИМЕНИТЬ</button>
-                <button id="cancelBalanceBtn" class="action-btn btn-secondary" style="flex:1;">ОТМЕНА</button>
-            </div>
-        </div>
-    </div>
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s < 10 ? '0' : ''}${s}`;
+}
 
-    <div id="resultModal" class="modal-overlay hidden">
-        <div class="modal-window">
-            <h2 id="modalSlotTitle" style="color: var(--gold); font-family: 'Orbitron', sans-serif;">Slot Name</h2>
-            <h3 id="modalQuestName" style="color: var(--pink); font-family: 'Rajdhani', sans-serif; font-size: 1.3rem;">Квест</h3>
-            <p id="modalQuestDesc" style="color: var(--text-muted); font-size: 0.95rem;"></p>
-            
-            <div style="text-align: left; margin: 10px 0;">
-                <label style="display: block; margin-bottom: 8px; font-weight: 600;">💰 Полный выигрыш с бонуса (₽):</label>
-                <input type="number" id="payoutValue" class="input-money" placeholder="0">
-            </div>
+// ==================== ВСПОМОГАТЕЛЬНЫЕ ====================
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
 
-            <div style="display: flex; gap: 12px;">
-                <button id="winConfirmBtn" class="action-btn btn-cyan" style="flex: 1; justify-content: center;"><i class="fas fa-check"></i> ВЫПОЛНЕН (Enter)</button>
-                <button id="loseConfirmBtn" class="action-btn" style="flex: 1; background: #cc0033; border-color:#990022; justify-content: center;"><i class="fas fa-times"></i> СЛИВ</button>
-            </div>
-            <button id="cancelModalBtn" style="background:none; border:none; color:var(--text-muted); text-decoration:underline; cursor:pointer;">Закрыть (Esc)</button>
-        </div>
-    </div>
+// ==================== ГЕНЕРАЦИЯ ЗВЁЗД ====================
+(function createStars() {
+  const starsContainer = document.getElementById('stars');
+  for (let i = 0; i < 80; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size = Math.random() * 3 + 1;
+    star.style.width = size + 'px';
+    star.style.height = size + 'px';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.animationDelay = Math.random() * 2 + 's';
+    starsContainer.appendChild(star);
+  }
+})();
 
-    <div id="rulesModal" class="modal-overlay hidden">
-        <div class="modal-window">
-            <h2 style="color: var(--gold); font-family: 'Orbitron', sans-serif;">ПРАВИЛА МАРАФОНА</h2>
-            <div style="text-align: left; font-size: 0.95rem; line-height: 1.6; color: #b1a4c4; display:flex; flex-direction:column; gap: 10px;">
-                <p>1. Нажимаем <strong>ВРАЩАТЬ БАРАБАН</strong>. Колесо останавливается только на ещё не пройденных контрактах.</p>
-                <p>2. Стример покупает бонусную игру в слоте по указанной цене (4800–11200 ₽).</p>
-                <p>3. По итогам бонуса вносим результат: при победе — сумму выплаты, при сливе — фиксируем минус.</p>
-                <p>4. <strong>Зевс (⚡👴)</strong> может вмешаться: изменить цену (x2, /2, x1.5), заставить выполнить задание дважды или вовсе пропустить его.</p>
-            </div>
-            <button id="closeRulesBtn" class="action-btn btn-cyan" style="width:100%; justify-content:center;">ПОНЯТНО</button>
-        </div>
-    </div>
-
-    <script>
-    (function(){
-        const PRICE_TIERS = [4800, 6400, 8000, 9600, 11200];
-        const BASE_QUEST_DATABASE = [
-            { id: 1, slot: "Gates of Olympus", type: "Дедовские Капли", desc: "Поймать суммарный множитель больше x15.", baseBuy: PRICE_TIERS[0], ico: "⚡", difficulty: "easy" },
-            { id: 2, slot: "The Dog House Megaways", type: "Пёсий Созвон", desc: "Поймать линию будок на 2-м, 3-м, 4-м барабане.", baseBuy: PRICE_TIERS[1], ico: "🐶", difficulty: "medium" },
-            { id: 3, slot: "Sugar Rush", type: "Диабет Отменяется", desc: "Раскачать хотя бы одну ячейку поля до множителя x32 в обычной бонуске.", baseBuy: PRICE_TIERS[1], ico: "🍬", difficulty: "medium" },
-            { id: 4, slot: "Juicy Fruits", type: "Витаминный Бум", desc: "Вырастить дикий Скаттер-квадрат до размера 4x4 или выше.", baseBuy: PRICE_TIERS[0], ico: "🍋", difficulty: "easy" },
-            { id: 5, slot: "Sweet Bonanza", type: "Заворот Кишок", desc: "Поймать ретриггер.", baseBuy: PRICE_TIERS[1], ico: "🍭", difficulty: "medium" },
-            { id: 6, slot: "Big Bass Splash", type: "Рыбалка на Живца", desc: "Дойти минимум до 2-го уровня (множитель x2).", baseBuy: PRICE_TIERS[0], ico: "🐟", difficulty: "easy" },
-            { id: 7, slot: "Starlight Princess", type: "Аниме-Синдром", desc: "Общий множитель x20 к концу бонуса.", baseBuy: PRICE_TIERS[2], ico: "⭐", difficulty: "hard" },
-            { id: 8, slot: "Cleocatra", type: "Кошачий Лоток", desc: "Поймать полноценную линию.", baseBuy: PRICE_TIERS[1], ico: "🐱", difficulty: "medium" },
-            { id: 9, slot: "Zeus vs Hades", type: "Семейные Разборки", desc: "Играть строго за Аида. Выбить хотя бы один расширяющийся барабан x6+.", baseBuy: PRICE_TIERS[1], ico: "🔥", difficulty: "medium" },
-            { id: 10, slot: "Wild West Gold", type: "Ковбойский Занос", desc: "Поймать линию вилдов или ретриггер на 8 спинов.", baseBuy: PRICE_TIERS[1], ico: "🤠", difficulty: "medium" },
-            { id: 11, slot: "Madame Destiny Megaways", type: "Гадание по Руке", desc: "На стартовом колесе фортуны выбить множитель не менее x8.", baseBuy: PRICE_TIERS[2], ico: "🔮", difficulty: "hard" },
-            { id: 12, slot: "Bigger Barn House Bonanza", type: "Бешеная лиса", desc: "Выбить 3 бонуса по ставке от 100 рублей.", baseBuy: PRICE_TIERS[2], ico: "🦬", difficulty: "hard" },
-            { id: 13, slot: "Big Bass Amazon Xtreme", type: "Амазонский Монстр", desc: "Окупить бонус.", baseBuy: PRICE_TIERS[2], ico: "🐊", difficulty: "hard" },
-            { id: 14, slot: "Sugar Rush 1000", type: "Сахарная Кома", desc: "Получить общую окупаемость бонуса x1.5 или выше.", baseBuy: PRICE_TIERS[3], ico: "🍩", difficulty: "hard" },
-            { id: 15, slot: "Wisdom of Athena", type: "Щит и Меч", desc: "Открыть 2 верхних заблокированных ряда ячеек.", baseBuy: PRICE_TIERS[3], ico: "🛡️", difficulty: "hard" },
-            { id: 16, slot: "Gems Bonanza", type: "Золотая Лихорадка", desc: "Успешно перейти на 3-й уровень прогресса карты (Gold Fever).", baseBuy: PRICE_TIERS[3], ico: "💎", difficulty: "hard" },
-            { id: 17, slot: "The Dog House Multihold", type: "Будка на Прокачку", desc: "Открыть хотя бы 3 активных экрана.", baseBuy: PRICE_TIERS[3], ico: "🐾", difficulty: "hard" },
-            { id: 18, slot: "Gates of Olympus 1000", type: "Гнев Деда x1000", desc: "Покупать бонуски пока не будешь довольна :)", baseBuy: PRICE_TIERS[4], ico: "👑", difficulty: "hard" },
-            { id: 19, slot: "Fruit Party 2", type: "Праздник Живота", desc: "Словить множитель x128 за сыгровку.", baseBuy: PRICE_TIERS[4], ico: "🍇", difficulty: "hard" },
-            { id: 20, slot: "Слот на выбор Чата", type: "Финальный Аккорд", desc: "Взять бонус за 11 200 ₽ в любом слоте и закрыть его в чистый плюс.", baseBuy: PRICE_TIERS[4], ico: "💬", difficulty: "hard" }
-        ];
-
-        let QUEST_DATABASE = [];
-        let state = { balance: 100000, profit: 0, completedList: [], modifiedBuys: {}, repeatCounts: {} };
-        let soundOn = true, isSpinning = false, currentActiveQuest = null, isFinalEnding = false;
-        let zeusAnimationLock = false;
-        let audioCtx = null;
-
-        let wheelAngle = 0;
-        let lastSectorTriggered = -1;
-        const totalSectors = 20;
-        const sectorAngleRad = (Math.PI * 2) / totalSectors;
-
-        let bgParticles = [];
-        let winExplosionParticles = [];
-        const slotMemeIcons = ["🍓", "🍭", "🍬", "⚡", "👑", "🍒", "💰", "💎", "💵"];
-
-        const els = {
-            balance: document.getElementById('balanceDisplay'),
-            progress: document.getElementById('progressDisplay'),
-            profit: document.getElementById('profitDisplay'),
-            questsContainer: document.getElementById('questsContainer'),
-            spinBtn: document.getElementById('spinWheelBtn'),
-            logBox: document.getElementById('logBox'),
-            resultModal: document.getElementById('resultModal'),
-            payoutInput: document.getElementById('payoutValue'),
-            banner: document.getElementById('winCelebrationBanner'),
-            zeus: document.getElementById('zeusCharacter'),
-            lightningSvg: document.getElementById('lightningBoltSvg'),
-            lightningPath: document.getElementById('lightningPath'),
-            balanceModal: document.getElementById('balanceModal'),
-            newBalanceInput: document.getElementById('newBalanceInput')
-        };
-
-        function getStyleColor(varName) {
-            return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
-        }
-
-        function initAudio() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-
-        function playEffect(type) {
-            if (!soundOn) return;
-            initAudio();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const now = audioCtx.currentTime;
-            switch (type) {
-                case 'click': {
-                    const osc = audioCtx.createOscillator();
-                    const gainNode = audioCtx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(320, now);
-                    osc.frequency.exponentialRampToValueAtTime(120, now + 0.03);
-                    gainNode.gain.setValueAtTime(0.15, now);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
-                    osc.connect(gainNode);
-                    gainNode.connect(audioCtx.destination);
-                    osc.start(now); osc.stop(now + 0.04);
-                    break;
-                }
-                case 'win': {
-                    const notes = [440, 554.37, 659.25, 880];
-                    notes.forEach((freq, i) => {
-                        const osc = audioCtx.createOscillator();
-                        const gainNode = audioCtx.createGain();
-                        osc.type = 'triangle';
-                        osc.frequency.setValueAtTime(freq, now + i * 0.05);
-                        gainNode.gain.setValueAtTime(0, now);
-                        gainNode.gain.linearRampToValueAtTime(0.2, now + i * 0.05 + 0.01);
-                        gainNode.gain.exponentialRampToValueAtTime(0.001, now + i * 0.05 + 0.4);
-                        osc.connect(gainNode); gainNode.connect(audioCtx.destination);
-                        osc.start(now + i * 0.05); osc.stop(now + i * 0.05 + 0.4);
-                    });
-                    break;
-                }
-                case 'lose': {
-                    const osc = audioCtx.createOscillator();
-                    const gainNode = audioCtx.createGain();
-                    osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(140, now);
-                    osc.frequency.linearRampToValueAtTime(60, now + 0.35);
-                    gainNode.gain.setValueAtTime(0.2, now);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-                    osc.connect(gainNode); gainNode.connect(audioCtx.destination);
-                    osc.start(now); osc.stop(now + 0.35);
-                    break;
-                }
-                case 'spin': {
-                    const osc = audioCtx.createOscillator();
-                    const gainNode = audioCtx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(180, now);
-                    osc.frequency.exponentialRampToValueAtTime(380, now + 0.25);
-                    gainNode.gain.setValueAtTime(0.1, now);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-                    osc.connect(gainNode); gainNode.connect(audioCtx.destination);
-                    osc.start(now); osc.stop(now + 0.25);
-                    break;
-                }
-                case 'thunder': {
-                    const bufferSize = audioCtx.sampleRate * 1.5;
-                    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                    const data = buffer.getChannelData(0);
-                    for (let i = 0; i < bufferSize; i++) {
-                        data[i] = Math.random() * 2 - 1;
-                    }
-                    const noise = audioCtx.createBufferSource();
-                    noise.buffer = buffer;
-                    const filter = audioCtx.createBiquadFilter();
-                    filter.type = 'lowpass';
-                    filter.frequency.setValueAtTime(300, now);
-                    filter.frequency.exponentialRampToValueAtTime(40, now + 1.2);
-                    const gainNode = audioCtx.createGain();
-                    gainNode.gain.setValueAtTime(0.4, now);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 1.4);
-                    noise.connect(filter); filter.connect(gainNode); gainNode.connect(audioCtx.destination);
-                    noise.start(now); noise.stop(now + 1.5);
-                    break;
-                }
-            }
-        }
-
-        function showToast(message, isError = false) {
-            const toast = document.createElement('div');
-            toast.className = 'toast-notification';
-            toast.textContent = message;
-            if (isError) toast.style.borderColor = '#ff3366';
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        function rebuildQuestDatabase() {
-            QUEST_DATABASE = BASE_QUEST_DATABASE.map(q => ({
-                ...q,
-                buy: state.modifiedBuys[q.id] !== undefined ? state.modifiedBuys[q.id] : q.baseBuy,
-                repeatCount: state.repeatCounts[q.id] !== undefined ? state.repeatCounts[q.id] : 1
-            }));
-        }
-
-        function saveAll() {
-            const save = {
-                balance: state.balance,
-                profit: state.profit,
-                completedList: state.completedList,
-                modifiedBuys: state.modifiedBuys,
-                repeatCounts: state.repeatCounts
-            };
-            localStorage.setItem('pragmatic_carousel_save', JSON.stringify(save));
-        }
-
-        function loadAll() {
-            const saved = localStorage.getItem('pragmatic_carousel_save');
-            if (saved) {
-                try {
-                    const data = JSON.parse(saved);
-                    state.balance = data.balance ?? 100000;
-                    state.profit = data.profit ?? 0;
-                    state.completedList = data.completedList ?? [];
-                    state.modifiedBuys = data.modifiedBuys ?? {};
-                    state.repeatCounts = data.repeatCounts ?? {};
-                } catch(e) {}
-            }
-            rebuildQuestDatabase();
-        }
-
-        // Фоновые эффекты
-        const bgCanvas = document.getElementById('bgMemeCanvas');
-        const bgCtx = bgCanvas.getContext('2d');
-
-        function initBg() {
-            bgCanvas.width = window.innerWidth; 
-            bgCanvas.height = window.innerHeight;
-            bgParticles = Array.from({length: 20}, () => ({
-                x: Math.random() * bgCanvas.width, 
-                y: Math.random() * bgCanvas.height,
-                r: 20 + Math.random() * 15, 
-                txt: slotMemeIcons[Math.floor(Math.random() * slotMemeIcons.length)],
-                sX: (Math.random() - 0.5) * 0.6, 
-                sY: (Math.random() - 0.5) * 0.6,
-                angle: Math.random() * Math.PI * 2,
-                rotSpeed: (Math.random() - 0.5) * 0.01
-            }));
-        }
-
-        function triggerWinExplosion() {
-            winExplosionParticles = [];
-            const count = 40;
-            for(let i=0; i<count; i++) {
-                winExplosionParticles.push({
-                    x: bgCanvas.width / 2,
-                    y: bgCanvas.height / 2,
-                    txt: slotMemeIcons[Math.floor(Math.random() * slotMemeIcons.length)],
-                    size: 24 + Math.random() * 20,
-                    vx: (Math.random() - 0.5) * 22,
-                    vy: -6 - Math.random() * 20,
-                    gravity: 0.5,
-                    alpha: 1,
-                    rot: Math.random() * Math.PI * 2,
-                    rotSp: (Math.random() - 0.5) * 0.15
-                });
-            }
-        }
-
-        let finalSaluteInterval = null;
-        function startFinalSalute() {
-            if (finalSaluteInterval) clearInterval(finalSaluteInterval);
-            finalSaluteInterval = setInterval(() => {
-                if (!isFinalEnding) {
-                    clearInterval(finalSaluteInterval);
-                    return;
-                }
-                for(let i=0; i<6; i++) {
-                    winExplosionParticles.push({
-                        x: Math.random() * bgCanvas.width,
-                        y: Math.random() * bgCanvas.height * 0.7,
-                        txt: ["🍓","👑","💎","✨","💰","🔥"][Math.floor(Math.random() * 6)],
-                        size: 25 + Math.random() * 30,
-                        vx: (Math.random() - 0.5) * 12,
-                        vy: (Math.random() - 0.5) * 12,
-                        gravity: 0.1,
-                        alpha: 1,
-                        rot: Math.random() * Math.PI * 2,
-                        rotSp: (Math.random() - 0.5) * 0.1
-                    });
-                }
-            }, 400);
-        }
-
-        function drawEffectsLoop() {
-            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-            bgParticles.forEach(m => {
-                bgCtx.save();
-                bgCtx.translate(m.x, m.y);
-                bgCtx.rotate(m.angle);
-                bgCtx.font = `${m.r}px "Segoe UI Emoji", "Apple Color Emoji"`;
-                bgCtx.globalAlpha = isSpinning ? 0.22 : 0.07;
-                bgCtx.textAlign = "center";
-                bgCtx.textBaseline = "middle";
-                bgCtx.fillText(m.txt, 0, 0);
-                bgCtx.restore();
-
-                let speedMultiplier = isSpinning ? 5 : 1;
-                m.x += m.sX * speedMultiplier; 
-                m.y += m.sY * speedMultiplier;
-                m.angle += m.rotSpeed * speedMultiplier;
-
-                if(m.x < -40 || m.x > bgCanvas.width + 40) m.sX *= -1;
-                if(m.y < -40 || m.y > bgCanvas.height + 40) m.sY *= -1;
-            });
-
-            for (let i = winExplosionParticles.length - 1; i >= 0; i--) {
-                let p = winExplosionParticles[i];
-                if (p.alpha <= 0) {
-                    winExplosionParticles.splice(i, 1);
-                    continue;
-                }
-                bgCtx.save();
-                bgCtx.globalAlpha = p.alpha;
-                bgCtx.font = `${p.size}px "Segoe UI Emoji"`;
-                bgCtx.translate(p.x, p.y);
-                bgCtx.rotate(p.rot);
-                bgCtx.textAlign = "center";
-                bgCtx.textBaseline = "middle";
-                bgCtx.fillText(p.txt, 0, 0);
-                bgCtx.restore();
-
-                p.x += p.vx;
-                p.y += p.vy;
-                p.vy += p.gravity;
-                p.rot += p.rotSp;
-                p.alpha -= 0.025;
-            }
-
-            requestAnimationFrame(drawEffectsLoop);
-        }
-
-        // ОТРИСОВКА КОЛЕСА
-        const wheelCanvas = document.getElementById('wheelCanvas');
-        const wCtx = wheelCanvas.getContext('2d');
-
-        function formatPrice(price) {
-            if (price >= 1000) return (price / 1000).toFixed(1) + "k";
-            return price.toString();
-        }
-
-        function drawWheel() {
-            const radius = 170;
-            wCtx.clearRect(0, 0, 340, 340);
-            for (let i = 0; i < totalSectors; i++) {
-                const q = QUEST_DATABASE[i];
-                const isDone = state.completedList.some(c => c.id === q.id);
-                const start = wheelAngle + i * sectorAngleRad - Math.PI / 2;
-                wCtx.save();
-                wCtx.translate(170, 170);
-                wCtx.rotate(start);
-                wCtx.beginPath();
-                wCtx.moveTo(0,0);
-                wCtx.arc(0, 0, radius, 0, sectorAngleRad);
-                wCtx.closePath();
-                if (isDone) {
-                    wCtx.fillStyle = '#0a0515';
-                } else {
-                    wCtx.fillStyle = i % 2 === 0 ? '#130724' : '#1b0b30';
-                }
-                wCtx.fill();
-                wCtx.strokeStyle = 'rgba(189, 0, 255, 0.25)';
-                wCtx.lineWidth = 1.5;
-                wCtx.stroke();
-
-                wCtx.save();
-                wCtx.rotate(sectorAngleRad / 2);
-                wCtx.font = "14px 'Segoe UI Emoji'";
-                wCtx.textAlign = "center";
-                wCtx.fillStyle = isDone ? 'rgba(255,255,255,0.15)' : '#fff';
-                wCtx.fillText(q.ico || "🎰", radius - 50, 0);
-                wCtx.font = "bold 9px 'Orbitron', sans-serif";
-                wCtx.fillStyle = isDone ? 'rgba(255,255,255,0.15)' : (i % 2 === 0 ? getStyleColor('--cyan') : getStyleColor('--pink'));
-                wCtx.fillText(formatPrice(q.buy), radius - 50, 16);
-                wCtx.font = "bold 10px 'Orbitron', sans-serif";
-                wCtx.fillStyle = isDone ? 'rgba(255,255,255,0.1)' : (i % 2 === 0 ? getStyleColor('--cyan') : getStyleColor('--pink'));
-                wCtx.textAlign = "right";
-                wCtx.fillText(q.id, radius - 12, 4);
-                wCtx.restore();
-                wCtx.restore();
-            }
-        }
-
-        // Молния
-        function drawLightningPath(startX, startY, endX, endY) {
-            let steps = 6;
-            let pathD = `M ${startX} ${startY}`;
-            for (let i = 1; i <= steps; i++) {
-                let t = i / steps;
-                let targetX = startX + (endX - startX) * t;
-                let targetY = startY + (endY - startY) * t;
-                if (i < steps) {
-                    targetX += (Math.random() - 0.5) * 60;
-                    targetY += (Math.random() - 0.5) * 60;
-                }
-                pathD += ` L ${targetX} ${targetY}`;
-            }
-            els.lightningPath.setAttribute('d', pathD);
-        }
-
-        // Эффекты Зевса
-        function applyZeusEffect(quest, callback) {
-            const effects = [
-                { name: "x2", desc: "удвоил стоимость контракта", modifier: (val) => val * 2, isSkip: false, isDoubleWork: false },
-                { name: "/2", desc: "уменьшил стоимость вдвое", modifier: (val) => Math.round(val / 2), isSkip: false, isDoubleWork: false },
-                { name: "x1.5", desc: "увеличил стоимость в полтора раза", modifier: (val) => Math.round(val * 1.5), isSkip: false, isDoubleWork: false },
-                { name: "Двойная работа", desc: "теперь этот контракт нужно выполнить дважды", modifier: (val) => val, isSkip: false, isDoubleWork: true },
-                { name: "Пропуск", desc: "задание автоматически засчитано! Баланс не меняется", modifier: (val) => val, isSkip: true, isDoubleWork: false }
-            ];
-            const effect = effects[Math.floor(Math.random() * effects.length)];
-            writeLog(`⚡ Зевс применил "${effect.name}" к контракту №${quest.id}: ${effect.desc}`);
-            showToast(`Зевс: ${effect.desc}`, effect.name === "Пропуск" ? false : true);
-            if (effect.isSkip) {
-                state.completedList.push({ id: quest.id, status: 'win', payout: 0 });
-                writeLog(`✨ Контракт №${quest.id} пропущен по воле Зевса!`);
-                callback(true);
-                return;
-            }
-            if (effect.isDoubleWork) {
-                state.repeatCounts[quest.id] = 2;
-                quest.repeatCount = 2;
-                writeLog(`⚠️ Теперь контракт №${quest.id} нужно выполнить дважды!`);
-                callback(false);
-                return;
-            }
-            const newBuy = effect.modifier(quest.buy);
-            quest.buy = newBuy;
-            state.modifiedBuys[quest.id] = newBuy;
-            writeLog(`💰 Новая стоимость: ${newBuy} ₽`);
-            callback(false);
-        }
-
-        function triggerZeusEvent(targetQuest, onComplete) {
-            zeusAnimationLock = true;
-            els.spinBtn.disabled = true;
-            playEffect('thunder');
-            els.zeus.classList.add('active');
-
-            setTimeout(() => {
-                const zeusBox = els.zeus.getBoundingClientRect();
-                const cardEl = document.getElementById(`quest-card-${targetQuest.id}`);
-                if (!cardEl) { 
-                    zeusAnimationLock = false;
-                    els.spinBtn.disabled = false;
-                    if (onComplete) onComplete();
-                    return; 
-                }
-                const cardBox = cardEl.getBoundingClientRect();
-                const sX = zeusBox.left + 30;
-                const sY = zeusBox.top + 50;
-                const eX = cardBox.left + cardBox.width / 2;
-                const eY = cardBox.top + cardBox.height / 2;
-                drawLightningPath(sX, sY, eX, eY);
-                els.lightningSvg.style.opacity = '1';
-                cardEl.classList.add('zeus-blitzed');
-                playEffect('thunder');
-
-                applyZeusEffect(targetQuest, (isSkipped) => {
-                    setTimeout(() => {
-                        els.lightningSvg.style.opacity = '0';
-                        cardEl.classList.remove('zeus-blitzed');
-                        renderQuests();
-                        saveAll();
-                        if (isSkipped) {
-                            zeusAnimationLock = false;
-                            els.spinBtn.disabled = false;
-                            els.zeus.classList.remove('active');
-                        }
-                        if (onComplete) onComplete(isSkipped);
-                    }, 300);
-                    if (!isSkipped) {
-                        setTimeout(() => {
-                            els.zeus.classList.remove('active');
-                            zeusAnimationLock = false;
-                            els.spinBtn.disabled = false;
-                        }, 1000);
-                    }
-                });
-            }, 1200);
-        }
-
-        // === ГЛАВНАЯ ЛОГИКА ВРАЩЕНИЯ С АДАПТИВНОЙ ДЛИТЕЛЬНОСТЬЮ ===
-        function startSpinAnimation(targetSectorIndex) {
-            if (isSpinning || zeusAnimationLock) return;
-            playEffect('spin');
-            isSpinning = true;
-            els.spinBtn.disabled = true;
-            
-            const remainingCount = QUEST_DATABASE.filter(q => !state.completedList.some(c => c.id === q.id)).length;
-            let extraRotations = 5;
-            let spinDuration = 2.6;
-            if (remainingCount <= 4) {
-                extraRotations = 3;
-                spinDuration = 1.8;
-            } else if (remainingCount <= 10) {
-                extraRotations = 4;
-                spinDuration = 2.2;
-            }
-            
-            const targetRaw = (Math.PI * 2) - (targetSectorIndex * sectorAngleRad + sectorAngleRad / 2);
-            const totalDelta = (Math.PI * 2) * extraRotations + targetRaw;
-            const startWheelAngle = wheelAngle;
-            const targetAngleRad = startWheelAngle + totalDelta;
-            const spinStartTime = performance.now();
-            
-            function animateSpin(currentTime) {
-                const elapsed = (currentTime - spinStartTime) / 1000;
-                if (elapsed >= spinDuration) {
-                    wheelAngle = targetAngleRad % (Math.PI * 2);
-                    drawWheel();
-                    isSpinning = false;
-                    if (!zeusAnimationLock) els.spinBtn.disabled = false;
-                    const finalSector = Math.floor(((Math.PI * 2) - (wheelAngle % (Math.PI * 2))) / sectorAngleRad) % totalSectors;
-                    handleSpinEnd(finalSector);
-                    return;
-                }
-                let t = elapsed / spinDuration;
-                const easeOut = 1 - Math.pow(1 - t, 4);
-                wheelAngle = startWheelAngle + totalDelta * easeOut;
-                const currentSector = Math.floor(((Math.PI * 2) - (wheelAngle % (Math.PI * 2))) / sectorAngleRad) % totalSectors;
-                if (currentSector !== lastSectorTriggered && currentSector >= 0) {
-                    playEffect('click');
-                    lastSectorTriggered = currentSector;
-                }
-                drawWheel();
-                requestAnimationFrame(animateSpin);
-            }
-            requestAnimationFrame(animateSpin);
-        }
-
-        function handleSpinEnd(sectorIndex) {
-            const quest = QUEST_DATABASE[sectorIndex];
-            if (state.completedList.some(c => c.id === quest.id)) {
-                writeLog(`⚠️ Сектор ${quest.id} уже выполнен, перезапуск...`);
-                const available = QUEST_DATABASE.filter(q => !state.completedList.some(c => c.id === q.id));
-                if (available.length === 0) {
-                    writeLog("🎉 Все контракты уже выполнены!");
-                    return;
-                }
-                const newQuest = available[Math.floor(Math.random() * available.length)];
-                const newIndex = QUEST_DATABASE.findIndex(x => x.id === newQuest.id);
-                startSpinAnimation(newIndex);
-                return;
-            }
-
-            currentActiveQuest = quest;
-            const card = document.getElementById(`quest-card-${quest.id}`);
-            if (card) {
-                card.classList.add('selected-anim');
-                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-            writeLog(`🎯 Колесо выбрало контракт №${quest.id} — ${quest.slot} (цена: ${quest.buy.toLocaleString()} ₽)`);
-
-            const triggerModal = (isSkipped) => {
-                if (isSkipped) {
-                    closeAndSync();
-                    return;
-                }
-                document.getElementById('modalSlotTitle').innerText = quest.slot + " " + quest.ico;
-                let taskText = `Задание: ${quest.type}`;
-                if (quest.repeatCount > 1) taskText += ` (${quest.repeatCount} раз)`;
-                document.getElementById('modalQuestName').innerHTML = taskText;
-                document.getElementById('modalQuestDesc').innerHTML = `${quest.desc}<br><span style="color: var(--gold);">💰 Цена бонуса: ${quest.buy.toLocaleString()} ₽</span>`;
-                els.payoutInput.value = '';
-                els.resultModal.classList.remove('hidden');
-                setTimeout(() => els.payoutInput.focus(), 50);
-                if (!zeusAnimationLock) els.spinBtn.disabled = false;
-            };
-
-            if (Math.random() < 0.25) {
-                triggerZeusEvent(quest, (isSkipped) => {
-                    if (!isSkipped) triggerModal(false);
-                    else {
-                        closeAndSync();
-                    }
-                });
-            } else {
-                triggerModal(false);
-                if (!zeusAnimationLock) els.spinBtn.disabled = false;
-            }
-        }
-
-        function writeLog(text) {
-            els.logBox.innerHTML = `<div>[${new Date().toLocaleTimeString()}] ${text}</div>` + els.logBox.innerHTML;
-        }
-
-        function renderQuests() {
-            els.questsContainer.innerHTML = '';
-            QUEST_DATABASE.forEach(q => {
-                const comp = state.completedList.find(c => c.id === q.id);
-                const card = document.createElement('div');
-                card.id = `quest-card-${q.id}`;
-                const isBlitzed = q.type.includes("⚡") || q.type.includes("💀");
-                let doneClass = '';
-                if (comp) doneClass = comp.status === 'win' ? 'done-win' : 'done-lose';
-                card.className = `quest-card ${doneClass}`;
-                let badge = `<div class="buy-badge" style="${isBlitzed ? 'color: var(--gold); border-color: var(--gold);' : ''}">Цена: ${q.buy.toLocaleString()} ₽</div>`;
-                if (comp) {
-                    const multiplier = (comp.payout / q.buy).toFixed(1);
-                    badge = `<div class="buy-badge" style="color:${comp.status==='win'?'#00ff66':'#ff3333'}; border-color:${comp.status==='win'?'#00ff66':'#ff3333'};">
-                        ${comp.status === 'win' ? '+' + comp.payout.toLocaleString() + ' ₽' : 'СЛИВ'} ${comp.status === 'win' ? ` (x${multiplier})` : ''}
-                    </div>`;
-                }
-                let repeatInfo = '';
-                if (q.repeatCount > 1 && !comp) repeatInfo = `<span style="color: var(--gold); font-size: 0.8rem;"> (нужно ${q.repeatCount} раза)</span>`;
-                card.innerHTML = `
-                    <div class="quest-index">${q.ico}</div>
-                    <div class="quest-main-details">
-                        <div class="slot-title">${q.slot} <span style="color: var(--text-muted); font-size:0.9rem;">(#${q.id})</span>${repeatInfo}</div>
-                        <div class="quest-type-label">${q.type}</div>
-                        <div class="quest-description">${q.desc}</div>
-                    </div>
-                    ${badge}
-                `;
-                els.questsContainer.appendChild(card);
-            });
-        }
-
-        function updateUI() {
-            els.balance.innerText = state.balance.toLocaleString() + " ₽";
-            const completedCount = state.completedList.length;
-            els.progress.innerText = `${completedCount} / ${QUEST_DATABASE.length}`;
-            let prof = state.completedList.reduce((acc, c) => {
-                const q = QUEST_DATABASE.find(q => q.id === c.id);
-                return acc + (c.payout - (q ? q.buy : 0));
-            }, 0);
-            state.profit = prof;
-            els.profit.innerText = (prof >= 0 ? '+' : '') + prof.toLocaleString() + " ₽";
-
-            if (completedCount === QUEST_DATABASE.length && !isFinalEnding) {
-                executeMassiveEnding(prof);
-            }
-        }
-
-        function executeMassiveEnding(finalProfit) {
-            isFinalEnding = true;
-            els.spinBtn.disabled = true;
-            els.spinBtn.innerText = "👑 МАРАФОН ЗАВЕРШЁН! 👑";
-            writeLog(`🏆 ТРИУМФ! Все 20 контрактов закрыты! Итоговый профит: ${finalProfit} ₽!`);
-            startFinalSalute();
-            setTimeout(() => {
-                els.banner.innerText = finalProfit >= 0 ? "👑 КОРОЛЕВА СЛОТОВ 👑" : "💀 СЛИВ ЗАЩИТАН 💀";
-                els.banner.className = finalProfit >= 0 ? "banner-megawin" : "banner-bigwin";
-                els.banner.style.fontSize = "3.5rem";
-                els.banner.classList.add('active');
-            }, 1000);
-        }
-
-        // ОБРАБОТЧИК КНОПКИ ВРАЩЕНИЯ
-        els.spinBtn.onclick = function() {
-            if (isSpinning || zeusAnimationLock || isFinalEnding) return;
-            const available = QUEST_DATABASE.filter(q => !state.completedList.some(c => c.id === q.id));
-            if (available.length === 0) {
-                writeLog("🎉 Все контракты уже выполнены!");
-                return;
-            }
-            document.querySelectorAll('.quest-card').forEach(c => c.classList.remove('selected-anim'));
-            const chosenQuest = available[Math.floor(Math.random() * available.length)];
-            const chosenIndex = QUEST_DATABASE.findIndex(x => x.id === chosenQuest.id);
-            startSpinAnimation(chosenIndex);
-        };
-
-        function confirmWin() {
-            if (!currentActiveQuest) return;
-            let p = parseFloat(els.payoutInput.value);
-            if (isNaN(p) || p < 0) p = 0;
-            
-            let repeat = currentActiveQuest.repeatCount || 1;
-            if (repeat > 1) {
-                currentActiveQuest.repeatCount = repeat - 1;
-                state.repeatCounts[currentActiveQuest.id] = currentActiveQuest.repeatCount;
-                writeLog(`⚠️ Контракт №${currentActiveQuest.id} выполнен! Осталось ещё ${currentActiveQuest.repeatCount} раз.`);
-                showToast(`Двойная работа: осталось ${currentActiveQuest.repeatCount} выполнений!`);
-                currentActiveQuest = null;
-                els.resultModal.classList.add('hidden');
-                updateUI(); renderQuests(); drawWheel();
-                saveAll();
-                return;
-            }
-            
-            state.completedList.push({ id: currentActiveQuest.id, status: 'win', payout: p });
-            state.balance = state.balance - currentActiveQuest.buy + p;
-            const multiplier = (p / currentActiveQuest.buy).toFixed(1);
-            writeLog(`✅ Контракт №${currentActiveQuest.id} выполнен! Слот: ${currentActiveQuest.slot} | Выплата: ${p} ₽ (x${multiplier})`);
-            triggerWinExplosion();
-            if (parseFloat(multiplier) >= 3) showCelebrationBanner("💎 MEGA WIN 💎", "banner-megawin");
-            else if (parseFloat(multiplier) >= 1.5) showCelebrationBanner("🍇 BIG WIN 🍇", "banner-bigwin");
-            else showCelebrationBanner("🎉 WIN 🎉", "banner-win");
-            closeAndSync();
-        }
-
-        function confirmLose() {
-            if (!currentActiveQuest) return;
-            
-            let repeat = currentActiveQuest.repeatCount || 1;
-            if (repeat > 1) {
-                currentActiveQuest.repeatCount = repeat - 1;
-                state.repeatCounts[currentActiveQuest.id] = currentActiveQuest.repeatCount;
-                writeLog(`❌ Контракт №${currentActiveQuest.id} провален! Осталось ещё ${currentActiveQuest.repeatCount} попыток.`);
-                showToast(`Двойная работа: осталось ${currentActiveQuest.repeatCount} выполнений!`, true);
-                currentActiveQuest = null;
-                els.resultModal.classList.add('hidden');
-                updateUI(); renderQuests(); drawWheel();
-                saveAll();
-                return;
-            }
-            
-            state.completedList.push({ id: currentActiveQuest.id, status: 'lose', payout: 0 });
-            state.balance -= currentActiveQuest.buy;
-            writeLog(`❌ Контракт №${currentActiveQuest.id} провален: ${currentActiveQuest.slot}. Потеряно: -${currentActiveQuest.buy} ₽`);
-            playEffect('lose');
-            closeAndSync();
-        }
-
-        function closeModal() {
-            currentActiveQuest = null; 
-            els.resultModal.classList.add('hidden');
-            document.querySelectorAll('.quest-card').forEach(c => c.classList.remove('selected-anim'));
-            if (!zeusAnimationLock) els.spinBtn.disabled = false;
-        }
-
-        function showCelebrationBanner(typeText, className) {
-            els.banner.innerText = typeText;
-            els.banner.className = className;
-            els.banner.classList.add('active');
-            playEffect('win');
-            setTimeout(() => els.banner.classList.remove('active'), 2500);
-        }
-
-        function closeAndSync() {
-            currentActiveQuest = null;
-            els.resultModal.classList.add('hidden');
-            updateUI(); renderQuests(); drawWheel();
-            saveAll();
-            zeusAnimationLock = false;
-            els.spinBtn.disabled = false;
-        }
-
-        // Ручное изменение баланса
-        function openBalanceModal() {
-            els.newBalanceInput.value = state.balance;
-            els.balanceModal.classList.remove('hidden');
-        }
-        function closeBalanceModal() {
-            els.balanceModal.classList.add('hidden');
-        }
-        function applyBalanceChange() {
-            let newBalance = parseFloat(els.newBalanceInput.value);
-            if (isNaN(newBalance) || newBalance < 0) {
-                showToast("Введите корректную сумму", true);
-                return;
-            }
-            state.balance = newBalance;
-            writeLog(`💰 Баланс скорректирован вручную. Новая фикса: ${state.balance.toLocaleString()} ₽`);
-            closeBalanceModal();
-            updateUI();
-            saveAll();
-        }
-
-        document.getElementById('winConfirmBtn').onclick = confirmWin;
-        document.getElementById('loseConfirmBtn').onclick = confirmLose;
-        document.getElementById('cancelModalBtn').onclick = closeModal;
-        document.getElementById('editBalanceBtn').onclick = openBalanceModal;
-        document.getElementById('applyBalanceBtn').onclick = applyBalanceChange;
-        document.getElementById('cancelBalanceBtn').onclick = closeBalanceModal;
-
-        window.addEventListener('keydown', function(e) {
-            if (els.resultModal.classList.contains('hidden')) return;
-            if (e.key === 'Enter') { e.preventDefault(); confirmWin(); } 
-            else if (e.key === 'Escape') { closeModal(); }
-        });
-
-        document.getElementById('fullResetBtn').onclick = function() {
-            if(confirm("Сбросить весь прогресс марафона и вернуть исходные цены?")) {
-                localStorage.removeItem('pragmatic_carousel_save');
-                state = { balance: 100000, profit: 0, completedList: [], modifiedBuys: {}, repeatCounts: {} };
-                rebuildQuestDatabase();
-                wheelAngle = 0; 
-                isSpinning = false;
-                currentActiveQuest = null;
-                isFinalEnding = false;
-                zeusAnimationLock = false;
-                if (finalSaluteInterval) clearInterval(finalSaluteInterval);
-                els.spinBtn.disabled = false;
-                els.spinBtn.innerHTML = `<i class="fas fa-dice"></i> ВРАЩАТЬ БАРАБАН`;
-                els.banner.classList.remove('active');
-                drawWheel(); updateUI(); renderQuests(); writeLog("♻️ Марафон полностью сброшен.");
-                saveAll();
-            }
-        };
-
-        document.getElementById('rulesBtn').onclick = () => document.getElementById('rulesModal').classList.remove('hidden');
-        document.getElementById('closeRulesBtn').onclick = () => document.getElementById('rulesModal').classList.add('hidden');
-        document.getElementById('soundToggle').onclick = function() {
-            soundOn = !soundOn;
-            this.innerHTML = soundOn ? `<i class="fas fa-volume-up"></i> ЗВУК: ВКЛ` : `<i class="fas fa-volume-mute"></i> ЗВУК: ВЫКЛ`;
-        };
-
-        window.addEventListener('resize', initBg);
-        document.body.addEventListener('click', () => initAudio(), { once: true });
-
-        loadAll();
-        initBg(); drawEffectsLoop(); updateUI(); renderQuests(); drawWheel();
-    })();
-    </script>
+// ==================== ЗАПУСК ====================
+loadGame();
+updateInventoryDisplay();
+renderPyramid();
+</script>
 </body>
 </html>
