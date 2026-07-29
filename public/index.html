@@ -6,6 +6,7 @@
   <title>Проклятие фараона | Квест для стрима</title>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    /* ОСНОВНЫЕ СТИЛИ */
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
       font-family: 'Playfair Display', serif;
@@ -15,15 +16,15 @@
       color: #e6c04c;
       user-select: none;
     }
-    /* Анимированный фон */
-    .bg-stars {
-      position: fixed; top:0; left:0; width:100%; height:100%;
-      background: transparent; z-index:-2; pointer-events: none;
-    }
+    /* АНИМИРОВАННЫЙ ФОН */
     .bg-gradient {
       position: fixed; top:0; left:0; width:100%; height:100%;
       background: radial-gradient(ellipse at 50% 30%, #3b2512 0%, #0a0300 90%);
       z-index:-3;
+    }
+    .stars-canvas {
+      position: fixed; top:0; left:0; width:100%; height:100%;
+      z-index:-2; pointer-events: none;
     }
     .pyramid-silhouette {
       position: fixed; bottom:0; left:5%; width:400px; height:300px;
@@ -36,7 +37,7 @@
       background: linear-gradient(transparent, #1e1308);
       opacity: 0.7; z-index:-1;
     }
-
+    /* ИГРОВАЯ ОБОЛОЧКА */
     .game-wrapper {
       max-width: 1200px; margin: 20px auto; padding: 25px;
       background: rgba(10, 5, 2, 0.8); backdrop-filter: blur(25px);
@@ -56,7 +57,31 @@
       from { text-shadow: 0 0 30px #b8860b, 0 0 10px black; }
       to { text-shadow: 0 0 60px #ffd700, 0 0 25px #ff8c00; }
     }
+  </style>
+</head>
+<body>
+  <div class="bg-gradient"></div>
+  <canvas class="stars-canvas" id="starsCanvas"></canvas>
+  <div class="pyramid-silhouette"></div>
+  <div class="sand-layer"></div>
+  <div class="game-wrapper">
+    <h1>⚱️ Проклятие фараона</h1>
+    <!-- Панель артефактов -->
+    <div class="artifacts-bar" id="inventory">
+      <div class="artifact" id="art-amulet" data-tip="Амулет переброса">🪬</div>
+      <div class="artifact" id="art-scarab" data-tip="Скарабей удачи">🪲</div>
+      <div class="artifact" id="art-eye" data-tip="Глаз Ра (подсказка)">👁️</div>
+    </div>
+    <button class="reset-button" onclick="resetProgress()">Сбросить прогресс</button>
+    <div class="pyramid-map" id="mapContainer"></div>
+  </div>
+  <!-- Модальное окно -->
+  <div class="modal-overlay hidden" id="modalOverlay">
+    <div class="modal-panel" id="modalPanel"></div>
+  </div>
 
+  <style>
+    /* Продолжение стилей */
     .artifacts-bar {
       display: flex; justify-content: flex-end; gap: 20px; margin: 0 0 20px;
       align-items: center;
@@ -77,13 +102,12 @@
       50% { box-shadow: 0 0 45px #ffa500, 0 0 25px #ff4500; }
       100% { box-shadow: 0 0 20px #ffd700; }
     }
-    .artifact:hover::after {
+    .artifact[data-tip]:hover::after {
       content: attr(data-tip); position: absolute; bottom: -45px;
       background: black; color: #f5d76e; padding: 6px 14px;
       border-radius: 25px; border: 1px solid gold; font-size: 0.85rem;
       white-space: nowrap; z-index:10;
     }
-
     .reset-button {
       position: absolute; top: 25px; right: 30px;
       background: transparent; border: 2px solid #8b6914; color: #c29b2e;
@@ -128,7 +152,6 @@
       white-space: nowrap; font-weight: bold; text-shadow: 0 0 10px black;
       letter-spacing: 0.5px;
     }
-
     /* Модальное окно */
     .modal-overlay {
       position: fixed; top:0; left:0; width:100%; height:100%;
@@ -138,7 +161,6 @@
     }
     .hidden { display: none; }
     @keyframes fadeIn { from{opacity:0;} }
-
     .modal-panel {
       background: linear-gradient(160deg, #261a0a, #0c0600);
       border: 3px solid #c29b2e; border-radius: 45px; padding: 35px;
@@ -212,7 +234,7 @@
     @media (max-width: 700px) {
       .room-card { width: 90px; height: 90px; }
     }
-    /* Дополнительные стили для атмосферы */
+    /* Частицы */
     .particle {
       position: fixed; pointer-events: none; z-index: 999;
       animation: particleFade 1s ease-out forwards;
@@ -222,445 +244,1694 @@
       100% { opacity: 0; transform: translateY(-80px) scale(0); }
     }
   </style>
-</head>
-<body>
-<div class="bg-gradient"></div>
-<div class="bg-stars" id="starsCanvas"></div>
-<div class="pyramid-silhouette"></div>
-<div class="sand-layer"></div>
 
-<div class="game-wrapper">
-  <h1>⚱️ Проклятие фараона</h1>
-  <div class="artifacts-bar">
-    <div class="artifact" id="art-amulet" data-tip="Амулет переброса (сменить задание)">🪬</div>
-    <div class="artifact" id="art-scarab" data-tip="Скарабей удачи (упростить условие)">🪲</div>
-    <div class="artifact" id="art-eye" data-tip="Глаз Ра (подсветка поиска)">👁️</div>
-  </div>
-  <button class="reset-button" onclick="resetProgress()">Сбросить прогресс</button>
-  <div class="pyramid-map" id="mapContainer"></div>
-</div>
-
-<div class="modal-overlay hidden" id="modalOverlay">
-  <div class="modal-panel" id="modalPanel"></div>
-</div>
-
-<script>
-// ==================== ЗВУКОВЫЕ ЭФФЕКТЫ ====================
-const AudioCtx = window.AudioContext || window.webkitAudioContext;
-let audioCtx;
-function initAudio() { if (!audioCtx) audioCtx = new AudioCtx(); }
-function playSound(type) {
-  if (!audioCtx) return;
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  osc.connect(gain); gain.connect(audioCtx.destination);
-  gain.gain.value = 0.15;
-  switch(type) {
-    case 'click': osc.frequency.value = 800; osc.type = 'sine'; gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08); osc.start(); osc.stop(audioCtx.currentTime + 0.08); break;
-    case 'success': osc.frequency.value = 1200; osc.type = 'triangle'; gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2); osc.start(); osc.stop(audioCtx.currentTime + 0.2); break;
-    case 'fail': osc.frequency.value = 250; osc.type = 'sawtooth'; gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15); osc.start(); osc.stop(audioCtx.currentTime + 0.15); break;
-    case 'artifact': osc.frequency.value = 1500; osc.type = 'sine'; gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3); osc.start(); osc.stop(audioCtx.currentTime + 0.3); break;
-  }
-}
-
-// ==================== ЧАСТИЦЫ ====================
-function spawnParticles(x, y, count = 10) {
-  for (let i = 0; i < count; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle';
-    p.style.left = x + 'px';
-    p.style.top = y + 'px';
-    p.style.width = '6px';
-    p.style.height = '6px';
-    p.style.background = '#ffd700';
-    p.style.borderRadius = '50%';
-    document.body.appendChild(p);
-    setTimeout(() => p.remove(), 1000);
-  }
-}
-
-// ==================== СОСТОЯНИЕ ====================
-const STORAGE_KEY = 'pharaoh_quest_ultra';
-let state = {
-  completed: [],
-  inventory: { amulet: 0, scarab: 0, eye: 0 },
-  currentRoomId: null
-};
-
-// ==================== 30 КОМНАТ ====================
-const rooms = [];
-const levelNames = ['Пустыня и вход','Зал Кобр','Зал Скарабеев','Святилище Бастет','Тронный зал'];
-for (let lvl = 1; lvl <= 5; lvl++) {
-  for (let i = 1; i <= 6; i++) {
-    const id = (lvl-1)*6 + i;
-    let puzzle, puzzleData, task;
-    if (lvl === 1) {
-      if (i === 1) { puzzle = 'find'; puzzleData = { items: ['🪲','🪲','🪲','🪲','🪲'] }; task = { slot:'Book of Dead', desc:'Сделай 15 вращений, получи хотя бы один расширяющийся символ', time:300 }; }
-      else if (i === 2) { puzzle = 'sliding'; puzzleData = { size:3 }; task = { slot:'Rise of Ra', desc:'За 5 минут собери 3 скаттера и запусти бонус', time:300 }; }
-      else if (i === 3) { puzzle = 'riddle'; puzzleData = { q:'Я высок, когда молод, и низок, когда стар. Что я?', ans:'свеча' }; task = { slot:'Legacy of Egypt', desc:'В бонусной игре набери выигрыш > x15', time:360 }; }
-      else if (i === 4) { puzzle = 'code'; puzzleData = { eq:'𓀀=2, 𓁿=3. 𓀀 + 𓁿 * 2 = ?', ans:8 }; task = { slot:'Eye of Horus', desc:'Дождись расширения дикого символа на весь барабан', time:360 }; }
-      else if (i === 5) { puzzle = 'door'; puzzleData = { correct:1 }; task = { slot:'Cleopatra', desc:'Выигрышная линия из 4+ фараонов', time:420 }; }
-      else if (i === 6) { puzzle = 'sequence'; puzzleData = { order:[2,1,3] }; task = { slot:'Sphinx Wild', desc:'Активируй Sphinx Wild 2 раза за 7 мин', time:420 }; }
-    }
-    else if (lvl === 2) {
-      if (i === 1) { puzzle = 'find'; puzzleData = { items: ['🐍','🐍','🐍','🐍'] }; task = { slot:'Book of Dead', desc:'Получи бонусную игру', time:360 }; }
-      else if (i === 2) { puzzle = 'riddle'; puzzleData = { q:'У чего есть глаза, но нет зрения?', ans:'игла' }; task = { slot:'Rise of Ra', desc:'Выигрыш x25 в бонусе', time:420 }; }
-      else if (i === 3) { puzzle = 'code'; puzzleData = { eq:'𓂀=4, 𓀀=2. 𓂀 * 𓀀 + 3 = ?', ans:11 }; task = { slot:'Legacy of Egypt', desc:'Активируй Wheel of Gods и выиграй x20', time:480 }; }
-      else if (i === 4) { puzzle = 'sliding'; puzzleData = { size:4 }; task = { slot:'Cleopatra', desc:'Собери 10 скаттеров за 8 мин', time:480 }; }
-      else if (i === 5) { puzzle = 'door'; puzzleData = { correct:3 }; task = { slot:'Eye of Horus', desc:'Расширение дикого символа 3 раза', time:540 }; }
-      else if (i === 6) { puzzle = 'sequence'; puzzleData = { order:[1,3,2] }; task = { slot:'Sphinx Wild', desc:'Получи джекпот в Sphinx Wild', time:600 }; }
-    }
-    else if (lvl === 3) {
-      if (i === 1) { puzzle = 'find'; puzzleData = { items: ['🐱','🐱','🐱','🐱'] }; task = { slot:'Book of Dead', desc:'Выиграй x50 за 10 мин', time:600 }; }
-      else if (i === 2) { puzzle = 'code'; puzzleData = { eq:'𓁿=5, 𓀀=3. (𓁿 - 𓀀) * 2 = ?', ans:4 }; task = { slot:'Rise of Ra', desc:'Запусти бонус и собери x30', time:480 }; }
-      else if (i === 3) { puzzle = 'sliding'; puzzleData = { size:3 }; task = { slot:'Legacy of Egypt', desc:'Выиграй x15 в основной игре', time:420 }; }
-      else if (i === 4) { puzzle = 'riddle'; puzzleData = { q:'Чем больше из неё берёшь, тем больше она становится. Что это?', ans:'яма' }; task = { slot:'Cleopatra', desc:'Получи 5 фараонов в линии', time:540 }; }
-      else if (i === 5) { puzzle = 'door'; puzzleData = { correct:2 }; task = { slot:'Eye of Horus', desc:'Расширение дикого символа 2 раза', time:480 }; }
-      else if (i === 6) { puzzle = 'sequence'; puzzleData = { order:[3,1,2] }; task = { slot:'Sphinx Wild', desc:'Активируй Sphinx Wild 3 раза', time:600 }; }
-    }
-    else if (lvl === 4) {
-      if (i === 1) { puzzle = 'find'; puzzleData = { items: ['🦂','🦂','🦂'] }; task = { slot:'Book of Dead', desc:'Выиграй x75 в бонусной игре', time:600 }; }
-      else if (i === 2) { puzzle = 'sliding'; puzzleData = { size:4 }; task = { slot:'Rise of Ra', desc:'Собери 4 скаттера за 8 мин', time:480 }; }
-      else if (i === 3) { puzzle = 'code'; puzzleData = { eq:'𓂀 + 𓀀 = 12, 𓁿=5. 𓂀 * 2 = ?', ans:14 }; task = { slot:'Legacy of Egypt', desc:'Активируй Wheel of Gods дважды', time:600 }; }
-      else if (i === 4) { puzzle = 'riddle'; puzzleData = { q:'Что можно разбить, даже не дотрагиваясь?', ans:'обещание' }; task = { slot:'Cleopatra', desc:'Выиграй x40 за 10 мин', time:600 }; }
-      else if (i === 5) { puzzle = 'door'; puzzleData = { correct:1 }; task = { slot:'Eye of Horus', desc:'Расширение дикого символа 4 раза', time:600 }; }
-      else if (i === 6) { puzzle = 'sequence'; puzzleData = { order:[2,3,1] }; task = { slot:'Sphinx Wild', desc:'Джекпот в Sphinx Wild за 15 мин', time:900 }; }
-    }
-    else if (lvl === 5) {
-      if (i === 1) { puzzle = 'find'; puzzleData = { items: ['☥','☥','☥'] }; task = { slot:'Book of Dead', desc:'Выиграй x100 за 12 мин', time:720 }; }
-      else if (i === 2) { puzzle = 'code'; puzzleData = { eq:'𓁿=8, 𓀀=2. (𓁿 - 𓀀) * 3 = ?', ans:18 }; task = { slot:'Rise of Ra', desc:'Запусти бонус 2 раза подряд', time:600 }; }
-      else if (i === 3) { puzzle = 'sliding'; puzzleData = { size:5 }; task = { slot:'Legacy of Egypt', desc:'Выиграй x60 в бонусе', time:660 }; }
-      else if (i === 4) { puzzle = 'riddle'; puzzleData = { q:'Я всегда иду, но никогда не двигаюсь. Что я?', ans:'часы' }; task = { slot:'Cleopatra', desc:'Собери 6 фараонов в линии', time:600 }; }
-      else if (i === 5) { puzzle = 'door'; puzzleData = { correct:2 }; task = { slot:'Eye of Horus', desc:'Расширение дикого символа 5 раз', time:720 }; }
-      else if (i === 6) { puzzle = null; puzzleData = null; task = { slot:'Cleopatra', desc:'ФИНАЛ: Удвой баланс ($7k→$14k) за 15 минут!', time:900 }; }
-    }
-    rooms.push({ id, name: `Комната ${id}`, level: lvl, puzzle, puzzleData, task });
-  }
-}
-
-// ==================== ЗАГРУЗКА / СОХРАНЕНИЕ ====================
-function loadState() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (raw) state = JSON.parse(raw);
-  else state = { completed: [], inventory: { amulet:0, scarab:0, eye:0 }, currentRoomId:null };
-}
-function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-function resetProgress() {
-  if (confirm('Сбросить весь прогресс?')) { localStorage.removeItem(STORAGE_KEY); location.reload(); }
-}
-
-// ==================== ОТРИСОВКА КАРТЫ ====================
-function renderMap() {
-  const map = document.getElementById('mapContainer');
-  map.innerHTML = '';
-  for (let lvl = 1; lvl <= 5; lvl++) {
-    const levelRooms = rooms.filter(r => r.level === lvl);
-    const row = document.createElement('div');
-    row.className = 'pyramid-level';
-    levelRooms.forEach(room => {
-      const card = document.createElement('div');
-      card.className = 'room-card';
-      if (state.completed.includes(room.id)) {
-        card.classList.add('completed');
-        card.textContent = '✓';
-      } else if (isUnlocked(room.id)) {
-        card.classList.add('current');
-        card.textContent = '☥';
-        card.onclick = () => { initAudio(); playSound('click'); openRoom(room.id); };
-      } else {
-        card.classList.add('locked');
-        card.textContent = '🔒';
+  <script>
+    // ==================== ЗВУКОВЫЕ ЭФФЕКТЫ (Web Audio) ====================
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx;
+    function initAudio() { if (!audioCtx) audioCtx = new AudioCtx(); }
+    function playSound(type) {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      gain.gain.value = 0.15;
+      switch(type) {
+        case 'click': osc.frequency.value = 800; osc.type = 'sine'; gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08); osc.start(); osc.stop(audioCtx.currentTime + 0.08); break;
+        case 'success': osc.frequency.value = 1200; osc.type = 'triangle'; gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2); osc.start(); osc.stop(audioCtx.currentTime + 0.2); break;
+        case 'fail': osc.frequency.value = 250; osc.type = 'sawtooth'; gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15); osc.start(); osc.stop(audioCtx.currentTime + 0.15); break;
+        case 'artifact': osc.frequency.value = 1500; osc.type = 'sine'; gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3); osc.start(); osc.stop(audioCtx.currentTime + 0.3); break;
       }
-      const label = document.createElement('div');
-      label.className = 'room-name';
-      label.textContent = room.name;
-      card.appendChild(label);
-      row.appendChild(card);
+    }
+
+    // ==================== ЧАСТИЦЫ ====================
+    function spawnParticles(x, y, count = 10) {
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = x + 'px';
+        p.style.top = y + 'px';
+        p.style.width = '6px';
+        p.style.height = '6px';
+        p.style.background = '#ffd700';
+        p.style.borderRadius = '50%';
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 1000);
+      }
+    }
+  </script>
+    // ==================== СОСТОЯНИЕ ИГРЫ ====================
+    const STORAGE_KEY = 'pharaoh_quest_full';
+    let state = {
+      completed: [],
+      inventory: { amulet: 0, scarab: 0, eye: 0 },
+      currentRoomId: null
+    };
+
+    // ==================== 30 КОМНАТ ====================
+    const rooms = [];
+    const levelNames = ['Пустыня и вход','Зал Кобр','Зал Скарабеев','Святилище Бастет','Тронный зал'];
+    for (let lvl = 1; lvl <= 5; lvl++) {
+      for (let i = 1; i <= 6; i++) {
+        const id = (lvl-1)*6 + i;
+        let puzzle, puzzleData, task;
+        if (lvl === 1) {
+          if (i === 1) { puzzle = 'find'; puzzleData = { items: ['🪲','🪲','🪲','🪲','🪲'] }; task = { slot:'Book of Dead', desc:'Сделай 15 вращений, получи хотя бы один расширяющийся символ', time:300 }; }
+          else if (i === 2) { puzzle = 'sliding'; puzzleData = { size:3 }; task = { slot:'Rise of Ra', desc:'За 5 минут собери 3 скаттера и запусти бонус', time:300 }; }
+          else if (i === 3) { puzzle = 'riddle'; puzzleData = { q:'Я высок, когда молод, и низок, когда стар. Что я?', ans:'свеча' }; task = { slot:'Legacy of Egypt', desc:'В бонусной игре набери выигрыш > x15', time:360 }; }
+          else if (i === 4) { puzzle = 'code'; puzzleData = { eq:'𓀀=2, 𓁿=3. 𓀀 + 𓁿 * 2 = ?', ans:8 }; task = { slot:'Eye of Horus', desc:'Дождись расширения дикого символа на весь барабан', time:360 }; }
+          else if (i === 5) { puzzle = 'door'; puzzleData = { correct:1 }; task = { slot:'Cleopatra', desc:'Выигрышная линия из 4+ фараонов', time:420 }; }
+          else if (i === 6) { puzzle = 'sequence'; puzzleData = { order:[2,1,3] }; task = { slot:'Sphinx Wild', desc:'Активируй Sphinx Wild 2 раза за 7 мин', time:420 }; }
+        }
+        else if (lvl === 2) {
+          if (i === 1) { puzzle = 'find'; puzzleData = { items: ['🐍','🐍','🐍','🐍'] }; task = { slot:'Book of Dead', desc:'Получи бонусную игру', time:360 }; }
+          else if (i === 2) { puzzle = 'riddle'; puzzleData = { q:'У чего есть глаза, но нет зрения?', ans:'игла' }; task = { slot:'Rise of Ra', desc:'Выигрыш x25 в бонусе', time:420 }; }
+          else if (i === 3) { puzzle = 'code'; puzzleData = { eq:'𓂀=4, 𓀀=2. 𓂀 * 𓀀 + 3 = ?', ans:11 }; task = { slot:'Legacy of Egypt', desc:'Активируй Wheel of Gods и выиграй x20', time:480 }; }
+          else if (i === 4) { puzzle = 'sliding'; puzzleData = { size:4 }; task = { slot:'Cleopatra', desc:'Собери 10 скаттеров за 8 мин', time:480 }; }
+          else if (i === 5) { puzzle = 'door'; puzzleData = { correct:3 }; task = { slot:'Eye of Horus', desc:'Расширение дикого символа 3 раза', time:540 }; }
+          else if (i === 6) { puzzle = 'sequence'; puzzleData = { order:[1,3,2] }; task = { slot:'Sphinx Wild', desc:'Получи джекпот в Sphinx Wild', time:600 }; }
+        }
+        else if (lvl === 3) {
+          if (i === 1) { puzzle = 'find'; puzzleData = { items: ['🐱','🐱','🐱','🐱'] }; task = { slot:'Book of Dead', desc:'Выиграй x50 за 10 мин', time:600 }; }
+          else if (i === 2) { puzzle = 'code'; puzzleData = { eq:'𓁿=5, 𓀀=3. (𓁿 - 𓀀) * 2 = ?', ans:4 }; task = { slot:'Rise of Ra', desc:'Запусти бонус и собери x30', time:480 }; }
+          else if (i === 3) { puzzle = 'sliding'; puzzleData = { size:3 }; task = { slot:'Legacy of Egypt', desc:'Выиграй x15 в основной игре', time:420 }; }
+          else if (i === 4) { puzzle = 'riddle'; puzzleData = { q:'Чем больше из неё берёшь, тем больше она становится. Что это?', ans:'яма' }; task = { slot:'Cleopatra', desc:'Получи 5 фараонов в линии', time:540 }; }
+          else if (i === 5) { puzzle = 'door'; puzzleData = { correct:2 }; task = { slot:'Eye of Horus', desc:'Расширение дикого символа 2 раза', time:480 }; }
+          else if (i === 6) { puzzle = 'sequence'; puzzleData = { order:[3,1,2] }; task = { slot:'Sphinx Wild', desc:'Активируй Sphinx Wild 3 раза', time:600 }; }
+        }
+        else if (lvl === 4) {
+          if (i === 1) { puzzle = 'find'; puzzleData = { items: ['🦂','🦂','🦂'] }; task = { slot:'Book of Dead', desc:'Выиграй x75 в бонусной игре', time:600 }; }
+          else if (i === 2) { puzzle = 'sliding'; puzzleData = { size:4 }; task = { slot:'Rise of Ra', desc:'Собери 4 скаттера за 8 мин', time:480 }; }
+          else if (i === 3) { puzzle = 'code'; puzzleData = { eq:'𓂀 + 𓀀 = 12, 𓁿=5. 𓂀 * 2 = ?', ans:14 }; task = { slot:'Legacy of Egypt', desc:'Активируй Wheel of Gods дважды', time:600 }; }
+          else if (i === 4) { puzzle = 'riddle'; puzzleData = { q:'Что можно разбить, даже не дотрагиваясь?', ans:'обещание' }; task = { slot:'Cleopatra', desc:'Выиграй x40 за 10 мин', time:600 }; }
+          else if (i === 5) { puzzle = 'door'; puzzleData = { correct:1 }; task = { slot:'Eye of Horus', desc:'Расширение дикого символа 4 раза', time:600 }; }
+          else if (i === 6) { puzzle = 'sequence'; puzzleData = { order:[2,3,1] }; task = { slot:'Sphinx Wild', desc:'Джекпот в Sphinx Wild за 15 мин', time:900 }; }
+        }
+        else if (lvl === 5) {
+          if (i === 1) { puzzle = 'find'; puzzleData = { items: ['☥','☥','☥'] }; task = { slot:'Book of Dead', desc:'Выиграй x100 за 12 мин', time:720 }; }
+          else if (i === 2) { puzzle = 'code'; puzzleData = { eq:'𓁿=8, 𓀀=2. (𓁿 - 𓀀) * 3 = ?', ans:18 }; task = { slot:'Rise of Ra', desc:'Запусти бонус 2 раза подряд', time:600 }; }
+          else if (i === 3) { puzzle = 'sliding'; puzzleData = { size:5 }; task = { slot:'Legacy of Egypt', desc:'Выиграй x60 в бонусе', time:660 }; }
+          else if (i === 4) { puzzle = 'riddle'; puzzleData = { q:'Я всегда иду, но никогда не двигаюсь. Что я?', ans:'часы' }; task = { slot:'Cleopatra', desc:'Собери 6 фараонов в линии', time:600 }; }
+          else if (i === 5) { puzzle = 'door'; puzzleData = { correct:2 }; task = { slot:'Eye of Horus', desc:'Расширение дикого символа 5 раз', time:720 }; }
+          else if (i === 6) { puzzle = null; puzzleData = null; task = { slot:'Cleopatra', desc:'ФИНАЛ: Удвой баланс ($7k→$14k) за 15 минут!', time:900 }; }
+        }
+        rooms.push({ id, name: `Комната ${id}`, level: lvl, puzzle, puzzleData, task });
+      }
+    }
+
+    // ==================== ЗАГРУЗКА / СОХРАНЕНИЕ ====================
+    function loadState() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) state = JSON.parse(raw);
+      else state = { completed: [], inventory: { amulet:0, scarab:0, eye:0 }, currentRoomId:null };
+    }
+    function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    function resetProgress() {
+      if (confirm('Сбросить весь прогресс?')) { localStorage.removeItem(STORAGE_KEY); location.reload(); }
+    }
+
+    // ==================== ОТРИСОВКА КАРТЫ ====================
+    function renderMap() {
+      const map = document.getElementById('mapContainer');
+      map.innerHTML = '';
+      for (let lvl = 1; lvl <= 5; lvl++) {
+        const levelRooms = rooms.filter(r => r.level === lvl);
+        const row = document.createElement('div');
+        row.className = 'pyramid-level';
+        levelRooms.forEach(room => {
+          const card = document.createElement('div');
+          card.className = 'room-card';
+          if (state.completed.includes(room.id)) {
+            card.classList.add('completed');
+            card.textContent = '✓';
+          } else if (isUnlocked(room.id)) {
+            card.classList.add('current');
+            card.textContent = '☥';
+            card.onclick = () => { initAudio(); playSound('click'); openRoom(room.id); };
+          } else {
+            card.classList.add('locked');
+            card.textContent = '🔒';
+          }
+          const label = document.createElement('div');
+          label.className = 'room-name';
+          label.textContent = room.name;
+          card.appendChild(label);
+          row.appendChild(card);
+        });
+        map.appendChild(row);
+      }
+    }
+
+    function isUnlocked(id) {
+      const idx = rooms.findIndex(r => r.id === id);
+      if (idx === 0) return true;
+      return state.completed.includes(rooms[idx-1].id);
+    }
+
+    function updateArtifactsUI() {
+      document.getElementById('art-amulet').classList.toggle('active', state.inventory.amulet > 0);
+      document.getElementById('art-scarab').classList.toggle('active', state.inventory.scarab > 0);
+      document.getElementById('art-eye').classList.toggle('active', state.inventory.eye > 0);
+    }
+
+    // ==================== МОДАЛЬНОЕ ОКНО ====================
+    let activeTaskTimer = null;
+    function openRoom(id) {
+      state.currentRoomId = id;
+      const room = rooms.find(r => r.id === id);
+      const overlay = document.getElementById('modalOverlay');
+      const panel = document.getElementById('modalPanel');
+      overlay.classList.remove('hidden');
+      panel.innerHTML = `<h2>${room.name}</h2><div id="puzzleArea"></div><div id="taskArea" class="hidden"></div>`;
+      if (room.puzzle) renderPuzzle(room);
+      else { showTask(room); }
+      overlay.onclick = (e) => { if (e.target === overlay) closeModal(); };
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.add('hidden');
+      if (activeTaskTimer) clearInterval(activeTaskTimer);
+      renderMap();
+    }
+
+    function completeRoom() {
+      const id = state.currentRoomId;
+      if (!state.completed.includes(id)) {
+        state.completed.push(id);
+        if (id === 5 || id === 20) state.inventory.amulet++;
+        if (id === 10 || id === 25) state.inventory.scarab++;
+        if (id === 15 || id === 30) state.inventory.eye++;
+        saveState();
+        playSound('success');
+        spawnParticles(window.innerWidth/2, window.innerHeight/2, 20);
+      }
+      updateArtifactsUI();
+      closeModal();
+    }
+    // ==================== ГОЛОВОЛОМКИ ====================
+    function renderPuzzle(room) {
+      const area = document.getElementById('puzzleArea');
+      area.innerHTML = '';
+      switch (room.puzzle) {
+        case 'find': renderFind(area, room); break;
+        case 'sliding': renderSliding(area, room); break;
+        case 'code': renderCode(area, room); break;
+        case 'riddle': renderRiddle(area, room); break;
+        case 'door': renderDoor(area, room); break;
+        case 'sequence': renderSequence(area, room); break;
+      }
+    }
+
+    function puzzleDone(room) {
+      playSound('success');
+      // спавн частиц по центру экрана
+      spawnParticles(window.innerWidth/2, window.innerHeight/2, 15);
+      showTask(room);
+    }
+
+    // Поиск предметов
+    function renderFind(container, room) {
+      const items = room.puzzleData.items;
+      let foundCount = 0;
+      container.innerHTML = '<p style="text-align:center;font-size:1.2rem;">Найди всех существ!</p>';
+      const grid = document.createElement('div');
+      grid.className = 'find-grid';
+      const icons = ['🐪','🏜️','☀️','⚱️','📜','🕋','🧿','🦂','🐫','🕷️','🏺','🌟'];
+      let cells = [...items];
+      while (cells.length < 25) cells.push(icons[Math.floor(Math.random()*icons.length)]);
+      shuffle(cells);
+      cells.forEach(icon => {
+        const cell = document.createElement('div');
+        cell.className = 'find-cell';
+        cell.textContent = icon;
+        if (items.includes(icon)) {
+          cell.dataset.target = '1';
+          cell.onclick = () => {
+            if (cell.classList.contains('found')) return;
+            cell.classList.add('found');
+            foundCount++;
+            if (foundCount === items.length) puzzleDone(room);
+          };
+        }
+        grid.appendChild(cell);
+      });
+      container.appendChild(grid);
+    }
+
+    // Пятнашки
+    function renderSliding(container, room) {
+      const size = room.puzzleData.size;
+      let tiles = [...Array(size*size-1).keys()].map(i => i+1).concat(0);
+      do { shuffle(tiles); } while (isSolved(tiles));
+      let emptyIdx = tiles.indexOf(0);
+      function draw() {
+        container.innerHTML = '';
+        const grid = document.createElement('div');
+        grid.className = 'sliding-grid';
+        grid.style.gridTemplateColumns = `repeat(${size}, 70px)`;
+        tiles.forEach((val, idx) => {
+          const tile = document.createElement('div');
+          tile.className = 'tile' + (val===0?' empty':'');
+          tile.textContent = val||'';
+          tile.onclick = () => move(idx);
+          grid.appendChild(tile);
+        });
+        container.appendChild(grid);
+      }
+      function move(idx) {
+        const r1 = Math.floor(idx/size), c1 = idx%size;
+        const r2 = Math.floor(emptyIdx/size), c2 = emptyIdx%size;
+        if (Math.abs(r1-r2)+Math.abs(c1-c2) === 1) {
+          [tiles[idx], tiles[emptyIdx]] = [tiles[emptyIdx], tiles[idx]];
+          emptyIdx = idx;
+          draw();
+          if (isSolved(tiles)) puzzleDone(room);
+        }
+      }
+      draw();
+    }
+    function isSolved(tiles) {
+      return tiles.slice(0,-1).every((v,i)=>v===i+1) && tiles[tiles.length-1]===0;
+    }
+
+    // Кодовый замок
+    function renderCode(container, room) {
+      container.innerHTML = `<p style="text-align:center;font-size:1.3rem;">${room.puzzleData.eq}</p>`;
+      const div = document.createElement('div'); div.style.textAlign='center';
+      const inp = document.createElement('input'); inp.type='number'; inp.className='code-input';
+      const btn = document.createElement('button'); btn.className='btn'; btn.textContent='✓';
+      btn.onclick = () => {
+        if (parseInt(inp.value) === room.puzzleData.ans) puzzleDone(room);
+        else { playSound('fail'); alert('Неверно'); }
+      };
+      div.appendChild(inp); div.appendChild(btn);
+      container.appendChild(div);
+    }
+
+    // Загадка
+    function renderRiddle(container, room) {
+      container.innerHTML = `<p style="font-size:1.3rem;margin-bottom:15px;">${room.puzzleData.q}</p>`;
+      const inp = document.createElement('input'); inp.type='text'; inp.className='code-input'; inp.style.width='200px';
+      const btn = document.createElement('button'); btn.className='btn'; btn.textContent='Ответ';
+      btn.onclick = () => {
+        if (inp.value.trim().toLowerCase() === room.puzzleData.ans.toLowerCase()) puzzleDone(room);
+        else { playSound('fail'); alert('Неправильно'); }
+      };
+      container.appendChild(inp); container.appendChild(btn);
+    }
+
+    // Выбор двери
+    function renderDoor(container, room) {
+      container.innerHTML = '<p style="text-align:center;">Выбери правильный проход:</p>';
+      const doorsDiv = document.createElement('div'); doorsDiv.style.display='flex'; doorsDiv.style.justifyContent='center'; doorsDiv.style.gap='20px';
+      for (let i=1;i<=3;i++) {
+        const door = document.createElement('div');
+        door.className = 'room-card'; door.style.width='80px'; door.style.height='100px'; door.textContent = i;
+        door.onclick = () => {
+          if (i === room.puzzleData.correct) puzzleDone(room);
+          else { playSound('fail'); alert('Замуровано!'); }
+        };
+        doorsDiv.appendChild(door);
+      }
+      container.appendChild(doorsDiv);
+    }
+
+    // Последовательность
+    function renderSequence(container, room) {
+      const order = room.puzzleData.order;
+      const symbols = ['𓀀','𓁿','𓂀'];
+      let userSeq = [];
+      container.innerHTML = '<p style="text-align:center;">Нажми символы в порядке: ' + order.map(i=>symbols[i-1]).join(' → ') + '</p>';
+      const btnsDiv = document.createElement('div'); btnsDiv.className = 'sequence-buttons';
+      symbols.forEach((sym, idx) => {
+        const btn = document.createElement('div');
+        btn.className = 'seq-btn'; btn.textContent = sym;
+        btn.onclick = () => {
+          userSeq.push(idx+1);
+          if (userSeq.length === order.length) {
+            if (userSeq.every((v,i)=>v===order[i])) puzzleDone(room);
+            else { playSound('fail'); userSeq = []; alert('Неверная последовательность!'); }
+          }
+        };
+        btnsDiv.appendChild(btn);
+      });
+      container.appendChild(btnsDiv);
+    }
+
+    // ==================== ЗАДАНИЕ (таймер и кнопки) ====================
+    function showTask(room) {
+      document.getElementById('puzzleArea').innerHTML = '<p style="text-align:center;color:gold;">✓ Пройдено</p>';
+      const taskArea = document.getElementById('taskArea');
+      taskArea.classList.remove('hidden');
+      const t = room.task;
+      taskArea.innerHTML = `
+        <div class="task-card"><strong>🎰 Слот: ${t.slot}</strong><br>📋 ${t.desc}</div>
+        <div class="timer-text" id="timerDisplay">${formatTime(t.time)}</div>
+        <button class="btn" id="startTaskBtn">▶ Начать задание</button>
+        <div id="actionButtons" class="hidden" style="text-align:center;">
+          <button class="btn" id="successBtn">✅ Успех</button>
+          <button class="btn" id="failBtn">❌ Провал</button>
+        </div>
+        <button class="btn hidden" id="amuletBtn">🪬 Амулет</button>
+      `;
+      const timerEl = document.getElementById('timerDisplay');
+      const startBtn = document.getElementById('startTaskBtn');
+      const actionDiv = document.getElementById('actionButtons');
+      const amuletBtn = document.getElementById('amuletBtn');
+      let interval;
+
+      if (state.inventory.amulet > 0) {
+        amuletBtn.classList.remove('hidden');
+        amuletBtn.onclick = () => {
+          state.inventory.amulet--; saveState(); updateArtifactsUI(); playSound('artifact');
+          const alt = { slot:'Book of Dead', desc:'Сделай 10 вращений с любым выигрышем', time:180 };
+          room.task = alt; showTask(room);
+        };
+      }
+
+      startBtn.onclick = () => {
+        startBtn.disabled = true;
+        let left = t.time;
+        timerEl.textContent = formatTime(left);
+        interval = setInterval(() => {
+          left--;
+          timerEl.textContent = formatTime(left);
+          if (left <= 0) {
+            clearInterval(interval);
+            timerEl.textContent = '⏰ Время вышло!';
+            startBtn.classList.add('hidden');
+            actionDiv.classList.remove('hidden');
+          }
+        }, 1000);
+        startBtn.textContent = 'Задание идёт...';
+      };
+
+      document.getElementById('successBtn').onclick = () => { if (interval) clearInterval(interval); completeRoom(); };
+      document.getElementById('failBtn').onclick = () => { if (interval) clearInterval(interval); closeModal(); };
+      activeTaskTimer = interval;
+    }
+
+    function formatTime(sec) {
+      const m = Math.floor(sec/60), s = sec%60;
+      return `${m}:${s<10?'0':''}${s}`;
+    }
+            // ==================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
+    // Перемешивание массива (Фишер-Йетс)
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+
+    // ==================== АНИМИРОВАННОЕ ЗВЁЗДНОЕ НЕБО ====================
+    (function initStars() {
+      const canvas = document.getElementById('starsCanvas');
+      if (!canvas) return;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const ctx = canvas.getContext('2d');
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < 120; i++) {
+          // Движение звёзд для эффекта мерцания
+          const x = (i * 37 + Date.now() * 0.01) % canvas.width;
+          const y = (i * 53) % canvas.height;
+          const brightness = 0.5 + Math.sin(Date.now() * 0.002 + i) * 0.3;
+          ctx.fillStyle = `rgba(255,226,140,${brightness})`;
+          ctx.beginPath();
+          ctx.arc(x, y, Math.random() * 1.8 + 0.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+              // ==================== ЗАПУСК ИГРЫ ====================
+    loadState();
+    updateArtifactsUI();
+    renderMap();
+  </script>
+</body>
+</html>
+              // ==================== ДОПОЛНИТЕЛЬНЫЕ МЕХАНИКИ АРТЕФАКТОВ ====================
+    // Глаз Ра: подсветка целей в режиме поиска
+    function useEyeOfRa() {
+      if (state.inventory.eye <= 0) return;
+      state.inventory.eye--;
+      saveState();
+      updateArtifactsUI();
+      playSound('artifact');
+      const cells = document.querySelectorAll('.find-cell[data-target="1"]:not(.found)');
+      cells.forEach(c => {
+        c.style.transition = '0.2s';
+        c.style.boxShadow = '0 0 25px #ffd700';
+        c.style.background = '#4d3a18';
+        setTimeout(() => {
+          c.style.boxShadow = '';
+          c.style.background = '';
+        }, 2500);
+      });
+      if (cells.length === 0) alert('Все цели уже найдены.');
+    }
+
+    // Скарабей удачи: уменьшает время активного задания на 30%
+    function useScarab() {
+      if (state.inventory.scarab <= 0 || !state.currentRoomId) return;
+      const room = rooms.find(r => r.id === state.currentRoomId);
+      if (!room || !room.task) return;
+      state.inventory.scarab--;
+      saveState();
+      updateArtifactsUI();
+      playSound('artifact');
+      room.task.time = Math.floor(room.task.time * 0.7);
+      alert('Скарабей удачи активирован! Время уменьшено на 30%.');
+      // Если таймер уже запущен, перезапустим отображение
+      const taskArea = document.getElementById('taskArea');
+      if (!taskArea.classList.contains('hidden')) {
+        showTask(room); // перерисует задание с новым временем
+      }
+    }
+
+    // Добавим вызов артефактов из инвентаря (клик по иконкам)
+    document.getElementById('art-eye').addEventListener('click', () => {
+      initAudio(); playSound('click'); useEyeOfRa();
     });
-    map.appendChild(row);
-  }
-}
+    document.getElementById('art-scarab').addEventListener('click', () => {
+      initAudio(); playSound('click'); useScarab();
+    });
 
-function isUnlocked(id) {
-  const idx = rooms.findIndex(r => r.id === id);
-  if (idx === 0) return true;
-  return state.completed.includes(rooms[idx-1].id);
-}
+    // ==================== НОВЫЕ ГОЛОВОЛОМКИ ====================
+    // 1. "memory" — найти пары египетских символов
+    function renderMemory(container, room) {
+      const symbols = ['☥','𓀀','𓁿','𓂀','🪲','🐍'];
+      const pairs = symbols.concat(symbols); // 12 карт
+      shuffle(pairs);
+      let opened = [];
+      let matched = 0;
+      container.innerHTML = '<p style="text-align:center;">Найди пары одинаковых символов</p>';
+      const grid = document.createElement('div');
+      grid.style.display = 'grid';
+      grid.style.gridTemplateColumns = 'repeat(4, 70px)';
+      grid.style.gap = '10px';
+      grid.style.justifyContent = 'center';
+      pairs.forEach((sym, idx) => {
+        const card = document.createElement('div');
+        card.style.width = '70px'; card.style.height = '70px';
+        card.style.background = '#2c1f0c';
+        card.style.border = '2px solid #8b6914';
+        card.style.borderRadius = '15px';
+        card.style.display = 'flex';
+        card.style.alignItems = 'center';
+        card.style.justifyContent = 'center';
+        card.style.fontSize = '2rem';
+        card.style.cursor = 'pointer';
+        card.textContent = '?';
+        card.dataset.symbol = sym;
+        card.dataset.index = idx;
+        card.onclick = () => {
+          if (opened.length === 2 || card.classList.contains('matched')) return;
+          card.textContent = sym;
+          opened.push(card);
+          if (opened.length === 2) {
+            const [c1, c2] = opened;
+            if (c1.dataset.symbol === c2.dataset.symbol) {
+              c1.classList.add('matched');
+              c2.classList.add('matched');
+              matched += 2;
+              opened = [];
+              playSound('success');
+              if (matched === pairs.length) {
+                setTimeout(() => puzzleDone(room), 300);
+              }
+            } else {
+              playSound('fail');
+              setTimeout(() => {
+                c1.textContent = '?';
+                c2.textContent = '?';
+                opened = [];
+              }, 600);
+            }
+          }
+        };
+        grid.appendChild(card);
+      });
+      container.appendChild(grid);
+    }
 
-function updateArtifactsUI() {
-  document.getElementById('art-amulet').classList.toggle('active', state.inventory.amulet > 0);
-  document.getElementById('art-scarab').classList.toggle('active', state.inventory.scarab > 0);
-  document.getElementById('art-eye').classList.toggle('active', state.inventory.eye > 0);
-}
+    // 2. "reaction" — поймай скарабея (кликни по движущейся цели)
+    function renderReaction(container, room) {
+      let clicksNeeded = 3;
+      let clicks = 0;
+      let timeout;
+      container.innerHTML = '<p style="text-align:center;">Поймай скарабея! Кликни по нему ' + clicksNeeded + ' раза</p>';
+      const area = document.createElement('div');
+      area.style.position = 'relative';
+      area.style.width = '300px';
+      area.style.height = '200px';
+      area.style.margin = '20px auto';
+      area.style.background = '#1b1105';
+      area.style.border = '2px solid #8b6914';
+      area.style.borderRadius = '20px';
+      area.style.overflow = 'hidden';
+      const target = document.createElement('div');
+      target.textContent = '🪲';
+      target.style.position = 'absolute';
+      target.style.fontSize = '3rem';
+      target.style.cursor = 'pointer';
+      target.style.transition = 'all 0.3s';
+      target.onclick = () => {
+        clicks++;
+        playSound('click');
+        if (clicks >= clicksNeeded) {
+          clearTimeout(timeout);
+          puzzleDone(room);
+        } else {
+          moveTarget();
+        }
+      };
+      function moveTarget() {
+        const x = Math.random() * (area.clientWidth - 50);
+        const y = Math.random() * (area.clientHeight - 50);
+        target.style.left = x + 'px';
+        target.style.top = y + 'px';
+        timeout = setTimeout(moveTarget, 800);
+      }
+      area.appendChild(target);
+      container.appendChild(area);
+      moveTarget();
+    }
 
-// ==================== МОДАЛЬНОЕ ОКНО ====================
-let activeTaskTimer = null;
-function openRoom(id) {
-  state.currentRoomId = id;
-  const room = rooms.find(r => r.id === id);
-  const overlay = document.getElementById('modalOverlay');
-  const panel = document.getElementById('modalPanel');
-  overlay.classList.remove('hidden');
-  panel.innerHTML = `<h2>${room.name}</h2><div id="puzzleArea"></div><div id="taskArea" class="hidden"></div>`;
-  if (room.puzzle) renderPuzzle(room);
-  else { showTask(room); }
-  overlay.onclick = (e) => { if (e.target === overlay) closeModal(); };
-}
+    // Переопределяем renderPuzzle для поддержки новых типов
+    const originalRenderPuzzle = renderPuzzle;
+    renderPuzzle = function(room) {
+      const area = document.getElementById('puzzleArea');
+      if (room.puzzle === 'memory') { renderMemory(area, room); }
+      else if (room.puzzle === 'reaction') { renderReaction(area, room); }
+      else { originalRenderPuzzle(room); }
+    };
 
-function closeModal() {
-  document.getElementById('modalOverlay').classList.add('hidden');
-  if (activeTaskTimer) clearInterval(activeTaskTimer);
-  renderMap();
-}
+    // ==================== МОДИФИКАЦИЯ КОМНАТ ДЛЯ НОВЫХ ГОЛОВОЛОМОК ====================
+    // Заменим несколько существующих комнат на новые типы
+    function replaceRoomPuzzle(id, puzzle, puzzleData, task) {
+      const room = rooms.find(r => r.id === id);
+      if (room) {
+        room.puzzle = puzzle;
+        room.puzzleData = puzzleData;
+        room.task = task;
+      }
+    }
+    // Пример: заменим комнату 7 (Полёт скарабея) на "memory"
+    replaceRoomPuzzle(7, 'memory', {}, { slot:'Book of Dead', desc:'Сделай 20 вращений и получи бонусную игру', time:360 });
+    // Комнату 14 (Печать саркофага) на "reaction"
+    replaceRoomPuzzle(14, 'reaction', {}, { slot:'Legacy of Egypt', desc:'Выиграй x50 в бонусной игре за 10 минут', time:600 });
+    // Ещё пару комнат можно сделать "memory"
+    replaceRoomPuzzle(22, 'memory', {}, { slot:'Rise of Ra', desc:'Запусти бонус и выиграй x25', time:420 });
 
-function completeRoom() {
-  const id = state.currentRoomId;
-  if (!state.completed.includes(id)) {
-    state.completed.push(id);
-    if (id === 5 || id === 20) state.inventory.amulet++;
-    if (id === 10 || id === 25) state.inventory.scarab++;
-    if (id === 15 || id === 30) state.inventory.eye++;
-    saveState();
-    playSound('success');
-    spawnParticles(window.innerWidth/2, window.innerHeight/2, 20);
-  }
-  updateArtifactsUI();
-  closeModal();
-}
+    // Добавим визуальное отображение активных артефактов в модальном окне
+    const originalShowTask = showTask;
+    showTask = function(room) {
+      originalShowTask(room);
+      // Если есть глаз или скарабей, покажем подсказку
+      if (state.inventory.eye > 0) {
+        const hint = document.createElement('p');
+        hint.style.textAlign = 'center';
+        hint.style.color = '#ffd700';
+        hint.textContent = '👁️ Доступен Глаз Ра (кликни иконку вверху)';
+        document.getElementById('taskArea').appendChild(hint);
+      }
+      if (state.inventory.scarab > 0) {
+        const hint = document.createElement('p');
+        hint.style.textAlign = 'center';
+        hint.style.color = '#ffd700';
+        hint.textContent = '🪲 Доступен Скарабей удачи';
+        document.getElementById('taskArea').appendChild(hint);
+      }
+    };
+            // ==================== СЮЖЕТНЫЕ ИНТРО ЯРУСОВ ====================
+    const levelIntros = {
+      1: { title: 'Пустыня и вход', desc: 'Песчаные бури скрывают вход в пирамиду. Найди путь через ловушки, чтобы проникнуть внутрь.' },
+      2: { title: 'Зал Кобр', desc: 'Стены украшены изображениями кобр. Их взгляд гипнотизирует. Будь осторожен.' },
+      3: { title: 'Зал Скарабеев', desc: 'Тысячи скарабеев ползут по полу. Древняя магия охраняет этот ярус.' },
+      4: { title: 'Святилище Бастет', desc: 'Статуи кошачьей богини наблюдают за тобой. Здесь сокрыты великие тайны.' },
+      5: { title: 'Тронный зал', desc: 'Фараон ждёт тебя. Последние испытания перед главным сокровищем.' }
+    };
+    let shownLevelIntros = {}; // ключ - уровень, значение - true, если показано
 
-// ==================== ГОЛОВОЛОМКИ ====================
-function renderPuzzle(room) {
-  const area = document.getElementById('puzzleArea');
-  area.innerHTML = '';
-  switch (room.puzzle) {
-    case 'find': renderFind(area, room); break;
-    case 'sliding': renderSliding(area, room); break;
-    case 'code': renderCode(area, room); break;
-    case 'riddle': renderRiddle(area, room); break;
-    case 'door': renderDoor(area, room); break;
-    case 'sequence': renderSequence(area, room); break;
-  }
-}
+    function showLevelIntro(level) {
+      if (shownLevelIntros[level]) return;
+      shownLevelIntros[level] = true;
+      const intro = levelIntros[level];
+      if (!intro) return;
+      const overlay = document.getElementById('modalOverlay');
+      const panel = document.getElementById('modalPanel');
+      overlay.classList.remove('hidden');
+      panel.innerHTML = `
+        <h2>${intro.title}</h2>
+        <p style="font-size:1.2rem; margin:20px 0; text-align:center;">${intro.desc}</p>
+        <div style="text-align:center;"><button class="btn" id="introContinueBtn">Продолжить</button></div>
+      `;
+      document.getElementById('introContinueBtn').onclick = () => {
+        overlay.classList.add('hidden');
+        // После закрытия интро открываем первую доступную комнату этого уровня
+        const firstRoom = rooms.find(r => r.level === level && isUnlocked(r.id) && !state.completed.includes(r.id));
+        if (firstRoom) openRoom(firstRoom.id);
+      };
+      // Блокируем клик по оверлею, чтобы случайно не закрыть
+      overlay.onclick = null;
+    }
 
-function puzzleDone(room) { playSound('success'); spawnParticles(event.clientX || 300, event.clientY || 300); showTask(room); }
+    // Перехватываем открытие комнаты, чтобы показать интро уровня
+    const originalOpenRoom = openRoom;
+    openRoom = function(id) {
+      const room = rooms.find(r => r.id === id);
+      if (room && !shownLevelIntros[room.level]) {
+        showLevelIntro(room.level);
+        return; // не открываем комнату, пока не закроют интро
+      }
+      originalOpenRoom(id);
+    };
 
-// Поиск предметов
-function renderFind(container, room) {
-  const items = room.puzzleData.items;
-  let foundCount = 0;
-  container.innerHTML = '<p style="text-align:center;font-size:1.2rem;">Найди всех существ!</p>';
-  const grid = document.createElement('div');
-  grid.className = 'find-grid';
-  const icons = ['🐪','🏜️','☀️','⚱️','📜','🕋','🧿','🦂','🐫','🕷️','🏺','🌟'];
-  let cells = [...items];
-  while (cells.length < 25) cells.push(icons[Math.floor(Math.random()*icons.length)]);
-  shuffle(cells);
-  cells.forEach(icon => {
-    const cell = document.createElement('div');
-    cell.className = 'find-cell';
-    cell.textContent = icon;
-    if (items.includes(icon)) {
-      cell.dataset.target = '1';
-      cell.onclick = () => {
-        if (cell.classList.contains('found')) return;
-        cell.classList.add('found');
-        foundCount++;
-        if (foundCount === items.length) puzzleDone(room);
+    // ==================== ПАРАЛЛАКС-ЭФФЕКТ ФОНА ====================
+    document.addEventListener('mousemove', (e) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 10;
+      const y = (e.clientY / window.innerHeight - 0.5) * 10;
+      const pyramid = document.querySelector('.pyramid-silhouette');
+      const sand = document.querySelector('.sand-layer');
+      if (pyramid) pyramid.style.transform = `translate(${x}px, ${-y}px)`;
+      if (sand) sand.style.transform = `translate(${-x/3}px, ${-y/3}px)`;
+    });
+
+    // ==================== НОВЫЕ ГОЛОВОЛОМКИ ====================
+    // 3. "hieroglyph" — расшифруй слово по подсказке
+    function renderHieroglyph(container, room) {
+      const mapping = { '𓀀':'A', '𓁿':'N', '𓂀':'K', '🪲':'H', '🐍':'S' };
+      const word = room.puzzleData.word; // например, 'ANKH'
+      const hints = word.split('').map(ch => Object.keys(mapping).find(key => mapping[key] === ch)).join(' ');
+      container.innerHTML = `
+        <p style="text-align:center;">Расшифруй слово, вводя латинские буквы: ${hints}</p>
+        <p style="text-align:center;font-size:0.9rem;">Подсказка: ${room.puzzleData.hint || 'древнеегипетский символ'}</p>
+      `;
+      const inp = document.createElement('input'); inp.type='text'; inp.className='code-input'; inp.style.width='200px';
+      inp.placeholder = 'Введи слово';
+      const btn = document.createElement('button'); btn.className='btn'; btn.textContent='Расшифровать';
+      btn.onclick = () => {
+        if (inp.value.trim().toUpperCase() === word) puzzleDone(room);
+        else { playSound('fail'); alert('Неверно, попробуй ещё.'); }
+      };
+      container.appendChild(inp); container.appendChild(btn);
+    }
+
+    // 4. "balance" — выбери правильные гири для равновесия
+    function renderBalance(container, room) {
+      const target = room.puzzleData.targetWeight; // например, 7
+      const options = room.puzzleData.options; // массив чисел, например [2,3,5,8]
+      let selected = [];
+      container.innerHTML = `<p style="text-align:center;">Уравновесь весы: сумма гирь должна быть равна ${target}</p>`;
+      const btnsDiv = document.createElement('div');
+      btnsDiv.style.display = 'flex'; btnsDiv.style.gap = '10px'; btnsDiv.style.justifyContent = 'center';
+      options.forEach(w => {
+        const btn = document.createElement('button');
+        btn.className = 'seq-btn'; btn.textContent = w + ' кг';
+        btn.onclick = () => {
+          if (selected.includes(w)) {
+            selected = selected.filter(x => x !== w);
+            btn.style.background = '#2b1a08';
+          } else {
+            selected.push(w);
+            btn.style.background = '#b8860b';
+          }
+          const sum = selected.reduce((a,b)=>a+b,0);
+          if (sum === target) puzzleDone(room);
+          else if (sum > target) {
+            playSound('fail');
+            alert('Перевес! Сбрось выбор.');
+            selected = [];
+            document.querySelectorAll('.seq-btn').forEach(b => b.style.background = '#2b1a08');
+          }
+        };
+        btnsDiv.appendChild(btn);
+      });
+      container.appendChild(btnsDiv);
+    }
+
+    // Расширяем renderPuzzle для новых типов
+    const originalRenderPuzzle2 = renderPuzzle; // ссылка на уже переопределенную в части 7
+    renderPuzzle = function(room) {
+      const area = document.getElementById('puzzleArea');
+      if (room.puzzle === 'hieroglyph') { renderHieroglyph(area, room); }
+      else if (room.puzzle === 'balance') { renderBalance(area, room); }
+      else { originalRenderPuzzle2(room); }
+    };
+
+    // Заменим еще несколько комнат для разнообразия
+    replaceRoomPuzzle(18, 'hieroglyph', { word:'ANKH', hint:'символ жизни' }, { slot:'Book of Dead', desc:'Получи расширяющийся символ 3 раза', time:480 });
+    replaceRoomPuzzle(23, 'balance', { targetWeight:7, options:[2,3,5,8] }, { slot:'Rise of Ra', desc:'Собери 4 скаттера за 8 минут', time:480 });
+    replaceRoomPuzzle(28, 'hieroglyph', { word:'SUN', hint:'источник света' }, { slot:'Eye of Horus', desc:'Расширение дикого символа 4 раза', time:600 });
+    replaceRoomPuzzle(29, 'balance', { targetWeight:12, options:[3,4,5,8] }, { slot:'Sphinx Wild', desc:'Активируй Sphinx Wild 3 раза', time:600 });
+
+    // ==================== ЗВУКИ ОКРУЖЕНИЯ (ЛЕГКИЙ ВЕТЕР) ====================
+    let ambientNoise = null;
+    function startAmbient() {
+      if (!audioCtx) return;
+      if (ambientNoise) return;
+      const bufferSize = 4096;
+      const noise = audioCtx.createScriptProcessor(bufferSize, 1, 1);
+      noise.onaudioprocess = (e) => {
+        const output = e.outputBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          output[i] = (Math.random() * 2 - 1) * 0.02; // очень тихий белый шум
+        }
+      };
+      const gain = audioCtx.createGain();
+      gain.gain.value = 0.03;
+      noise.connect(gain);
+      gain.connect(audioCtx.destination);
+      ambientNoise = noise;
+    }
+    document.addEventListener('click', () => {
+      initAudio();
+      startAmbient();
+    }, { once: true });
+
+    // ==================== ДОПОЛНИТЕЛЬНАЯ АНИМАЦИЯ ПЕРЕХОДОВ МЕЖДУ КОМНАТАМИ ====================
+    // Добавим эффект вспышки при открытии комнаты
+    const originalRenderMap = renderMap;
+    renderMap = function() {
+      originalRenderMap();
+      // Анимируем карточки при появлении
+      document.querySelectorAll('.room-card').forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          card.style.transition = 'all 0.3s ease';
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, index * 30);
+      });
+    };
+              // ==================== СИСТЕМА ОЧКОВ ====================
+    state.score = state.score || 0;
+
+    function addScore(amount) {
+      state.score += amount;
+      saveState();
+      updateScoreDisplay();
+      // Анимация прибавления очков
+      const scoreEl = document.getElementById('scoreValue');
+      if (scoreEl) {
+        scoreEl.style.transform = 'scale(1.5)';
+        scoreEl.style.color = '#ffd700';
+        setTimeout(() => {
+          scoreEl.style.transform = 'scale(1)';
+          scoreEl.style.color = '#e6c04c';
+        }, 300);
+      }
+    }
+
+    function updateScoreDisplay() {
+      const el = document.getElementById('scoreValue');
+      if (el) el.textContent = state.score;
+    }
+
+    // Добавляем отображение очков в интерфейс (в .game-wrapper перед .pyramid-map)
+    const scoreHTML = `
+      <div style="text-align:center; margin: 10px 0;">
+        <span style="font-size:1.5rem; font-family:'Cinzel',serif; color:#e6c04c;">Сокровища: </span>
+        <span id="scoreValue" style="font-size:1.8rem; font-weight:bold; color:#e6c04c; transition:0.3s;">${state.score}</span>
+      </div>
+      <button class="btn" id="shopBtn" style="display:block; margin: 10px auto;">🏺 Магазин артефактов</button>
+    `;
+    const mapContainer = document.getElementById('mapContainer');
+    const scoreDiv = document.createElement('div');
+    scoreDiv.innerHTML = scoreHTML;
+    mapContainer.parentNode.insertBefore(scoreDiv, mapContainer);
+
+    // ==================== МАГАЗИН АРТЕФАКТОВ ====================
+    document.addEventListener('click', function(e) {
+      if (e.target.id === 'shopBtn') {
+        initAudio(); playSound('click');
+        openShop();
+      }
+    });
+
+    function openShop() {
+      const overlay = document.getElementById('modalOverlay');
+      const panel = document.getElementById('modalPanel');
+      overlay.classList.remove('hidden');
+      panel.innerHTML = `
+        <h2>🏺 Магазин артефактов</h2>
+        <p style="text-align:center;">Ваши сокровища: <strong>${state.score}</strong></p>
+        <div style="display:flex; justify-content:center; gap:20px; margin:20px 0;">
+          <div style="border:1px solid gold; border-radius:20px; padding:15px; text-align:center; width:120px;">
+            <div style="font-size:3rem;">🪬</div>
+            <div>Амулет переброса</div>
+            <button class="btn" id="buyAmulet">Купить (50)</button>
+          </div>
+          <div style="border:1px solid gold; border-radius:20px; padding:15px; text-align:center; width:120px;">
+            <div style="font-size:3rem;">🪲</div>
+            <div>Скарабей удачи</div>
+            <button class="btn" id="buyScarab">Купить (40)</button>
+          </div>
+          <div style="border:1px solid gold; border-radius:20px; padding:15px; text-align:center; width:120px;">
+            <div style="font-size:3rem;">👁️</div>
+            <div>Глаз Ра</div>
+            <button class="btn" id="buyEye">Купить (30)</button>
+          </div>
+        </div>
+        <button class="btn" id="closeShopBtn" style="display:block; margin:0 auto;">Закрыть</button>
+      `;
+      document.getElementById('closeShopBtn').onclick = () => overlay.classList.add('hidden');
+      document.getElementById('buyAmulet').onclick = () => buyArtifact('amulet', 50);
+      document.getElementById('buyScarab').onclick = () => buyArtifact('scarab', 40);
+      document.getElementById('buyEye').onclick = () => buyArtifact('eye', 30);
+      overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.add('hidden'); };
+    }
+
+    function buyArtifact(type, cost) {
+      if (state.score >= cost) {
+        state.score -= cost;
+        state.inventory[type]++;
+        saveState();
+        updateScoreDisplay();
+        updateArtifactsUI();
+        playSound('artifact');
+        alert(`Куплен ${type === 'amulet' ? 'Амулет' : type === 'scarab' ? 'Скарабей' : 'Глаз Ра'}!`);
+      } else {
+        playSound('fail');
+        alert('Недостаточно сокровищ!');
+      }
+    }
+
+    // ==================== ВЫБОР СЛОЖНОСТИ ЗАДАНИЯ ====================
+    // Модифицируем showTask: теперь room.task может иметь массив вариантов сложности
+    const originalShowTask2 = showTask;
+    showTask = function(room) {
+      const task = room.task;
+      // Если есть варианты сложности, покажем выбор
+      if (task.difficulties) {
+        document.getElementById('puzzleArea').innerHTML = '<p style="text-align:center;color:gold;">✓ Пройдено</p>';
+        const taskArea = document.getElementById('taskArea');
+        taskArea.classList.remove('hidden');
+        taskArea.innerHTML = `
+          <div class="task-card">
+            <strong>🎰 Слот: ${task.slot}</strong><br>
+            📋 ${task.desc}
+          </div>
+          <p style="text-align:center;">Выбери уровень риска:</p>
+          <div style="display:flex; justify-content:center; gap:15px;">
+            <button class="btn" id="easyBtn">😌 Легко<br><small>${formatTime(task.difficulties.easy.time)} · +30 очков</small></button>
+            <button class="btn" id="normalBtn">⚖️ Норма<br><small>${formatTime(task.difficulties.normal.time)} · +50 очков</small></button>
+            <button class="btn" id="hardBtn">🔥 Сложно<br><small>${formatTime(task.difficulties.hard.time)} · +80 очков</small></button>
+          </div>
+        `;
+        document.getElementById('easyBtn').onclick = () => startTaskWithDifficulty(room, 'easy');
+        document.getElementById('normalBtn').onclick = () => startTaskWithDifficulty(room, 'normal');
+        document.getElementById('hardBtn').onclick = () => startTaskWithDifficulty(room, 'hard');
+        return;
+      }
+      // Иначе обычное задание
+      originalShowTask2(room);
+    };
+
+    function startTaskWithDifficulty(room, level) {
+      const diff = room.task.difficulties[level];
+      const t = { slot: room.task.slot, desc: room.task.desc, time: diff.time, scoreReward: diff.score };
+      room.task = t; // заменяем, чтобы таймер использовал это
+      // Показываем задание с таймером (без выбора сложности)
+      document.getElementById('taskArea').innerHTML = '';
+      originalShowTask2(room);
+    }
+
+    // Добавим в originalShowTask2 начисление очков при успехе (перехватим completeRoom)
+    const originalCompleteRoom = completeRoom;
+    completeRoom = function() {
+      const room = rooms.find(r => r.id === state.currentRoomId);
+      if (room && room.task.scoreReward) {
+        addScore(room.task.scoreReward);
+        checkAchievements(room.task.scoreReward);
+      } else {
+        addScore(10); // базовые очки за обычное задание
+      }
+      originalCompleteRoom();
+    };
+
+    // ==================== ДОСТИЖЕНИЯ ====================
+    const achievements = [
+      { id: 'first_step', name: 'Первый шаг', desc: 'Пройти первую комнату', check: () => state.completed.length >= 1 },
+      { id: 'half_way', name: 'Полпути', desc: 'Пройти 15 комнат', check: () => state.completed.length >= 15 },
+      { id: 'pyramid_master', name: 'Повелитель пирамиды', desc: 'Пройти все 30 комнат', check: () => state.completed.length === 30 },
+      { id: 'rich', name: 'Богач', desc: 'Накопить 200 сокровищ', check: () => state.score >= 200 },
+      { id: 'speedrunner', name: 'Спидраннер', desc: 'Пройти задание быстрее чем за 1 минуту (в сложном режиме)', check: () => false } // будет выдаваться при выполнении харда с быстрым таймером
+    ];
+    let unlockedAchievements = state.unlockedAchievements || [];
+    state.unlockedAchievements = unlockedAchievements;
+
+    function checkAchievements(recentScore) {
+      achievements.forEach(ach => {
+        if (!unlockedAchievements.includes(ach.id) && ach.check()) {
+          unlockedAchievements.push(ach.id);
+          saveState();
+          showAchievement(ach);
+        }
+      });
+      // Спидраннер: если последнее задание было хард и оставшееся время >80% от изначального? Просто пример.
+      const lastRoom = rooms.find(r => r.id === state.currentRoomId);
+      if (lastRoom && lastRoom.task.time <= 60 && lastRoom.task.scoreReward >= 80) {
+        if (!unlockedAchievements.includes('speedrunner')) {
+          unlockedAchievements.push('speedrunner');
+          saveState();
+          showAchievement(achievements.find(a => a.id === 'speedrunner'));
+        }
+      }
+    }
+
+    function showAchievement(ach) {
+      const div = document.createElement('div');
+      div.style.position = 'fixed';
+      div.style.top = '20px';
+      div.style.right = '20px';
+      div.style.background = '#261a0a';
+      div.style.border = '2px solid #ffd700';
+      div.style.borderRadius = '20px';
+      div.style.padding = '15px 25px';
+      div.style.color = '#ffd700';
+      div.style.zIndex = '2000';
+      div.style.animation = 'modalPop 0.5s ease, fadeOut 1s 3s forwards';
+      div.innerHTML = `<strong>🏆 Достижение: ${ach.name}</strong><br>${ach.desc}`;
+      document.body.appendChild(div);
+      setTimeout(() => div.remove(), 4000);
+      playSound('success');
+    }
+
+    // Добавим стили для анимации исчезновения
+    const fadeOutStyle = document.createElement('style');
+    fadeOutStyle.textContent = `
+      @keyframes fadeOut { from { opacity:1; } to { opacity:0; } }
+    `;
+    document.head.appendChild(fadeOutStyle);
+
+    // Модифицируем некоторые комнаты, чтобы добавить выбор сложности
+    function addDifficultyToRoom(id, slot, desc, easyTime, normalTime, hardTime) {
+      const room = rooms.find(r => r.id === id);
+      if (room) {
+        room.task = {
+          slot, desc,
+          difficulties: {
+            easy: { time: easyTime, score: 30 },
+            normal: { time: normalTime, score: 50 },
+            hard: { time: hardTime, score: 80 }
+          }
+        };
+      }
+    }
+    // Применим к нескольким ключевым комнатам
+    addDifficultyToRoom(5, 'Cleopatra', 'Выигрышная линия из 4+ фараонов', 600, 420, 300);
+    addDifficultyToRoom(12, 'Sphinx Wild', 'Получи джекпот в Sphinx Wild', 900, 600, 420);
+    addDifficultyToRoom(15, 'Cleopatra', 'ФИНАЛ: Удвой баланс ($7k→$14k)', 1200, 900, 600);
+    addDifficultyToRoom(20, 'Book of Dead', 'Выиграй x75 в бонусной игре', 720, 540, 360);
+            // ==================== ФИНАЛЬНАЯ БИТВА С БОССОМ ====================
+    let bossDefeated = state.bossDefeated || false;
+    state.bossDefeated = bossDefeated;
+    
+    const bossData = {
+      name: 'Анубис',
+      health: 100,
+      maxHealth: 100,
+      attacks: [
+        { name: 'Проклятие песков', damage: 15, desc: 'Анубис призывает песчаную бурю!' },
+        { name: 'Взгляд смерти', damage: 25, desc: 'Глаза Анубиса сверкают тьмой!' },
+        { name: 'Призыв скарабеев', damage: 20, desc: 'Скарабеи атакуют со всех сторон!' }
+      ]
+    };
+    
+    function checkBossEncounter() {
+      if (state.completed.length === 30 && !bossDefeated) {
+        const room = rooms.find(r => r.id === 30);
+        if (room) {
+          room.puzzle = 'boss';
+          room.puzzleData = null;
+          room.task = null;
+        }
+        renderMap();
+      }
+    }
+    
+    const originalOpenRoom3 = openRoom;
+    openRoom = function(id) {
+      const room = rooms.find(r => r.id === id);
+      if (room && room.puzzle === 'boss') {
+        startBossBattle(room);
+        return;
+      }
+      originalOpenRoom3(id);
+    };
+    
+    function startBossBattle(room) {
+      const overlay = document.getElementById('modalOverlay');
+      const panel = document.getElementById('modalPanel');
+      overlay.classList.remove('hidden');
+      panel.innerHTML = `
+        <h2>⚔️ БИТВА С БОССОМ</h2>
+        <div style="text-align:center; font-size:1.5rem; margin:10px 0;">${bossData.name}</div>
+        <div style="background:#0a0300; border:2px solid red; border-radius:20px; height:30px; margin:15px 0;">
+          <div id="bossHealthBar" style="background:red; height:100%; width:100%; border-radius:18px; transition: width 0.3s;"></div>
+        </div>
+        <div id="bossHPText" style="text-align:center;">${bossData.health}/${bossData.maxHealth} HP</div>
+        <div id="bossMessage" style="text-align:center; margin:10px 0; font-style:italic;">Анубис ждёт твоего хода...</div>
+        <div style="display:flex; justify-content:center; gap:15px; margin:20px 0;">
+          <button class="btn" id="playerAttackBtn">⚡ Атаковать</button>
+          <button class="btn" id="playerDefendBtn">🛡️ Защита</button>
+        </div>
+        <div id="playerHPText" style="text-align:center;">Ваше HP: 100/100</div>
+        <div style="background:#0a0300; border:2px solid green; border-radius:20px; height:20px; margin:10px 0;">
+          <div id="playerHealthBar" style="background:green; height:100%; width:100%; border-radius:18px; transition: width 0.3s;"></div>
+        </div>
+      `;
+      
+      let playerHP = 100;
+      const maxPlayerHP = 100;
+      let bossHP = bossData.health;
+      let playerDefending = false;
+      
+      function updateUI() {
+        document.getElementById('bossHealthBar').style.width = (bossHP / bossData.maxHealth * 100) + '%';
+        document.getElementById('bossHPText').textContent = `${Math.max(0, bossHP)}/${bossData.maxHealth} HP`;
+        document.getElementById('playerHealthBar').style.width = (playerHP / maxPlayerHP * 100) + '%';
+        document.getElementById('playerHPText').textContent = `Ваше HP: ${Math.max(0, playerHP)}/100`;
+      }
+      
+      function bossTurn() {
+        const attack = bossData.attacks[Math.floor(Math.random() * bossData.attacks.length)];
+        let damage = attack.damage;
+        if (playerDefending) {
+          damage = Math.floor(damage / 2);
+          playerDefending = false;
+          document.getElementById('bossMessage').textContent = attack.desc + ' Вы блокировали часть урона!';
+        } else {
+          document.getElementById('bossMessage').textContent = attack.desc;
+        }
+        playerHP -= damage;
+        updateUI();
+        playSound('fail');
+        if (playerHP <= 0) {
+          document.getElementById('bossMessage').textContent = 'Анубис победил... Попробуй ещё раз.';
+          document.getElementById('playerAttackBtn').disabled = true;
+          document.getElementById('playerDefendBtn').disabled = true;
+          setTimeout(() => {
+            overlay.classList.add('hidden');
+          }, 2000);
+        }
+      }
+      
+      function playerAttack() {
+        const damage = 15 + Math.floor(Math.random() * 10);
+        bossHP -= damage;
+        updateUI();
+        playSound('click');
+        document.getElementById('bossMessage').textContent = `Вы нанесли ${damage} урона!`;
+        if (bossHP <= 0) {
+          document.getElementById('bossMessage').textContent = 'Анубис повержен! Пирамида свободна!';
+          document.getElementById('playerAttackBtn').disabled = true;
+          document.getElementById('playerDefendBtn').disabled = true;
+          bossDefeated = true;
+          state.bossDefeated = true;
+          state.completed.push(30);
+          saveState();
+          playSound('success');
+          spawnParticles(window.innerWidth/2, window.innerHeight/2, 30);
+          addScore(200);
+          checkAchievements();
+          setTimeout(() => {
+            overlay.classList.add('hidden');
+            renderMap();
+          }, 2500);
+          return;
+        }
+        bossTurn();
+      }
+      
+      document.getElementById('playerAttackBtn').onclick = playerAttack;
+      document.getElementById('playerDefendBtn').onclick = () => {
+        playerDefending = true;
+        document.getElementById('bossMessage').textContent = 'Вы встали в защитную стойку.';
+        playSound('click');
+        bossTurn();
+      };
+      
+      overlay.onclick = (e) => {
+        if (e.target === overlay && bossHP <= 0) overlay.classList.add('hidden');
       };
     }
-    grid.appendChild(cell);
-  });
-  container.appendChild(grid);
-}
+    
+    const originalCompleteRoom5 = completeRoom;
+    completeRoom = function() {
+      const id = state.currentRoomId;
+      if (id === 30 && !bossDefeated) {
+        startBossBattle(rooms.find(r => r.id === 30));
+        return;
+      }
+      originalCompleteRoom5();
+    };
+    
+    checkBossEncounter();
+    addDifficultyToRoom(30, 'Cleopatra', 'ФИНАЛ: Удвой баланс ($7k→$14k)', 1200, 900, 600); // уже есть, но обновим
+              // ==================== ФИНАЛЬНАЯ БИТВА С БОССОМ ====================
+    let bossDefeated = state.bossDefeated || false;
+    state.bossDefeated = bossDefeated;
+    
+    const bossData = {
+      name: 'Анубис',
+      health: 100,
+      maxHealth: 100,
+      attacks: [
+        { name: 'Проклятие песков', damage: 15, desc: 'Анубис призывает песчаную бурю!' },
+        { name: 'Взгляд смерти', damage: 25, desc: 'Глаза Анубиса сверкают тьмой!' },
+        { name: 'Призыв скарабеев', damage: 20, desc: 'Скарабеи атакуют со всех сторон!' }
+      ]
+    };
+    
+    function checkBossEncounter() {
+      if (state.completed.length === 30 && !bossDefeated) {
+        const room = rooms.find(r => r.id === 30);
+        if (room) {
+          room.puzzle = 'boss';
+          room.puzzleData = null;
+          room.task = null;
+        }
+        renderMap();
+      }
+    }
+    
+    const originalOpenRoom3 = openRoom;
+    openRoom = function(id) {
+      const room = rooms.find(r => r.id === id);
+      if (room && room.puzzle === 'boss') {
+        startBossBattle(room);
+        return;
+      }
+      originalOpenRoom3(id);
+    };
+    
+    function startBossBattle(room) {
+      const overlay = document.getElementById('modalOverlay');
+      const panel = document.getElementById('modalPanel');
+      overlay.classList.remove('hidden');
+      panel.innerHTML = `
+        <h2>⚔️ БИТВА С БОССОМ</h2>
+        <div style="text-align:center; font-size:1.5rem; margin:10px 0;">${bossData.name}</div>
+        <div style="background:#0a0300; border:2px solid red; border-radius:20px; height:30px; margin:15px 0;">
+          <div id="bossHealthBar" style="background:red; height:100%; width:100%; border-radius:18px; transition: width 0.3s;"></div>
+        </div>
+        <div id="bossHPText" style="text-align:center;">${bossData.health}/${bossData.maxHealth} HP</div>
+        <div id="bossMessage" style="text-align:center; margin:10px 0; font-style:italic;">Анубис ждёт твоего хода...</div>
+        <div style="display:flex; justify-content:center; gap:15px; margin:20px 0;">
+          <button class="btn" id="playerAttackBtn">⚡ Атаковать</button>
+          <button class="btn" id="playerDefendBtn">🛡️ Защита</button>
+        </div>
+        <div id="playerHPText" style="text-align:center;">Ваше HP: 100/100</div>
+        <div style="background:#0a0300; border:2px solid green; border-radius:20px; height:20px; margin:10px 0;">
+          <div id="playerHealthBar" style="background:green; height:100%; width:100%; border-radius:18px; transition: width 0.3s;"></div>
+        </div>
+      `;
+      
+      let playerHP = 100;
+      const maxPlayerHP = 100;
+      let bossHP = bossData.health;
+      let playerDefending = false;
+      
+      function updateUI() {
+        document.getElementById('bossHealthBar').style.width = (bossHP / bossData.maxHealth * 100) + '%';
+        document.getElementById('bossHPText').textContent = `${Math.max(0, bossHP)}/${bossData.maxHealth} HP`;
+        document.getElementById('playerHealthBar').style.width = (playerHP / maxPlayerHP * 100) + '%';
+        document.getElementById('playerHPText').textContent = `Ваше HP: ${Math.max(0, playerHP)}/100`;
+      }
+      
+      function bossTurn() {
+        const attack = bossData.attacks[Math.floor(Math.random() * bossData.attacks.length)];
+        let damage = attack.damage;
+        if (playerDefending) {
+          damage = Math.floor(damage / 2);
+          playerDefending = false;
+          document.getElementById('bossMessage').textContent = attack.desc + ' Вы блокировали часть урона!';
+        } else {
+          document.getElementById('bossMessage').textContent = attack.desc;
+        }
+        playerHP -= damage;
+        updateUI();
+        playSound('fail');
+        if (playerHP <= 0) {
+          document.getElementById('bossMessage').textContent = 'Анубис победил... Попробуй ещё раз.';
+          document.getElementById('playerAttackBtn').disabled = true;
+          document.getElementById('playerDefendBtn').disabled = true;
+          setTimeout(() => {
+            overlay.classList.add('hidden');
+          }, 2000);
+        }
+      }
+      
+      function playerAttack() {
+        const damage = 15 + Math.floor(Math.random() * 10);
+        bossHP -= damage;
+        updateUI();
+        playSound('click');
+        document.getElementById('bossMessage').textContent = `Вы нанесли ${damage} урона!`;
+        if (bossHP <= 0) {
+          document.getElementById('bossMessage').textContent = 'Анубис повержен! Пирамида свободна!';
+          document.getElementById('playerAttackBtn').disabled = true;
+          document.getElementById('playerDefendBtn').disabled = true;
+          bossDefeated = true;
+          state.bossDefeated = true;
+          state.completed.push(30);
+          saveState();
+          playSound('success');
+          spawnParticles(window.innerWidth/2, window.innerHeight/2, 30);
+          addScore(200);
+          checkAchievements();
+          setTimeout(() => {
+            overlay.classList.add('hidden');
+            renderMap();
+          }, 2500);
+          return;
+        }
+        bossTurn();
+      }
+      
+      document.getElementById('playerAttackBtn').onclick = playerAttack;
+      document.getElementById('playerDefendBtn').onclick = () => {
+        playerDefending = true;
+        document.getElementById('bossMessage').textContent = 'Вы встали в защитную стойку.';
+        playSound('click');
+        bossTurn();
+      };
+      
+      overlay.onclick = (e) => {
+        if (e.target === overlay && bossHP <= 0) overlay.classList.add('hidden');
+      };
+    }
+    
+    const originalCompleteRoom5 = completeRoom;
+    completeRoom = function() {
+      const id = state.currentRoomId;
+      if (id === 30 && !bossDefeated) {
+        startBossBattle(rooms.find(r => r.id === 30));
+        return;
+      }
+      originalCompleteRoom5();
+    };
+    
+    checkBossEncounter();
+              // ==================== ФИНАЛЬНЫЕ НАГРАДЫ И СТАТИСТИКА ====================
+    state.totalScoreEarned = state.totalScoreEarned || 0;
+    state.totalRoomsCompleted = state.totalRoomsCompleted || 0;
+    state.totalArtifactsUsed = state.totalArtifactsUsed || 0;
+    state.totalBossWins = state.totalBossWins || 0;
 
-// Пятнашки
-function renderSliding(container, room) {
-  const size = room.puzzleData.size;
-  let tiles = [...Array(size*size-1).keys()].map(i => i+1).concat(0);
-  do { shuffle(tiles); } while (isSolved(tiles));
-  let emptyIdx = tiles.indexOf(0);
-  function draw() {
-    container.innerHTML = '';
-    const grid = document.createElement('div');
-    grid.className = 'sliding-grid';
-    grid.style.gridTemplateColumns = `repeat(${size}, 70px)`;
-    tiles.forEach((val, idx) => {
-      const tile = document.createElement('div');
-      tile.className = 'tile' + (val===0?' empty':'');
-      tile.textContent = val||'';
-      tile.onclick = () => move(idx);
-      grid.appendChild(tile);
+    // Обновляем статистику при завершении комнаты
+    const originalCompleteRoom6 = completeRoom;
+    completeRoom = function() {
+      if (state.currentRoomId === 30 && !bossDefeated) {
+        startBossBattle(rooms.find(r => r.id === 30));
+        return;
+      }
+      state.totalRoomsCompleted++;
+      saveState();
+      originalCompleteRoom6();
+    };
+
+    // При использовании артефактов
+    const originalUseEye2 = useEyeOfRa;
+    useEyeOfRa = function() {
+      state.totalArtifactsUsed++;
+      saveState();
+      originalUseEye2();
+    };
+    const originalUseScarab2 = useScarab;
+    useScarab = function() {
+      state.totalArtifactsUsed++;
+      saveState();
+      originalUseScarab2();
+    };
+
+    // При победе над боссом
+    const originalBossDefeat = bossDefeated; // ссылка на глобальную переменную
+    // Добавим в startBossBattle увеличение счетчика при победе
+    const originalStartBossBattle = startBossBattle;
+    startBossBattle = function(room) {
+      originalStartBossBattle(room);
+      // Перехватываем момент победы
+      const originalPlayerAttack = document.getElementById('playerAttackBtn')?.onclick;
+      if (originalPlayerAttack) {
+        document.getElementById('playerAttackBtn').onclick = function() {
+          // Вызываем оригинальную атаку
+          originalPlayerAttack();
+          // Если босс умер (проверим флаг)
+          if (bossDefeated) {
+            state.totalBossWins++;
+            saveState();
+          }
+        };
+      }
+    };
+
+    // Финальная награда после прохождения всех комнат и босса
+    function checkFinalReward() {
+      if (state.completed.length === 30 && bossDefeated && !state.finalRewardClaimed) {
+        state.finalRewardClaimed = true;
+        addScore(500);
+        saveState();
+        showAchievement({
+          id: 'final_reward',
+          name: 'Сокровище фараона',
+          desc: 'Получена главная награда пирамиды!'
+        });
+        spawnParticles(window.innerWidth/2, window.innerHeight/2, 50);
+      }
+    }
+    // Вызываем проверку после каждой завершённой комнаты
+    const originalCompleteRoom7 = completeRoom;
+    completeRoom = function() {
+      originalCompleteRoom7();
+      checkFinalReward();
+    };
+
+    // ==================== СЕКРЕТНЫЕ КОМНАТЫ ====================
+    // С определённым шансом (10%) после прохождения комнаты может открыться секретная комната
+    function maybeOpenSecretRoom() {
+      if (Math.random() < 0.1 && !state.secretRoomActive) {
+        state.secretRoomActive = true;
+        saveState();
+        // Добавляем временную комнату (id 99) со сложной головоломкой и большой наградой
+        rooms.push({
+          id: 99,
+          name: 'Тайная усыпальница',
+          level: 5,
+          puzzle: 'hieroglyph',
+          puzzleData: { word: 'SECRET', hint: 'скрытое знание' },
+          task: { slot: 'Book of Dead', desc: 'Секретное задание: выиграй x200 за 5 минут!', time: 300, scoreReward: 150 }
+        });
+        renderMap();
+        alert('Обнаружена тайная усыпальница! Открой её, чтобы получить огромную награду.');
+      }
+    }
+    // Вызываем при завершении комнаты
+    const originalCompleteRoom8 = completeRoom;
+    completeRoom = function() {
+      originalCompleteRoom8();
+      if (state.currentRoomId !== 99) maybeOpenSecretRoom();
+    };
+
+    // После прохождения секретной комнаты удаляем её
+    const originalCompleteRoom9 = completeRoom;
+    completeRoom = function() {
+      if (state.currentRoomId === 99) {
+        state.secretRoomActive = false;
+        rooms.pop(); // удаляем секретную комнату
+        saveState();
+      }
+      originalCompleteRoom9();
+    };
+
+    // ==================== ТАБЛИЦА СТАТИСТИКИ ====================
+    const statsBtnHTML = `<button class="btn" id="statsBtn" style="display:block; margin:10px auto;">📊 Статистика</button>`;
+    const statsBtnDiv = document.createElement('div');
+    statsBtnDiv.innerHTML = statsBtnHTML;
+    document.getElementById('mapContainer').parentNode.insertBefore(statsBtnDiv, document.getElementById('mapContainer'));
+
+    document.addEventListener('click', function(e) {
+      if (e.target.id === 'statsBtn') {
+        showStats();
+      }
     });
-    container.appendChild(grid);
-  }
-  function move(idx) {
-    const r1 = Math.floor(idx/size), c1 = idx%size;
-    const r2 = Math.floor(emptyIdx/size), c2 = emptyIdx%size;
-    if (Math.abs(r1-r2)+Math.abs(c1-c2) === 1) {
-      [tiles[idx], tiles[emptyIdx]] = [tiles[emptyIdx], tiles[idx]];
-      emptyIdx = idx;
-      draw();
-      if (isSolved(tiles)) puzzleDone(room);
+
+    function showStats() {
+      const overlay = document.getElementById('modalOverlay');
+      const panel = document.getElementById('modalPanel');
+      overlay.classList.remove('hidden');
+      panel.innerHTML = `
+        <h2>📊 Статистика</h2>
+        <div style="border:1px solid gold; border-radius:20px; padding:20px;">
+          <p>✅ Пройдено комнат: ${state.totalRoomsCompleted}</p>
+          <p>🏆 Заработано сокровищ: ${state.totalScoreEarned}</p>
+          <p>🪬 Использовано артефактов: ${state.totalArtifactsUsed}</p>
+          <p>⚔️ Побед над боссом: ${state.totalBossWins}</p>
+          <p>🔥 Максимальное комбо: ${state.maxCombo}</p>
+          <p>💀 Секретных комнат открыто: ${state.secretRoomActive ? 'активна' : (state.completed.includes(99) ? 'пройдена' : 'нет')}</p>
+        </div>
+        <button class="btn" id="closeStatsBtn">Закрыть</button>
+      `;
+      document.getElementById('closeStatsBtn').onclick = () => overlay.classList.add('hidden');
+      overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.add('hidden'); };
     }
-  }
-  draw();
-}
-function isSolved(tiles) {
-  return tiles.slice(0,-1).every((v,i)=>v===i+1) && tiles[tiles.length-1]===0;
-}
 
-// Код
-function renderCode(container, room) {
-  container.innerHTML = `<p style="text-align:center;font-size:1.3rem;">${room.puzzleData.eq}</p>`;
-  const div = document.createElement('div'); div.style.textAlign='center';
-  const inp = document.createElement('input'); inp.type='number'; inp.className='code-input';
-  const btn = document.createElement('button'); btn.className='btn'; btn.textContent='✓';
-  btn.onclick = () => {
-    if (parseInt(inp.value) === room.puzzleData.ans) { playSound('success'); puzzleDone(room); }
-    else { playSound('fail'); alert('Неверно'); }
-  };
-  div.appendChild(inp); div.appendChild(btn);
-  container.appendChild(div);
-}
-
-// Загадка
-function renderRiddle(container, room) {
-  container.innerHTML = `<p style="font-size:1.3rem;margin-bottom:15px;">${room.puzzleData.q}</p>`;
-  const inp = document.createElement('input'); inp.type='text'; inp.className='code-input'; inp.style.width='200px';
-  const btn = document.createElement('button'); btn.className='btn'; btn.textContent='Ответ';
-  btn.onclick = () => {
-    if (inp.value.trim().toLowerCase() === room.puzzleData.ans.toLowerCase()) { playSound('success'); puzzleDone(room); }
-    else { playSound('fail'); alert('Неправильно'); }
-  };
-  container.appendChild(inp); container.appendChild(btn);
-}
-
-// Дверь
-function renderDoor(container, room) {
-  container.innerHTML = '<p style="text-align:center;">Выбери правильный проход:</p>';
-  const doorsDiv = document.createElement('div'); doorsDiv.style.display='flex'; doorsDiv.style.justifyContent='center'; doorsDiv.style.gap='20px';
-  for (let i=1;i<=3;i++) {
-    const door = document.createElement('div');
-    door.className = 'room-card'; door.style.width='80px'; door.style.height='100px'; door.textContent = i;
-    door.onclick = () => {
-      if (i === room.puzzleData.correct) puzzleDone(room);
-      else { playSound('fail'); alert('Замуровано!'); }
+    // Обновление totalScoreEarned в addScore
+    const originalAddScore = addScore;
+    addScore = function(amount) {
+      state.totalScoreEarned += amount;
+      saveState();
+      originalAddScore(amount);
     };
-    doorsDiv.appendChild(door);
-  }
-  container.appendChild(doorsDiv);
-}
+            // ==================== ТАБЛИЦА РЕКОРДОВ (LOCALSTORAGE) ====================
+    let records = JSON.parse(localStorage.getItem('pharaoh_quest_records')) || [];
+    // Запись рекорда при завершении всех комнат и босса
+    function addRecord(score, roomsCompleted, bossDefeated) {
+      const entry = {
+        date: new Date().toLocaleString(),
+        score: score,
+        rooms: roomsCompleted,
+        boss: bossDefeated
+      };
+      records.push(entry);
+      records.sort((a,b) => b.score - a.score);
+      if (records.length > 10) records = records.slice(0,10);
+      localStorage.setItem('pharaoh_quest_records', JSON.stringify(records));
+    }
 
-// Последовательность
-function renderSequence(container, room) {
-  const order = room.puzzleData.order;
-  const symbols = ['𓀀','𓁿','𓂀'];
-  let userSeq = [];
-  container.innerHTML = '<p style="text-align:center;">Нажми символы в порядке: ' + order.map(i=>symbols[i-1]).join(' → ') + '</p>';
-  const btnsDiv = document.createElement('div'); btnsDiv.className = 'sequence-buttons';
-  symbols.forEach((sym, idx) => {
-    const btn = document.createElement('div');
-    btn.className = 'seq-btn'; btn.textContent = sym;
-    btn.onclick = () => {
-      userSeq.push(idx+1);
-      if (userSeq.length === order.length) {
-        if (userSeq.every((v,i)=>v===order[i])) puzzleDone(room);
-        else { playSound('fail'); userSeq = []; alert('Неверная последовательность!'); }
+    // Вызываем запись рекорда при полной победе
+    const originalCompleteRoom10 = completeRoom;
+    completeRoom = function() {
+      originalCompleteRoom10();
+      if (state.completed.length === 30 && bossDefeated && !state.recordedWin) {
+        state.recordedWin = true;
+        addRecord(state.totalScoreEarned, state.totalRoomsCompleted, true);
+        saveState();
       }
     };
-    btnsDiv.appendChild(btn);
-  });
-  container.appendChild(btnsDiv);
-}
 
-// ==================== ЗАДАНИЕ ====================
-function showTask(room) {
-  document.getElementById('puzzleArea').innerHTML = '<p style="text-align:center;color:gold;">✓ Пройдено</p>';
-  const taskArea = document.getElementById('taskArea');
-  taskArea.classList.remove('hidden');
-  const t = room.task;
-  taskArea.innerHTML = `
-    <div class="task-card"><strong>🎰 Слот: ${t.slot}</strong><br>📋 ${t.desc}</div>
-    <div class="timer-text" id="timerDisplay">${formatTime(t.time)}</div>
-    <button class="btn" id="startTaskBtn">▶ Начать задание</button>
-    <div id="actionButtons" class="hidden" style="text-align:center;">
-      <button class="btn" id="successBtn">✅ Успех</button>
-      <button class="btn" id="failBtn">❌ Провал</button>
-    </div>
-    <button class="btn hidden" id="amuletBtn">🪬 Амулет</button>
-  `;
-  const timerEl = document.getElementById('timerDisplay');
-  const startBtn = document.getElementById('startTaskBtn');
-  const actionDiv = document.getElementById('actionButtons');
-  const amuletBtn = document.getElementById('amuletBtn');
-  let interval;
+    // Кнопка просмотра рекордов (добавляем рядом со статистикой)
+    const recordsBtnHTML = `<button class="btn" id="recordsBtn" style="display:block; margin:10px auto;">🏅 Таблица рекордов</button>`;
+    const recordsBtnDiv = document.createElement('div');
+    recordsBtnDiv.innerHTML = recordsBtnHTML;
+    document.getElementById('mapContainer').parentNode.insertBefore(recordsBtnDiv, document.getElementById('mapContainer'));
 
-  if (state.inventory.amulet > 0) {
-    amuletBtn.classList.remove('hidden');
-    amuletBtn.onclick = () => {
-      state.inventory.amulet--; saveState(); updateArtifactsUI(); playSound('artifact');
-      const alt = { slot:'Book of Dead', desc:'Сделай 10 вращений с любым выигрышем', time:180 };
-      room.task = alt; showTask(room);
-    };
-  }
-
-  startBtn.onclick = () => {
-    startBtn.disabled = true;
-    let left = t.time;
-    timerEl.textContent = formatTime(left);
-    interval = setInterval(() => {
-      left--;
-      timerEl.textContent = formatTime(left);
-      if (left <= 0) {
-        clearInterval(interval);
-        timerEl.textContent = '⏰ Время вышло!';
-        startBtn.classList.add('hidden');
-        actionDiv.classList.remove('hidden');
+    document.addEventListener('click', function(e) {
+      if (e.target.id === 'recordsBtn') {
+        showRecords();
       }
-    }, 1000);
-    startBtn.textContent = 'Задание идёт...';
-  };
+    });
 
-  document.getElementById('successBtn').onclick = () => { if (interval) clearInterval(interval); completeRoom(); };
-  document.getElementById('failBtn').onclick = () => { if (interval) clearInterval(interval); closeModal(); };
-  activeTaskTimer = interval;
-}
-
-function formatTime(sec) {
-  const m = Math.floor(sec/60), s = sec%60;
-  return `${m}:${s<10?'0':''}${s}`;
-}
-
-// ==================== ЗВЁЗДНЫЙ ФОН ====================
-(function initStars() {
-  const canvas = document.getElementById('starsCanvas');
-  if (!canvas) return;
-  canvas.style.position = 'fixed'; canvas.style.top=0; canvas.style.left=0;
-  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-  const ctx = canvas.getContext('2d');
-  function draw() {
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    for (let i=0;i<120;i++) {
-      const x = (i*37)%canvas.width, y = (i*53)%canvas.height;
-      ctx.fillStyle = `rgba(255,226,140,${0.5+Math.sin(Date.now()*0.002+i)*0.3})`;
-      ctx.beginPath(); ctx.arc(x,y,Math.random()*2+0.5,0,Math.PI*2); ctx.fill();
+    function showRecords() {
+      const overlay = document.getElementById('modalOverlay');
+      const panel = document.getElementById('modalPanel');
+      overlay.classList.remove('hidden');
+      panel.innerHTML = `<h2>🏅 Таблица рекордов</h2>`;
+      if (records.length === 0) {
+        panel.innerHTML += '<p style="text-align:center;">Пока нет рекордов. Пройдите игру!</p>';
+      } else {
+        panel.innerHTML += '<div style="border:1px solid gold; border-radius:20px; padding:20px;">';
+        records.forEach((rec, idx) => {
+          panel.innerHTML += `<p>${idx+1}. Сокровищ: ${rec.score}, комнат: ${rec.rooms}, босс: ${rec.boss ? '✅' : '❌'} (${rec.date})</p>`;
+        });
+        panel.innerHTML += '</div>';
+      }
+      panel.innerHTML += `<button class="btn" id="closeRecordsBtn">Закрыть</button>`;
+      document.getElementById('closeRecordsBtn').onclick = () => overlay.classList.add('hidden');
+      overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.add('hidden'); };
     }
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
 
-function shuffle(arr) {
-  for (let i=arr.length-1;i>0;i--) {
-    const j = Math.floor(Math.random()*(i+1));
-    [arr[i],arr[j]] = [arr[j],arr[i]];
-  }
-}
+    // ==================== СИСТЕМА ПРЕСТИЖА ====================
+    // После полного прохождения игры можно начать заново с бонусными очками.
+    state.prestige = state.prestige || 0;
+    state.prestigeMultiplier = state.prestigeMultiplier || 1;
 
-// ==================== СТАРТ ====================
-loadState();
-updateArtifactsUI();
-renderMap();
+    function prestigeReset() {
+      if (state.completed.length === 30 && bossDefeated) {
+        if (confirm('Начать престиж? Весь прогресс комнат будет сброшен, но вы получите бонусный множитель очков и сохраните артефакты.')) {
+          state.prestige++;
+          state.prestigeMultiplier += 0.2; // +20% очков за каждый престиж
+          state.completed = [];
+          state.currentRoomId = null;
+          state.bossDefeated = false;
+          bossDefeated = false;
+          state.recordedWin = false;
+          state.secretRoomActive = false;
+          // Удаляем секретную комнату, если есть
+          const secretRoomIndex = rooms.findIndex(r => r.id === 99);
+          if (secretRoomIndex !== -1) rooms.splice(secretRoomIndex, 1);
+          saveState();
+          renderMap();
+          updateArtifactsUI();
+          alert(`Престиж ${state.prestige}! Множитель очков теперь x${state.prestigeMultiplier.toFixed(1)}`);
+        }
+      } else {
+        alert('Пройдите все 30 комнат и победите босса, чтобы открыть престиж.');
+      }
+    }
+
+    // Кнопка престижа
+    const prestigeBtnHTML = `<button class="btn" id="prestigeBtn" style="display:block; margin:10px auto;">🌟 Престиж</button>`;
+    const prestigeBtnDiv = document.createElement('div');
+    prestigeBtnDiv.innerHTML = prestigeBtnHTML;
+    document.getElementById('mapContainer').parentNode.insertBefore(prestigeBtnDiv, document.getElementById('mapContainer'));
+
+    document.addEventListener('click', function(e) {
+      if (e.target.id === 'prestigeBtn') {
+        prestigeReset();
+      }
+    });
+
+    // Применяем множитель престижа к начисляемым очкам
+    const originalAddScore2 = addScore;
+    addScore = function(amount) {
+      const adjusted = Math.floor(amount * state.prestigeMultiplier);
+      originalAddScore2(adjusted);
+    };
+            // ==================== КАСТОМИЗАЦИЯ ТЕМЫ ====================
+    const themes = {
+      gold: {
+        name: 'Золото фараона',
+        bg: 'radial-gradient(ellipse at 50% 30%, #3b2512 0%, #0a0300 90%)',
+        border: '#c29b2e',
+        cardBg: '#2b1a08',
+        cardBorder: '#8b6914',
+        glow: '#ffd700'
+      },
+      dark: {
+        name: 'Тьма гробницы',
+        bg: 'radial-gradient(ellipse at 50% 30%, #1a1a2e 0%, #000000 90%)',
+        border: '#555',
+        cardBg: '#1a1a2e',
+        cardBorder: '#444',
+        glow: '#8888ff'
+      },
+      neon: {
+        name: 'Неоновая пирамида',
+        bg: 'radial-gradient(ellipse at 50% 30%, #0f0f2e 0%, #000 90%)',
+        border: '#0ff',
+        cardBg: '#112',
+        cardBorder: '#0ff',
+        glow: '#0ff'
+      }
+    };
+    state.theme = state.theme || 'gold';
+    applyTheme(state.theme);
+
+    function applyTheme(themeName) {
+      const t = themes[themeName];
+      if (!t) return;
+      document.querySelector('.bg-gradient').style.background = t.bg;
+      document.querySelector('.game-wrapper').style.borderColor = t.border;
+      document.querySelectorAll('.room-card').forEach(card => {
+        if (!card.classList.contains('completed') && !card.classList.contains('locked')) {
+          card.style.background = t.cardBg;
+          card.style.borderColor = t.cardBorder;
+        }
+      });
+      // Меняем свечение анимаций
+      const style = document.getElementById('themeStyle') || document.createElement('style');
+      style.id = 'themeStyle';
+      style.textContent = `
+        @keyframes roomGlow {
+          from { box-shadow: 0 0 25px ${t.glow}; }
+          to { box-shadow: 0 0 55px ${t.glow}, 0 0 75px ${t.glow}; }
+        }
+        @keyframes artPulse {
+          0% { box-shadow: 0 0 20px ${t.glow}; }
+          50% { box-shadow: 0 0 45px ${t.glow}, 0 0 25px ${t.glow}; }
+          100% { box-shadow: 0 0 20px ${t.glow}; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    // Кнопка смены темы
+    const themeBtnHTML = `<button class="btn" id="themeBtn" style="display:block; margin:10px auto;">🎨 Сменить тему</button>`;
+    const themeBtnDiv = document.createElement('div');
+    themeBtnDiv.innerHTML = themeBtnHTML;
+    document.getElementById('mapContainer').parentNode.insertBefore(themeBtnDiv, document.getElementById('mapContainer'));
+
+    document.addEventListener('click', function(e) {
+      if (e.target.id === 'themeBtn') {
+        cycleTheme();
+      }
+    });
+
+    function cycleTheme() {
+      const keys = Object.keys(themes);
+      const idx = keys.indexOf(state.theme);
+      const next = keys[(idx + 1) % keys.length];
+      state.theme = next;
+      applyTheme(next);
+      saveState();
+      alert(`Тема изменена на: ${themes[next].name}`);
+    }
+
+    // ==================== ДОПОЛНИТЕЛЬНЫЕ ВИЗУАЛЬНЫЕ ЭФФЕКТЫ ====================
+    // Эффект "дрожания" экрана при провале задания (сбрасывается комбо)
+    function shakeScreen() {
+      const wrapper = document.querySelector('.game-wrapper');
+      wrapper.style.transform = 'translate(5px, 0)';
+      setTimeout(() => wrapper.style.transform = 'translate(-5px, 0)', 50);
+      setTimeout(() => wrapper.style.transform = 'translate(0, 0)', 100);
+    }
+    const originalCloseModal2 = closeModal;
+    closeModal = function() {
+      if (activeTaskTimer) {
+        shakeScreen();
+      }
+      originalCloseModal2();
+    };
+
+    // Эффект "золотого дождя" при успешном выполнении задания
+    function goldenRain() {
+      for (let i = 0; i < 30; i++) {
+        setTimeout(() => {
+          spawnParticles(
+            Math.random() * window.innerWidth,
+            -20,
+            1
+          );
+        }, i * 30);
+      }
+    }
+    const originalCompleteRoom11 = completeRoom;
+    completeRoom = function() {
+      goldenRain();
+      originalCompleteRoom11();
+    };
+
+    // Эффект печати на экране (иероглифы) при открытии интро уровня
+    const originalShowLevelIntro = showLevelIntro;
+    showLevelIntro = function(level) {
+      originalShowLevelIntro(level);
+      // Добавим пару иероглифов на фон модального окна
+      const panel = document.getElementById('modalPanel');
+      if (panel) {
+        const hiero = document.createElement('div');
+        hiero.style.position = 'absolute';
+        hiero.style.top = '10px';
+        hiero.style.right = '20px';
+        hiero.style.fontSize = '4rem';
+        hiero.style.opacity = '0.2';
+        hiero.textContent = '𓂀';
+        panel.appendChild(hiero);
+      }
+    };
+            // ==================== ФИНАЛЬНАЯ ИНИЦИАЛИЗАЦИЯ ====================
+    loadState();
+    updateArtifactsUI();
+    renderMap();
 </script>
 </body>
 </html>
