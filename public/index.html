@@ -212,6 +212,15 @@
     @media (max-width: 700px) {
       .room-card { width: 90px; height: 90px; }
     }
+    /* Дополнительные стили для атмосферы */
+    .particle {
+      position: fixed; pointer-events: none; z-index: 999;
+      animation: particleFade 1s ease-out forwards;
+    }
+    @keyframes particleFade {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-80px) scale(0); }
+    }
   </style>
 </head>
 <body>
@@ -236,12 +245,10 @@
 </div>
 
 <script>
-// ==================== ЗВУКОВЫЕ ЭФФЕКТЫ (Web Audio) ====================
+// ==================== ЗВУКОВЫЕ ЭФФЕКТЫ ====================
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 let audioCtx;
-function initAudio() {
-  if (!audioCtx) audioCtx = new AudioCtx();
-}
+function initAudio() { if (!audioCtx) audioCtx = new AudioCtx(); }
 function playSound(type) {
   if (!audioCtx) return;
   const osc = audioCtx.createOscillator();
@@ -256,8 +263,24 @@ function playSound(type) {
   }
 }
 
-// ==================== СОСТОЯНИЕ ИГРЫ ====================
-const STORAGE_KEY = 'pharaoh_quest_pro';
+// ==================== ЧАСТИЦЫ ====================
+function spawnParticles(x, y, count = 10) {
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = x + 'px';
+    p.style.top = y + 'px';
+    p.style.width = '6px';
+    p.style.height = '6px';
+    p.style.background = '#ffd700';
+    p.style.borderRadius = '50%';
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1000);
+  }
+}
+
+// ==================== СОСТОЯНИЕ ====================
+const STORAGE_KEY = 'pharaoh_quest_ultra';
 let state = {
   completed: [],
   inventory: { amulet: 0, scarab: 0, eye: 0 },
@@ -271,7 +294,6 @@ for (let lvl = 1; lvl <= 5; lvl++) {
   for (let i = 1; i <= 6; i++) {
     const id = (lvl-1)*6 + i;
     let puzzle, puzzleData, task;
-    // Заполняем в зависимости от номера
     if (lvl === 1) {
       if (i === 1) { puzzle = 'find'; puzzleData = { items: ['🪲','🪲','🪲','🪲','🪲'] }; task = { slot:'Book of Dead', desc:'Сделай 15 вращений, получи хотя бы один расширяющийся символ', time:300 }; }
       else if (i === 2) { puzzle = 'sliding'; puzzleData = { size:3 }; task = { slot:'Rise of Ra', desc:'За 5 минут собери 3 скаттера и запусти бонус', time:300 }; }
@@ -395,12 +417,12 @@ function completeRoom() {
   const id = state.currentRoomId;
   if (!state.completed.includes(id)) {
     state.completed.push(id);
-    // Выдача артефактов
     if (id === 5 || id === 20) state.inventory.amulet++;
     if (id === 10 || id === 25) state.inventory.scarab++;
     if (id === 15 || id === 30) state.inventory.eye++;
     saveState();
     playSound('success');
+    spawnParticles(window.innerWidth/2, window.innerHeight/2, 20);
   }
   updateArtifactsUI();
   closeModal();
@@ -420,7 +442,7 @@ function renderPuzzle(room) {
   }
 }
 
-function puzzleDone(room) { playSound('success'); showTask(room); }
+function puzzleDone(room) { playSound('success'); spawnParticles(event.clientX || 300, event.clientY || 300); showTask(room); }
 
 // Поиск предметов
 function renderFind(container, room) {
