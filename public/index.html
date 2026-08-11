@@ -578,17 +578,17 @@
             margin-top: 2px;
         }
 
-        /* ========== МОДАЛКА ПРАВИЛ ========== */
+        /* ========== МОДАЛКА ПРИВЕТСТВИЯ И ПРАВИЛ ========== */
         .modal-rules-overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
             z-index: 3000;
             justify-content: center;
             align-items: center;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.4s ease;
         }
 
         .modal-rules-overlay.active {
@@ -598,14 +598,14 @@
         .modal-rules {
             background: linear-gradient(160deg, #1a1828, #12101e);
             border-radius: 48px;
-            max-width: 650px;
-            width: 92%;
-            padding: 36px;
-            border: 1px solid rgba(255, 215, 0, 0.08);
+            max-width: 720px;
+            width: 94%;
+            padding: 40px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
             box-shadow: 0 40px 100px rgba(0, 0, 0, 0.9);
             position: relative;
             overflow: hidden;
-            max-height: 80vh;
+            max-height: 85vh;
             overflow-y: auto;
         }
 
@@ -622,49 +622,54 @@
         }
 
         .modal-rules h2 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #f0e8f8;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #f7d44a;
+            text-align: center;
             margin-bottom: 16px;
             position: relative;
             z-index: 1;
-            text-align: center;
+            text-shadow: 0 0 30px rgba(245, 166, 35, 0.15);
         }
 
-        .modal-rules .rules-list {
+        .modal-rules .rules-content {
             position: relative;
             z-index: 1;
             color: #c0b8d0;
             font-size: 1rem;
-            line-height: 1.8;
-            padding-left: 20px;
+            line-height: 1.7;
         }
 
-        .modal-rules .rules-list li {
-            margin-bottom: 10px;
+        .modal-rules .rules-content p {
+            margin-bottom: 12px;
         }
 
-        .modal-rules .rules-list .highlight-coin { color: #cd7f32; font-weight: 600; }
-        .modal-rules .rules-list .highlight-diamond { color: #c0c0c0; font-weight: 600; }
-        .modal-rules .rules-list .highlight-crown { color: #f7d44a; font-weight: 600; }
-        .modal-rules .rules-list .highlight-light { color: #f7d44a; font-weight: 600; }
-        .modal-rules .rules-list .highlight-dark { color: #b388ff; font-weight: 600; }
-
-        .modal-rules .rules-list .prize {
-            color: #f7d44a;
-            font-weight: 700;
+        .modal-rules .rules-content ul {
+            padding-left: 24px;
+            margin-bottom: 16px;
         }
+
+        .modal-rules .rules-content ul li {
+            margin-bottom: 6px;
+        }
+
+        .modal-rules .rules-content .highlight-coin { color: #cd7f32; font-weight: 600; }
+        .modal-rules .rules-content .highlight-diamond { color: #c0c0c0; font-weight: 600; }
+        .modal-rules .rules-content .highlight-crown { color: #f7d44a; font-weight: 600; }
+        .modal-rules .rules-content .highlight-light { color: #f7d44a; font-weight: 600; }
+        .modal-rules .rules-content .highlight-dark { color: #b388ff; font-weight: 600; }
+        .modal-rules .rules-content .prize { color: #f7d44a; font-weight: 700; }
 
         .modal-rules .close-rules-btn {
             background: linear-gradient(135deg, #f7d44a, #f5a623);
             border: none;
             color: #0a0a0f;
-            padding: 10px 30px;
+            padding: 12px 36px;
             border-radius: 40px;
             font-weight: 700;
             cursor: pointer;
             transition: 0.3s;
-            font-size: 1rem;
+            font-size: 1.1rem;
             margin-top: 20px;
             display: block;
             margin-left: auto;
@@ -675,7 +680,7 @@
 
         .modal-rules .close-rules-btn:hover {
             transform: scale(1.03);
-            box-shadow: 0 0 30px rgba(245, 166, 35, 0.2);
+            box-shadow: 0 0 40px rgba(245, 166, 35, 0.2);
         }
 
         /* ========== МОДАЛКА ВЫБОРА МОНЕТА/АЛМАЗ/КОРОНА ========== */
@@ -1158,6 +1163,7 @@
             .current-player-banner { flex-direction: column; align-items: flex-start; }
             .current-player-banner .player-turn-hint { margin-left: 0; }
             .modal .result-status { flex-direction: column; }
+            .modal-rules { padding: 24px; }
         }
         @media (max-width: 480px) {
             .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -1254,29 +1260,40 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА ПРАВИЛ -->
-    <div class="modal-rules-overlay" id="rulesModal">
+    <!-- МОДАЛКА ПРИВЕТСТВИЯ И ПРАВИЛ -->
+    <div class="modal-rules-overlay" id="welcomeModal">
         <div class="modal-rules">
-            <h2>📜 Правила квеста</h2>
-            <ul class="rules-list">
-                <li>🎯 <span class="highlight-light">30 комнат</span> — в каждой игрок выбирает уровень сложности:</li>
-                <li>🪙 <span class="highlight-coin">Монета</span> — лёгкое задание, даёт <strong>10 очков</strong>.</li>
-                <li>💎 <span class="highlight-diamond">Алмаз</span> — среднее задание, даёт <strong>25 очков</strong>.</li>
-                <li>👑 <span class="highlight-crown">Корона</span> — сложное задание, даёт <strong>50 очков</strong>.</li>
-                <li>⛔ Одна команда <span class="highlight-light">не может выполнить больше 3 заданий подряд</span> — ход переходит автоматически.</li>
-                <li>🎲 Участник выбирается <span class="highlight-dark">случайным образом</span> из доступных в команде.</li>
-                <li>💬 Имена можно менять <span class="highlight-light">кликом по ним</span> в таблице.</li>
-                <li>✅ <span class="highlight-light">Выполненное</span> задание приносит очки и даёт право на следующий ход (до 3 подряд).</li>
-                <li>❌ <span class="highlight-dark">Проваленное</span> задание — очки не начисляются, ход переходит к другой команде.</li>
-                <li>🏆 Побеждает команда, набравшая <span class="highlight-light">больше очков</span>.</li>
-                <li>💰 <span class="prize">Призы:</span><br>
-                    &nbsp;&nbsp;• Команда-победитель — каждый участник получает <span class="prize">3 000 ₽</span>.<br>
-                    &nbsp;&nbsp;• Лучший игрок команды-победителя (по очкам) — <span class="prize">10 000 ₽</span>.<br>
-                    &nbsp;&nbsp;• Второй игрок команды-победителя — <span class="prize">5 000 ₽</span>.<br>
-                    &nbsp;&nbsp;• Остальные участники (3-5 места) — без награды.
-                </li>
-            </ul>
-            <button class="close-rules-btn" id="rulesCloseBtn">Понятно!</button>
+            <h2>⚔️ Добро пожаловать в «Битву Королевств»!</h2>
+            <div class="rules-content">
+                <p><strong>Это командный квест для стрима!</strong> Две команды — <span class="highlight-light">Королевство Света</span> и <span class="highlight-dark">Королевство Тьмы</span> — соревнуются, проходя 30 комнат. В каждой комнате участник выбирает уровень сложности и получает задание.</p>
+                
+                <p><strong>Как это работает?</strong></p>
+                <ul>
+                    <li>📌 Стример нажимает «<strong>🎲 Выбрать участника</strong>» — система случайно выбирает команду и игрока.</li>
+                    <li>📌 Выбранный игрок открывает комнату и выбирает награду:</li>
+                    <ul>
+                        <li>🪙 <span class="highlight-coin">Монета</span> — лёгкое задание, даёт <strong>10 очков</strong>.</li>
+                        <li>💎 <span class="highlight-diamond">Алмаз</span> — среднее задание, даёт <strong>25 очков</strong>.</li>
+                        <li>👑 <span class="highlight-crown">Корона</span> — сложное задание, даёт <strong>50 очков</strong>.</li>
+                    </ul>
+                    <li>📌 Появляется задание (конкретный слот и цель). Стример выполняет его в казино.</li>
+                    <li>📌 Затем вводит результат (множитель или сумму выигрыша) и выбирает статус: <span class="highlight-light">✅ Выполнено</span> или <span class="highlight-dark">❌ Провалено</span>.</li>
+                    <li>📌 Если задание выполнено — игрок получает очки, команда продолжает ход (максимум 3 победы подряд). Если провал — очки не начисляются, ход переходит другой команде.</li>
+                    <li>📌 После 30 комнат квест завершается, объявляется победитель.</li>
+                </ul>
+
+                <p><strong>🏆 Призы:</strong></p>
+                <ul>
+                    <li>🎯 Команда-победитель — каждый участник получает <span class="prize">3 000 ₽</span>.</li>
+                    <li>🥇 Лучший игрок команды-победителя (по очкам) — <span class="prize">10 000 ₽</span>.</li>
+                    <li>🥈 Второй игрок команды-победителя — <span class="prize">5 000 ₽</span>.</li>
+                    <li>Остальные участники (3–5 места) — без награды.</li>
+                </ul>
+
+                <p><strong>📌 Важно:</strong> Имена участников можно менять кликом по ним в таблице.</p>
+                <p style="font-style:italic; color:#8a7a9a;">Удачи! Пусть сильнейший победит! ⚔️</p>
+            </div>
+            <button class="close-rules-btn" id="welcomeCloseBtn">Понятно, начинаем!</button>
         </div>
     </div>
 
@@ -1334,9 +1351,7 @@
     <div class="modal-final-overlay" id="finalModal">
         <div class="modal-final">
             <h2>🏆 КВЕСТ ЗАВЕРШЁН!</h2>
-            <div class="final-results" id="finalResults">
-                <!-- заполняется скриптом -->
-            </div>
+            <div class="final-results" id="finalResults"></div>
             <button class="close-final-btn" id="closeFinalBtn">Закрыть</button>
         </div>
     </div>
@@ -1363,9 +1378,7 @@
                 }
             };
 
-            // ======================== ЗАДАНИЯ (пулы) ========================
-            // Вы можете легко заменить эти задания на свои, добавив сколько угодно.
-            // Просто добавляйте объекты { title: "...", desc: "..." } в нужный массив.
+            // ======================== ЗАДАНИЯ ========================
             const TASK_POOLS = {
                 coin: [
                     { title: "Fruit Party 2", desc: "35 спинов. Цель: множитель ≥ x30." },
@@ -1489,13 +1502,13 @@
             const playerTeamDisplay = document.getElementById('playerTeamDisplay');
             const rulesBanner = document.getElementById('rulesBanner');
             const rulesOpenBtn = document.getElementById('rulesOpenBtn');
-            const rulesModal = document.getElementById('rulesModal');
-            const rulesCloseBtn = document.getElementById('rulesCloseBtn');
+            const welcomeModal = document.getElementById('welcomeModal');
+            const welcomeCloseBtn = document.getElementById('welcomeCloseBtn');
             const finalModal = document.getElementById('finalModal');
             const finalResults = document.getElementById('finalResults');
             const closeFinalBtn = document.getElementById('closeFinalBtn');
 
-            // ======================== ФУНКЦИИ ========================
+            // ======================== ВСПОМОГАТЕЛЬНЫЕ ========================
 
             function showNotification(msg, duration = 3000) {
                 const notif = document.createElement('div');
@@ -1532,14 +1545,14 @@
                 }
             }
 
-            // Сортировка участников по очкам (убывание)
             function sortMembers(members, scores) {
                 const indexed = members.map((name, idx) => ({ name, score: scores[idx], idx }));
                 indexed.sort((a, b) => b.score - a.score);
                 return indexed;
             }
 
-            // Выбор случайного участника
+            // ======================== ОСНОВНАЯ ЛОГИКА ========================
+
             function pickRandomPlayer() {
                 let teamKey = state.currentTeam;
                 if (!teamKey) {
@@ -1567,7 +1580,6 @@
 
                 updatePlayerBanner();
                 updateUI();
-
                 openNextRoom();
             }
 
@@ -1604,7 +1616,6 @@
                 modalSaveBtn.style.display = 'none';
                 modalCloseBtn.textContent = 'Отмена';
 
-                // Сброс статуса
                 selectedStatus = 'success';
                 statusSuccess.className = 'active-success';
                 statusFail.className = '';
@@ -1681,13 +1692,11 @@
                         updatePlayerBanner();
                         showNotification(`⚠️ 3 победы подряд! Ход переходит команде ${state.currentTeam === 'light' ? 'Света' : 'Тьмы'}`);
                     } else {
-                        // остаёмся с той же командой, но сбрасываем выбор участника
                         state.isPlayerSelected = false;
                         state.currentMemberIndex = -1;
                         updatePlayerBanner();
                     }
                 } else {
-                    // провал – ход переходит другой команде
                     state.streak = 0;
                     state.currentTeam = state.currentTeam === 'light' ? 'dark' : 'light';
                     state.isPlayerSelected = false;
@@ -1852,7 +1861,6 @@
                     teamDarkMembers.appendChild(row);
                 });
 
-                // Индикатор хода
                 if (state.currentTeam && state.isPlayerSelected) {
                     const teamName = state.currentTeam === 'light' ? '☀️ Свет' : '🌙 Тьма';
                     currentTeamName.textContent = teamName;
@@ -1881,7 +1889,6 @@
                 const dark = state.teams.dark;
                 const winner = light.total > dark.total ? 'light' : (dark.total > light.total ? 'dark' : 'draw');
 
-                // Сортируем игроков в каждой команде
                 const sortedLight = sortMembers(light.members, light.scores);
                 const sortedDark = sortMembers(dark.members, dark.scores);
 
@@ -1927,7 +1934,7 @@
                 finalModal.classList.add('active');
             }
 
-            // ======================== СОХРАНЕНИЕ ========================
+            // ======================== СОХРАНЕНИЕ И СБРОС ========================
 
             function saveToLocal() {
                 const data = {
@@ -1980,6 +1987,15 @@
                 }));
             }
 
+            function resetGame() {
+                if (!confirm('Сбросить весь прогресс квеста? Это удалит все данные и имена участников.')) return;
+                // Удаляем оба хранилища
+                localStorage.removeItem('castleQuestTeams');
+                localStorage.removeItem('castleTeamNames');
+                // Перезагружаем страницу, чтобы всё сбросилось
+                location.reload();
+            }
+
             // ======================== РЕДАКТИРОВАНИЕ ИМЁН ========================
 
             function setupNameEditing() {
@@ -2006,50 +2022,50 @@
                 });
             }
 
-            // ======================== СБРОС ========================
+            // ======================== ОТКРЫТИЕ ПРИВЕТСТВИЯ ========================
 
-            function resetGame() {
-                if (!confirm('Сбросить весь прогресс квеста?')) return;
-                localStorage.removeItem('castleQuestTeams');
-                const lightMembers = [...state.teams.light.members];
-                const darkMembers = [...state.teams.dark.members];
-                state.teams.light.scores = [0, 0, 0, 0, 0];
-                state.teams.light.total = 0;
-                state.teams.dark.scores = [0, 0, 0, 0, 0];
-                state.teams.dark.total = 0;
-                state.completed = [];
-                state.results = {};
-                state.currentTeam = null;
-                state.currentMemberIndex = -1;
-                state.turnNumber = 0;
-                state.streak = 0;
-                state.isPlayerSelected = false;
-                state.teams.light.members = lightMembers;
-                state.teams.dark.members = darkMembers;
-                saveNames();
-                saveToLocal();
+            function showWelcome() {
+                welcomeModal.classList.add('active');
+            }
+
+            function closeWelcome() {
+                welcomeModal.classList.remove('active');
+                // Если нет сохранённого прогресса, начинаем с чистого листа
+                if (!loadFromLocal()) {
+                    // Если прогресса нет, ничего не делаем, уже пусто
+                }
                 renderAll();
-                showNotification('🔄 Квест сброшен! Нажмите "Выбрать участника" для начала.');
-            }
-
-            // ======================== ПРАВИЛА ========================
-
-            function openRulesModal() {
-                rulesModal.classList.add('active');
-            }
-
-            function closeRulesModal() {
-                rulesModal.classList.remove('active');
+                showNotification('🎯 Нажмите "Выбрать участника" для начала квеста!', 4000);
             }
 
             // ======================== ИНИЦИАЛИЗАЦИЯ ========================
 
             function init() {
+                // Проверяем, есть ли сохранённые данные
+                const hasSaved = loadFromLocal();
+                // Загружаем имена (если есть)
                 loadNames();
-                const loaded = loadFromLocal();
-                renderAll();
 
-                // События на кнопки выбора
+                if (hasSaved && state.completed.length > 0) {
+                    // Есть прогресс — показываем квест
+                    renderAll();
+                    showNotification('🎯 Продолжаем квест! Нажмите "Выбрать участника".', 3000);
+                } else {
+                    // Нет прогресса или он пустой — показываем приветствие
+                    // Очищаем имена, чтобы не висели старые
+                    state.teams.light.members = ['', '', '', '', ''];
+                    state.teams.dark.members = ['', '', '', '', ''];
+                    saveNames();
+                    renderAll();
+                    // Показываем модалку приветствия
+                    setTimeout(() => {
+                        showWelcome();
+                    }, 300);
+                }
+
+                // ======================== СОБЫТИЯ ========================
+
+                // Кнопки выбора сундука
                 document.querySelectorAll('.chest-btn').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const type = this.dataset.type;
@@ -2092,16 +2108,15 @@
                     }
                 });
 
-                // Правила
-                rulesBanner.addEventListener('click', openRulesModal);
+                // Правила (открывается та же модалка, что и приветствие, но с правилами)
+                rulesBanner.addEventListener('click', () => {
+                    welcomeModal.classList.add('active');
+                });
                 rulesOpenBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    openRulesModal();
+                    welcomeModal.classList.add('active');
                 });
-                rulesCloseBtn.addEventListener('click', closeRulesModal);
-                rulesModal.addEventListener('click', (e) => {
-                    if (e.target === rulesModal) closeRulesModal();
-                });
+                welcomeCloseBtn.addEventListener('click', closeWelcome);
 
                 // Финальная модалка
                 closeFinalBtn.addEventListener('click', () => {
@@ -2109,16 +2124,6 @@
                 });
 
                 setupNameEditing();
-
-                // Если квест только начался, показываем правила автоматически
-                if (!loaded || state.completed.length === 0) {
-                    setTimeout(() => {
-                        openRulesModal();
-                        showNotification('🎯 Добро пожаловать! Ознакомьтесь с правилами.', 5000);
-                    }, 500);
-                } else {
-                    showNotification('🎯 Продолжаем квест! Нажмите "Выбрать участника".', 3000);
-                }
 
                 console.log('⚔️ Битва Королевств загружена!');
                 console.log(`🏰 Всего комнат: ${ROOMS.length}`);
