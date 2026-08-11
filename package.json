@@ -1,12 +1,13 @@
 {
-  "name": "pharaoh-quest",
+  "name": "quest-hunt",
   "version": "1.0.0",
-  "description": "Egyptian quest",
+  "description": "Квест 'Охота на сокровища' для стрима",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
   }
 }
