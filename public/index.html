@@ -28,7 +28,6 @@
             position: relative;
         }
 
-        /* ========== ФОН С ЗАМКОМ ========== */
         body::before {
             content: '🏰';
             position: fixed;
@@ -131,6 +130,28 @@
             font-weight: 300;
         }
 
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-rules {
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            color: #f7d44a;
+            padding: 6px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.85rem;
+        }
+
+        .btn-rules:hover {
+            background: rgba(255, 215, 0, 0.15);
+        }
+
         .btn-reset {
             background: rgba(255, 50, 50, 0.08);
             border: 1px solid rgba(255, 50, 50, 0.15);
@@ -144,55 +165,6 @@
 
         .btn-reset:hover {
             background: rgba(255, 50, 50, 0.18);
-        }
-
-        /* ========== ПРАВИЛА ========== */
-        .rules-banner {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 30px;
-            padding: 14px 24px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 215, 0, 0.06);
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 16px 30px;
-            position: relative;
-            z-index: 1;
-            backdrop-filter: blur(4px);
-            font-size: 0.85rem;
-        }
-
-        .rules-banner .rule-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #b0a8c0;
-        }
-
-        .rules-banner .rule-item .highlight {
-            color: #f7d44a;
-            font-weight: 600;
-        }
-
-        .rules-banner .rule-item .highlight-dark {
-            color: #b388ff;
-            font-weight: 600;
-        }
-
-        .rules-banner .rule-item .highlight-bronze {
-            color: #cd7f32;
-            font-weight: 600;
-        }
-
-        .rules-banner .rule-item .highlight-silver {
-            color: #c0c0c0;
-            font-weight: 600;
-        }
-
-        .rules-banner .rule-item .highlight-gold {
-            color: #f7d44a;
-            font-weight: 600;
         }
 
         /* ========== СТАТУС-БАР ========== */
@@ -495,7 +467,7 @@
             margin-top: 2px;
         }
 
-        /* ========== МОДАЛКА ВЫБОРА СУНДУКА ========== */
+        /* ========== МОДАЛКА КОМНАТЫ (ВЫБОР СУНДУКА) ========== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -572,7 +544,6 @@
             font-weight: 600;
         }
 
-        /* Выбор сундуков */
         .chest-choice {
             display: flex;
             gap: 20px;
@@ -623,7 +594,6 @@
             display: block;
         }
 
-        /* Бронза */
         .chest-btn.bronze {
             border-color: rgba(205, 127, 50, 0.2);
             background: rgba(60, 40, 20, 0.2);
@@ -636,7 +606,6 @@
             filter: drop-shadow(0 0 10px rgba(205, 127, 50, 0.15));
         }
 
-        /* Серебро */
         .chest-btn.silver {
             border-color: rgba(192, 192, 192, 0.15);
             background: rgba(50, 50, 60, 0.15);
@@ -649,7 +618,6 @@
             filter: drop-shadow(0 0 10px rgba(192, 192, 192, 0.12));
         }
 
-        /* Золото */
         .chest-btn.gold {
             border-color: rgba(255, 215, 0, 0.15);
             background: rgba(60, 50, 20, 0.15);
@@ -662,12 +630,10 @@
             filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.15));
         }
 
-        /* Анимация сундуков при наведении */
         .chest-btn:hover .chest-icon {
             transform: scale(1.08) rotate(-2deg);
         }
 
-        /* Информация о задании после выбора сундука (появляется внутри) */
         .task-detail {
             display: none;
             background: rgba(0, 0, 0, 0.35);
@@ -763,6 +729,40 @@
             background: rgba(255, 255, 255, 0.08);
         }
 
+        /* ========== МОДАЛКА ПРАВИЛ ========== */
+        .rules-modal .modal-content {
+            text-align: left;
+        }
+        .rules-modal .modal-content h2 {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .rules-modal .modal-content ul {
+            list-style: none;
+            padding: 0;
+        }
+        .rules-modal .modal-content ul li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .rules-modal .modal-content ul li:last-child {
+            border-bottom: none;
+        }
+        .rules-modal .modal-content .rule-icon {
+            font-size: 1.4rem;
+            min-width: 30px;
+            text-align: center;
+        }
+        .rules-modal .modal-content .rule-text {
+            color: #c0b8d0;
+        }
+        .rules-modal .modal-content .rule-text strong {
+            color: #f7d44a;
+        }
+
         /* ========== КНОПКА СМЕНЫ КОМАНДЫ ========== */
         .force-switch-wrap {
             text-align: center;
@@ -801,11 +801,12 @@
             .modal {
                 padding: 24px 20px;
             }
-            .rules-banner {
+            .header {
                 flex-direction: column;
-                align-items: flex-start;
-                gap: 8px;
-                padding: 12px 18px;
+                align-items: stretch;
+            }
+            .header-actions {
+                justify-content: flex-start;
             }
         }
         @media (max-width: 480px) {
@@ -843,17 +844,10 @@
                     <div class="subtitle">30 комнат · выбор сундука · 2 команды</div>
                 </div>
             </div>
-            <button id="resetBtn" class="btn-reset">🔄 Сбросить всё</button>
-        </div>
-
-        <!-- ПРАВИЛА -->
-        <div class="rules-banner">
-            <span class="rule-item">🏰 <span class="highlight">30 комнат</span> — в каждой выбери сундук</span>
-            <span class="rule-item">🪙 <span class="highlight-bronze">Бронза</span> +10 очков</span>
-            <span class="rule-item">💎 <span class="highlight-silver">Серебро</span> +25 очков</span>
-            <span class="rule-item">👑 <span class="highlight-gold">Золото</span> +50 очков</span>
-            <span class="rule-item">⛔ <span class="highlight">Максимум 3 победы</span> подряд одной команде</span>
-            <span class="rule-item">🎲 <span class="highlight-dark">Случайный</span> выбор участника</span>
+            <div class="header-actions">
+                <button id="rulesBtn" class="btn-rules">📜 Правила</button>
+                <button id="resetBtn" class="btn-reset">🔄 Сбросить всё</button>
+            </div>
         </div>
 
         <!-- СТАТУС-БАР -->
@@ -904,7 +898,7 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА ВЫБОРА СУНДУКА -->
+    <!-- МОДАЛКА КОМНАТЫ -->
     <div class="modal-overlay" id="taskModal">
         <div class="modal">
             <div class="modal-header">
@@ -914,7 +908,6 @@
                 </div>
             </div>
 
-            <!-- Выбор сундука -->
             <div class="chest-choice" id="chestChoice">
                 <div class="chest-btn bronze" data-type="bronze" data-points="10">
                     <span class="chest-icon">🪙</span>
@@ -933,7 +926,6 @@
                 </div>
             </div>
 
-            <!-- Детали задания (появляются после выбора сундука) -->
             <div class="task-detail" id="taskDetail">
                 <div class="task-title" id="taskTitle">Задание</div>
                 <div class="task-desc" id="taskDesc">Описание</div>
@@ -945,6 +937,27 @@
             <div class="btn-group">
                 <button class="btn-secondary" id="modalCloseBtn">Отмена</button>
                 <button class="btn-primary" id="modalSaveBtn">✅ Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛКА ПРАВИЛ -->
+    <div class="modal-overlay rules-modal" id="rulesModal">
+        <div class="modal">
+            <div class="modal-content">
+                <h2>📜 Правила квеста</h2>
+                <ul>
+                    <li><span class="rule-icon">🏰</span><span class="rule-text">Всего <strong>30 комнат</strong>. В каждой комнате участник выбирает один из трёх сундуков.</span></li>
+                    <li><span class="rule-icon">🪙</span><span class="rule-text"><strong>Бронзовый</strong> сундук — простое задание, +10 очков.</span></li>
+                    <li><span class="rule-icon">💎</span><span class="rule-text"><strong>Серебряный</strong> сундук — среднее задание, +25 очков.</span></li>
+                    <li><span class="rule-icon">👑</span><span class="rule-text"><strong>Золотой</strong> сундук — сложное задание, +50 очков.</span></li>
+                    <li><span class="rule-icon">⛔</span><span class="rule-text">Одна команда не может победить <strong>больше 3 раз подряд</strong>. После 3 побед ход переходит к другой команде.</span></li>
+                    <li><span class="rule-icon">🎲</span><span class="rule-text">Ход определяется случайным выбором участника из команды, которая сейчас ходит.</span></li>
+                    <li><span class="rule-icon">💰</span><span class="rule-text">В конце квеста побеждает команда с наибольшим количеством очков. Участник с максимумом очков в команде получает бонус.</span></li>
+                </ul>
+                <div style="text-align:center; margin-top:20px;">
+                    <button id="rulesCloseBtn" class="btn-primary">Понял!</button>
+                </div>
             </div>
         </div>
     </div>
@@ -971,9 +984,10 @@
                 }
             };
 
-            // ======================== ЗАДАНИЯ ПО ТИПАМ ========================
+            // ======================== ЗАДАНИЯ (90 штук) ========================
             const TASK_POOLS = {
                 bronze: [
+                    // 30 лёгких заданий (спины с простыми целями)
                     { title: "Fruit Party 2", desc: "35 спинов в Fruit Party 2 (Pragmatic). Цель: множитель ≥ x30." },
                     { title: "Starz MegaWays", desc: "40 спинов в Starz MegaWays (Red Tiger). Цель: выигрыш > 2000 ₽." },
                     { title: "Рулетка", desc: "3 ставки на красное/чёрное. Цель: выиграть 2 из 3." },
@@ -985,9 +999,28 @@
                     { title: "Wild Walker", desc: "40 спинов в Wild Walker. Цель: множитель ≥ x40." },
                     { title: "Le Bandit", desc: "30 спинов в Le Bandit (Hacksaw). Цель: множитель ≥ x30." },
                     { title: "Gates of Olympus", desc: "40 спинов. Цель: множитель ≥ x40." },
-                    { title: "Sweet Bonanza", desc: "35 спинов. Цель: множитель ≥ x35." }
+                    { title: "Sweet Bonanza", desc: "35 спинов. Цель: множитель ≥ x35." },
+                    { title: "Big Bass Bonanza", desc: "40 спинов. Цель: поймать 3 рыбы." },
+                    { title: "Starlight Princess", desc: "35 спинов. Цель: множитель ≥ x30." },
+                    { title: "The Dog House", desc: "40 спинов. Цель: поймать бонус." },
+                    { title: "Coin UP Lightning", desc: "30 спинов. Цель: выигрыш > 1500 ₽." },
+                    { title: "Hot Fiesta", desc: "35 спинов. Цель: множитель ≥ x25." },
+                    { title: "Pirates Pub", desc: "40 спинов. Цель: поймать бонус." },
+                    { title: "Retro Sweet", desc: "35 спинов. Цель: множитель ≥ x30." },
+                    { title: "Sugar Rush", desc: "40 спинов. Цель: множитель ≥ x30." },
+                    { title: "Le Pharaon", desc: "30 спинов. Цель: поймать бонус." },
+                    { title: "Miami Mayhem", desc: "35 спинов. Цель: множитель ≥ x25." },
+                    { title: "Wild West Gold", desc: "40 спинов. Цель: множитель ≥ x35." },
+                    { title: "Fruit Party", desc: "35 спинов. Цель: множитель ≥ x30." },
+                    { title: "Rise of Merlin", desc: "40 спинов. Цель: выигрыш > 2000 ₽." },
+                    { title: "Book of Dead", desc: "35 спинов. Цель: множитель ≥ x30." },
+                    { title: "Bonanza Megaways", desc: "40 спинов. Цель: множитель ≥ x25." },
+                    { title: "Money Train 3", desc: "30 спинов. Цель: поймать бонус." },
+                    { title: "Temple of Fortune", desc: "35 спинов. Цель: множитель ≥ x30." },
+                    { title: "Candy Crush", desc: "40 спинов. Цель: выигрыш > 2500 ₽." },
                 ],
                 silver: [
+                    // 30 средних заданий
                     { title: "Chaos Crew 2", desc: "30 спинов. Цель: поймать бонусный раунд." },
                     { title: "Razor Returns", desc: "40 спинов. Цель: поймать акулу (бонус)." },
                     { title: "Temple Tumble 2", desc: "50 спинов. Цель: множитель ≥ x75." },
@@ -999,9 +1032,28 @@
                     { title: "Fruit Party 2", desc: "35 спинов. Цель: множитель ≥ x50." },
                     { title: "Le Bandit", desc: "40 спинов. Цель: множитель ≥ x50." },
                     { title: "Money Train 3", desc: "Купить бонус за 80x. Цель: окупить (≥ 80x)." },
-                    { title: "Sugar Rush", desc: "40 спинов. Цель: множитель ≥ x70." }
+                    { title: "Sugar Rush", desc: "40 спинов. Цель: множитель ≥ x70." },
+                    { title: "Big Bass Bonanza", desc: "50 спинов. Цель: поймать 5 рыб." },
+                    { title: "Gates of Olympus", desc: "40 спинов. Цель: множитель ≥ x60." },
+                    { title: "Sweet Bonanza", desc: "35 спинов. Цель: множитель ≥ x50." },
+                    { title: "Starlight Princess", desc: "40 спинов. Цель: множитель ≥ x50." },
+                    { title: "The Dog House Megaways", desc: "40 спинов. Цель: поймать бонус." },
+                    { title: "Coin UP Lightning", desc: "35 спинов. Цель: множитель ≥ x50." },
+                    { title: "Hot Fiesta", desc: "40 спинов. Цель: множитель ≥ x45." },
+                    { title: "Pirates Pub", desc: "45 спинов. Цель: множитель ≥ x55." },
+                    { title: "Retro Sweet", desc: "40 спинов. Цель: множитель ≥ x50." },
+                    { title: "Le Pharaon", desc: "40 спинов. Цель: множитель ≥ x60." },
+                    { title: "Miami Mayhem", desc: "35 спинов. Цель: множитель ≥ x50." },
+                    { title: "Wild West Gold", desc: "40 спинов. Цель: множитель ≥ x55." },
+                    { title: "Rise of Merlin", desc: "40 спинов. Цель: множитель ≥ x50." },
+                    { title: "Book of Dead", desc: "40 спинов. Цель: множитель ≥ x60." },
+                    { title: "Bonanza Megaways", desc: "45 спинов. Цель: множитель ≥ x50." },
+                    { title: "Money Train 4", desc: "Купить бонус за 100x. Цель: окупить (≥ 100x)." },
+                    { title: "Temple of Fortune", desc: "40 спинов. Цель: множитель ≥ x60." },
+                    { title: "Candy Crush", desc: "45 спинов. Цель: множитель ≥ x50." },
                 ],
                 gold: [
+                    // 30 сложных заданий
                     { title: "Mental", desc: "50 спинов в Mental (NoLimit City). Цель: множитель ≥ x100." },
                     { title: "San Quentin xWays", desc: "40 спинов. Цель: активировать xWays + множитель ≥ x50." },
                     { title: "Reactoonz 2", desc: "45 спинов. Цель: поймать Gargantoon." },
@@ -1013,7 +1065,25 @@
                     { title: "Temple Tumble 2", desc: "50 спинов. Цель: множитель ≥ x120." },
                     { title: "Mental", desc: "50 спинов. Цель: множитель ≥ x120." },
                     { title: "San Quentin xWays", desc: "40 спинов. Цель: множитель ≥ x200." },
-                    { title: "Le Bandit", desc: "40 спинов. Цель: множитель ≥ x150." }
+                    { title: "Le Bandit", desc: "40 спинов. Цель: множитель ≥ x150." },
+                    { title: "Sugar Rush", desc: "50 спинов. Цель: множитель ≥ x120." },
+                    { title: "Big Bass Bonanza", desc: "60 спинов. Цель: поймать 10 рыб." },
+                    { title: "Gates of Olympus", desc: "50 спинов. Цель: множитель ≥ x120." },
+                    { title: "Sweet Bonanza", desc: "45 спинов. Цель: множитель ≥ x100." },
+                    { title: "Starlight Princess", desc: "50 спинов. Цель: множитель ≥ x100." },
+                    { title: "The Dog House Megaways", desc: "50 спинов. Цель: множитель ≥ x100." },
+                    { title: "Coin UP Lightning", desc: "45 спинов. Цель: множитель ≥ x80." },
+                    { title: "Hot Fiesta", desc: "50 спинов. Цель: множитель ≥ x90." },
+                    { title: "Pirates Pub", desc: "50 спинов. Цель: множитель ≥ x100." },
+                    { title: "Retro Sweet", desc: "45 спинов. Цель: множитель ≥ x100." },
+                    { title: "Le Pharaon", desc: "50 спинов. Цель: множитель ≥ x120." },
+                    { title: "Miami Mayhem", desc: "45 спинов. Цель: множитель ≥ x100." },
+                    { title: "Wild West Gold", desc: "50 спинов. Цель: множитель ≥ x100." },
+                    { title: "Rise of Merlin", desc: "50 спинов. Цель: множитель ≥ x100." },
+                    { title: "Book of Dead", desc: "50 спинов. Цель: множитель ≥ x120." },
+                    { title: "Bonanza Megaways", desc: "50 спинов. Цель: множитель ≥ x100." },
+                    { title: "Temple of Fortune", desc: "50 спинов. Цель: множитель ≥ x100." },
+                    { title: "Candy Crush", desc: "50 спинов. Цель: множитель ≥ x100." },
                 ]
             };
 
@@ -1021,10 +1091,15 @@
             const ROOMS = [];
             const POINTS_MAP = { bronze: 10, silver: 25, gold: 50 };
 
-            // Создаём 10 комнат каждого типа
+            // Создаём 30 комнат (по 10 каждого типа) с перемешиванием
             for (let type of ['bronze', 'silver', 'gold']) {
                 const pool = TASK_POOLS[type];
-                const shuffled = [...pool].sort(() => Math.random() - 0.5);
+                // Перемешиваем задания в пуле
+                const shuffled = [...pool];
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
                 for (let i = 0; i < 10; i++) {
                     const task = shuffled[i % shuffled.length];
                     ROOMS.push({
@@ -1056,13 +1131,12 @@
                 results: {}, // { roomId: { result, type, points } }
                 streak: 0,
                 isPlayerSelected: false,
-                // Для модалки
                 selectedChestType: null,
-                selectedRoomId: null
+                selectedRoomId: null,
+                modalStep: 'select' // 'select' или 'input'
             };
 
             let currentRoomId = null;
-            let modalStep = 'select'; // 'select' или 'input'
 
             // ======================== DOM ========================
             const gridEl = document.getElementById('gridContainer');
@@ -1087,10 +1161,12 @@
             const pickPlayerBtn = document.getElementById('pickPlayerBtn');
             const resetBtn = document.getElementById('resetBtn');
             const forceSwitchBtn = document.getElementById('forceSwitchBtn');
+            const rulesBtn = document.getElementById('rulesBtn');
+            const rulesModal = document.getElementById('rulesModal');
+            const rulesCloseBtn = document.getElementById('rulesCloseBtn');
 
             // ======================== ФУНКЦИИ ========================
 
-            // Показать уведомление
             function showNotification(msg, duration = 3000) {
                 const notif = document.createElement('div');
                 notif.style.cssText = `
@@ -1110,7 +1186,6 @@
                 }, duration);
             }
 
-            // Выбор случайного участника
             function pickRandomPlayer() {
                 let teamKey = state.currentTeam;
                 if (!teamKey) {
@@ -1136,14 +1211,10 @@
                 state.isPlayerSelected = true;
                 state.turnNumber++;
 
-                // Обновляем UI
                 updateUI();
-
-                // Открываем следующую комнату
                 openNextRoom();
             }
 
-            // Принудительная смена команды
             function switchTeam() {
                 state.currentTeam = state.currentTeam === 'light' ? 'dark' : 'light';
                 state.streak = 0;
@@ -1154,9 +1225,7 @@
                 saveToLocal();
             }
 
-            // Открыть следующую комнату
             function openNextRoom() {
-                // Ищем первую невыполненную комнату
                 const nextRoom = ROOMS.find(r => !state.completed.includes(r.id));
                 if (!nextRoom) {
                     showNotification('🎉 Все комнаты пройдены! Квест завершён!', 5000);
@@ -1164,22 +1233,19 @@
                 }
 
                 currentRoomId = nextRoom.id;
-                modalStep = 'select';
+                state.modalStep = 'select';
                 modalTitle.textContent = `Комната #${nextRoom.id}`;
                 const playerName = state.teams[state.currentTeam].members[state.currentMemberIndex] || 'Игрок';
                 modalPlayerName.textContent = playerName;
 
-                // Показываем выбор сундуков, скрываем детали
                 chestChoice.style.display = 'flex';
                 taskDetail.classList.remove('active');
                 taskDetail.style.display = 'none';
-                resultInput.value = '';
                 resultInput.style.display = 'none';
                 document.querySelector('.modal .hint').style.display = 'none';
                 modalSaveBtn.style.display = 'none';
                 modalCloseBtn.textContent = 'Отмена';
 
-                // Снимаем выбор с сундуков
                 document.querySelectorAll('.chest-btn').forEach(el => {
                     el.style.borderColor = '';
                     el.style.background = '';
@@ -1189,28 +1255,23 @@
                 saveToLocal();
             }
 
-            // Выбор сундука
             function selectChest(type) {
                 const room = ROOMS.find(r => r.id === currentRoomId);
                 if (!room) return;
 
-                // Сохраняем выбор
                 state.selectedChestType = type;
                 state.selectedRoomId = currentRoomId;
 
-                // Находим задание для этого типа
                 const pool = TASK_POOLS[type];
                 const taskIndex = state.completed.length % pool.length;
                 const task = pool[taskIndex % pool.length];
 
-                // Показываем детали задания
                 chestChoice.style.display = 'none';
                 taskDetail.style.display = 'block';
                 taskDetail.classList.add('active');
                 taskTitle.textContent = `🎯 ${task.title}`;
                 taskDesc.textContent = task.desc;
 
-                // Показываем поле ввода
                 resultInput.style.display = 'block';
                 document.querySelector('.modal .hint').style.display = 'block';
                 modalSaveBtn.style.display = 'inline-block';
@@ -1218,10 +1279,9 @@
                 resultInput.value = '';
                 resultInput.focus();
 
-                modalStep = 'input';
+                state.modalStep = 'input';
             }
 
-            // Сохранить результат
             function saveResult() {
                 if (!state.selectedRoomId || state.selectedChestType === null) return;
 
@@ -1237,7 +1297,6 @@
                 const isSuccess = value > 0;
 
                 if (isSuccess) {
-                    // Начисляем очки
                     const teamKey = state.currentTeam;
                     const memberIdx = state.currentMemberIndex;
                     if (teamKey && memberIdx >= 0) {
@@ -1246,14 +1305,11 @@
                     }
                 }
 
-                // Отмечаем комнату выполненной
                 state.completed.push(roomId);
                 state.results[roomId] = { result: value, type: type, points: points, success: isSuccess };
 
-                // Увеличиваем счётчик подряд
                 state.streak++;
 
-                // Проверяем ограничение 3 подряд
                 if (state.streak >= 3) {
                     state.streak = 0;
                     state.currentTeam = state.currentTeam === 'light' ? 'dark' : 'light';
@@ -1261,12 +1317,10 @@
                     state.currentMemberIndex = -1;
                     showNotification(`⚠️ 3 победы подряд! Ход переходит команде ${state.currentTeam === 'light' ? 'Света' : 'Тьмы'}`);
                 } else {
-                    // Сбрасываем выбор участника для следующего хода
                     state.isPlayerSelected = false;
                     state.currentMemberIndex = -1;
                 }
 
-                // Сбрасываем выбор сундука
                 state.selectedChestType = null;
                 state.selectedRoomId = null;
 
@@ -1274,7 +1328,6 @@
                 renderAll();
                 closeModal();
 
-                // Если есть ещё комнаты, предлагаем выбрать нового участника
                 if (state.completed.length < ROOMS.length) {
                     setTimeout(() => {
                         if (!state.isPlayerSelected) {
@@ -1286,13 +1339,11 @@
                 }
             }
 
-            // Закрыть модалку
             function closeModal() {
                 modalOverlay.classList.remove('active');
-                modalStep = 'select';
+                state.modalStep = 'select';
                 state.selectedChestType = null;
                 state.selectedRoomId = null;
-                // Сбрасываем UI
                 chestChoice.style.display = 'flex';
                 taskDetail.classList.remove('active');
                 taskDetail.style.display = 'none';
@@ -1352,14 +1403,12 @@
 
                     cell.addEventListener('click', () => {
                         if (!state.completed.includes(room.id)) {
-                            // Если ещё не выбран участник, просим выбрать
                             if (!state.isPlayerSelected || state.currentTeam === null) {
                                 showNotification('Сначала выберите участника кнопкой 🎲');
                                 return;
                             }
-                            // Открываем комнату с выбором сундука
                             currentRoomId = room.id;
-                            modalStep = 'select';
+                            state.modalStep = 'select';
                             modalTitle.textContent = `Комната #${room.id}`;
                             const playerName = state.teams[state.currentTeam].members[state.currentMemberIndex] || 'Игрок';
                             modalPlayerName.textContent = playerName;
@@ -1383,7 +1432,6 @@
             }
 
             function renderTeams() {
-                // Команда Света
                 const light = state.teams.light;
                 teamLightScore.textContent = light.total;
                 teamLightMembers.innerHTML = '';
@@ -1404,7 +1452,6 @@
                     teamLightMembers.appendChild(row);
                 });
 
-                // Команда Тьмы
                 const dark = state.teams.dark;
                 teamDarkScore.textContent = dark.total;
                 teamDarkMembers.innerHTML = '';
@@ -1425,7 +1472,6 @@
                     teamDarkMembers.appendChild(row);
                 });
 
-                // Индикатор хода
                 if (state.currentTeam && state.isPlayerSelected) {
                     const teamName = state.currentTeam === 'light' ? '☀️ Свет' : '🌙 Тьма';
                     currentTeamName.textContent = teamName;
@@ -1551,6 +1597,16 @@
                 showNotification('🔄 Квест сброшен! Нажмите "Выбрать участника" для начала.');
             }
 
+            // ======================== ПРАВИЛА ========================
+
+            function openRules() {
+                rulesModal.classList.add('active');
+            }
+
+            function closeRules() {
+                rulesModal.classList.remove('active');
+            }
+
             // ======================== ИНИЦИАЛИЗАЦИЯ ========================
 
             function init() {
@@ -1558,7 +1614,7 @@
                 const loaded = loadFromLocal();
                 renderAll();
 
-                // События на кнопки сундуков
+                // Обработчики сундуков
                 document.querySelectorAll('.chest-btn').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const type = this.dataset.type;
@@ -1566,6 +1622,7 @@
                     });
                 });
 
+                // Кнопки
                 pickPlayerBtn.addEventListener('click', pickRandomPlayer);
                 forceSwitchBtn.addEventListener('click', () => {
                     switchTeam();
@@ -1581,26 +1638,39 @@
                     if (e.target === modalOverlay) closeModal();
                 });
                 document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape') closeModal();
-                    if (e.key === 'Enter' && modalOverlay.classList.contains('active') && modalStep === 'input') {
+                    if (e.key === 'Escape') {
+                        if (rulesModal.classList.contains('active')) closeRules();
+                        else closeModal();
+                    }
+                    if (e.key === 'Enter' && modalOverlay.classList.contains('active') && state.modalStep === 'input') {
                         saveResult();
                     }
                 });
 
+                // Правила
+                rulesBtn.addEventListener('click', openRules);
+                rulesCloseBtn.addEventListener('click', closeRules);
+                rulesModal.addEventListener('click', (e) => {
+                    if (e.target === rulesModal) closeRules();
+                });
+
+                // Редактирование имён
                 setupNameEditing();
 
+                // Если нет сохранения или не выбран ход, показываем приветствие
                 if (!loaded || !state.currentTeam) {
                     showNotification('🎯 Нажмите "Выбрать участника" для начала квеста!');
+                }
+
+                // Открываем правила при первом запуске
+                if (!loaded) {
+                    setTimeout(openRules, 800);
                 }
 
                 console.log('⚔️ Битва Королевств загружена!');
                 console.log(`🏰 Всего комнат: ${ROOMS.length}`);
                 console.log('🔄 Кликните на имя игрока в таблице, чтобы изменить его');
             }
-
-            // Открываем функцию для консоли (отладка)
-            window.__state = state;
-            window.__render = renderAll;
 
             init();
         })();
