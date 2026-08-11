@@ -21,8 +21,6 @@
             padding: 20px;
             color: #e0d6e8;
             position: relative;
-
-            /* Фон: картинка + затемнение + градиенты */
             background: 
                 radial-gradient(ellipse at 20% 30%, rgba(255, 215, 0, 0.10) 0%, transparent 50%),
                 radial-gradient(ellipse at 80% 70%, rgba(138, 43, 226, 0.12) 0%, transparent 50%),
@@ -31,7 +29,6 @@
             background-blend-mode: overlay, overlay, normal, normal;
         }
 
-        /* Слой затемнения сверху для читаемости текста */
         body::before {
             content: '';
             position: fixed;
@@ -601,7 +598,7 @@
         .modal-rules {
             background: linear-gradient(160deg, #1a1828, #12101e);
             border-radius: 48px;
-            max-width: 600px;
+            max-width: 650px;
             width: 92%;
             padding: 36px;
             border: 1px solid rgba(255, 215, 0, 0.08);
@@ -644,7 +641,7 @@
         }
 
         .modal-rules .rules-list li {
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         .modal-rules .rules-list .highlight-coin { color: #cd7f32; font-weight: 600; }
@@ -652,6 +649,11 @@
         .modal-rules .rules-list .highlight-crown { color: #f7d44a; font-weight: 600; }
         .modal-rules .rules-list .highlight-light { color: #f7d44a; font-weight: 600; }
         .modal-rules .rules-list .highlight-dark { color: #b388ff; font-weight: 600; }
+
+        .modal-rules .rules-list .prize {
+            color: #f7d44a;
+            font-weight: 700;
+        }
 
         .modal-rules .close-rules-btn {
             background: linear-gradient(135deg, #f7d44a, #f5a623);
@@ -747,7 +749,7 @@
             font-weight: 600;
         }
 
-        /* Выбор монета/алмаз/корона */
+        /* Выбор награды */
         .chest-choice {
             display: flex;
             gap: 20px;
@@ -798,7 +800,6 @@
             display: block;
         }
 
-        /* Монета (была bronze) */
         .chest-btn.coin {
             border-color: rgba(205, 127, 50, 0.2);
             background: rgba(60, 40, 20, 0.15);
@@ -811,7 +812,6 @@
             filter: drop-shadow(0 0 10px rgba(205, 127, 50, 0.15));
         }
 
-        /* Алмаз (была silver) */
         .chest-btn.diamond {
             border-color: rgba(192, 192, 192, 0.15);
             background: rgba(50, 50, 60, 0.12);
@@ -824,7 +824,6 @@
             filter: drop-shadow(0 0 10px rgba(192, 192, 192, 0.12));
         }
 
-        /* Корона (была gold) */
         .chest-btn.crown {
             border-color: rgba(255, 215, 0, 0.15);
             background: rgba(60, 50, 20, 0.12);
@@ -898,6 +897,44 @@
             box-shadow: 0 0 30px rgba(245, 166, 35, 0.06);
         }
 
+        .modal .result-status {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin: 10px 0 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .modal .result-status button {
+            padding: 10px 28px;
+            border-radius: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.06);
+            background: rgba(0, 0, 0, 0.3);
+            color: #b0a8c0;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 1rem;
+            flex: 1;
+        }
+
+        .modal .result-status button.active-success {
+            border-color: #2ecc71;
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+
+        .modal .result-status button.active-fail {
+            border-color: #ff6b6b;
+            background: rgba(255, 50, 50, 0.08);
+            color: #ff6b6b;
+        }
+
+        .modal .result-status button:hover:not(.active-success):not(.active-fail) {
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
         .modal .btn-group {
             display: flex;
             gap: 14px;
@@ -926,6 +963,12 @@
             box-shadow: 0 0 40px rgba(245, 166, 35, 0.15);
         }
 
+        .modal .btn-primary:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .modal .btn-secondary {
             background: rgba(255, 255, 255, 0.04);
             color: #8a7a9a;
@@ -934,6 +977,161 @@
 
         .modal .btn-secondary:hover {
             background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* ========== КОНЕЦ КВЕСТА ========== */
+        .modal-final-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(16px);
+            z-index: 4000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .modal-final-overlay.active {
+            display: flex;
+        }
+
+        .modal-final {
+            background: linear-gradient(160deg, #1a1828, #12101e);
+            border-radius: 56px;
+            max-width: 700px;
+            width: 92%;
+            padding: 40px;
+            border: 2px solid rgba(255, 215, 0, 0.15);
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.95);
+            position: relative;
+            overflow: hidden;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-final::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg at 50% 50%, transparent 0%, rgba(255, 215, 0, 0.05) 25%, transparent 50%, rgba(138, 43, 226, 0.05) 75%, transparent 100%);
+            animation: rotateGlow 20s linear infinite;
+            pointer-events: none;
+        }
+
+        .modal-final h2 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            text-align: center;
+            color: #f7d44a;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 0 40px rgba(245, 166, 35, 0.2);
+        }
+
+        .modal-final .final-results {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .modal-final .final-team {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 30px;
+            padding: 18px 22px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .modal-final .final-team.light {
+            border-color: rgba(247, 212, 74, 0.15);
+        }
+        .modal-final .final-team.dark {
+            border-color: rgba(179, 136, 255, 0.15);
+        }
+
+        .modal-final .final-team .team-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-final .final-team .team-title .team-score {
+            font-size: 1.6rem;
+        }
+
+        .modal-final .final-team .team-title .team-score.light-score { color: #f7d44a; }
+        .modal-final .final-team .team-title .team-score.dark-score { color: #b388ff; }
+
+        .modal-final .final-team .team-players {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .modal-final .final-team .team-players .player-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            font-size: 0.95rem;
+        }
+
+        .modal-final .final-team .team-players .player-row .p-name {
+            color: #c0b8d0;
+        }
+        .modal-final .final-team .team-players .player-row .p-score {
+            color: #f7d44a;
+            font-weight: 600;
+        }
+
+        .modal-final .final-winner {
+            text-align: center;
+            margin-top: 10px;
+            padding: 14px;
+            border-radius: 40px;
+            background: rgba(255, 215, 0, 0.06);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            position: relative;
+            z-index: 1;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .modal-final .final-winner .win-team {
+            color: #f7d44a;
+        }
+
+        .modal-final .close-final-btn {
+            background: linear-gradient(135deg, #f7d44a, #f5a623);
+            border: none;
+            color: #0a0a0f;
+            padding: 12px 36px;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 1.1rem;
+            margin-top: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .modal-final .close-final-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 40px rgba(245, 166, 35, 0.2);
         }
 
         /* ========== КНОПКА СМЕНЫ КОМАНДЫ ========== */
@@ -959,6 +1157,7 @@
             .rules-banner { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 18px; }
             .current-player-banner { flex-direction: column; align-items: flex-start; }
             .current-player-banner .player-turn-hint { margin-left: 0; }
+            .modal .result-status { flex-direction: column; }
         }
         @media (max-width: 480px) {
             .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -1060,15 +1259,22 @@
         <div class="modal-rules">
             <h2>📜 Правила квеста</h2>
             <ul class="rules-list">
-                <li>🎯 <span class="highlight-light">30 комнат</span> — в каждой игрок выбирает награду:</li>
+                <li>🎯 <span class="highlight-light">30 комнат</span> — в каждой игрок выбирает уровень сложности:</li>
                 <li>🪙 <span class="highlight-coin">Монета</span> — лёгкое задание, даёт <strong>10 очков</strong>.</li>
                 <li>💎 <span class="highlight-diamond">Алмаз</span> — среднее задание, даёт <strong>25 очков</strong>.</li>
                 <li>👑 <span class="highlight-crown">Корона</span> — сложное задание, даёт <strong>50 очков</strong>.</li>
                 <li>⛔ Одна команда <span class="highlight-light">не может выполнить больше 3 заданий подряд</span> — ход переходит автоматически.</li>
                 <li>🎲 Участник выбирается <span class="highlight-dark">случайным образом</span> из доступных в команде.</li>
                 <li>💬 Имена можно менять <span class="highlight-light">кликом по ним</span> в таблице.</li>
-                <li>🏆 Победитель — команда с большим количеством очков.</li>
-                <li>💰 Призы: команда-победитель получает по 3000 ₽, лучший игрок 10 000 ₽, второй 5 000 ₽.</li>
+                <li>✅ <span class="highlight-light">Выполненное</span> задание приносит очки и даёт право на следующий ход (до 3 подряд).</li>
+                <li>❌ <span class="highlight-dark">Проваленное</span> задание — очки не начисляются, ход переходит к другой команде.</li>
+                <li>🏆 Побеждает команда, набравшая <span class="highlight-light">больше очков</span>.</li>
+                <li>💰 <span class="prize">Призы:</span><br>
+                    &nbsp;&nbsp;• Команда-победитель — каждый участник получает <span class="prize">3 000 ₽</span>.<br>
+                    &nbsp;&nbsp;• Лучший игрок команды-победителя (по очкам) — <span class="prize">10 000 ₽</span>.<br>
+                    &nbsp;&nbsp;• Второй игрок команды-победителя — <span class="prize">5 000 ₽</span>.<br>
+                    &nbsp;&nbsp;• Остальные участники (3-5 места) — без награды.
+                </li>
             </ul>
             <button class="close-rules-btn" id="rulesCloseBtn">Понятно!</button>
         </div>
@@ -1112,10 +1318,26 @@
             <div class="hint">Введите результат (множитель или выигрыш в ₽):</div>
             <input type="number" id="resultInput" placeholder="Например: 8700" step="any" />
 
+            <div class="result-status" id="resultStatus">
+                <button class="active-success" id="statusSuccess">✅ Выполнено</button>
+                <button id="statusFail">❌ Провалено</button>
+            </div>
+
             <div class="btn-group">
                 <button class="btn-secondary" id="modalCloseBtn">Отмена</button>
                 <button class="btn-primary" id="modalSaveBtn">✅ Сохранить</button>
             </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛКА КОНЦА КВЕСТА -->
+    <div class="modal-final-overlay" id="finalModal">
+        <div class="modal-final">
+            <h2>🏆 КВЕСТ ЗАВЕРШЁН!</h2>
+            <div class="final-results" id="finalResults">
+                <!-- заполняется скриптом -->
+            </div>
+            <button class="close-final-btn" id="closeFinalBtn">Закрыть</button>
         </div>
     </div>
 
@@ -1141,9 +1363,9 @@
                 }
             };
 
-            // ======================== ЗАДАНИЯ (будете заполнять сами) ========================
-            // Здесь я оставляю по 10 примеров для каждого типа, всего 30.
-            // Вы можете легко заменить их на свои 90 заданий (по 30 на тип).
+            // ======================== ЗАДАНИЯ (пулы) ========================
+            // Вы можете легко заменить эти задания на свои, добавив сколько угодно.
+            // Просто добавляйте объекты { title: "...", desc: "..." } в нужный массив.
             const TASK_POOLS = {
                 coin: [
                     { title: "Fruit Party 2", desc: "35 спинов. Цель: множитель ≥ x30." },
@@ -1188,10 +1410,8 @@
             const ROOMS = [];
             const TYPES = ['coin', 'diamond', 'crown'];
 
-            // Создаём по 10 комнат каждого типа
             TYPES.forEach(type => {
                 const pool = TASK_POOLS[type];
-                // Если заданий в пуле меньше 10, дополняем их же
                 const extended = [];
                 while (extended.length < 10) {
                     for (let t of pool) {
@@ -1235,7 +1455,8 @@
             };
 
             let currentRoomId = null;
-            let modalStep = 'select'; // 'select' или 'input'
+            let modalStep = 'select';
+            let selectedStatus = 'success'; // 'success' или 'fail'
 
             // ======================== DOM ========================
             const gridEl = document.getElementById('gridContainer');
@@ -1247,6 +1468,8 @@
             const taskTitle = document.getElementById('taskTitle');
             const taskDesc = document.getElementById('taskDesc');
             const resultInput = document.getElementById('resultInput');
+            const statusSuccess = document.getElementById('statusSuccess');
+            const statusFail = document.getElementById('statusFail');
             const modalCloseBtn = document.getElementById('modalCloseBtn');
             const modalSaveBtn = document.getElementById('modalSaveBtn');
             const doneCountEl = document.getElementById('doneCount');
@@ -1260,22 +1483,20 @@
             const pickPlayerBtn = document.getElementById('pickPlayerBtn');
             const resetBtn = document.getElementById('resetBtn');
             const forceSwitchBtn = document.getElementById('forceSwitchBtn');
-
-            // Элементы для плашки участника
             const currentPlayerBanner = document.getElementById('currentPlayerBanner');
             const playerAvatar = document.getElementById('playerAvatar');
             const playerNameDisplay = document.getElementById('playerNameDisplay');
             const playerTeamDisplay = document.getElementById('playerTeamDisplay');
-
-            // Правила
             const rulesBanner = document.getElementById('rulesBanner');
             const rulesOpenBtn = document.getElementById('rulesOpenBtn');
             const rulesModal = document.getElementById('rulesModal');
             const rulesCloseBtn = document.getElementById('rulesCloseBtn');
+            const finalModal = document.getElementById('finalModal');
+            const finalResults = document.getElementById('finalResults');
+            const closeFinalBtn = document.getElementById('closeFinalBtn');
 
             // ======================== ФУНКЦИИ ========================
 
-            // Показать уведомление
             function showNotification(msg, duration = 3000) {
                 const notif = document.createElement('div');
                 notif.style.cssText = `
@@ -1295,7 +1516,6 @@
                 }, duration);
             }
 
-            // Обновить плашку текущего участника
             function updatePlayerBanner() {
                 if (state.isPlayerSelected && state.currentTeam && state.currentMemberIndex >= 0) {
                     const teamKey = state.currentTeam;
@@ -1303,7 +1523,6 @@
                     const teamLabel = teamKey === 'light' ? 'Свет' : 'Тьма';
                     const teamClass = teamKey === 'light' ? 'team-light-label' : 'team-dark-label';
                     const avatar = teamKey === 'light' ? '☀️' : '🌙';
-
                     playerAvatar.textContent = avatar;
                     playerNameDisplay.textContent = memberName;
                     playerTeamDisplay.innerHTML = `Команда: <span class="${teamClass}">${teamLabel}</span>`;
@@ -1311,6 +1530,13 @@
                 } else {
                     currentPlayerBanner.classList.remove('active');
                 }
+            }
+
+            // Сортировка участников по очкам (убывание)
+            function sortMembers(members, scores) {
+                const indexed = members.map((name, idx) => ({ name, score: scores[idx], idx }));
+                indexed.sort((a, b) => b.score - a.score);
+                return indexed;
             }
 
             // Выбор случайного участника
@@ -1342,11 +1568,9 @@
                 updatePlayerBanner();
                 updateUI();
 
-                // Открываем следующую комнату
                 openNextRoom();
             }
 
-            // Принудительная смена команды
             function switchTeam() {
                 state.currentTeam = state.currentTeam === 'light' ? 'dark' : 'light';
                 state.streak = 0;
@@ -1358,11 +1582,10 @@
                 saveToLocal();
             }
 
-            // Открыть следующую комнату
             function openNextRoom() {
                 const nextRoom = ROOMS.find(r => !state.completed.includes(r.id));
                 if (!nextRoom) {
-                    showNotification('🎉 Все комнаты пройдены! Квест завершён!', 5000);
+                    showFinalResults();
                     return;
                 }
 
@@ -1381,6 +1604,11 @@
                 modalSaveBtn.style.display = 'none';
                 modalCloseBtn.textContent = 'Отмена';
 
+                // Сброс статуса
+                selectedStatus = 'success';
+                statusSuccess.className = 'active-success';
+                statusFail.className = '';
+
                 document.querySelectorAll('.chest-btn').forEach(el => {
                     el.style.borderColor = '';
                     el.style.background = '';
@@ -1390,7 +1618,6 @@
                 saveToLocal();
             }
 
-            // Выбор награды
             function selectChest(type) {
                 const room = ROOMS.find(r => r.id === currentRoomId);
                 if (!room) return;
@@ -1418,7 +1645,6 @@
                 modalStep = 'input';
             }
 
-            // Сохранить результат
             function saveResult() {
                 if (!state.selectedRoomId || state.selectedChestType === null) return;
 
@@ -1431,9 +1657,9 @@
                 const roomId = state.selectedRoomId;
                 const type = state.selectedChestType;
                 const points = POINTS_MAP[type];
-                const isSuccess = value > 0;
+                const success = (selectedStatus === 'success');
 
-                if (isSuccess) {
+                if (success) {
                     const teamKey = state.currentTeam;
                     const memberIdx = state.currentMemberIndex;
                     if (teamKey && memberIdx >= 0) {
@@ -1443,21 +1669,31 @@
                 }
 
                 state.completed.push(roomId);
-                state.results[roomId] = { result: value, type: type, points: points, success: isSuccess };
+                state.results[roomId] = { result: value, type: type, points: points, success: success };
 
-                state.streak++;
-
-                if (state.streak >= 3) {
+                if (success) {
+                    state.streak++;
+                    if (state.streak >= 3) {
+                        state.streak = 0;
+                        state.currentTeam = state.currentTeam === 'light' ? 'dark' : 'light';
+                        state.isPlayerSelected = false;
+                        state.currentMemberIndex = -1;
+                        updatePlayerBanner();
+                        showNotification(`⚠️ 3 победы подряд! Ход переходит команде ${state.currentTeam === 'light' ? 'Света' : 'Тьмы'}`);
+                    } else {
+                        // остаёмся с той же командой, но сбрасываем выбор участника
+                        state.isPlayerSelected = false;
+                        state.currentMemberIndex = -1;
+                        updatePlayerBanner();
+                    }
+                } else {
+                    // провал – ход переходит другой команде
                     state.streak = 0;
                     state.currentTeam = state.currentTeam === 'light' ? 'dark' : 'light';
                     state.isPlayerSelected = false;
                     state.currentMemberIndex = -1;
                     updatePlayerBanner();
-                    showNotification(`⚠️ 3 победы подряд! Ход переходит команде ${state.currentTeam === 'light' ? 'Света' : 'Тьмы'}`);
-                } else {
-                    state.isPlayerSelected = false;
-                    state.currentMemberIndex = -1;
-                    updatePlayerBanner();
+                    showNotification(`❌ Провал! Ход переходит команде ${state.currentTeam === 'light' ? 'Света' : 'Тьмы'}`);
                 }
 
                 state.selectedChestType = null;
@@ -1474,7 +1710,7 @@
                         }
                     }, 500);
                 } else {
-                    showNotification('🎉 Все комнаты пройдены! Квест завершён!', 5000);
+                    showFinalResults();
                 }
             }
 
@@ -1555,6 +1791,9 @@
                             resultInput.style.display = 'none';
                             document.querySelector('.modal .hint').style.display = 'none';
                             modalSaveBtn.style.display = 'none';
+                            selectedStatus = 'success';
+                            statusSuccess.className = 'active-success';
+                            statusFail.className = '';
                             document.querySelectorAll('.chest-btn').forEach(el => {
                                 el.style.borderColor = '';
                                 el.style.background = '';
@@ -1572,19 +1811,20 @@
                 // Свет
                 const light = state.teams.light;
                 teamLightScore.textContent = light.total;
+                const sortedLight = sortMembers(light.members, light.scores);
                 teamLightMembers.innerHTML = '';
-                light.members.forEach((name, idx) => {
+                sortedLight.forEach((item) => {
                     const row = document.createElement('div');
                     row.className = 'member-row';
-                    if (state.currentTeam === 'light' && state.currentMemberIndex === idx && state.isPlayerSelected) {
+                    if (state.currentTeam === 'light' && state.currentMemberIndex === item.idx && state.isPlayerSelected) {
                         row.classList.add('active-turn');
                     }
                     const nameSpan = document.createElement('span');
                     nameSpan.className = 'member-name';
-                    nameSpan.textContent = name || `Игрок ${idx+1}`;
+                    nameSpan.textContent = item.name || `Игрок ${item.idx+1}`;
                     const scoreSpan = document.createElement('span');
                     scoreSpan.className = 'member-score';
-                    scoreSpan.textContent = light.scores[idx];
+                    scoreSpan.textContent = item.score;
                     row.appendChild(nameSpan);
                     row.appendChild(scoreSpan);
                     teamLightMembers.appendChild(row);
@@ -1593,19 +1833,20 @@
                 // Тьма
                 const dark = state.teams.dark;
                 teamDarkScore.textContent = dark.total;
+                const sortedDark = sortMembers(dark.members, dark.scores);
                 teamDarkMembers.innerHTML = '';
-                dark.members.forEach((name, idx) => {
+                sortedDark.forEach((item) => {
                     const row = document.createElement('div');
                     row.className = 'member-row';
-                    if (state.currentTeam === 'dark' && state.currentMemberIndex === idx && state.isPlayerSelected) {
+                    if (state.currentTeam === 'dark' && state.currentMemberIndex === item.idx && state.isPlayerSelected) {
                         row.classList.add('active-turn');
                     }
                     const nameSpan = document.createElement('span');
                     nameSpan.className = 'member-name';
-                    nameSpan.textContent = name || `Игрок ${idx+1}`;
+                    nameSpan.textContent = item.name || `Игрок ${item.idx+1}`;
                     const scoreSpan = document.createElement('span');
                     scoreSpan.className = 'member-score';
-                    scoreSpan.textContent = dark.scores[idx];
+                    scoreSpan.textContent = item.score;
                     row.appendChild(nameSpan);
                     row.appendChild(scoreSpan);
                     teamDarkMembers.appendChild(row);
@@ -1631,6 +1872,59 @@
                 doneCountEl.textContent = done;
                 const progress = (done / ROOMS.length) * 100;
                 progressBar.style.width = progress + '%';
+            }
+
+            // ======================== ФИНАЛ ========================
+
+            function showFinalResults() {
+                const light = state.teams.light;
+                const dark = state.teams.dark;
+                const winner = light.total > dark.total ? 'light' : (dark.total > light.total ? 'dark' : 'draw');
+
+                // Сортируем игроков в каждой команде
+                const sortedLight = sortMembers(light.members, light.scores);
+                const sortedDark = sortMembers(dark.members, dark.scores);
+
+                let html = '';
+                html += `<div class="final-team light">
+                            <div class="team-title">
+                                <span>☀️ Королевство Света</span>
+                                <span class="team-score light-score">${light.total}</span>
+                            </div>
+                            <div class="team-players">`;
+                sortedLight.forEach((p, i) => {
+                    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+                    html += `<div class="player-row">
+                                <span class="p-name">${medal} ${p.name || 'Игрок'}</span>
+                                <span class="p-score">${p.score}</span>
+                            </div>`;
+                });
+                html += `</div></div>`;
+
+                html += `<div class="final-team dark">
+                            <div class="team-title">
+                                <span>🌙 Королевство Тьмы</span>
+                                <span class="team-score dark-score">${dark.total}</span>
+                            </div>
+                            <div class="team-players">`;
+                sortedDark.forEach((p, i) => {
+                    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+                    html += `<div class="player-row">
+                                <span class="p-name">${medal} ${p.name || 'Игрок'}</span>
+                                <span class="p-score">${p.score}</span>
+                            </div>`;
+                });
+                html += `</div></div>`;
+
+                if (winner === 'draw') {
+                    html += `<div class="final-winner">🤝 Ничья! Обе команды показали равную силу.</div>`;
+                } else {
+                    const winName = winner === 'light' ? '☀️ Королевство Света' : '🌙 Королевство Тьмы';
+                    html += `<div class="final-winner">🏆 Победитель: <span class="win-team">${winName}</span></div>`;
+                }
+
+                finalResults.innerHTML = html;
+                finalModal.classList.add('active');
             }
 
             // ======================== СОХРАНЕНИЕ ========================
@@ -1738,7 +2032,7 @@
                 showNotification('🔄 Квест сброшен! Нажмите "Выбрать участника" для начала.');
             }
 
-            // ======================== ПРАВИЛА (МОДАЛКА) ========================
+            // ======================== ПРАВИЛА ========================
 
             function openRulesModal() {
                 rulesModal.classList.add('active');
@@ -1761,6 +2055,18 @@
                         const type = this.dataset.type;
                         selectChest(type);
                     });
+                });
+
+                // Статус выполнения
+                statusSuccess.addEventListener('click', function() {
+                    selectedStatus = 'success';
+                    this.className = 'active-success';
+                    statusFail.className = '';
+                });
+                statusFail.addEventListener('click', function() {
+                    selectedStatus = 'fail';
+                    this.className = 'active-fail';
+                    statusSuccess.className = '';
                 });
 
                 // Основные кнопки
@@ -1797,10 +2103,21 @@
                     if (e.target === rulesModal) closeRulesModal();
                 });
 
+                // Финальная модалка
+                closeFinalBtn.addEventListener('click', () => {
+                    finalModal.classList.remove('active');
+                });
+
                 setupNameEditing();
 
-                if (!loaded || !state.currentTeam) {
-                    showNotification('🎯 Нажмите "Выбрать участника" для начала квеста!');
+                // Если квест только начался, показываем правила автоматически
+                if (!loaded || state.completed.length === 0) {
+                    setTimeout(() => {
+                        openRulesModal();
+                        showNotification('🎯 Добро пожаловать! Ознакомьтесь с правилами.', 5000);
+                    }, 500);
+                } else {
+                    showNotification('🎯 Продолжаем квест! Нажмите "Выбрать участника".', 3000);
                 }
 
                 console.log('⚔️ Битва Королевств загружена!');
@@ -1808,7 +2125,7 @@
                 console.log('🔄 Кликните на имя игрока в таблице, чтобы изменить его');
             }
 
-            // Открываем функции для консоли (отладка)
+            // Отладка
             window.__state = state;
             window.__render = renderAll;
 
