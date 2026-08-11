@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>⚔️ Битва Королевств · Выбор сундука</title>
+    <title>⚔️ Битва Королевств</title>
     <style>
         /* ========== БАЗОВЫЕ СТИЛИ ========== */
         * {
@@ -15,52 +15,41 @@
 
         body {
             min-height: 100vh;
-            background: #0a0a0f;
-            background-image:
-                radial-gradient(ellipse at 30% 20%, rgba(88, 28, 135, 0.25) 0%, transparent 50%),
-                radial-gradient(ellipse at 70% 80%, rgba(255, 165, 0, 0.12) 0%, transparent 50%),
-                linear-gradient(180deg, #0a0a0f 0%, #14141e 100%);
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
             color: #e0d6e8;
             position: relative;
+
+            /* Фон: картинка + затемнение + градиенты */
+            background: 
+                radial-gradient(ellipse at 20% 30%, rgba(255, 215, 0, 0.10) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(138, 43, 226, 0.12) 0%, transparent 50%),
+                linear-gradient(180deg, rgba(10, 10, 15, 0.75) 0%, rgba(20, 20, 30, 0.85) 100%),
+                url('chatmost_ru_1786482668814.png') center/cover fixed no-repeat;
+            background-blend-mode: overlay, overlay, normal, normal;
         }
 
+        /* Слой затемнения сверху для читаемости текста */
         body::before {
-            content: '🏰';
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%) scale(6);
-            font-size: 120px;
-            opacity: 0.03;
-            pointer-events: none;
-            z-index: 0;
-            filter: drop-shadow(0 0 80px rgba(255, 215, 0, 0.02));
-        }
-
-        body::after {
             content: '';
             position: fixed;
             inset: 0;
-            background:
-                radial-gradient(ellipse at 20% 80%, rgba(88, 28, 135, 0.08) 0%, transparent 40%),
-                radial-gradient(ellipse at 80% 20%, rgba(255, 165, 0, 0.05) 0%, transparent 40%);
-            pointer-events: none;
+            background: rgba(0, 0, 0, 0.25);
             z-index: 0;
+            pointer-events: none;
         }
 
         .container {
             max-width: 1400px;
             width: 100%;
-            background: rgba(20, 18, 30, 0.88);
-            backdrop-filter: blur(12px);
+            background: rgba(20, 18, 30, 0.82);
+            backdrop-filter: blur(8px);
             border-radius: 56px;
             padding: 32px;
-            border: 1px solid rgba(255, 215, 0, 0.10);
-            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 215, 0, 0.03);
+            border: 1px solid rgba(255, 215, 0, 0.08);
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
             position: relative;
             z-index: 1;
             overflow: hidden;
@@ -114,7 +103,7 @@
 
         .title-group .icon {
             font-size: 2.4rem;
-            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.25));
+            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.2));
             animation: float 3s ease-in-out infinite;
         }
 
@@ -130,28 +119,6 @@
             font-weight: 300;
         }
 
-        .header-actions {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .btn-rules {
-            background: rgba(255, 215, 0, 0.08);
-            border: 1px solid rgba(255, 215, 0, 0.15);
-            color: #f7d44a;
-            padding: 6px 18px;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 0.85rem;
-        }
-
-        .btn-rules:hover {
-            background: rgba(255, 215, 0, 0.15);
-        }
-
         .btn-reset {
             background: rgba(255, 50, 50, 0.08);
             border: 1px solid rgba(255, 50, 50, 0.15);
@@ -161,10 +128,133 @@
             cursor: pointer;
             transition: 0.3s;
             font-size: 0.85rem;
+            z-index: 2;
+            position: relative;
         }
 
         .btn-reset:hover {
             background: rgba(255, 50, 50, 0.18);
+        }
+
+        /* ========== ПЛАШКА ПРАВИЛ ========== */
+        .rules-banner {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 30px;
+            padding: 12px 24px;
+            margin-bottom: 18px;
+            border: 1px solid rgba(255, 215, 0, 0.06);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px 20px;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(4px);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .rules-banner:hover {
+            border-color: rgba(255, 215, 0, 0.15);
+        }
+
+        .rules-banner .rules-text {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 24px;
+            font-size: 0.85rem;
+            color: #b0a8c0;
+        }
+
+        .rules-banner .rules-text .rule-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .rules-banner .rules-text .highlight-coin { color: #cd7f32; font-weight: 600; }
+        .rules-banner .rules-text .highlight-diamond { color: #c0c0c0; font-weight: 600; }
+        .rules-banner .rules-text .highlight-crown { color: #f7d44a; font-weight: 600; }
+        .rules-banner .rules-text .highlight-light { color: #f7d44a; font-weight: 600; }
+        .rules-banner .rules-text .highlight-dark { color: #b388ff; font-weight: 600; }
+
+        .rules-banner .rules-open-btn {
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            color: #f7d44a;
+            padding: 4px 16px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+
+        .rules-banner .rules-open-btn:hover {
+            background: rgba(255, 215, 0, 0.15);
+        }
+
+        /* ========== ПЛАШКА ТЕКУЩЕГО УЧАСТНИКА ========== */
+        .current-player-banner {
+            display: none;
+            background: rgba(0, 0, 0, 0.45);
+            border-radius: 40px;
+            padding: 10px 24px;
+            margin-bottom: 18px;
+            border: 1px solid rgba(255, 215, 0, 0.06);
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            backdrop-filter: blur(4px);
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .current-player-banner.active {
+            display: flex;
+        }
+
+        .current-player-banner .player-avatar {
+            font-size: 2rem;
+            line-height: 1;
+        }
+
+        .current-player-banner .player-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .current-player-banner .player-name {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #f0e8f8;
+        }
+
+        .current-player-banner .player-team {
+            font-size: 0.85rem;
+            color: #8a7a9a;
+        }
+
+        .current-player-banner .player-team .team-light-label {
+            color: #f7d44a;
+            font-weight: 600;
+        }
+
+        .current-player-banner .player-team .team-dark-label {
+            color: #b388ff;
+            font-weight: 600;
+        }
+
+        .current-player-banner .player-turn-hint {
+            margin-left: auto;
+            font-size: 0.85rem;
+            color: #8a7a9a;
+            background: rgba(255, 215, 0, 0.04);
+            padding: 4px 14px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 215, 0, 0.04);
         }
 
         /* ========== СТАТУС-БАР ========== */
@@ -174,7 +264,7 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 14px;
-            background: rgba(10, 10, 18, 0.6);
+            background: rgba(10, 10, 18, 0.5);
             padding: 12px 22px;
             border-radius: 40px;
             border: 1px solid rgba(255, 215, 0, 0.06);
@@ -233,7 +323,7 @@
 
         .btn-gold:hover {
             transform: scale(1.04);
-            box-shadow: 0 0 30px rgba(245, 166, 35, 0.25);
+            box-shadow: 0 0 30px rgba(245, 166, 35, 0.2);
         }
 
         .btn-gold:disabled {
@@ -249,7 +339,6 @@
             font-size: 0.85rem;
             color: #b0a8c0;
         }
-
         .stat-pill span {
             color: #f0e8f8;
             font-weight: 600;
@@ -268,7 +357,7 @@
         .team-table {
             flex: 1;
             min-width: 260px;
-            background: rgba(0, 0, 0, 0.35);
+            background: rgba(0, 0, 0, 0.30);
             border-radius: 32px;
             padding: 18px 22px;
             border: 1px solid rgba(255, 215, 0, 0.04);
@@ -278,9 +367,12 @@
 
         .team-table.team-light {
             border-color: rgba(247, 212, 74, 0.12);
+            background: rgba(60, 50, 20, 0.08);
         }
+
         .team-table.team-dark {
             border-color: rgba(179, 136, 255, 0.12);
+            background: rgba(40, 20, 60, 0.08);
         }
 
         .team-table .team-header {
@@ -299,15 +391,24 @@
 
         .team-light .team-header h3 {
             color: #f7d44a;
+            text-shadow: 0 0 20px rgba(247, 212, 74, 0.15);
         }
         .team-dark .team-header h3 {
             color: #b388ff;
+            text-shadow: 0 0 20px rgba(179, 136, 255, 0.15);
         }
 
         .team-table .team-header .team-score {
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             font-weight: 800;
             color: #f0e8f8;
+        }
+
+        .team-light .team-header .team-score {
+            color: #f7d44a;
+        }
+        .team-dark .team-header .team-score {
+            color: #b388ff;
         }
 
         .team-table .member-row {
@@ -330,10 +431,23 @@
             font-size: 0.95rem;
         }
 
+        .team-light .member-row .member-name {
+            color: #e8d8b0;
+        }
+        .team-dark .member-row .member-name {
+            color: #b8b0d0;
+        }
+
         .team-table .member-row .member-score {
             font-weight: 600;
-            color: #f7d44a;
             font-size: 0.95rem;
+        }
+
+        .team-light .member-row .member-score {
+            color: #f7d44a;
+        }
+        .team-dark .member-row .member-score {
+            color: #b388ff;
         }
 
         .team-table .member-row.active-turn {
@@ -370,7 +484,7 @@
             100% { background-position: 200% 0; }
         }
 
-        /* ========== КАРТЫ КОМНАТ ========== */
+        /* ========== СЕТКА КОМНАТ ========== */
         .grid {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
@@ -395,7 +509,7 @@
             text-align: center;
             overflow: hidden;
             border: 2px solid rgba(255, 255, 255, 0.04);
-            background: rgba(20, 18, 30, 0.5);
+            background: rgba(20, 18, 30, 0.4);
         }
 
         .cell::before {
@@ -440,7 +554,7 @@
 
         .cell.done {
             border-color: rgba(46, 204, 113, 0.2);
-            background: rgba(20, 50, 30, 0.25);
+            background: rgba(20, 50, 30, 0.2);
             cursor: default;
             transform: scale(0.96);
             opacity: 0.5;
@@ -463,11 +577,106 @@
 
         .cell .cell-type {
             font-size: 0.55rem;
-            color: rgba(255, 215, 0, 0.12);
+            color: rgba(255, 215, 0, 0.10);
             margin-top: 2px;
         }
 
-        /* ========== МОДАЛКА КОМНАТЫ (ВЫБОР СУНДУКА) ========== */
+        /* ========== МОДАЛКА ПРАВИЛ ========== */
+        .modal-rules-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-rules-overlay.active {
+            display: flex;
+        }
+
+        .modal-rules {
+            background: linear-gradient(160deg, #1a1828, #12101e);
+            border-radius: 48px;
+            max-width: 600px;
+            width: 92%;
+            padding: 36px;
+            border: 1px solid rgba(255, 215, 0, 0.08);
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.9);
+            position: relative;
+            overflow: hidden;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-rules::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg at 50% 50%, transparent 0%, rgba(255, 215, 0, 0.03) 25%, transparent 50%, rgba(138, 43, 226, 0.03) 75%, transparent 100%);
+            animation: rotateGlow 20s linear infinite;
+            pointer-events: none;
+        }
+
+        .modal-rules h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #f0e8f8;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .modal-rules .rules-list {
+            position: relative;
+            z-index: 1;
+            color: #c0b8d0;
+            font-size: 1rem;
+            line-height: 1.8;
+            padding-left: 20px;
+        }
+
+        .modal-rules .rules-list li {
+            margin-bottom: 8px;
+        }
+
+        .modal-rules .rules-list .highlight-coin { color: #cd7f32; font-weight: 600; }
+        .modal-rules .rules-list .highlight-diamond { color: #c0c0c0; font-weight: 600; }
+        .modal-rules .rules-list .highlight-crown { color: #f7d44a; font-weight: 600; }
+        .modal-rules .rules-list .highlight-light { color: #f7d44a; font-weight: 600; }
+        .modal-rules .rules-list .highlight-dark { color: #b388ff; font-weight: 600; }
+
+        .modal-rules .close-rules-btn {
+            background: linear-gradient(135deg, #f7d44a, #f5a623);
+            border: none;
+            color: #0a0a0f;
+            padding: 10px 30px;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 1rem;
+            margin-top: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .modal-rules .close-rules-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 30px rgba(245, 166, 35, 0.2);
+        }
+
+        /* ========== МОДАЛКА ВЫБОРА МОНЕТА/АЛМАЗ/КОРОНА ========== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -485,14 +694,8 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .modal {
@@ -544,6 +747,7 @@
             font-weight: 600;
         }
 
+        /* Выбор монета/алмаз/корона */
         .chest-choice {
             display: flex;
             gap: 20px;
@@ -556,8 +760,8 @@
 
         .chest-btn {
             flex: 1;
-            min-width: 130px;
-            max-width: 200px;
+            min-width: 120px;
+            max-width: 180px;
             padding: 18px 12px 16px;
             border-radius: 32px;
             border: 2px solid rgba(255, 255, 255, 0.04);
@@ -594,39 +798,42 @@
             display: block;
         }
 
-        .chest-btn.bronze {
+        /* Монета (была bronze) */
+        .chest-btn.coin {
             border-color: rgba(205, 127, 50, 0.2);
-            background: rgba(60, 40, 20, 0.2);
+            background: rgba(60, 40, 20, 0.15);
         }
-        .chest-btn.bronze:hover {
+        .chest-btn.coin:hover {
             border-color: #cd7f32;
             box-shadow: 0 0 40px rgba(205, 127, 50, 0.12);
         }
-        .chest-btn.bronze .chest-icon {
+        .chest-btn.coin .chest-icon {
             filter: drop-shadow(0 0 10px rgba(205, 127, 50, 0.15));
         }
 
-        .chest-btn.silver {
+        /* Алмаз (была silver) */
+        .chest-btn.diamond {
             border-color: rgba(192, 192, 192, 0.15);
-            background: rgba(50, 50, 60, 0.15);
+            background: rgba(50, 50, 60, 0.12);
         }
-        .chest-btn.silver:hover {
+        .chest-btn.diamond:hover {
             border-color: #c0c0c0;
             box-shadow: 0 0 40px rgba(192, 192, 192, 0.08);
         }
-        .chest-btn.silver .chest-icon {
+        .chest-btn.diamond .chest-icon {
             filter: drop-shadow(0 0 10px rgba(192, 192, 192, 0.12));
         }
 
-        .chest-btn.gold {
+        /* Корона (была gold) */
+        .chest-btn.crown {
             border-color: rgba(255, 215, 0, 0.15);
-            background: rgba(60, 50, 20, 0.15);
+            background: rgba(60, 50, 20, 0.12);
         }
-        .chest-btn.gold:hover {
+        .chest-btn.crown:hover {
             border-color: #f7d44a;
             box-shadow: 0 0 50px rgba(255, 215, 0, 0.12);
         }
-        .chest-btn.gold .chest-icon {
+        .chest-btn.crown .chest-icon {
             filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.15));
         }
 
@@ -729,40 +936,6 @@
             background: rgba(255, 255, 255, 0.08);
         }
 
-        /* ========== МОДАЛКА ПРАВИЛ ========== */
-        .rules-modal .modal-content {
-            text-align: left;
-        }
-        .rules-modal .modal-content h2 {
-            text-align: center;
-            margin-bottom: 16px;
-        }
-        .rules-modal .modal-content ul {
-            list-style: none;
-            padding: 0;
-        }
-        .rules-modal .modal-content ul li {
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .rules-modal .modal-content ul li:last-child {
-            border-bottom: none;
-        }
-        .rules-modal .modal-content .rule-icon {
-            font-size: 1.4rem;
-            min-width: 30px;
-            text-align: center;
-        }
-        .rules-modal .modal-content .rule-text {
-            color: #c0b8d0;
-        }
-        .rules-modal .modal-content .rule-text strong {
-            color: #f7d44a;
-        }
-
         /* ========== КНОПКА СМЕНЫ КОМАНДЫ ========== */
         .force-switch-wrap {
             text-align: center;
@@ -773,62 +946,26 @@
 
         /* ========== АДАПТИВ ========== */
         @media (max-width: 1024px) {
-            .grid {
-                grid-template-columns: repeat(5, 1fr);
-            }
+            .grid { grid-template-columns: repeat(5, 1fr); }
         }
         @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-            .grid {
-                grid-template-columns: repeat(4, 1fr);
-                gap: 10px;
-            }
-            .title-group h1 {
-                font-size: 1.6rem;
-            }
-            .status-bar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .team-table-wrap {
-                flex-direction: column;
-            }
-            .chest-btn {
-                min-width: 100px;
-            }
-            .modal {
-                padding: 24px 20px;
-            }
-            .header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .header-actions {
-                justify-content: flex-start;
-            }
+            .container { padding: 20px; }
+            .grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+            .title-group h1 { font-size: 1.6rem; }
+            .status-bar { flex-direction: column; align-items: stretch; }
+            .team-table-wrap { flex-direction: column; }
+            .chest-btn { min-width: 100px; }
+            .modal { padding: 24px 20px; }
+            .rules-banner { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 18px; }
+            .current-player-banner { flex-direction: column; align-items: flex-start; }
+            .current-player-banner .player-turn-hint { margin-left: 0; }
         }
         @media (max-width: 480px) {
-            .grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 8px;
-            }
-            .cell .cell-number {
-                font-size: 1.4rem;
-            }
-            .chest-choice {
-                flex-direction: column;
-                align-items: center;
-            }
-            .chest-btn {
-                max-width: 100%;
-                width: 100%;
-            }
-            .container {
-                padding: 14px;
-                border-radius: 32px;
-            }
+            .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+            .cell .cell-number { font-size: 1.4rem; }
+            .chest-choice { flex-direction: column; align-items: center; }
+            .chest-btn { max-width: 100%; width: 100%; }
+            .container { padding: 14px; border-radius: 32px; }
         }
     </style>
 </head>
@@ -841,13 +978,33 @@
                 <span class="icon">⚔️</span>
                 <div>
                     <h1>Битва Королевств</h1>
-                    <div class="subtitle">30 комнат · выбор сундука · 2 команды</div>
+                    <div class="subtitle">30 комнат · выбор монеты/алмаза/короны</div>
                 </div>
             </div>
-            <div class="header-actions">
-                <button id="rulesBtn" class="btn-rules">📜 Правила</button>
-                <button id="resetBtn" class="btn-reset">🔄 Сбросить всё</button>
+            <button id="resetBtn" class="btn-reset">🔄 Сбросить всё</button>
+        </div>
+
+        <!-- ПЛАШКА ПРАВИЛ -->
+        <div class="rules-banner" id="rulesBanner">
+            <div class="rules-text">
+                <span class="rule-item">🏰 <span class="highlight-light">30 комнат</span> — выбери награду</span>
+                <span class="rule-item">🪙 <span class="highlight-coin">Монета</span> +10</span>
+                <span class="rule-item">💎 <span class="highlight-diamond">Алмаз</span> +25</span>
+                <span class="rule-item">👑 <span class="highlight-crown">Корона</span> +50</span>
+                <span class="rule-item">⛔ <span class="highlight-light">Макс. 3 победы</span> подряд</span>
+                <span class="rule-item">🎲 <span class="highlight-dark">Случайный</span> выбор</span>
             </div>
+            <span class="rules-open-btn" id="rulesOpenBtn">📜 Подробнее</span>
+        </div>
+
+        <!-- ПЛАШКА ТЕКУЩЕГО УЧАСТНИКА -->
+        <div class="current-player-banner" id="currentPlayerBanner">
+            <span class="player-avatar" id="playerAvatar">⚔️</span>
+            <div class="player-info">
+                <span class="player-name" id="playerNameDisplay">—</span>
+                <span class="player-team" id="playerTeamDisplay">Команда: <span class="team-light-label">Свет</span></span>
+            </div>
+            <span class="player-turn-hint">🎯 Сейчас ходит</span>
         </div>
 
         <!-- СТАТУС-БАР -->
@@ -898,7 +1055,26 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА КОМНАТЫ -->
+    <!-- МОДАЛКА ПРАВИЛ -->
+    <div class="modal-rules-overlay" id="rulesModal">
+        <div class="modal-rules">
+            <h2>📜 Правила квеста</h2>
+            <ul class="rules-list">
+                <li>🎯 <span class="highlight-light">30 комнат</span> — в каждой игрок выбирает награду:</li>
+                <li>🪙 <span class="highlight-coin">Монета</span> — лёгкое задание, даёт <strong>10 очков</strong>.</li>
+                <li>💎 <span class="highlight-diamond">Алмаз</span> — среднее задание, даёт <strong>25 очков</strong>.</li>
+                <li>👑 <span class="highlight-crown">Корона</span> — сложное задание, даёт <strong>50 очков</strong>.</li>
+                <li>⛔ Одна команда <span class="highlight-light">не может выполнить больше 3 заданий подряд</span> — ход переходит автоматически.</li>
+                <li>🎲 Участник выбирается <span class="highlight-dark">случайным образом</span> из доступных в команде.</li>
+                <li>💬 Имена можно менять <span class="highlight-light">кликом по ним</span> в таблице.</li>
+                <li>🏆 Победитель — команда с большим количеством очков.</li>
+                <li>💰 Призы: команда-победитель получает по 3000 ₽, лучший игрок 10 000 ₽, второй 5 000 ₽.</li>
+            </ul>
+            <button class="close-rules-btn" id="rulesCloseBtn">Понятно!</button>
+        </div>
+    </div>
+
+    <!-- МОДАЛКА ВЫБОРА -->
     <div class="modal-overlay" id="taskModal">
         <div class="modal">
             <div class="modal-header">
@@ -908,24 +1084,26 @@
                 </div>
             </div>
 
+            <!-- Выбор награды -->
             <div class="chest-choice" id="chestChoice">
-                <div class="chest-btn bronze" data-type="bronze" data-points="10">
+                <div class="chest-btn coin" data-type="coin" data-points="10">
                     <span class="chest-icon">🪙</span>
-                    <span class="chest-label">Бронзовый</span>
+                    <span class="chest-label">Монета</span>
                     <span class="chest-points">+10 очков</span>
                 </div>
-                <div class="chest-btn silver" data-type="silver" data-points="25">
+                <div class="chest-btn diamond" data-type="diamond" data-points="25">
                     <span class="chest-icon">💎</span>
-                    <span class="chest-label">Серебряный</span>
+                    <span class="chest-label">Алмаз</span>
                     <span class="chest-points">+25 очков</span>
                 </div>
-                <div class="chest-btn gold" data-type="gold" data-points="50">
+                <div class="chest-btn crown" data-type="crown" data-points="50">
                     <span class="chest-icon">👑</span>
-                    <span class="chest-label">Золотой</span>
+                    <span class="chest-label">Корона</span>
                     <span class="chest-points">+50 очков</span>
                 </div>
             </div>
 
+            <!-- Детали задания -->
             <div class="task-detail" id="taskDetail">
                 <div class="task-title" id="taskTitle">Задание</div>
                 <div class="task-desc" id="taskDesc">Описание</div>
@@ -937,27 +1115,6 @@
             <div class="btn-group">
                 <button class="btn-secondary" id="modalCloseBtn">Отмена</button>
                 <button class="btn-primary" id="modalSaveBtn">✅ Сохранить</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- МОДАЛКА ПРАВИЛ -->
-    <div class="modal-overlay rules-modal" id="rulesModal">
-        <div class="modal">
-            <div class="modal-content">
-                <h2>📜 Правила квеста</h2>
-                <ul>
-                    <li><span class="rule-icon">🏰</span><span class="rule-text">Всего <strong>30 комнат</strong>. В каждой комнате участник выбирает один из трёх сундуков.</span></li>
-                    <li><span class="rule-icon">🪙</span><span class="rule-text"><strong>Бронзовый</strong> сундук — простое задание, +10 очков.</span></li>
-                    <li><span class="rule-icon">💎</span><span class="rule-text"><strong>Серебряный</strong> сундук — среднее задание, +25 очков.</span></li>
-                    <li><span class="rule-icon">👑</span><span class="rule-text"><strong>Золотой</strong> сундук — сложное задание, +50 очков.</span></li>
-                    <li><span class="rule-icon">⛔</span><span class="rule-text">Одна команда не может победить <strong>больше 3 раз подряд</strong>. После 3 побед ход переходит к другой команде.</span></li>
-                    <li><span class="rule-icon">🎲</span><span class="rule-text">Ход определяется случайным выбором участника из команды, которая сейчас ходит.</span></li>
-                    <li><span class="rule-icon">💰</span><span class="rule-text">В конце квеста побеждает команда с наибольшим количеством очков. Участник с максимумом очков в команде получает бонус.</span></li>
-                </ul>
-                <div style="text-align:center; margin-top:20px;">
-                    <button id="rulesCloseBtn" class="btn-primary">Понял!</button>
-                </div>
             </div>
         </div>
     </div>
@@ -984,45 +1141,25 @@
                 }
             };
 
-            // ======================== ЗАДАНИЯ (90 штук) ========================
+            // ======================== ЗАДАНИЯ (будете заполнять сами) ========================
+            // Здесь я оставляю по 10 примеров для каждого типа, всего 30.
+            // Вы можете легко заменить их на свои 90 заданий (по 30 на тип).
             const TASK_POOLS = {
-                bronze: [
-                    // 30 лёгких заданий (спины с простыми целями)
-                    { title: "Fruit Party 2", desc: "35 спинов в Fruit Party 2 (Pragmatic). Цель: множитель ≥ x30." },
-                    { title: "Starz MegaWays", desc: "40 спинов в Starz MegaWays (Red Tiger). Цель: выигрыш > 2000 ₽." },
+                coin: [
+                    { title: "Fruit Party 2", desc: "35 спинов. Цель: множитель ≥ x30." },
+                    { title: "Starz MegaWays", desc: "40 спинов. Цель: выигрыш > 2000 ₽." },
                     { title: "Рулетка", desc: "3 ставки на красное/чёрное. Цель: выиграть 2 из 3." },
-                    { title: "Tomb of Nefertiti", desc: "35 спинов в Tomb of Nefertiti (Play'n GO). Цель: выигрыш > 3000 ₽." },
+                    { title: "Tomb of Nefertiti", desc: "35 спинов. Цель: выигрыш > 3000 ₽." },
                     { title: "Блэкджек", desc: "3 раздачи. Цель: выиграть 2 из 3." },
-                    { title: "Dragon's Fire", desc: "30 спинов в Dragon's Fire (Red Tiger). Цель: поймать бонус." },
-                    { title: "Gorilla Kingdom", desc: "35 спинов в Gorilla Kingdom (NetEnt). Цель: поймать бонус." },
+                    { title: "Dragon's Fire", desc: "30 спинов. Цель: поймать бонус." },
+                    { title: "Gorilla Kingdom", desc: "35 спинов. Цель: поймать бонус." },
                     { title: "Vikings Go Berzerk", desc: "40 спинов. Цель: множитель ≥ x60." },
-                    { title: "Wild Walker", desc: "40 спинов в Wild Walker. Цель: множитель ≥ x40." },
-                    { title: "Le Bandit", desc: "30 спинов в Le Bandit (Hacksaw). Цель: множитель ≥ x30." },
-                    { title: "Gates of Olympus", desc: "40 спинов. Цель: множитель ≥ x40." },
-                    { title: "Sweet Bonanza", desc: "35 спинов. Цель: множитель ≥ x35." },
-                    { title: "Big Bass Bonanza", desc: "40 спинов. Цель: поймать 3 рыбы." },
-                    { title: "Starlight Princess", desc: "35 спинов. Цель: множитель ≥ x30." },
-                    { title: "The Dog House", desc: "40 спинов. Цель: поймать бонус." },
-                    { title: "Coin UP Lightning", desc: "30 спинов. Цель: выигрыш > 1500 ₽." },
-                    { title: "Hot Fiesta", desc: "35 спинов. Цель: множитель ≥ x25." },
-                    { title: "Pirates Pub", desc: "40 спинов. Цель: поймать бонус." },
-                    { title: "Retro Sweet", desc: "35 спинов. Цель: множитель ≥ x30." },
-                    { title: "Sugar Rush", desc: "40 спинов. Цель: множитель ≥ x30." },
-                    { title: "Le Pharaon", desc: "30 спинов. Цель: поймать бонус." },
-                    { title: "Miami Mayhem", desc: "35 спинов. Цель: множитель ≥ x25." },
-                    { title: "Wild West Gold", desc: "40 спинов. Цель: множитель ≥ x35." },
-                    { title: "Fruit Party", desc: "35 спинов. Цель: множитель ≥ x30." },
-                    { title: "Rise of Merlin", desc: "40 спинов. Цель: выигрыш > 2000 ₽." },
-                    { title: "Book of Dead", desc: "35 спинов. Цель: множитель ≥ x30." },
-                    { title: "Bonanza Megaways", desc: "40 спинов. Цель: множитель ≥ x25." },
-                    { title: "Money Train 3", desc: "30 спинов. Цель: поймать бонус." },
-                    { title: "Temple of Fortune", desc: "35 спинов. Цель: множитель ≥ x30." },
-                    { title: "Candy Crush", desc: "40 спинов. Цель: выигрыш > 2500 ₽." },
+                    { title: "Wild Walker", desc: "40 спинов. Цель: множитель ≥ x40." },
+                    { title: "Le Bandit", desc: "30 спинов. Цель: множитель ≥ x30." }
                 ],
-                silver: [
-                    // 30 средних заданий
+                diamond: [
                     { title: "Chaos Crew 2", desc: "30 спинов. Цель: поймать бонусный раунд." },
-                    { title: "Razor Returns", desc: "40 спинов. Цель: поймать акулу (бонус)." },
+                    { title: "Razor Returns", desc: "40 спинов. Цель: поймать акулу." },
                     { title: "Temple Tumble 2", desc: "50 спинов. Цель: множитель ≥ x75." },
                     { title: "Book of Shadows", desc: "45 спинов. Цель: множитель ≥ x100." },
                     { title: "Punk Rocker", desc: "30 спинов. Цель: поймать бонус." },
@@ -1030,32 +1167,11 @@
                     { title: "Gorilla Kingdom", desc: "35 спинов. Цель: множитель ≥ x70." },
                     { title: "Wild Walker", desc: "40 спинов. Цель: множитель ≥ x60." },
                     { title: "Fruit Party 2", desc: "35 спинов. Цель: множитель ≥ x50." },
-                    { title: "Le Bandit", desc: "40 спинов. Цель: множитель ≥ x50." },
-                    { title: "Money Train 3", desc: "Купить бонус за 80x. Цель: окупить (≥ 80x)." },
-                    { title: "Sugar Rush", desc: "40 спинов. Цель: множитель ≥ x70." },
-                    { title: "Big Bass Bonanza", desc: "50 спинов. Цель: поймать 5 рыб." },
-                    { title: "Gates of Olympus", desc: "40 спинов. Цель: множитель ≥ x60." },
-                    { title: "Sweet Bonanza", desc: "35 спинов. Цель: множитель ≥ x50." },
-                    { title: "Starlight Princess", desc: "40 спинов. Цель: множитель ≥ x50." },
-                    { title: "The Dog House Megaways", desc: "40 спинов. Цель: поймать бонус." },
-                    { title: "Coin UP Lightning", desc: "35 спинов. Цель: множитель ≥ x50." },
-                    { title: "Hot Fiesta", desc: "40 спинов. Цель: множитель ≥ x45." },
-                    { title: "Pirates Pub", desc: "45 спинов. Цель: множитель ≥ x55." },
-                    { title: "Retro Sweet", desc: "40 спинов. Цель: множитель ≥ x50." },
-                    { title: "Le Pharaon", desc: "40 спинов. Цель: множитель ≥ x60." },
-                    { title: "Miami Mayhem", desc: "35 спинов. Цель: множитель ≥ x50." },
-                    { title: "Wild West Gold", desc: "40 спинов. Цель: множитель ≥ x55." },
-                    { title: "Rise of Merlin", desc: "40 спинов. Цель: множитель ≥ x50." },
-                    { title: "Book of Dead", desc: "40 спинов. Цель: множитель ≥ x60." },
-                    { title: "Bonanza Megaways", desc: "45 спинов. Цель: множитель ≥ x50." },
-                    { title: "Money Train 4", desc: "Купить бонус за 100x. Цель: окупить (≥ 100x)." },
-                    { title: "Temple of Fortune", desc: "40 спинов. Цель: множитель ≥ x60." },
-                    { title: "Candy Crush", desc: "45 спинов. Цель: множитель ≥ x50." },
+                    { title: "Le Bandit", desc: "40 спинов. Цель: множитель ≥ x50." }
                 ],
-                gold: [
-                    // 30 сложных заданий
-                    { title: "Mental", desc: "50 спинов в Mental (NoLimit City). Цель: множитель ≥ x100." },
-                    { title: "San Quentin xWays", desc: "40 спинов. Цель: активировать xWays + множитель ≥ x50." },
+                crown: [
+                    { title: "Mental", desc: "50 спинов. Цель: множитель ≥ x100." },
+                    { title: "San Quentin xWays", desc: "40 спинов. Цель: xWays + множитель ≥ x50." },
                     { title: "Reactoonz 2", desc: "45 спинов. Цель: поймать Gargantoon." },
                     { title: "Jammin' Jars 2", desc: "30 спинов. Цель: множитель ≥ x200." },
                     { title: "Money Train 4", desc: "Купить бонус за 100x. Цель: окупить (≥ 100x)." },
@@ -1063,45 +1179,28 @@
                     { title: "Chaos Crew 2", desc: "30 спинов. Цель: множитель ≥ x200." },
                     { title: "Razor Returns", desc: "40 спинов. Цель: множитель ≥ x150." },
                     { title: "Temple Tumble 2", desc: "50 спинов. Цель: множитель ≥ x120." },
-                    { title: "Mental", desc: "50 спинов. Цель: множитель ≥ x120." },
-                    { title: "San Quentin xWays", desc: "40 спинов. Цель: множитель ≥ x200." },
-                    { title: "Le Bandit", desc: "40 спинов. Цель: множитель ≥ x150." },
-                    { title: "Sugar Rush", desc: "50 спинов. Цель: множитель ≥ x120." },
-                    { title: "Big Bass Bonanza", desc: "60 спинов. Цель: поймать 10 рыб." },
-                    { title: "Gates of Olympus", desc: "50 спинов. Цель: множитель ≥ x120." },
-                    { title: "Sweet Bonanza", desc: "45 спинов. Цель: множитель ≥ x100." },
-                    { title: "Starlight Princess", desc: "50 спинов. Цель: множитель ≥ x100." },
-                    { title: "The Dog House Megaways", desc: "50 спинов. Цель: множитель ≥ x100." },
-                    { title: "Coin UP Lightning", desc: "45 спинов. Цель: множитель ≥ x80." },
-                    { title: "Hot Fiesta", desc: "50 спинов. Цель: множитель ≥ x90." },
-                    { title: "Pirates Pub", desc: "50 спинов. Цель: множитель ≥ x100." },
-                    { title: "Retro Sweet", desc: "45 спинов. Цель: множитель ≥ x100." },
-                    { title: "Le Pharaon", desc: "50 спинов. Цель: множитель ≥ x120." },
-                    { title: "Miami Mayhem", desc: "45 спинов. Цель: множитель ≥ x100." },
-                    { title: "Wild West Gold", desc: "50 спинов. Цель: множитель ≥ x100." },
-                    { title: "Rise of Merlin", desc: "50 спинов. Цель: множитель ≥ x100." },
-                    { title: "Book of Dead", desc: "50 спинов. Цель: множитель ≥ x120." },
-                    { title: "Bonanza Megaways", desc: "50 спинов. Цель: множитель ≥ x100." },
-                    { title: "Temple of Fortune", desc: "50 спинов. Цель: множитель ≥ x100." },
-                    { title: "Candy Crush", desc: "50 спинов. Цель: множитель ≥ x100." },
+                    { title: "Mental", desc: "50 спинов. Цель: множитель ≥ x120." }
                 ]
             };
 
             // ======================== ГЕНЕРАЦИЯ 30 КОМНАТ ========================
+            const POINTS_MAP = { coin: 10, diamond: 25, crown: 50 };
             const ROOMS = [];
-            const POINTS_MAP = { bronze: 10, silver: 25, gold: 50 };
+            const TYPES = ['coin', 'diamond', 'crown'];
 
-            // Создаём 30 комнат (по 10 каждого типа) с перемешиванием
-            for (let type of ['bronze', 'silver', 'gold']) {
+            // Создаём по 10 комнат каждого типа
+            TYPES.forEach(type => {
                 const pool = TASK_POOLS[type];
-                // Перемешиваем задания в пуле
-                const shuffled = [...pool];
-                for (let i = shuffled.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                // Если заданий в пуле меньше 10, дополняем их же
+                const extended = [];
+                while (extended.length < 10) {
+                    for (let t of pool) {
+                        if (extended.length >= 10) break;
+                        extended.push({ ...t });
+                    }
                 }
                 for (let i = 0; i < 10; i++) {
-                    const task = shuffled[i % shuffled.length];
+                    const task = extended[i % extended.length];
                     ROOMS.push({
                         id: ROOMS.length + 1,
                         type: type,
@@ -1110,7 +1209,7 @@
                         points: POINTS_MAP[type]
                     });
                 }
-            }
+            });
 
             // Перемешиваем комнаты
             for (let i = ROOMS.length - 1; i > 0; i--) {
@@ -1124,19 +1223,19 @@
                     light: { members: ['', '', '', '', ''], scores: [0, 0, 0, 0, 0], total: 0 },
                     dark: { members: ['', '', '', '', ''], scores: [0, 0, 0, 0, 0], total: 0 }
                 },
-                currentTeam: null, // 'light' или 'dark'
+                currentTeam: null,
                 currentMemberIndex: -1,
                 turnNumber: 0,
-                completed: [], // id комнат
-                results: {}, // { roomId: { result, type, points } }
+                completed: [],
+                results: {},
                 streak: 0,
                 isPlayerSelected: false,
                 selectedChestType: null,
-                selectedRoomId: null,
-                modalStep: 'select' // 'select' или 'input'
+                selectedRoomId: null
             };
 
             let currentRoomId = null;
+            let modalStep = 'select'; // 'select' или 'input'
 
             // ======================== DOM ========================
             const gridEl = document.getElementById('gridContainer');
@@ -1161,12 +1260,22 @@
             const pickPlayerBtn = document.getElementById('pickPlayerBtn');
             const resetBtn = document.getElementById('resetBtn');
             const forceSwitchBtn = document.getElementById('forceSwitchBtn');
-            const rulesBtn = document.getElementById('rulesBtn');
+
+            // Элементы для плашки участника
+            const currentPlayerBanner = document.getElementById('currentPlayerBanner');
+            const playerAvatar = document.getElementById('playerAvatar');
+            const playerNameDisplay = document.getElementById('playerNameDisplay');
+            const playerTeamDisplay = document.getElementById('playerTeamDisplay');
+
+            // Правила
+            const rulesBanner = document.getElementById('rulesBanner');
+            const rulesOpenBtn = document.getElementById('rulesOpenBtn');
             const rulesModal = document.getElementById('rulesModal');
             const rulesCloseBtn = document.getElementById('rulesCloseBtn');
 
             // ======================== ФУНКЦИИ ========================
 
+            // Показать уведомление
             function showNotification(msg, duration = 3000) {
                 const notif = document.createElement('div');
                 notif.style.cssText = `
@@ -1186,6 +1295,25 @@
                 }, duration);
             }
 
+            // Обновить плашку текущего участника
+            function updatePlayerBanner() {
+                if (state.isPlayerSelected && state.currentTeam && state.currentMemberIndex >= 0) {
+                    const teamKey = state.currentTeam;
+                    const memberName = state.teams[teamKey].members[state.currentMemberIndex] || 'Игрок';
+                    const teamLabel = teamKey === 'light' ? 'Свет' : 'Тьма';
+                    const teamClass = teamKey === 'light' ? 'team-light-label' : 'team-dark-label';
+                    const avatar = teamKey === 'light' ? '☀️' : '🌙';
+
+                    playerAvatar.textContent = avatar;
+                    playerNameDisplay.textContent = memberName;
+                    playerTeamDisplay.innerHTML = `Команда: <span class="${teamClass}">${teamLabel}</span>`;
+                    currentPlayerBanner.classList.add('active');
+                } else {
+                    currentPlayerBanner.classList.remove('active');
+                }
+            }
+
+            // Выбор случайного участника
             function pickRandomPlayer() {
                 let teamKey = state.currentTeam;
                 if (!teamKey) {
@@ -1211,20 +1339,26 @@
                 state.isPlayerSelected = true;
                 state.turnNumber++;
 
+                updatePlayerBanner();
                 updateUI();
+
+                // Открываем следующую комнату
                 openNextRoom();
             }
 
+            // Принудительная смена команды
             function switchTeam() {
                 state.currentTeam = state.currentTeam === 'light' ? 'dark' : 'light';
                 state.streak = 0;
                 state.isPlayerSelected = false;
                 state.currentMemberIndex = -1;
+                updatePlayerBanner();
                 updateUI();
                 showNotification(`🔄 Ход передан команде ${state.currentTeam === 'light' ? 'Света' : 'Тьмы'}`);
                 saveToLocal();
             }
 
+            // Открыть следующую комнату
             function openNextRoom() {
                 const nextRoom = ROOMS.find(r => !state.completed.includes(r.id));
                 if (!nextRoom) {
@@ -1233,7 +1367,7 @@
                 }
 
                 currentRoomId = nextRoom.id;
-                state.modalStep = 'select';
+                modalStep = 'select';
                 modalTitle.textContent = `Комната #${nextRoom.id}`;
                 const playerName = state.teams[state.currentTeam].members[state.currentMemberIndex] || 'Игрок';
                 modalPlayerName.textContent = playerName;
@@ -1241,6 +1375,7 @@
                 chestChoice.style.display = 'flex';
                 taskDetail.classList.remove('active');
                 taskDetail.style.display = 'none';
+                resultInput.value = '';
                 resultInput.style.display = 'none';
                 document.querySelector('.modal .hint').style.display = 'none';
                 modalSaveBtn.style.display = 'none';
@@ -1255,6 +1390,7 @@
                 saveToLocal();
             }
 
+            // Выбор награды
             function selectChest(type) {
                 const room = ROOMS.find(r => r.id === currentRoomId);
                 if (!room) return;
@@ -1279,9 +1415,10 @@
                 resultInput.value = '';
                 resultInput.focus();
 
-                state.modalStep = 'input';
+                modalStep = 'input';
             }
 
+            // Сохранить результат
             function saveResult() {
                 if (!state.selectedRoomId || state.selectedChestType === null) return;
 
@@ -1315,10 +1452,12 @@
                     state.currentTeam = state.currentTeam === 'light' ? 'dark' : 'light';
                     state.isPlayerSelected = false;
                     state.currentMemberIndex = -1;
+                    updatePlayerBanner();
                     showNotification(`⚠️ 3 победы подряд! Ход переходит команде ${state.currentTeam === 'light' ? 'Света' : 'Тьмы'}`);
                 } else {
                     state.isPlayerSelected = false;
                     state.currentMemberIndex = -1;
+                    updatePlayerBanner();
                 }
 
                 state.selectedChestType = null;
@@ -1341,7 +1480,7 @@
 
             function closeModal() {
                 modalOverlay.classList.remove('active');
-                state.modalStep = 'select';
+                modalStep = 'select';
                 state.selectedChestType = null;
                 state.selectedRoomId = null;
                 chestChoice.style.display = 'flex';
@@ -1362,6 +1501,7 @@
                 renderGrid();
                 renderTeams();
                 updateStats();
+                updatePlayerBanner();
             }
 
             function renderGrid() {
@@ -1371,10 +1511,7 @@
                     cell.className = 'cell';
                     const isDone = state.completed.includes(room.id);
 
-                    if (isDone) {
-                        cell.classList.add('done');
-                    }
-
+                    if (isDone) cell.classList.add('done');
                     cell.dataset.id = room.id;
 
                     const numSpan = document.createElement('div');
@@ -1408,7 +1545,7 @@
                                 return;
                             }
                             currentRoomId = room.id;
-                            state.modalStep = 'select';
+                            modalStep = 'select';
                             modalTitle.textContent = `Комната #${room.id}`;
                             const playerName = state.teams[state.currentTeam].members[state.currentMemberIndex] || 'Игрок';
                             modalPlayerName.textContent = playerName;
@@ -1432,6 +1569,7 @@
             }
 
             function renderTeams() {
+                // Свет
                 const light = state.teams.light;
                 teamLightScore.textContent = light.total;
                 teamLightMembers.innerHTML = '';
@@ -1452,6 +1590,7 @@
                     teamLightMembers.appendChild(row);
                 });
 
+                // Тьма
                 const dark = state.teams.dark;
                 teamDarkScore.textContent = dark.total;
                 teamDarkMembers.innerHTML = '';
@@ -1472,6 +1611,7 @@
                     teamDarkMembers.appendChild(row);
                 });
 
+                // Индикатор хода
                 if (state.currentTeam && state.isPlayerSelected) {
                     const teamName = state.currentTeam === 'light' ? '☀️ Свет' : '🌙 Тьма';
                     currentTeamName.textContent = teamName;
@@ -1567,6 +1707,7 @@
                         saveNames();
                         saveToLocal();
                         renderTeams();
+                        updatePlayerBanner();
                     }
                 });
             }
@@ -1597,13 +1738,13 @@
                 showNotification('🔄 Квест сброшен! Нажмите "Выбрать участника" для начала.');
             }
 
-            // ======================== ПРАВИЛА ========================
+            // ======================== ПРАВИЛА (МОДАЛКА) ========================
 
-            function openRules() {
+            function openRulesModal() {
                 rulesModal.classList.add('active');
             }
 
-            function closeRules() {
+            function closeRulesModal() {
                 rulesModal.classList.remove('active');
             }
 
@@ -1614,7 +1755,7 @@
                 const loaded = loadFromLocal();
                 renderAll();
 
-                // Обработчики сундуков
+                // События на кнопки выбора
                 document.querySelectorAll('.chest-btn').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const type = this.dataset.type;
@@ -1622,12 +1763,13 @@
                     });
                 });
 
-                // Кнопки
+                // Основные кнопки
                 pickPlayerBtn.addEventListener('click', pickRandomPlayer);
                 forceSwitchBtn.addEventListener('click', () => {
                     switchTeam();
                     state.isPlayerSelected = false;
                     state.currentMemberIndex = -1;
+                    updatePlayerBanner();
                     saveToLocal();
                     renderAll();
                 });
@@ -1638,39 +1780,37 @@
                     if (e.target === modalOverlay) closeModal();
                 });
                 document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape') {
-                        if (rulesModal.classList.contains('active')) closeRules();
-                        else closeModal();
-                    }
-                    if (e.key === 'Enter' && modalOverlay.classList.contains('active') && state.modalStep === 'input') {
+                    if (e.key === 'Escape') closeModal();
+                    if (e.key === 'Enter' && modalOverlay.classList.contains('active') && modalStep === 'input') {
                         saveResult();
                     }
                 });
 
                 // Правила
-                rulesBtn.addEventListener('click', openRules);
-                rulesCloseBtn.addEventListener('click', closeRules);
+                rulesBanner.addEventListener('click', openRulesModal);
+                rulesOpenBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    openRulesModal();
+                });
+                rulesCloseBtn.addEventListener('click', closeRulesModal);
                 rulesModal.addEventListener('click', (e) => {
-                    if (e.target === rulesModal) closeRules();
+                    if (e.target === rulesModal) closeRulesModal();
                 });
 
-                // Редактирование имён
                 setupNameEditing();
 
-                // Если нет сохранения или не выбран ход, показываем приветствие
                 if (!loaded || !state.currentTeam) {
                     showNotification('🎯 Нажмите "Выбрать участника" для начала квеста!');
-                }
-
-                // Открываем правила при первом запуске
-                if (!loaded) {
-                    setTimeout(openRules, 800);
                 }
 
                 console.log('⚔️ Битва Королевств загружена!');
                 console.log(`🏰 Всего комнат: ${ROOMS.length}`);
                 console.log('🔄 Кликните на имя игрока в таблице, чтобы изменить его');
             }
+
+            // Открываем функции для консоли (отладка)
+            window.__state = state;
+            window.__render = renderAll;
 
             init();
         })();
