@@ -799,7 +799,7 @@
             color: #f7d44a;
         }
 
-        /* Модалка приветствия */
+        /* Модалка приветствия (кратко) */
         .modal-welcome ul {
             color: #c0b8d0;
             font-size: 0.95rem;
@@ -1137,7 +1137,7 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА ПРИВЕТСТВИЯ -->
+    <!-- МОДАЛКА ПРИВЕТСТВИЯ (КРАТКАЯ, ОТКРЫВАЕТСЯ 1 РАЗ) -->
     <div class="modal-welcome-overlay" id="welcomeModal">
         <div class="modal-welcome">
             <h2>⚔️ Добро пожаловать в «Битву Королевств»!</h2>
@@ -1147,8 +1147,8 @@
                 <li>💎 <span class="highlight-diamond">Алмаз</span> (среднее) — даёт <strong>25 очков</strong>.</li>
                 <li>👑 <span class="highlight-crown">Корона</span> (сложное) — даёт <strong>50 очков</strong>.</li>
                 <li>После выбора уровня откроется задание. Введите <span class="highlight">стоимость</span> и <span class="highlight">выигрыш</span> — множитель рассчитается автоматически.</li>
-                <li>Нажмите <span class="highlight-light">«Выполнено»</span> если цель достигнута, или <span class="highlight-dark">«Провалено»</span>.</li>
-                <li>При успехе — очки начисляются, <span class="highlight-light">команда продолжает ход</span> (максимум 3 подряд).</li>
+                <li>Нажмите <span class="highlight-light">«Выполнено»</span> или <span class="highlight-dark">«Провалено»</span>.</li>
+                <li>При успехе — очки начисляются, <span class="highlight-light">команда продолжает ход</span> (макс. 3 подряд).</li>
                 <li>При провале — ход <span class="highlight-dark">переходит другой команде</span>.</li>
                 <li>🏆 <span class="highlight">Топ иксовок</span> — лучший множитель получает <span class="prize">5000 ₽</span>.</li>
                 <li>💰 Команда-победитель — каждый участник получает <span class="prize">3000 ₽</span>.</li>
@@ -1158,7 +1158,7 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА ПРАВИЛ (ПОДРОБНАЯ) -->
+    <!-- МОДАЛКА ПРАВИЛ (ПОДРОБНАЯ, ОТКРЫВАЕТСЯ ПО КНОПКЕ) -->
     <div class="modal-rules-overlay" id="rulesModal">
         <div class="modal-rules">
             <h2>📜 Полные правила</h2>
@@ -1297,7 +1297,7 @@
                 }
             };
 
-            // ======================== ЗАДАНИЯ (20 на каждый тип) ========================
+            // ======================== ЗАДАНИЯ ========================
             const TASKS_LIST = {
                 coin: [
                     { title: "Мумии (топ)", desc: "Купить топовую бонуску в муммии за 20к и выбить больше 10 спинов за 3 попытки." },
@@ -2107,22 +2107,20 @@
                 loadNames();
                 const loaded = loadFromLocal();
 
+                // Если прогресса нет — показываем приветствие
                 if (!loaded || state.completed.length === 0) {
                     welcomeModal.classList.add('active');
                 }
 
+                // Закрываем приветствие и начинаем игру
                 welcomeStartBtn.addEventListener('click', () => {
                     welcomeModal.classList.remove('active');
-                    if (!loaded || state.completed.length === 0) {
-                        setTimeout(() => {
-                            openRulesModal();
-                            showNotification('🎯 Ознакомьтесь с правилами, затем нажмите "Выбрать участника".', 5000);
-                        }, 500);
-                    }
+                    // Никаких дополнительных открытий правил!
                 });
 
                 renderAll();
 
+                // Навешиваем обработчики на кнопки выбора уровня
                 document.querySelectorAll('.chest-btn').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const type = this.dataset.type;
@@ -2130,6 +2128,7 @@
                     });
                 });
 
+                // Статус выполнения
                 statusSuccess.addEventListener('click', function() {
                     selectedStatus = 'success';
                     this.className = 'active-success';
@@ -2141,6 +2140,7 @@
                     statusSuccess.className = '';
                 });
 
+                // Основные кнопки управления
                 pickPlayerBtn.addEventListener('click', pickRandomPlayer);
                 forceSwitchBtn.addEventListener('click', () => {
                     switchTeam();
@@ -2162,12 +2162,14 @@
                     }
                 });
 
+                // Правила – открываются только по кнопке
                 rulesOpenBtn.addEventListener('click', openRulesModal);
                 rulesCloseBtn.addEventListener('click', closeRulesModal);
                 rulesModal.addEventListener('click', (e) => {
                     if (e.target === rulesModal) closeRulesModal();
                 });
 
+                // Топ
                 topOpenBtn.addEventListener('click', openTopModal);
                 topCloseBtn.addEventListener('click', closeTopModal);
                 topModal.addEventListener('click', (e) => {
