@@ -646,14 +646,15 @@
             margin-bottom: 16px;
         }
 
-        /* Модалка правил */
+        /* Модалка правил (ПОДРОБНАЯ) */
         .modal-rules .rules-list {
             position: relative;
             z-index: 1;
             color: #c0b8d0;
             font-size: 1rem;
-            line-height: 1.8;
+            line-height: 1.7;
             padding-left: 20px;
+            list-style-type: disc;
         }
         .modal-rules .rules-list li {
             margin-bottom: 10px;
@@ -1157,23 +1158,43 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА ПРАВИЛ -->
+    <!-- МОДАЛКА ПРАВИЛ (ПОДРОБНАЯ) -->
     <div class="modal-rules-overlay" id="rulesModal">
         <div class="modal-rules">
-            <h2>📜 Правила</h2>
+            <h2>📜 Полные правила</h2>
             <ul class="rules-list">
-                <li>🎯 <span class="highlight-light">20 комнат</span> — в каждой игрок выбирает уровень сложности.</li>
-                <li>🪙 <span class="highlight-coin">Монета</span> (лёгкое) — <strong>+10 очков</strong>.</li>
-                <li>💎 <span class="highlight-diamond">Алмаз</span> (среднее) — <strong>+25 очков</strong>.</li>
-                <li>👑 <span class="highlight-crown">Корона</span> (сложное) — <strong>+50 очков</strong>.</li>
-                <li>⛔ Одна команда <span class="highlight-light">не может выполнить больше 3 заданий подряд</span> — ход переходит автоматически.</li>
-                <li>🎲 Участник выбирается <span class="highlight-dark">случайным образом</span> из доступных в команде.</li>
-                <li>💬 Имена можно менять <span class="highlight-light">кликом по ним</span> в таблице.</li>
-                <li>✅ <span class="highlight-light">Выполненное</span> задание приносит очки и даёт право на следующий ход (до 3 подряд).</li>
-                <li>❌ <span class="highlight-dark">Проваленное</span> задание — очки не начисляются, ход переходит к другой команде.</li>
-                <li>🏆 <span class="highlight">Топ иксовок</span> — лучший множитель (выигрыш/стоимость) получает <span class="prize">5000 ₽</span>.</li>
-                <li>💰 Команда-победитель — каждый участник получает <span class="prize">3000 ₽</span>.</li>
-                <li>🥇 Лучший игрок команды-победителя — <span class="prize">10 000 ₽</span>, второй — <span class="prize">5 000 ₽</span>.</li>
+                <li><strong>Цель квеста</strong> — пройти <span class="highlight-light">20 комнат</span>, выполняя задания. Каждая комната содержит три уровня сложности, которые выбирает игрок.</li>
+                <li><strong>Команды</strong> — две команды по 5 участников: <span class="highlight-light">Королевство Света</span> и <span class="highlight-dark">Королевство Тьмы</span>. Побеждает команда, набравшая больше очков по итогам всех комнат.</li>
+                <li><strong>Уровни сложности:</strong>
+                    <ul>
+                        <li>🪙 <span class="highlight-coin">Монета</span> — лёгкое задание, приносит <strong>10 очков</strong>.</li>
+                        <li>💎 <span class="highlight-diamond">Алмаз</span> — среднее задание, приносит <strong>25 очков</strong>.</li>
+                        <li>👑 <span class="highlight-crown">Корона</span> — сложное задание, приносит <strong>50 очков</strong>.</li>
+                    </ul>
+                </li>
+                <li><strong>Ход игры:</strong>
+                    <ul>
+                        <li>Стример нажимает кнопку <span class="highlight-light">«Выбрать участника»</span> — система случайно выбирает игрока из команды, чей сейчас ход. <span class="highlight-dark">Каждый участник обязан сыграть хотя бы 1 раз</span> (гарантированное участие).</li>
+                        <li>Выбранный игрок открывает комнату и выбирает уровень сложности.</li>
+                        <li>После выбора открывается конкретное задание (слот, ставка, цель). Участник вводит <span class="highlight">стоимость</span> и <span class="highlight">выигрыш</span> (в рублях) — множитель вычисляется автоматически.</li>
+                        <li>Затем участник нажимает <span class="highlight-light">«Выполнено»</span> (если цель достигнута) или <span class="highlight-dark">«Провалено»</span> (если нет).</li>
+                        <li>При успехе — очки начисляются игроку и его команде, и <span class="highlight-light">ход остаётся за той же командой</span> (но не более <strong>3 побед подряд</strong>).</li>
+                        <li>При провале — очки не начисляются, <span class="highlight-dark">ход переходит другой команде</span>.</li>
+                        <li>После 3 побед подряд ход автоматически переходит к противнику.</li>
+                    </ul>
+                </li>
+                <li><strong>Топ иксовок</strong> — отдельный рейтинг, в который записываются все успешные задания с множителем (выигрыш / стоимость). <span class="highlight">Лучший множитель</span> за весь квест получает дополнительный приз <span class="prize">5000 ₽</span>.</li>
+                <li><strong>Окончание квеста</strong> — после прохождения всех 20 комнат открывается финальное окно с итоговыми очками команд и лучшими игроками.</li>
+                <li><strong>Призы:</strong>
+                    <ul>
+                        <li>💰 Команда-победитель — <span class="prize">3000 ₽</span> каждому участнику.</li>
+                        <li>🥇 Лучший игрок команды-победителя (по очкам) — <span class="prize">10 000 ₽</span>.</li>
+                        <li>🥈 Второй игрок команды-победителя — <span class="prize">5 000 ₽</span>.</li>
+                        <li>Остальные участники (3–5 места) — без награды.</li>
+                    </ul>
+                </li>
+                <li><strong>Имена участников</strong> можно менять <span class="highlight-light">кликом по ним</span> в таблице.</li>
+                <li><strong>Внимание!</strong> Система строго следит за честностью: все результаты фиксируются, и после завершения квеста данные сохраняются в локальном хранилище.</li>
             </ul>
             <button class="close-rules-btn" id="rulesCloseBtn">Понятно!</button>
         </div>
