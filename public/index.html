@@ -345,7 +345,7 @@
         .team-table-wrap {
             display: flex;
             gap: 24px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             position: relative;
             z-index: 1;
             flex-wrap: wrap;
@@ -453,6 +453,113 @@
             border-radius: 20px 4px 4px 20px;
         }
 
+        /* ========== ТОП ИКСОВОК ========== */
+        .top-multipliers {
+            background: rgba(0, 0, 0, 0.30);
+            border-radius: 32px;
+            padding: 18px 22px;
+            margin-bottom: 22px;
+            border: 1px solid rgba(255, 215, 0, 0.06);
+            backdrop-filter: blur(4px);
+            position: relative;
+            z-index: 1;
+        }
+
+        .top-multipliers .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .top-multipliers .top-header h3 {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #f7d44a;
+        }
+
+        .top-multipliers .top-header .prize-badge {
+            background: rgba(255, 215, 0, 0.08);
+            padding: 4px 16px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            color: #f7d44a;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        .top-multipliers .top-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .top-multipliers .top-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .top-multipliers .top-item .rank {
+            font-weight: 700;
+            color: #8a7a9a;
+            width: 30px;
+        }
+
+        .top-multipliers .top-item .info {
+            flex: 1;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .top-multipliers .top-item .info .player {
+            color: #f0e8f8;
+        }
+
+        .top-multipliers .top-item .info .team {
+            font-size: 0.8rem;
+            padding: 2px 10px;
+            border-radius: 30px;
+        }
+
+        .top-multipliers .top-item .info .team.light {
+            color: #f7d44a;
+            background: rgba(247, 212, 74, 0.08);
+        }
+        .top-multipliers .top-item .info .team.dark {
+            color: #b388ff;
+            background: rgba(179, 136, 255, 0.08);
+        }
+
+        .top-multipliers .top-item .info .type {
+            font-size: 0.8rem;
+            color: #8a7a9a;
+        }
+
+        .top-multipliers .top-item .multiplier {
+            font-weight: 700;
+            color: #f7d44a;
+            font-size: 1.1rem;
+        }
+
+        .top-multipliers .top-item .win {
+            font-size: 0.85rem;
+            color: #8a7a9a;
+        }
+
+        .top-multipliers .empty-top {
+            color: #6a5a7a;
+            font-style: italic;
+            text-align: center;
+            padding: 20px 0;
+        }
+
         /* ========== ПРОГРЕСС ========== */
         .progress-wrap {
             background: rgba(0, 0, 0, 0.5);
@@ -484,7 +591,7 @@
         /* ========== СЕТКА КОМНАТ ========== */
         .grid {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 14px;
             margin-bottom: 24px;
             position: relative;
@@ -541,7 +648,7 @@
             line-height: 1;
         }
 
-        .cell .cell-label {
+        .cell .cell-type-label {
             font-size: 0.55rem;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -561,7 +668,7 @@
             color: #2ecc71;
             font-size: 1.6rem;
         }
-        .cell.done .cell-label {
+        .cell.done .cell-type-label {
             color: rgba(46, 204, 113, 0.2);
         }
 
@@ -572,9 +679,9 @@
             font-weight: 600;
         }
 
-        .cell .cell-type {
-            font-size: 0.55rem;
-            color: rgba(255, 215, 0, 0.10);
+        .cell .cell-multiplier {
+            font-size: 0.65rem;
+            color: #b388ff;
             margin-top: 2px;
         }
 
@@ -858,7 +965,7 @@
             font-weight: 600;
         }
 
-        /* Выбор награды */
+        /* Выбор уровня сложности */
         .chest-choice {
             display: flex;
             gap: 20px;
@@ -978,14 +1085,9 @@
         }
 
         .modal .input-group {
-            display: none;
             position: relative;
             z-index: 1;
             margin: 8px 0 12px;
-        }
-
-        .modal .input-group.active {
-            display: block;
         }
 
         .modal .input-row {
@@ -997,7 +1099,7 @@
 
         .modal .input-row .field {
             flex: 1;
-            min-width: 120px;
+            min-width: 100px;
         }
 
         .modal .input-row .field label {
@@ -1025,17 +1127,18 @@
             box-shadow: 0 0 30px rgba(245, 166, 35, 0.06);
         }
 
+        .modal .input-row .field input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .modal .result-status {
-            display: none;
+            display: flex;
             gap: 16px;
             justify-content: center;
             margin: 10px 0 16px;
             position: relative;
             z-index: 1;
-        }
-
-        .modal .result-status.active {
-            display: flex;
         }
 
         .modal .result-status button {
@@ -1276,15 +1379,15 @@
 
         /* ========== АДАПТИВ ========== */
         @media (max-width: 1024px) {
-            .grid { grid-template-columns: repeat(5, 1fr); }
+            .grid { grid-template-columns: repeat(4, 1fr); }
         }
         @media (max-width: 768px) {
             .container { padding: 20px; }
-            .grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+            .grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
             .title-group h1 { font-size: 1.6rem; }
             .status-bar { flex-direction: column; align-items: stretch; }
             .team-table-wrap { flex-direction: column; }
-            .chest-btn { min-width: 100px; }
+            .top-multipliers .top-item { flex-wrap: wrap; gap: 8px; }
             .modal { padding: 24px 20px; }
             .rules-banner { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 18px; }
             .current-player-banner { flex-direction: column; align-items: flex-start; }
@@ -1295,8 +1398,6 @@
         @media (max-width: 480px) {
             .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
             .cell .cell-number { font-size: 1.4rem; }
-            .chest-choice { flex-direction: column; align-items: center; }
-            .chest-btn { max-width: 100%; width: 100%; }
             .container { padding: 14px; border-radius: 32px; }
         }
     </style>
@@ -1310,7 +1411,7 @@
                 <span class="icon">⚔️</span>
                 <div>
                     <h1>Битва Королевств</h1>
-                    <div class="subtitle">30 комнат · выбор монеты/алмаза/короны</div>
+                    <div class="subtitle">20 комнат · выбор уровня · топ иксовок</div>
                 </div>
             </div>
             <button id="resetBtn" class="btn-reset">🔄 Сбросить всё</button>
@@ -1319,12 +1420,12 @@
         <!-- ПЛАШКА ПРАВИЛ -->
         <div class="rules-banner" id="rulesBanner">
             <div class="rules-text">
-                <span class="rule-item">🏰 <span class="highlight-light">30 комнат</span> — выбери награду</span>
+                <span class="rule-item">🏰 <span class="highlight-light">20 комнат</span> — выбери уровень</span>
                 <span class="rule-item">🪙 <span class="highlight-coin">Монета</span> +10</span>
                 <span class="rule-item">💎 <span class="highlight-diamond">Алмаз</span> +25</span>
                 <span class="rule-item">👑 <span class="highlight-crown">Корона</span> +50</span>
+                <span class="rule-item">🏆 <span class="highlight-light">Топ иксовок</span> +5000 ₽</span>
                 <span class="rule-item">⛔ <span class="highlight-light">Макс. 3 победы</span> подряд</span>
-                <span class="rule-item">🎲 <span class="highlight-dark">Случайный</span> выбор</span>
             </div>
             <span class="rules-open-btn" id="rulesOpenBtn">📜 Подробнее</span>
         </div>
@@ -1348,7 +1449,7 @@
             </div>
             <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
                 <button id="pickPlayerBtn" class="btn-gold">🎲 Выбрать участника</button>
-                <span class="stat-pill">Выполнено: <span id="doneCount">0</span>/30</span>
+                <span class="stat-pill">Выполнено: <span id="doneCount">0</span>/20</span>
             </div>
         </div>
 
@@ -1369,6 +1470,15 @@
                 </div>
                 <div id="teamDarkMembers"></div>
             </div>
+        </div>
+
+        <!-- ТОП ИКСОВОК -->
+        <div class="top-multipliers" id="topMultipliers">
+            <div class="top-header">
+                <h3>🏆 Топ иксовок (приз 5000 ₽)</h3>
+                <span class="prize-badge">🔥 Лидер</span>
+            </div>
+            <div class="top-list" id="topList"></div>
         </div>
 
         <!-- ПРОГРЕСС -->
@@ -1393,22 +1503,17 @@
             <h2>⚔️ Добро пожаловать в «Битву Королевств»!</h2>
             <p><strong>Что нужно делать?</strong></p>
             <ul>
-                <li><span class="highlight">30 комнат</span> — каждая скрывает задание. В начале комнаты ты выбираешь <span class="highlight">уровень сложности</span>.</li>
-                <li><span class="highlight-coin">Монета</span> (лёгкое задание) — <strong>+10 очков</strong>.</li>
-                <li><span class="highlight-diamond">Алмаз</span> (среднее задание) — <strong>+25 очков</strong>.</li>
-                <li><span class="highlight-crown">Корона</span> (сложное задание) — <strong>+50 очков</strong>.</li>
-                <li>После выбора появляется <span class="highlight">конкретное задание</span> (слот, цель). Стример выполняет его в казино.</li>
-                <li>Введите <span class="highlight">стоимость</span> (ставка или покупка бонуса), <span class="highlight">выигрыш</span> и <span class="highlight">множитель</span>.</li>
-                <li>Нажмите <span class="highlight-light">«Выполнено»</span>, если цель достигнута, или <span class="highlight-dark">«Провалено»</span>, если нет.</li>
-                <li>При успехе — очки начисляются, и <span class="highlight-light">команда продолжает ход</span> (максимум 3 победы подряд).</li>
-                <li>При провале — очки не начисляются, <span class="highlight-dark">ход переходит другой команде</span>.</li>
-                <li>Команда с наибольшим количеством очков после 30 комнат — <span class="highlight">победитель</span>.</li>
-                <li>💰 <span class="prize">Призы:</span><br>
-                    • Команда-победитель — каждый участник получает <span class="prize">3 000 ₽</span>.<br>
-                    • Лучший игрок команды-победителя — <span class="prize">10 000 ₽</span>.<br>
-                    • Второй игрок — <span class="prize">5 000 ₽</span>.<br>
-                    • Остальные — без награды.
-                </li>
+                <li>🏰 <span class="highlight">20 комнат</span> — каждая комната содержит три задания разной сложности.</li>
+                <li>🪙 <span class="highlight-coin">Монета</span> (лёгкое) — даёт <strong>10 очков</strong>.</li>
+                <li>💎 <span class="highlight-diamond">Алмаз</span> (среднее) — даёт <strong>25 очков</strong>.</li>
+                <li>👑 <span class="highlight-crown">Корона</span> (сложное) — даёт <strong>50 очков</strong>.</li>
+                <li>После выбора уровня откроется задание. Введите <span class="highlight">стоимость</span> (ставка или цена бонуса), <span class="highlight">выигрыш</span> — множитель рассчитается автоматически.</li>
+                <li>Нажмите <span class="highlight-light">«Выполнено»</span> если цель достигнута, или <span class="highlight-dark">«Провалено»</span>.</li>
+                <li>При успехе — очки начисляются, <span class="highlight-light">команда продолжает ход</span> (максимум 3 подряд).</li>
+                <li>При провале — ход <span class="highlight-dark">переходит другой команде</span>.</li>
+                <li>🏆 <span class="highlight">Топ иксовок</span> — лучший множитель (выигрыш/стоимость) получает <span class="prize">5000 ₽</span>.</li>
+                <li>💰 Команда-победитель — каждый участник получает <span class="prize">3000 ₽</span>.</li>
+                <li>🥇 Лучший игрок команды-победителя — <span class="prize">10 000 ₽</span>, второй — <span class="prize">5 000 ₽</span>.</li>
             </ul>
             <button class="start-btn" id="welcomeStartBtn">Начать квест!</button>
         </div>
@@ -1419,7 +1524,7 @@
         <div class="modal-rules">
             <h2>📜 Правила</h2>
             <ul class="rules-list">
-                <li>🎯 <span class="highlight-light">30 комнат</span> — в каждой игрок выбирает уровень сложности:</li>
+                <li>🎯 <span class="highlight-light">20 комнат</span> — в каждой игрок выбирает уровень сложности.</li>
                 <li>🪙 <span class="highlight-coin">Монета</span> (лёгкое) — <strong>+10 очков</strong>.</li>
                 <li>💎 <span class="highlight-diamond">Алмаз</span> (среднее) — <strong>+25 очков</strong>.</li>
                 <li>👑 <span class="highlight-crown">Корона</span> (сложное) — <strong>+50 очков</strong>.</li>
@@ -1428,19 +1533,15 @@
                 <li>💬 Имена можно менять <span class="highlight-light">кликом по ним</span> в таблице.</li>
                 <li>✅ <span class="highlight-light">Выполненное</span> задание приносит очки и даёт право на следующий ход (до 3 подряд).</li>
                 <li>❌ <span class="highlight-dark">Проваленное</span> задание — очки не начисляются, ход переходит к другой команде.</li>
-                <li>🏆 Побеждает команда, набравшая <span class="highlight-light">больше очков</span>.</li>
-                <li>💰 <span class="prize">Призы:</span><br>
-                    &nbsp;&nbsp;• Команда-победитель — каждый участник получает <span class="prize">3 000 ₽</span>.<br>
-                    &nbsp;&nbsp;• Лучший игрок команды-победителя — <span class="prize">10 000 ₽</span>.<br>
-                    &nbsp;&nbsp;• Второй игрок команды-победителя — <span class="prize">5 000 ₽</span>.<br>
-                    &nbsp;&nbsp;• Остальные участники (3-5 места) — без награды.
-                </li>
+                <li>🏆 <span class="highlight">Топ иксовок</span> — лучший множитель (выигрыш/стоимость) получает <span class="prize">5000 ₽</span>.</li>
+                <li>💰 Команда-победитель — каждый участник получает <span class="prize">3000 ₽</span>.</li>
+                <li>🥇 Лучший игрок команды-победителя — <span class="prize">10 000 ₽</span>, второй — <span class="prize">5 000 ₽</span>.</li>
             </ul>
             <button class="close-rules-btn" id="rulesCloseBtn">Понятно!</button>
         </div>
     </div>
 
-    <!-- МОДАЛКА ВЫБОРА -->
+    <!-- МОДАЛКА ЗАДАНИЯ -->
     <div class="modal-overlay" id="taskModal">
         <div class="modal">
             <div class="modal-header">
@@ -1450,7 +1551,6 @@
                 </div>
             </div>
 
-            <!-- Выбор награды -->
             <div class="chest-choice" id="chestChoice">
                 <div class="chest-btn coin" data-type="coin" data-points="10">
                     <span class="chest-icon">🪙</span>
@@ -1469,14 +1569,12 @@
                 </div>
             </div>
 
-            <!-- Детали задания -->
             <div class="task-detail" id="taskDetail">
                 <div class="task-title" id="taskTitle">Задание</div>
                 <div class="task-desc" id="taskDesc">Описание</div>
             </div>
 
-            <!-- Поля ввода (появляются после выбора) -->
-            <div class="input-group" id="inputGroup">
+            <div class="input-group">
                 <div class="input-row">
                     <div class="field">
                         <label>💰 Стоимость (₽)</label>
@@ -1488,13 +1586,12 @@
                     </div>
                     <div class="field">
                         <label>📈 Множитель (x)</label>
-                        <input type="number" id="multiplierInput" placeholder="0" step="any" />
+                        <input type="number" id="multiplierInput" placeholder="авто" step="any" disabled />
                     </div>
                 </div>
             </div>
 
-            <!-- Кнопки статуса (появляются после выбора) -->
-            <div class="result-status" id="resultStatus">
+            <div class="result-status">
                 <button class="active-success" id="statusSuccess">✅ Выполнено</button>
                 <button id="statusFail">❌ Провалено</button>
             </div>
@@ -1539,75 +1636,97 @@
                 }
             };
 
-            // ======================== ЗАДАНИЯ ========================
-            const TASK_POOLS = {
+            // ======================== ЗАДАНИЯ (20 на каждый тип) ========================
+            const TASKS_LIST = {
                 coin: [
-                    { title: "Fruit Party 2", desc: "35 спинов. Цель: множитель ≥ x30." },
-                    { title: "Starz MegaWays", desc: "40 спинов. Цель: выигрыш > 2000 ₽." },
-                    { title: "Рулетка", desc: "3 ставки на красное/чёрное. Цель: выиграть 2 из 3." },
-                    { title: "Tomb of Nefertiti", desc: "35 спинов. Цель: выигрыш > 3000 ₽." },
-                    { title: "Блэкджек", desc: "3 раздачи. Цель: выиграть 2 из 3." },
-                    { title: "Dragon's Fire", desc: "30 спинов. Цель: поймать бонус." },
-                    { title: "Gorilla Kingdom", desc: "35 спинов. Цель: поймать бонус." },
-                    { title: "Vikings Go Berzerk", desc: "40 спинов. Цель: множитель ≥ x60." },
-                    { title: "Wild Walker", desc: "40 спинов. Цель: множитель ≥ x40." },
-                    { title: "Le Bandit", desc: "30 спинов. Цель: множитель ≥ x30." }
+                    { title: "Мумии (топ)", desc: "Купить топовую бонуску в муммии за 20к и выбить больше 10 спинов за 3 попытки." },
+                    { title: "Le Bandit (бонус)", desc: "Выбить хотя бы обычную бонуску в le bandit по 600 рублей с шансом за 30 спинов." },
+                    { title: "Sugar Rush (окупить)", desc: "Окупить бонуску в Sugar Rush за 40000 (2 попытки)." },
+                    { title: "Минотавр", desc: "Выбить минотавра на любом барабане, ставка 200 (50 спинов)." },
+                    { title: "Sweet Bonanza (окупить)", desc: "Окупить бонус в Sweet Bonanza за 32000 (2 попытки)." },
+                    { title: "The Big Dog House (бонус)", desc: "Выбить бонус в The Big Dog House по 200 (60 спинов)." },
+                    { title: "Fruit Party (иксовка)", desc: "Поймать иксовку х64 за спин во Fruit party в бонуске за 32000 (2 попытки)." },
+                    { title: "Pirates Pub (бонус)", desc: "Выбить бонуску в pirates pub по 315 рублей за спин (80 спинов)." },
+                    { title: "Big Bass Blast", desc: "Пройти до х2 c первой попытки в Big Bass Blast в бонуске за 30000." },
+                    { title: "Sugar Supreme", desc: "Поймать больше 70x в sugar supreme с первой попытке в бонуске за 32000." },
+                    { title: "Money Train 3", desc: "Выбить снайпера в money train 3 в бонуске за 35000 (3 попытки)." },
+                    { title: "Le Digger", desc: "Пробить обычную бонуску до топовой в Le digger за 3 попытки, ставку выбирает участник (но не больше 3к)." },
+                    { title: "Iron Bank 2", desc: "Купить бонус в Iron Bank 2 за 30000 и выбить символ не дороже туза (2 попытки)." },
+                    { title: "Crazy Time", desc: "Сделать ставку на любое число или бонуску в Crazy time и выйти в плюс, ставка 20000." },
+                    { title: "Блэкджэк", desc: "Сделать ставку в Блэкджэк на 2 руки по 10000 и поймать больше 19." },
+                    { title: "Lord of Thunder", desc: "Выбить бонуску в Lord of Thunder по ставке 250 (60 спинов)." },
+                    { title: "Big Bamboo", desc: "Выбить с рандомки в Big bamboo топовую бонуску за 2 попытки, ставку выбирает участник (но не больше 3к)." },
+                    { title: "Le Fisherman", desc: "Купить топовую радугу в Le Fisherman за 50000 и поймать золотой сбор (1 попытка)." },
+                    { title: "Wanted", desc: "Поймать две шторы за спин в Wanted в бонуске за 40000 (Они должны сыграть)." },
+                    { title: "Le Sortudo", desc: "Выбить две любых бонуски в Le sortudo, ставку выбирает участник (но не больше 3к)." }
                 ],
                 diamond: [
-                    { title: "Chaos Crew 2", desc: "30 спинов. Цель: поймать бонусный раунд." },
-                    { title: "Razor Returns", desc: "40 спинов. Цель: поймать акулу." },
-                    { title: "Temple Tumble 2", desc: "50 спинов. Цель: множитель ≥ x75." },
-                    { title: "Book of Shadows", desc: "45 спинов. Цель: множитель ≥ x100." },
-                    { title: "Punk Rocker", desc: "30 спинов. Цель: поймать бонус." },
-                    { title: "Vikings Go Berzerk", desc: "40 спинов. Цель: множитель ≥ x80." },
-                    { title: "Gorilla Kingdom", desc: "35 спинов. Цель: множитель ≥ x70." },
-                    { title: "Wild Walker", desc: "40 спинов. Цель: множитель ≥ x60." },
-                    { title: "Fruit Party 2", desc: "35 спинов. Цель: множитель ≥ x50." },
-                    { title: "Le Bandit", desc: "40 спинов. Цель: множитель ≥ x50." }
+                    { title: "Мумии (топ пробив)", desc: "Пробить топовую бонуску в муммии за 2 попытки стоимость пробития 36000." },
+                    { title: "Dog House Megaways", desc: "Выбить 4 лапы в The dog house megaways в бонуске за 40000 (3 попытки)." },
+                    { title: "Gates of Olympus Super Scatter", desc: "Выбить скаттер при покупке обычной бонуски в Gates of Olympus Super Scatter за 50000 (2 попытки)." },
+                    { title: "Lucky Barrel Tavern", desc: "Пробить в Lucky Barrel Tavern бонуску с шансом 1 к 5 по 28000 (3 попытки)." },
+                    { title: "Sugar Rush (ретригер)", desc: "Поймать ретригер в Sugar Rush по 36000 (3 попытки)." },
+                    { title: "Минотавр (4 барабан)", desc: "Выбить минотавра на 4 барабане, ставка 300 (50 спинов)." },
+                    { title: "Bigger Barn House Bonanza", desc: "Выбить 2 бонуски в Bigger Barn House Bonanza по ставке 280 (100 спинов)." },
+                    { title: "Wild West Gold Blazing Bounty", desc: "Поймать х200 от ставки в Wild West Gold Blazing Bounty в бонуске за 50000 (2 попытки)." },
+                    { title: "Sweet Bonanza (бомба)", desc: "Выбить бомбу от 500х в топовом спине в Sweet Bonanza 2500." },
+                    { title: "The Big Dog House (топ)", desc: "Выбить один из топовых бонусов в The Big Dog House по 200 (50 спинов)." },
+                    { title: "Dog House Multihold", desc: "Открыть 3 барабана в The Dog House Multihold в бонуске за 40000 (2 попытки)." },
+                    { title: "Wild West Gold (линия)", desc: "Поймать линию вилдов в Wild West Gold в бонуске за 32000 (2 попытки)." },
+                    { title: "Pirates Pub (линия)", desc: "Поймать линию из хотя бы 4-х вилдов в pirates pub в бонуске за 63000 (2 попытки)." },
+                    { title: "Hot Fiesta", desc: "Поймать 4 пиньяты в бонуске за 50000 в Hot Fiesta (1 попытка)." },
+                    { title: "Le Prechaun", desc: "Поймать проходку в Le Prechaun с первой попытки в топовой бонуске за 50000." },
+                    { title: "Beast Below", desc: "Выбить бонуску в Beast below и поймать в ней больше 70х по ставке 600 рублей (с шансом)." },
+                    { title: "Ride The Lightning", desc: "Окупить бонуску в Ride The Lightning за 45000 (2 попытки)." },
+                    { title: "Red Rascal", desc: "Поймать х200 в Red rascal в бонуске за 30000 (2 попытки)." },
+                    { title: "Cult", desc: "Поймать иксовку 30х+ в Cult с первой попытки в бонуске за 50000." },
+                    { title: "Frkn Bananas", desc: "Поймать 5 и больше бананов и go bananas на них в Frkn bananas бонуске за 75000 (1 попытка)." }
                 ],
                 crown: [
-                    { title: "Mental", desc: "50 спинов. Цель: множитель ≥ x100." },
-                    { title: "San Quentin xWays", desc: "40 спинов. Цель: xWays + множитель ≥ x50." },
-                    { title: "Reactoonz 2", desc: "45 спинов. Цель: поймать Gargantoon." },
-                    { title: "Jammin' Jars 2", desc: "30 спинов. Цель: множитель ≥ x200." },
-                    { title: "Money Train 4", desc: "Купить бонус за 100x. Цель: окупить (≥ 100x)." },
-                    { title: "Book of Shadows", desc: "45 спинов. Цель: множитель ≥ x150." },
-                    { title: "Chaos Crew 2", desc: "30 спинов. Цель: множитель ≥ x200." },
-                    { title: "Razor Returns", desc: "40 спинов. Цель: множитель ≥ x150." },
-                    { title: "Temple Tumble 2", desc: "50 спинов. Цель: множитель ≥ x120." },
-                    { title: "Mental", desc: "50 спинов. Цель: множитель ≥ x120." }
+                    { title: "Zeus ze Zecond", desc: "Дойти до серебряных монет в zeus ze zecond (2 попытки)." },
+                    { title: "Gates of Olympus (бонус)", desc: "Выбить бонуску в любом gates of Olympus (60 спинов)." },
+                    { title: "Lucky Barrel Tavern (1 к 20)", desc: "Пробить в Lucky Barrel Tavern бонуску с шансом 1 к 20 (3 попытки)." },
+                    { title: "Sweet Bonanza 1000", desc: "Выбить 1000х в Sweet Bonanza 1000 в топовой бонуске (2 попытки)." },
+                    { title: "3 Buzzing Wilds", desc: "Купить бонуску в 3 Buzzing wilds и выбить 2 пчелки за бонуску (2 попытки)." },
+                    { title: "Big Bass Secret", desc: "Купить обычную бонуску в Big bass secret of the golden lake и пробить ее до топовой (2 попытки)." },
+                    { title: "The Luxe", desc: "Пробить максвин в The luxe." },
+                    { title: "Sugar Rush Super Scatter", desc: "Выбить 2 супер скаттера в Sugar rush super scatter (3 попытки)." },
+                    { title: "Le Santa", desc: "Поймать умножение на коллектор в Le santa в топовой бонуске (2 попытки)." },
+                    { title: "Le Cowboy", desc: "Пробить топовую бонуску до хот мода в le cowboy." },
+                    { title: "Le Bandit (2 топ)", desc: "Выбить две топовых бонуски в Le bandit за 100 спинов по ставке 300." },
+                    { title: "Wanted (х300)", desc: "Поймать х300 в Wanted за две попытки." },
+                    { title: "Rip City", desc: "Поймать 4 кота в топовой бонуске в Rip city с первой попытки." },
+                    { title: "Six Six Six", desc: "Пробить хот мод в six six six (2 попытки)." },
+                    { title: "Octo Attack", desc: "Пусть осьминог поймает в бонуске вилд с иксом в Octo attack (1 попытка)." },
+                    { title: "Le Bandit (радуга)", desc: "Поймать монету х250 и выше в Le bandit в радуге за 3 попытки." },
+                    { title: "Le Bandit (топ х1000)", desc: "Поймать х1000 в Le bandit в топовой бонуске (2 попытки)." },
+                    { title: "Money Train 4", desc: "Поймать payer collector в Money train 4 (3 попытки)." },
+                    { title: "Zeus vs Hades", desc: "Выбить 3 шторы в Zeus vs hades (2 попытки)." },
+                    { title: "Le Zeus", desc: "Дойти до золотых монет в Le zeus (3 попытки)." }
                 ]
             };
 
+            // ======================== ГЕНЕРАЦИЯ 20 КОМНАТ ========================
             const POINTS_MAP = { coin: 10, diamond: 25, crown: 50 };
             const ROOMS = [];
             const TYPES = ['coin', 'diamond', 'crown'];
-
-            TYPES.forEach(type => {
-                const pool = TASK_POOLS[type];
-                const extended = [];
-                while (extended.length < 10) {
-                    for (let t of pool) {
-                        if (extended.length >= 10) break;
-                        extended.push({ ...t });
-                    }
-                }
-                for (let i = 0; i < 10; i++) {
-                    const task = extended[i % extended.length];
-                    ROOMS.push({
-                        id: ROOMS.length + 1,
-                        type: type,
+            // Создаём 20 комнат (каждая комната будет содержать задания всех трёх типов)
+            for (let i = 0; i < 20; i++) {
+                const room = {
+                    id: i + 1,
+                    tasks: {}
+                };
+                TYPES.forEach(type => {
+                    const pool = TASKS_LIST[type];
+                    // Берём задание по индексу i (если выходит за пределы, берём по модулю, но у нас ровно 20)
+                    const task = pool[i % pool.length];
+                    room.tasks[type] = {
                         title: task.title,
                         desc: task.desc,
                         points: POINTS_MAP[type]
-                    });
-                }
-            });
-
-            // Перемешиваем
-            for (let i = ROOMS.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [ROOMS[i], ROOMS[j]] = [ROOMS[j], ROOMS[i]];
+                    };
+                });
+                ROOMS.push(room);
             }
 
             // ======================== СОСТОЯНИЕ ========================
@@ -1619,16 +1738,17 @@
                 currentTeam: null,
                 currentMemberIndex: -1,
                 turnNumber: 0,
-                completed: [],
-                results: {},
+                completed: [], // массив id комнат (все выполненные)
+                // для каждой выполненной комнаты храним результат по выбранному типу
+                results: {}, // key: roomId, value: { type, cost, win, multiplier, success, points, team, player }
                 streak: 0,
                 isPlayerSelected: false,
-                selectedChestType: null,
-                selectedRoomId: null
+                // Используем счётчики для каждого типа, чтобы выдавать задания по порядку
+                typeIndex: { coin: 0, diamond: 0, crown: 0 }
             };
 
             let currentRoomId = null;
-            let modalStep = 'select';
+            let selectedType = null; // выбранный тип в текущей комнате
             let selectedStatus = 'success';
 
             // ======================== DOM ========================
@@ -1643,8 +1763,6 @@
             const costInput = document.getElementById('costInput');
             const winInput = document.getElementById('winInput');
             const multiplierInput = document.getElementById('multiplierInput');
-            const inputGroup = document.getElementById('inputGroup');
-            const resultStatus = document.getElementById('resultStatus');
             const statusSuccess = document.getElementById('statusSuccess');
             const statusFail = document.getElementById('statusFail');
             const modalCloseBtn = document.getElementById('modalCloseBtn');
@@ -1673,8 +1791,24 @@
             const closeFinalBtn = document.getElementById('closeFinalBtn');
             const welcomeModal = document.getElementById('welcomeModal');
             const welcomeStartBtn = document.getElementById('welcomeStartBtn');
+            const topList = document.getElementById('topList');
 
             // ======================== ФУНКЦИИ ========================
+
+            // Автоматический расчёт множителя
+            function updateMultiplier() {
+                const cost = parseFloat(costInput.value);
+                const win = parseFloat(winInput.value);
+                if (cost > 0 && win >= 0) {
+                    const mult = win / cost;
+                    multiplierInput.value = mult.toFixed(2);
+                } else {
+                    multiplierInput.value = '';
+                }
+            }
+
+            costInput.addEventListener('input', updateMultiplier);
+            winInput.addEventListener('input', updateMultiplier);
 
             function showNotification(msg, duration = 3000) {
                 const notif = document.createElement('div');
@@ -1758,6 +1892,7 @@
                 saveToLocal();
             }
 
+            // Открывает следующую невыполненную комнату
             function openNextRoom() {
                 const nextRoom = ROOMS.find(r => !state.completed.includes(r.id));
                 if (!nextRoom) {
@@ -1766,100 +1901,98 @@
                 }
 
                 currentRoomId = nextRoom.id;
-                modalStep = 'select';
+                selectedType = null;
                 modalTitle.textContent = `Комната #${nextRoom.id}`;
                 const playerName = state.teams[state.currentTeam].members[state.currentMemberIndex] || 'Игрок';
                 modalPlayerName.textContent = playerName;
 
-                // Показываем выбор сундуков, скрываем всё остальное
+                // Показываем выбор уровня
                 chestChoice.style.display = 'flex';
                 taskDetail.classList.remove('active');
                 taskDetail.style.display = 'none';
-                inputGroup.classList.remove('active');
-                resultStatus.classList.remove('active');
                 modalSaveBtn.style.display = 'none';
                 modalCloseBtn.textContent = 'Отмена';
-
                 document.querySelectorAll('.chest-btn').forEach(el => {
                     el.style.borderColor = '';
                     el.style.background = '';
                 });
-
-                // Сброс статуса
+                // Сбрасываем поля
+                costInput.value = '';
+                winInput.value = '';
+                multiplierInput.value = '';
                 selectedStatus = 'success';
                 statusSuccess.className = 'active-success';
                 statusFail.className = '';
 
                 modalOverlay.classList.add('active');
-                saveToLocal();
             }
 
-            function selectChest(type) {
+            // Выбор уровня сложности
+            function selectType(type) {
+                selectedType = type;
                 const room = ROOMS.find(r => r.id === currentRoomId);
                 if (!room) return;
 
-                state.selectedChestType = type;
-                state.selectedRoomId = currentRoomId;
+                const task = room.tasks[type];
+                if (!task) return;
 
-                const pool = TASK_POOLS[type];
-                const taskIndex = state.completed.length % pool.length;
-                const task = pool[taskIndex % pool.length];
-
-                // Скрываем выбор, показываем задание и поля
+                // Скрываем выбор, показываем задание
                 chestChoice.style.display = 'none';
                 taskDetail.style.display = 'block';
                 taskDetail.classList.add('active');
-                taskTitle.textContent = `🎯 ${task.title}`;
+                taskTitle.textContent = task.title;
                 taskDesc.textContent = task.desc;
-
-                // Показываем поля и кнопки
-                inputGroup.classList.add('active');
-                resultStatus.classList.add('active');
                 modalSaveBtn.style.display = 'inline-block';
                 modalCloseBtn.textContent = 'Отмена';
 
-                costInput.value = '';
-                winInput.value = '';
-                multiplierInput.value = '';
-                costInput.focus();
-
-                modalStep = 'input';
+                // Показываем поля
+                // уже видны
             }
 
             function saveResult() {
-                if (!state.selectedRoomId || state.selectedChestType === null) return;
+                if (currentRoomId === null || selectedType === null) {
+                    showNotification('Сначала выберите уровень сложности.');
+                    return;
+                }
 
                 const cost = parseFloat(costInput.value);
                 const win = parseFloat(winInput.value);
                 const mult = parseFloat(multiplierInput.value);
-                if (isNaN(cost) || isNaN(win) || isNaN(mult) || cost < 0 || win < 0 || mult < 0) {
-                    showNotification('⚠️ Заполните все поля положительными числами');
+                if (isNaN(cost) || isNaN(win) || isNaN(mult) || cost < 0 || win < 0) {
+                    showNotification('⚠️ Заполните стоимость и выигрыш положительными числами.');
                     return;
                 }
 
-                const roomId = state.selectedRoomId;
-                const type = state.selectedChestType;
-                const points = POINTS_MAP[type];
+                const room = ROOMS.find(r => r.id === currentRoomId);
+                if (!room) return;
+
                 const success = (selectedStatus === 'success');
+                const teamKey = state.currentTeam;
+                const memberIdx = state.currentMemberIndex;
+                const playerName = state.teams[teamKey].members[memberIdx] || 'Игрок';
+                const points = success ? room.tasks[selectedType].points : 0;
 
                 if (success) {
-                    const teamKey = state.currentTeam;
-                    const memberIdx = state.currentMemberIndex;
                     if (teamKey && memberIdx >= 0) {
                         state.teams[teamKey].scores[memberIdx] += points;
                         state.teams[teamKey].total += points;
                     }
                 }
 
-                state.completed.push(roomId);
-                state.results[roomId] = {
+                state.completed.push(currentRoomId);
+                state.results[currentRoomId] = {
+                    type: selectedType,
                     cost: cost,
                     win: win,
                     multiplier: mult,
-                    type: type,
+                    success: success,
                     points: points,
-                    success: success
+                    team: teamKey,
+                    player: playerName
                 };
+
+                // Увеличиваем счётчик использованных заданий для этого типа
+                state.typeIndex[selectedType]++;
 
                 if (success) {
                     state.streak++;
@@ -1884,9 +2017,6 @@
                     showNotification(`❌ Провал! Ход переходит команде ${state.currentTeam === 'light' ? 'Света' : 'Тьмы'}`);
                 }
 
-                state.selectedChestType = null;
-                state.selectedRoomId = null;
-
                 saveToLocal();
                 renderAll();
                 closeModal();
@@ -1904,14 +2034,11 @@
 
             function closeModal() {
                 modalOverlay.classList.remove('active');
-                modalStep = 'select';
-                state.selectedChestType = null;
-                state.selectedRoomId = null;
+                currentRoomId = null;
+                selectedType = null;
                 chestChoice.style.display = 'flex';
                 taskDetail.classList.remove('active');
                 taskDetail.style.display = 'none';
-                inputGroup.classList.remove('active');
-                resultStatus.classList.remove('active');
                 modalSaveBtn.style.display = 'none';
                 document.querySelectorAll('.chest-btn').forEach(el => {
                     el.style.borderColor = '';
@@ -1924,6 +2051,7 @@
             function renderAll() {
                 renderGrid();
                 renderTeams();
+                renderTopMultipliers();
                 updateStats();
                 updatePlayerBanner();
             }
@@ -1950,14 +2078,19 @@
                             resSpan.className = 'cell-result';
                             resSpan.textContent = `${data.win} ₽`;
                             cell.appendChild(resSpan);
-                            const label = document.createElement('div');
-                            label.className = 'cell-label';
-                            label.textContent = `${data.points} очков`;
-                            cell.appendChild(label);
+                            const multSpan = document.createElement('div');
+                            multSpan.className = 'cell-multiplier';
+                            multSpan.textContent = `x${data.multiplier}`;
+                            cell.appendChild(multSpan);
+                            const typeLabel = document.createElement('div');
+                            typeLabel.className = 'cell-type-label';
+                            const typeMap = { coin: '🪙', diamond: '💎', crown: '👑' };
+                            typeLabel.textContent = typeMap[data.type] || '';
+                            cell.appendChild(typeLabel);
                         }
                     } else {
                         const label = document.createElement('div');
-                        label.className = 'cell-label';
+                        label.className = 'cell-type-label';
                         label.textContent = '🪙💎👑';
                         cell.appendChild(label);
                     }
@@ -1969,16 +2102,18 @@
                                 return;
                             }
                             currentRoomId = room.id;
-                            modalStep = 'select';
+                            selectedType = null;
                             modalTitle.textContent = `Комната #${room.id}`;
                             const playerName = state.teams[state.currentTeam].members[state.currentMemberIndex] || 'Игрок';
                             modalPlayerName.textContent = playerName;
                             chestChoice.style.display = 'flex';
                             taskDetail.classList.remove('active');
                             taskDetail.style.display = 'none';
-                            inputGroup.classList.remove('active');
-                            resultStatus.classList.remove('active');
                             modalSaveBtn.style.display = 'none';
+                            modalCloseBtn.textContent = 'Отмена';
+                            costInput.value = '';
+                            winInput.value = '';
+                            multiplierInput.value = '';
                             selectedStatus = 'success';
                             statusSuccess.className = 'active-success';
                             statusFail.className = '';
@@ -1986,7 +2121,6 @@
                                 el.style.borderColor = '';
                                 el.style.background = '';
                             });
-                            modalCloseBtn.textContent = 'Отмена';
                             modalOverlay.classList.add('active');
                         }
                     });
@@ -2050,6 +2184,68 @@
                     document.getElementById('statusBar').className = 'status-bar';
                 }
                 turnNumber.textContent = state.turnNumber;
+            }
+
+            function renderTopMultipliers() {
+                const entries = [];
+                for (const [roomId, data] of Object.entries(state.results)) {
+                    if (data.success && data.multiplier > 0) {
+                        entries.push({
+                            roomId: parseInt(roomId),
+                            player: data.player,
+                            team: data.team,
+                            type: data.type,
+                            multiplier: data.multiplier,
+                            win: data.win
+                        });
+                    }
+                }
+                entries.sort((a, b) => b.multiplier - a.multiplier);
+
+                topList.innerHTML = '';
+                if (entries.length === 0) {
+                    topList.innerHTML = '<div class="empty-top">Пока нет иксовок. Выполните задания!</div>';
+                    return;
+                }
+
+                entries.forEach((item, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'top-item';
+                    const rank = document.createElement('span');
+                    rank.className = 'rank';
+                    rank.textContent = index + 1;
+                    div.appendChild(rank);
+
+                    const info = document.createElement('div');
+                    info.className = 'info';
+                    const playerSpan = document.createElement('span');
+                    playerSpan.className = 'player';
+                    playerSpan.textContent = item.player;
+                    info.appendChild(playerSpan);
+
+                    const teamSpan = document.createElement('span');
+                    teamSpan.className = `team ${item.team}`;
+                    teamSpan.textContent = item.team === 'light' ? '☀️ Свет' : '🌙 Тьма';
+                    info.appendChild(teamSpan);
+
+                    const typeSpan = document.createElement('span');
+                    typeSpan.className = 'type';
+                    const typeMap = { coin: '🪙', diamond: '💎', crown: '👑' };
+                    typeSpan.textContent = typeMap[item.type] || '';
+                    info.appendChild(typeSpan);
+
+                    const multSpan = document.createElement('span');
+                    multSpan.className = 'multiplier';
+                    multSpan.textContent = `x${item.multiplier}`;
+                    div.appendChild(multSpan);
+
+                    const winSpan = document.createElement('span');
+                    winSpan.className = 'win';
+                    winSpan.textContent = `${item.win} ₽`;
+                    div.appendChild(winSpan);
+
+                    topList.appendChild(div);
+                });
             }
 
             function updateStats() {
@@ -2122,7 +2318,8 @@
                     completed: state.completed,
                     results: state.results,
                     streak: state.streak,
-                    isPlayerSelected: state.isPlayerSelected
+                    isPlayerSelected: state.isPlayerSelected,
+                    typeIndex: state.typeIndex
                 };
                 localStorage.setItem('castleQuestTeams', JSON.stringify(data));
             }
@@ -2140,6 +2337,7 @@
                     state.results = data.results || {};
                     state.streak = data.streak || 0;
                     state.isPlayerSelected = data.isPlayerSelected || false;
+                    state.typeIndex = data.typeIndex || { coin: 0, diamond: 0, crown: 0 };
                     return true;
                 } catch (e) {
                     return false;
@@ -2193,10 +2391,10 @@
             // ======================== СБРОС ========================
 
             function resetGame() {
-                if (!confirm('Сбросить весь прогресс квеста?')) return;
-                // Очищаем только прогресс, имена сохраняются
-                const lightMembers = [...state.teams.light.members];
-                const darkMembers = [...state.teams.dark.members];
+                if (!confirm('Сбросить весь прогресс квеста (включая имена участников)?')) return;
+                // Полный сброс: очищаем всё, включая имена
+                state.teams.light.members = ['', '', '', '', ''];
+                state.teams.dark.members = ['', '', '', '', ''];
                 state.teams.light.scores = [0, 0, 0, 0, 0];
                 state.teams.light.total = 0;
                 state.teams.dark.scores = [0, 0, 0, 0, 0];
@@ -2208,12 +2406,12 @@
                 state.turnNumber = 0;
                 state.streak = 0;
                 state.isPlayerSelected = false;
-                state.teams.light.members = lightMembers;
-                state.teams.dark.members = darkMembers;
-                saveNames();
+                state.typeIndex = { coin: 0, diamond: 0, crown: 0 };
+                // Удаляем сохранённые имена
+                localStorage.removeItem('castleTeamNames');
                 saveToLocal();
                 renderAll();
-                showNotification('🔄 Квест сброшен! Нажмите "Выбрать участника" для начала.');
+                showNotification('🔄 Квест полностью сброшен. Начните заново.');
             }
 
             // ======================== ПРАВИЛА ========================
@@ -2232,14 +2430,12 @@
                 loadNames();
                 const loaded = loadFromLocal();
 
-                // Приветственная модалка
                 if (!loaded || state.completed.length === 0) {
                     welcomeModal.classList.add('active');
                 }
 
                 welcomeStartBtn.addEventListener('click', () => {
                     welcomeModal.classList.remove('active');
-                    // Если ещё не было прогресса, показываем правила
                     if (!loaded || state.completed.length === 0) {
                         setTimeout(() => {
                             openRulesModal();
@@ -2250,11 +2446,11 @@
 
                 renderAll();
 
-                // События на кнопки выбора
+                // События на кнопки выбора уровня
                 document.querySelectorAll('.chest-btn').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const type = this.dataset.type;
-                        selectChest(type);
+                        selectType(type);
                     });
                 });
 
@@ -2288,7 +2484,7 @@
                 });
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') closeModal();
-                    if (e.key === 'Enter' && modalOverlay.classList.contains('active') && modalStep === 'input') {
+                    if (e.key === 'Enter' && modalOverlay.classList.contains('active')) {
                         saveResult();
                     }
                 });
