@@ -2,10 +2,9 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <title>⚔️ Битва Королевств</title>
     <style>
-        /* ========== БАЗОВЫЕ СТИЛИ ========== */
         * {
             margin: 0;
             padding: 0;
@@ -18,7 +17,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 16px;
+            padding: 10px;
             color: #e0d6e8;
             position: relative;
             background: 
@@ -33,7 +32,7 @@
             content: '';
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.25);
+            background: rgba(0, 0, 0, 0.2);
             z-index: 0;
             pointer-events: none;
         }
@@ -42,14 +41,27 @@
             max-width: 1400px;
             width: 100%;
             background: rgba(20, 18, 30, 0.82);
-            backdrop-filter: blur(8px);
-            border-radius: 48px;
-            padding: 24px 28px;
+            backdrop-filter: blur(6px);
+            border-radius: 32px;
+            padding: 14px 18px;
             border: 1px solid rgba(255, 215, 0, 0.08);
-            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
             position: relative;
             z-index: 1;
             overflow: hidden;
+            max-height: 100vh;
+            overflow-y: auto;
+        }
+
+        .container::-webkit-scrollbar {
+            width: 4px;
+        }
+        .container::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.2);
+        }
+        .container::-webkit-scrollbar-thumb {
+            background: rgba(255,215,0,0.3);
+            border-radius: 10px;
         }
 
         .container::before {
@@ -69,14 +81,13 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* ========== ХЕДЕР ========== */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 12px;
+            gap: 6px;
+            margin-bottom: 6px;
             position: relative;
             z-index: 1;
         }
@@ -84,47 +95,48 @@
         .title-group {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 6px;
         }
 
         .title-group h1 {
-            font-size: 2rem;
+            font-size: 1.4rem;
             font-weight: 800;
             background: linear-gradient(135deg, #f7d44a, #f5a623, #e8870e);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             text-shadow: 0 0 40px rgba(245, 166, 35, 0.15);
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
 
         .title-group .icon {
-            font-size: 2rem;
-            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.2));
+            font-size: 1.4rem;
+            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.2));
             animation: float 3s ease-in-out infinite;
         }
 
         @keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-6px); }
+            50% { transform: translateY(-4px); }
         }
 
         .subtitle {
             color: #8a7a9a;
-            font-size: 0.8rem;
-            letter-spacing: 1px;
+            font-size: 0.6rem;
+            letter-spacing: 0.5px;
             font-weight: 300;
+            margin-left: 2px;
         }
 
         .btn-reset {
             background: rgba(255, 50, 50, 0.08);
             border: 1px solid rgba(255, 50, 50, 0.15);
             color: #ff6b6b;
-            padding: 4px 16px;
+            padding: 2px 12px;
             border-radius: 30px;
             cursor: pointer;
             transition: 0.3s;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             z-index: 2;
             position: relative;
         }
@@ -133,18 +145,17 @@
             background: rgba(255, 50, 50, 0.18);
         }
 
-        /* ========== ПЛАШКА ПРАВИЛ И ТОПА ========== */
         .rules-banner {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 30px;
-            padding: 8px 18px;
-            margin-bottom: 12px;
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 20px;
+            padding: 4px 12px;
+            margin-bottom: 6px;
             border: 1px solid rgba(255, 215, 0, 0.06);
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            gap: 8px 16px;
+            gap: 4px 10px;
             position: relative;
             z-index: 1;
             backdrop-filter: blur(4px);
@@ -159,15 +170,15 @@
         .rules-banner .rules-text {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px 16px;
-            font-size: 0.8rem;
+            gap: 4px 10px;
+            font-size: 0.65rem;
             color: #b0a8c0;
         }
 
         .rules-banner .rules-text .rule-item {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
         }
 
         .rules-banner .rules-text .highlight-coin { color: #cd7f32; font-weight: 600; }
@@ -178,16 +189,16 @@
 
         .rules-banner .banner-buttons {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
 
         .rules-banner .banner-btn {
             background: rgba(255, 215, 0, 0.06);
             border: 1px solid rgba(255, 215, 0, 0.08);
             color: #f7d44a;
-            padding: 3px 14px;
+            padding: 2px 10px;
             border-radius: 30px;
-            font-size: 0.75rem;
+            font-size: 0.6rem;
             cursor: pointer;
             transition: 0.2s;
             white-space: nowrap;
@@ -197,16 +208,15 @@
             background: rgba(255, 215, 0, 0.12);
         }
 
-        /* ========== ПЛАШКА ТЕКУЩЕГО УЧАСТНИКА ========== */
         .current-player-banner {
             display: none;
             background: rgba(0, 0, 0, 0.45);
-            border-radius: 40px;
-            padding: 6px 20px;
-            margin-bottom: 12px;
+            border-radius: 30px;
+            padding: 4px 16px;
+            margin-bottom: 6px;
             border: 1px solid rgba(255, 215, 0, 0.06);
             align-items: center;
-            gap: 12px;
+            gap: 8px;
             flex-wrap: wrap;
             backdrop-filter: blur(4px);
             position: relative;
@@ -219,7 +229,7 @@
         }
 
         .current-player-banner .player-avatar {
-            font-size: 1.8rem;
+            font-size: 1.2rem;
             line-height: 1;
         }
 
@@ -230,12 +240,12 @@
 
         .current-player-banner .player-name {
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             color: #f0e8f8;
         }
 
         .current-player-banner .player-team {
-            font-size: 0.8rem;
+            font-size: 0.65rem;
             color: #8a7a9a;
         }
 
@@ -251,26 +261,25 @@
 
         .current-player-banner .player-turn-hint {
             margin-left: auto;
-            font-size: 0.8rem;
+            font-size: 0.65rem;
             color: #8a7a9a;
             background: rgba(255, 215, 0, 0.04);
-            padding: 2px 14px;
+            padding: 2px 10px;
             border-radius: 30px;
             border: 1px solid rgba(255, 215, 0, 0.04);
         }
 
-        /* ========== СТАТУС-БАР ========== */
         .status-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
-            background: rgba(10, 10, 18, 0.5);
-            padding: 8px 18px;
-            border-radius: 40px;
+            gap: 6px;
+            background: rgba(10, 10, 18, 0.4);
+            padding: 4px 12px;
+            border-radius: 30px;
             border: 1px solid rgba(255, 215, 0, 0.06);
-            margin-bottom: 14px;
+            margin-bottom: 6px;
             position: relative;
             z-index: 1;
         }
@@ -278,18 +287,18 @@
         .turn-indicator {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 6px;
         }
 
         .turn-indicator .label {
             color: #8a7a9a;
-            font-size: 0.8rem;
+            font-size: 0.65rem;
         }
 
         .turn-indicator .team-name {
             font-weight: 700;
-            font-size: 1rem;
-            padding: 2px 14px;
+            font-size: 0.8rem;
+            padding: 1px 10px;
             border-radius: 30px;
         }
 
@@ -304,7 +313,7 @@
 
         .turn-counter {
             color: #8a7a9a;
-            font-size: 0.8rem;
+            font-size: 0.65rem;
         }
         .turn-counter span {
             color: #f0e8f8;
@@ -315,17 +324,17 @@
             background: linear-gradient(135deg, #f7d44a, #f5a623);
             border: none;
             color: #0a0a0f;
-            padding: 6px 18px;
+            padding: 4px 14px;
             border-radius: 30px;
             font-weight: 700;
             cursor: pointer;
             transition: 0.3s;
-            font-size: 0.85rem;
+            font-size: 0.7rem;
         }
 
         .btn-gold:hover {
             transform: scale(1.03);
-            box-shadow: 0 0 30px rgba(245, 166, 35, 0.2);
+            box-shadow: 0 0 20px rgba(245, 166, 35, 0.2);
         }
 
         .btn-gold:disabled {
@@ -336,9 +345,9 @@
 
         .stat-pill {
             background: rgba(0, 0, 0, 0.3);
-            padding: 2px 14px;
+            padding: 1px 10px;
             border-radius: 30px;
-            font-size: 0.8rem;
+            font-size: 0.65rem;
             color: #b0a8c0;
         }
         .stat-pill span {
@@ -346,23 +355,22 @@
             font-weight: 600;
         }
 
-        /* ========== КОМАНДЫ (верхний блок) ========== */
         .teams-section {
             display: flex;
             justify-content: space-between;
             align-items: stretch;
-            gap: 16px;
-            margin-bottom: 14px;
+            gap: 10px;
+            margin-bottom: 6px;
             position: relative;
             z-index: 1;
         }
 
         .team-block {
             flex: 1;
-            min-width: 200px;
-            background: rgba(0, 0, 0, 0.25);
-            border-radius: 28px;
-            padding: 12px 16px;
+            min-width: 150px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            padding: 6px 10px;
             border: 1px solid rgba(255, 215, 0, 0.04);
             backdrop-filter: blur(4px);
         }
@@ -382,9 +390,9 @@
             justify-content: space-between;
             align-items: center;
             font-weight: 600;
-            font-size: 1rem;
-            margin-bottom: 6px;
-            padding-bottom: 4px;
+            font-size: 0.75rem;
+            margin-bottom: 3px;
+            padding-bottom: 2px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         }
 
@@ -396,7 +404,7 @@
         }
 
         .team-block .team-title .team-total {
-            font-size: 1.4rem;
+            font-size: 1rem;
             font-weight: 800;
         }
 
@@ -411,9 +419,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 2px 6px;
-            border-radius: 16px;
-            font-size: 0.85rem;
+            padding: 1px 4px;
+            border-radius: 12px;
+            font-size: 0.65rem;
             transition: 0.2s;
             cursor: pointer;
         }
@@ -435,7 +443,7 @@
 
         .team-block .member-row .member-score {
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.7rem;
         }
 
         .team-block.light .member-row .member-score {
@@ -448,165 +456,15 @@
         .team-block .member-row.active-turn {
             background: rgba(255, 215, 0, 0.06);
             border-left: 2px solid #f5a623;
-            border-radius: 16px 4px 4px 16px;
+            border-radius: 12px 2px 2px 12px;
         }
 
-        /* ========== ТОП ИКСОВОК (модалка) ========== */
-        .modal-top-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(16px);
-            z-index: 3000;
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-top-overlay.active {
-            display: flex;
-        }
-
-        .modal-top {
-            background: linear-gradient(160deg, #1a1828, #12101e);
-            border-radius: 48px;
-            max-width: 700px;
-            width: 92%;
-            padding: 32px;
-            border: 2px solid rgba(255, 215, 0, 0.12);
-            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.95);
-            position: relative;
-            overflow: hidden;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal-top::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(from 0deg at 50% 50%, transparent 0%, rgba(255, 215, 0, 0.03) 25%, transparent 50%, rgba(138, 43, 226, 0.03) 75%, transparent 100%);
-            animation: rotateGlow 20s linear infinite;
-            pointer-events: none;
-        }
-
-        .modal-top h2 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #f7d44a;
-            text-align: center;
-            margin-bottom: 16px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .modal-top .top-list {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .modal-top .top-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 14px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 20px;
-            font-size: 0.95rem;
-        }
-
-        .modal-top .top-item .rank {
-            font-weight: 700;
-            color: #8a7a9a;
-            width: 30px;
-        }
-
-        .modal-top .top-item .info {
-            flex: 1;
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .modal-top .top-item .info .player {
-            color: #f0e8f8;
-        }
-
-        .modal-top .top-item .info .team {
-            font-size: 0.8rem;
-            padding: 1px 10px;
-            border-radius: 30px;
-        }
-
-        .modal-top .top-item .info .team.light {
-            color: #f7d44a;
-            background: rgba(247, 212, 74, 0.08);
-        }
-        .modal-top .top-item .info .team.dark {
-            color: #b388ff;
-            background: rgba(179, 136, 255, 0.08);
-        }
-
-        .modal-top .top-item .info .type {
-            font-size: 0.8rem;
-            color: #8a7a9a;
-        }
-
-        .modal-top .top-item .multiplier {
-            font-weight: 700;
-            color: #f7d44a;
-            font-size: 1.1rem;
-        }
-
-        .modal-top .top-item .win {
-            font-size: 0.85rem;
-            color: #8a7a9a;
-        }
-
-        .modal-top .empty-top {
-            color: #6a5a7a;
-            font-style: italic;
-            text-align: center;
-            padding: 30px 0;
-        }
-
-        .modal-top .close-top-btn {
-            background: linear-gradient(135deg, #f7d44a, #f5a623);
-            border: none;
-            color: #0a0a0f;
-            padding: 10px 30px;
-            border-radius: 40px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 1rem;
-            margin-top: 20px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            position: relative;
-            z-index: 1;
-        }
-
-        .modal-top .close-top-btn:hover {
-            transform: scale(1.03);
-            box-shadow: 0 0 30px rgba(245, 166, 35, 0.2);
-        }
-
-        /* ========== ПРОГРЕСС ========== */
         .progress-wrap {
             background: rgba(0, 0, 0, 0.4);
-            border-radius: 30px;
-            height: 6px;
+            border-radius: 20px;
+            height: 4px;
             width: 100%;
-            margin-bottom: 14px;
+            margin-bottom: 6px;
             overflow: hidden;
             border: 1px solid rgba(255, 215, 0, 0.04);
             position: relative;
@@ -619,7 +477,7 @@
             background: linear-gradient(90deg, #f5a623, #f7d44a, #f5a623);
             background-size: 200% 100%;
             animation: shimmer 2s linear infinite;
-            border-radius: 30px;
+            border-radius: 20px;
             transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
@@ -628,31 +486,30 @@
             100% { background-position: 200% 0; }
         }
 
-        /* ========== СЕТКА КОМНАТ ========== */
         .grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin-bottom: 14px;
+            gap: 5px;
+            margin-bottom: 8px;
             position: relative;
             z-index: 1;
         }
 
         .cell {
             aspect-ratio: 1 / 1;
-            border-radius: 18px;
+            border-radius: 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: all 0.2s ease;
             position: relative;
             user-select: none;
-            padding: 6px;
+            padding: 2px;
             text-align: center;
             overflow: hidden;
-            border: 2px solid rgba(255, 255, 255, 0.04);
+            border: 1.5px solid rgba(255, 255, 255, 0.04);
             background: rgba(20, 18, 30, 0.4);
         }
 
@@ -660,8 +517,8 @@
             content: '';
             position: absolute;
             inset: 0;
-            border-radius: 18px;
-            padding: 2px;
+            border-radius: 12px;
+            padding: 1.5px;
             background: linear-gradient(135deg, rgba(255, 215, 0, 0.05), transparent);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -676,12 +533,12 @@
             opacity: 1;
         }
         .cell:hover:not(.done) {
-            transform: translateY(-2px);
+            transform: translateY(-1px);
             border-color: rgba(255, 215, 0, 0.10);
         }
 
         .cell .cell-number {
-            font-size: 1.8rem;
+            font-size: 1rem;
             font-weight: 800;
             color: rgba(255, 255, 255, 0.05);
             transition: 0.3s;
@@ -689,11 +546,11 @@
         }
 
         .cell .cell-type-label {
-            font-size: 0.5rem;
+            font-size: 0.4rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: rgba(255, 255, 255, 0.06);
-            margin-top: 2px;
+            margin-top: 1px;
         }
 
         .cell.done {
@@ -706,152 +563,66 @@
 
         .cell.done .cell-number {
             color: #2ecc71;
-            font-size: 1.4rem;
+            font-size: 0.8rem;
         }
         .cell.done .cell-type-label {
             color: rgba(46, 204, 113, 0.15);
         }
 
         .cell .cell-result {
-            font-size: 0.55rem;
+            font-size: 0.45rem;
             color: #f7d44a;
-            margin-top: 2px;
+            margin-top: 1px;
             font-weight: 600;
         }
 
         .cell .cell-multiplier {
-            font-size: 0.55rem;
+            font-size: 0.45rem;
             color: #b388ff;
-            margin-top: 1px;
+            margin-top: 0px;
         }
 
-        /* ========== ПРИНУДИТЕЛЬНАЯ СМЕНА ========== */
         .force-switch-wrap {
             text-align: center;
             position: relative;
             z-index: 1;
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
-        /* ========== МОДАЛКИ (правила, выбор, финал) ========== */
-        /* Правила — стили как раньше, укажу кратко */
-        .modal-rules-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            z-index: 3000;
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn 0.3s ease;
-        }
-        .modal-rules-overlay.active {
-            display: flex;
-        }
-        .modal-rules {
-            background: linear-gradient(160deg, #1a1828, #12101e);
-            border-radius: 48px;
-            max-width: 650px;
-            width: 92%;
-            padding: 32px;
-            border: 1px solid rgba(255, 215, 0, 0.08);
-            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.9);
-            position: relative;
-            overflow: hidden;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-        .modal-rules::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(from 0deg at 50% 50%, transparent 0%, rgba(255, 215, 0, 0.03) 25%, transparent 50%, rgba(138, 43, 226, 0.03) 75%, transparent 100%);
-            animation: rotateGlow 20s linear infinite;
-            pointer-events: none;
-        }
-        .modal-rules h2 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #f0e8f8;
-            text-align: center;
-            margin-bottom: 16px;
-            position: relative;
-            z-index: 1;
-        }
-        .modal-rules .rules-list {
-            position: relative;
-            z-index: 1;
-            color: #c0b8d0;
-            font-size: 1rem;
-            line-height: 1.8;
-            padding-left: 20px;
-        }
-        .modal-rules .rules-list li {
-            margin-bottom: 8px;
-        }
-        .modal-rules .rules-list .highlight-coin { color: #cd7f32; font-weight: 600; }
-        .modal-rules .rules-list .highlight-diamond { color: #c0c0c0; font-weight: 600; }
-        .modal-rules .rules-list .highlight-crown { color: #f7d44a; font-weight: 600; }
-        .modal-rules .rules-list .highlight-light { color: #f7d44a; font-weight: 600; }
-        .modal-rules .rules-list .highlight-dark { color: #b388ff; font-weight: 600; }
-        .modal-rules .rules-list .prize { color: #f7d44a; font-weight: 700; }
-        .modal-rules .close-rules-btn {
-            background: linear-gradient(135deg, #f7d44a, #f5a623);
-            border: none;
-            color: #0a0a0f;
-            padding: 10px 30px;
-            border-radius: 40px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 1rem;
-            margin-top: 20px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            position: relative;
-            z-index: 1;
-        }
-        .modal-rules .close-rules-btn:hover {
-            transform: scale(1.03);
-            box-shadow: 0 0 30px rgba(245, 166, 35, 0.2);
-        }
-
-        /* Модалка выбора (задания) */
-        .modal-overlay {
+        /* ========== МОДАЛКИ ========== */
+        .modal-overlay, .modal-rules-overlay, .modal-top-overlay, .modal-final-overlay, .modal-welcome-overlay {
             display: none;
             position: fixed;
             inset: 0;
             background: rgba(0, 0, 0, 0.82);
-            backdrop-filter: blur(14px);
+            backdrop-filter: blur(12px);
             z-index: 2000;
             justify-content: center;
             align-items: center;
-            animation: fadeIn 0.35s ease;
+            animation: fadeIn 0.3s ease;
         }
-        .modal-overlay.active {
+        .modal-overlay.active, .modal-rules-overlay.active, .modal-top-overlay.active, .modal-final-overlay.active, .modal-welcome-overlay.active {
             display: flex;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
         }
-        .modal {
+
+        .modal, .modal-rules, .modal-top, .modal-final, .modal-welcome {
             background: linear-gradient(160deg, #1a1828, #12101e);
-            border-radius: 48px;
+            border-radius: 40px;
             max-width: 600px;
             width: 92%;
-            padding: 32px 28px 28px;
+            padding: 24px 20px;
             border: 1px solid rgba(255, 215, 0, 0.08);
             box-shadow: 0 40px 100px rgba(0, 0, 0, 0.95);
             position: relative;
             overflow: hidden;
+            max-height: 85vh;
+            overflow-y: auto;
         }
-        .modal::before {
+        .modal::before, .modal-rules::before, .modal-top::before, .modal-final::before, .modal-welcome::before {
             content: '';
             position: absolute;
             top: -50%;
@@ -862,22 +633,25 @@
             animation: rotateGlow 20s linear infinite;
             pointer-events: none;
         }
+        .modal h2, .modal-rules h2, .modal-top h2, .modal-final h2, .modal-welcome h2 {
+            position: relative;
+            z-index: 1;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #f0e8f8;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
         .modal .modal-header {
             text-align: center;
             position: relative;
             z-index: 1;
-            margin-bottom: 12px;
-        }
-        .modal .modal-header h2 {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #f0e8f8;
-            margin-bottom: 2px;
+            margin-bottom: 10px;
         }
         .modal .modal-header .room-info {
             color: #8a7a9a;
             font-size: 0.85rem;
-            letter-spacing: 0.5px;
         }
         .modal .modal-header .room-info .highlight-player {
             color: #f7d44a;
@@ -886,19 +660,19 @@
 
         .chest-choice {
             display: flex;
-            gap: 16px;
+            gap: 12px;
             justify-content: center;
-            margin: 14px 0 8px;
+            margin: 10px 0 8px;
             position: relative;
             z-index: 1;
             flex-wrap: wrap;
         }
         .chest-btn {
             flex: 1;
-            min-width: 100px;
-            max-width: 160px;
-            padding: 14px 10px 12px;
-            border-radius: 28px;
+            min-width: 90px;
+            max-width: 140px;
+            padding: 10px 8px;
+            border-radius: 24px;
             border: 2px solid rgba(255, 255, 255, 0.04);
             background: rgba(0, 0, 0, 0.3);
             cursor: pointer;
@@ -909,23 +683,22 @@
             overflow: hidden;
         }
         .chest-btn:hover {
-            transform: translateY(-4px);
+            transform: translateY(-3px);
         }
         .chest-btn .chest-icon {
-            font-size: 2.6rem;
+            font-size: 2.2rem;
             display: block;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             transition: 0.3s;
         }
         .chest-btn .chest-label {
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             display: block;
         }
         .chest-btn .chest-points {
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             color: #8a7a9a;
-            margin-top: 2px;
             display: block;
         }
         .chest-btn.coin {
@@ -934,10 +707,7 @@
         }
         .chest-btn.coin:hover {
             border-color: #cd7f32;
-            box-shadow: 0 0 40px rgba(205, 127, 50, 0.10);
-        }
-        .chest-btn.coin .chest-icon {
-            filter: drop-shadow(0 0 8px rgba(205, 127, 50, 0.12));
+            box-shadow: 0 0 30px rgba(205, 127, 50, 0.10);
         }
         .chest-btn.diamond {
             border-color: rgba(192, 192, 192, 0.12);
@@ -945,10 +715,7 @@
         }
         .chest-btn.diamond:hover {
             border-color: #c0c0c0;
-            box-shadow: 0 0 40px rgba(192, 192, 192, 0.06);
-        }
-        .chest-btn.diamond .chest-icon {
-            filter: drop-shadow(0 0 8px rgba(192, 192, 192, 0.08));
+            box-shadow: 0 0 30px rgba(192, 192, 192, 0.06);
         }
         .chest-btn.crown {
             border-color: rgba(255, 215, 0, 0.12);
@@ -956,19 +723,16 @@
         }
         .chest-btn.crown:hover {
             border-color: #f7d44a;
-            box-shadow: 0 0 50px rgba(255, 215, 0, 0.10);
-        }
-        .chest-btn.crown .chest-icon {
-            filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.12));
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.10);
         }
         .chest-btn:hover .chest-icon {
-            transform: scale(1.06) rotate(-2deg);
+            transform: scale(1.05) rotate(-2deg);
         }
 
         .task-detail {
             display: none;
             background: rgba(0, 0, 0, 0.3);
-            padding: 14px 18px;
+            padding: 12px 16px;
             border-radius: 20px;
             margin: 8px 0 12px;
             border-left: 3px solid #f5a623;
@@ -997,35 +761,34 @@
         }
         .modal .input-row {
             display: flex;
-            gap: 10px;
-            margin-bottom: 8px;
+            gap: 8px;
+            margin-bottom: 6px;
             flex-wrap: wrap;
         }
         .modal .input-row .field {
             flex: 1;
-            min-width: 80px;
+            min-width: 70px;
         }
         .modal .input-row .field label {
             display: block;
             color: #8a7a9a;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             margin-bottom: 2px;
         }
         .modal .input-row .field input {
             width: 100%;
-            padding: 8px 12px;
+            padding: 6px 10px;
             background: rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 215, 0, 0.08);
             border-radius: 30px;
             color: #f0e8f8;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             text-align: center;
             outline: none;
             transition: 0.3s;
         }
         .modal .input-row .field input:focus {
             border-color: #f5a623;
-            box-shadow: 0 0 30px rgba(245, 166, 35, 0.05);
         }
         .modal .input-row .field input:disabled {
             opacity: 0.4;
@@ -1034,14 +797,14 @@
 
         .modal .result-status {
             display: flex;
-            gap: 14px;
+            gap: 12px;
             justify-content: center;
-            margin: 8px 0 10px;
+            margin: 8px 0 6px;
             position: relative;
             z-index: 1;
         }
         .modal .result-status button {
-            padding: 10px 24px;
+            padding: 8px 20px;
             border-radius: 40px;
             border: 2px solid rgba(255, 255, 255, 0.06);
             background: rgba(0, 0, 0, 0.3);
@@ -1049,7 +812,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: 0.3s;
-            font-size: 1rem;
+            font-size: 0.9rem;
             flex: 1;
         }
         .modal .result-status button.active-success {
@@ -1066,66 +829,98 @@
             border-color: rgba(255, 255, 255, 0.10);
         }
 
-        /* Конец квеста */
-        .modal-final-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(16px);
-            z-index: 4000;
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn 0.5s ease;
-        }
-        .modal-final-overlay.active {
-            display: flex;
-        }
-        .modal-final {
-            background: linear-gradient(160deg, #1a1828, #12101e);
-            border-radius: 56px;
-            max-width: 700px;
-            width: 92%;
-            padding: 36px;
-            border: 2px solid rgba(255, 215, 0, 0.12);
-            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.95);
-            position: relative;
-            overflow: hidden;
-            max-height: 85vh;
-            overflow-y: auto;
-        }
-        .modal-final::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(from 0deg at 50% 50%, transparent 0%, rgba(255, 215, 0, 0.04) 25%, transparent 50%, rgba(138, 43, 226, 0.04) 75%, transparent 100%);
-            animation: rotateGlow 20s linear infinite;
-            pointer-events: none;
-        }
-        .modal-final h2 {
-            font-size: 2.2rem;
-            font-weight: 800;
-            text-align: center;
-            color: #f7d44a;
-            margin-bottom: 16px;
+        .modal-rules .rules-list {
             position: relative;
             z-index: 1;
-            text-shadow: 0 0 40px rgba(245, 166, 35, 0.2);
+            color: #c0b8d0;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            padding-left: 18px;
         }
+        .modal-rules .rules-list li {
+            margin-bottom: 6px;
+        }
+        .modal-rules .rules-list .highlight-coin { color: #cd7f32; font-weight: 600; }
+        .modal-rules .rules-list .highlight-diamond { color: #c0c0c0; font-weight: 600; }
+        .modal-rules .rules-list .highlight-crown { color: #f7d44a; font-weight: 600; }
+        .modal-rules .rules-list .highlight-light { color: #f7d44a; font-weight: 600; }
+        .modal-rules .rules-list .highlight-dark { color: #b388ff; font-weight: 600; }
+        .modal-rules .rules-list .prize { color: #f7d44a; font-weight: 700; }
+
+        .modal-top .top-list {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .modal-top .top-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            font-size: 0.85rem;
+        }
+        .modal-top .top-item .rank {
+            font-weight: 700;
+            color: #8a7a9a;
+            width: 25px;
+        }
+        .modal-top .top-item .info {
+            flex: 1;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .modal-top .top-item .info .player {
+            color: #f0e8f8;
+        }
+        .modal-top .top-item .info .team {
+            font-size: 0.7rem;
+            padding: 1px 8px;
+            border-radius: 30px;
+        }
+        .modal-top .top-item .info .team.light {
+            color: #f7d44a;
+            background: rgba(247, 212, 74, 0.08);
+        }
+        .modal-top .top-item .info .team.dark {
+            color: #b388ff;
+            background: rgba(179, 136, 255, 0.08);
+        }
+        .modal-top .top-item .info .type {
+            font-size: 0.7rem;
+            color: #8a7a9a;
+        }
+        .modal-top .top-item .multiplier {
+            font-weight: 700;
+            color: #f7d44a;
+            font-size: 1rem;
+        }
+        .modal-top .top-item .win {
+            font-size: 0.75rem;
+            color: #8a7a9a;
+        }
+        .modal-top .empty-top {
+            color: #6a5a7a;
+            font-style: italic;
+            text-align: center;
+            padding: 20px 0;
+        }
+
         .modal-final .final-results {
             position: relative;
             z-index: 1;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
         }
         .modal-final .final-team {
-            background: rgba(0, 0, 0, 0.25);
-            border-radius: 28px;
-            padding: 16px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            padding: 12px 16px;
             border: 1px solid rgba(255, 255, 255, 0.04);
         }
         .modal-final .final-team.light {
@@ -1136,18 +931,17 @@
         }
         .modal-final .final-team .team-title {
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: 1rem;
             display: flex;
             justify-content: space-between;
-            align-items: center;
         }
         .modal-final .final-team .team-title .team-score {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
         }
         .modal-final .final-team .team-title .team-score.light-score { color: #f7d44a; }
         .modal-final .final-team .team-title .team-score.dark-score { color: #b388ff; }
         .modal-final .final-team .team-players {
-            margin-top: 8px;
+            margin-top: 6px;
             display: flex;
             flex-direction: column;
             gap: 3px;
@@ -1155,10 +949,10 @@
         .modal-final .final-team .team-players .player-row {
             display: flex;
             justify-content: space-between;
-            padding: 3px 10px;
-            border-radius: 16px;
+            padding: 2px 8px;
+            border-radius: 12px;
             background: rgba(255, 255, 255, 0.02);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         .modal-final .final-team .team-players .player-row .p-name {
             color: #c0b8d0;
@@ -1169,103 +963,45 @@
         }
         .modal-final .final-winner {
             text-align: center;
-            margin-top: 8px;
-            padding: 12px;
-            border-radius: 40px;
+            margin-top: 6px;
+            padding: 10px;
+            border-radius: 30px;
             background: rgba(255, 215, 0, 0.05);
             border: 1px solid rgba(255, 215, 0, 0.08);
-            position: relative;
-            z-index: 1;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
         }
         .modal-final .final-winner .win-team {
             color: #f7d44a;
         }
-        .modal-final .close-final-btn {
+
+        .close-btn, .close-rules-btn, .close-top-btn, .close-final-btn, .start-btn {
             background: linear-gradient(135deg, #f7d44a, #f5a623);
             border: none;
             color: #0a0a0f;
-            padding: 10px 36px;
+            padding: 8px 24px;
             border-radius: 40px;
             font-weight: 700;
             cursor: pointer;
             transition: 0.3s;
-            font-size: 1rem;
-            margin-top: 16px;
+            font-size: 0.9rem;
+            margin-top: 12px;
             display: block;
             margin-left: auto;
             margin-right: auto;
             position: relative;
             z-index: 1;
         }
-        .modal-final .close-final-btn:hover {
+        .close-btn:hover, .close-rules-btn:hover, .close-top-btn:hover, .close-final-btn:hover, .start-btn:hover {
             transform: scale(1.03);
             box-shadow: 0 0 30px rgba(245, 166, 35, 0.15);
         }
 
-        /* Приветствие */
-        .modal-welcome-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(16px);
-            z-index: 5000;
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn 0.5s ease;
-        }
-        .modal-welcome-overlay.active {
-            display: flex;
-        }
-        .modal-welcome {
-            background: linear-gradient(160deg, #1a1828, #12101e);
-            border-radius: 56px;
-            max-width: 700px;
-            width: 92%;
-            padding: 36px;
-            border: 2px solid rgba(255, 215, 0, 0.12);
-            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.95);
-            position: relative;
-            overflow: hidden;
-            max-height: 85vh;
-            overflow-y: auto;
-        }
-        .modal-welcome::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(from 0deg at 50% 50%, transparent 0%, rgba(255, 215, 0, 0.04) 25%, transparent 50%, rgba(138, 43, 226, 0.04) 75%, transparent 100%);
-            animation: rotateGlow 20s linear infinite;
-            pointer-events: none;
-        }
-        .modal-welcome h2 {
-            font-size: 2.2rem;
-            font-weight: 800;
-            text-align: center;
-            color: #f7d44a;
-            margin-bottom: 12px;
-            position: relative;
-            z-index: 1;
-            text-shadow: 0 0 40px rgba(245, 166, 35, 0.2);
-        }
-        .modal-welcome p {
-            color: #c0b8d0;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
-        }
         .modal-welcome ul {
             color: #c0b8d0;
-            font-size: 0.95rem;
-            line-height: 1.7;
-            padding-left: 20px;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            padding-left: 18px;
             position: relative;
             z-index: 1;
         }
@@ -1280,50 +1016,21 @@
             color: #b388ff;
             font-weight: 600;
         }
-        .modal-welcome .start-btn {
-            background: linear-gradient(135deg, #f7d44a, #f5a623);
-            border: none;
-            color: #0a0a0f;
-            padding: 12px 36px;
-            border-radius: 40px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 1.1rem;
-            margin-top: 16px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            position: relative;
-            z-index: 1;
-        }
-        .modal-welcome .start-btn:hover {
-            transform: scale(1.03);
-            box-shadow: 0 0 30px rgba(245, 166, 35, 0.15);
-        }
 
         /* ========== АДАПТИВ ========== */
-        @media (max-width: 1024px) {
+        @media (max-width: 900px) {
             .grid { grid-template-columns: repeat(4, 1fr); }
-            .teams-section { flex-direction: column; align-items: stretch; }
-            .team-block { min-width: 0; }
         }
-        @media (max-width: 768px) {
-            .container { padding: 16px; }
-            .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-            .title-group h1 { font-size: 1.6rem; }
-            .status-bar { flex-direction: column; align-items: stretch; }
-            .rules-banner { flex-direction: column; align-items: flex-start; }
-            .rules-banner .banner-buttons { margin-top: 4px; }
-            .chest-btn { min-width: 80px; padding: 10px 6px; }
-            .modal { padding: 20px; }
-            .modal .input-row { flex-direction: column; }
-            .modal .result-status { flex-direction: column; }
+        @media (max-width: 700px) {
+            .grid { grid-template-columns: repeat(3, 1fr); }
+            .teams-section { flex-direction: column; }
+            .modal { padding: 18px; }
         }
-        @media (max-width: 480px) {
-            .grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
-            .cell .cell-number { font-size: 1.4rem; }
-            .container { padding: 12px; }
+        @media (max-width: 500px) {
+            .grid { grid-template-columns: repeat(3, 1fr); gap: 4px; }
+            .container { padding: 8px; }
+            .rules-banner .rules-text { font-size: 0.5rem; }
+            .title-group h1 { font-size: 1.2rem; }
         }
     </style>
 </head>
@@ -1336,25 +1043,25 @@
                 <span class="icon">⚔️</span>
                 <div>
                     <h1>Битва Королевств</h1>
-                    <div class="subtitle">20 комнат · выбор уровня · топ иксовок</div>
+                    <span class="subtitle">20 комнат</span>
                 </div>
             </div>
-            <button id="resetBtn" class="btn-reset">🔄 Сбросить всё</button>
+            <button id="resetBtn" class="btn-reset">🔄 Сброс</button>
         </div>
 
         <!-- ПЛАШКА ПРАВИЛ И КНОПКИ -->
         <div class="rules-banner" id="rulesBanner">
             <div class="rules-text">
-                <span class="rule-item">🏰 <span class="highlight-light">20 комнат</span> — выбери уровень</span>
-                <span class="rule-item">🪙 <span class="highlight-coin">Монета</span> +10</span>
-                <span class="rule-item">💎 <span class="highlight-diamond">Алмаз</span> +25</span>
-                <span class="rule-item">👑 <span class="highlight-crown">Корона</span> +50</span>
-                <span class="rule-item">🏆 <span class="highlight-light">Топ иксовок</span> +5000 ₽</span>
-                <span class="rule-item">⛔ <span class="highlight-light">Макс. 3 победы</span> подряд</span>
+                <span class="rule-item">🏰 <span class="highlight-light">20</span></span>
+                <span class="rule-item">🪙 <span class="highlight-coin">+10</span></span>
+                <span class="rule-item">💎 <span class="highlight-diamond">+25</span></span>
+                <span class="rule-item">👑 <span class="highlight-crown">+50</span></span>
+                <span class="rule-item">🏆 <span class="highlight-light">Топ</span></span>
+                <span class="rule-item">⛔ <span class="highlight-light">3</span></span>
             </div>
             <div class="banner-buttons">
-                <span class="banner-btn" id="rulesOpenBtn">📜 Правила</span>
-                <span class="banner-btn" id="topOpenBtn">🏆 Топ иксовок</span>
+                <span class="banner-btn" id="rulesOpenBtn">📜</span>
+                <span class="banner-btn" id="topOpenBtn">🏆</span>
             </div>
         </div>
 
@@ -1371,17 +1078,17 @@
         <!-- СТАТУС-БАР -->
         <div class="status-bar" id="statusBar">
             <div class="turn-indicator" id="turnIndicator">
-                <span class="label">⚡ Ход:</span>
+                <span class="label">⚡</span>
                 <span class="team-name" id="currentTeamName">—</span>
-                <span class="turn-counter">ход #<span id="turnNumber">0</span></span>
+                <span class="turn-counter">#<span id="turnNumber">0</span></span>
             </div>
-            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-                <button id="pickPlayerBtn" class="btn-gold">🎲 Выбрать участника</button>
-                <span class="stat-pill">Выполнено: <span id="doneCount">0</span>/20</span>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                <button id="pickPlayerBtn" class="btn-gold">🎲</button>
+                <span class="stat-pill"><span id="doneCount">0</span>/20</span>
             </div>
         </div>
 
-        <!-- КОМАНДЫ (две колонки) -->
+        <!-- КОМАНДЫ -->
         <div class="teams-section">
             <div class="team-block light" id="teamLightBlock">
                 <div class="team-title">
@@ -1410,8 +1117,8 @@
 
         <!-- ПРИНУДИТЕЛЬНАЯ СМЕНА -->
         <div class="force-switch-wrap">
-            <button id="forceSwitchBtn" class="btn-reset" style="background:rgba(255,215,0,0.03); border-color:rgba(255,215,0,0.08); color:#8a7a9a;">
-                🔄 Принудительная смена команды
+            <button id="forceSwitchBtn" class="btn-reset" style="background:rgba(255,215,0,0.03); border-color:rgba(255,215,0,0.08); color:#8a7a9a; font-size:0.6rem;">
+                🔄 Смена
             </button>
         </div>
     </div>
@@ -1419,22 +1126,21 @@
     <!-- МОДАЛКА ПРИВЕТСТВИЯ -->
     <div class="modal-welcome-overlay" id="welcomeModal">
         <div class="modal-welcome">
-            <h2>⚔️ Добро пожаловать в «Битву Королевств»!</h2>
-            <p><strong>Что нужно делать?</strong></p>
+            <h2>⚔️ Добро пожаловать!</h2>
             <ul>
-                <li>🏰 <span class="highlight">20 комнат</span> — каждая комната содержит три задания разной сложности.</li>
-                <li>🪙 <span class="highlight-coin">Монета</span> (лёгкое) — даёт <strong>10 очков</strong>.</li>
-                <li>💎 <span class="highlight-diamond">Алмаз</span> (среднее) — даёт <strong>25 очков</strong>.</li>
-                <li>👑 <span class="highlight-crown">Корона</span> (сложное) — даёт <strong>50 очков</strong>.</li>
-                <li>После выбора уровня откроется задание. Введите <span class="highlight">стоимость</span> (ставка или цена бонуса), <span class="highlight">выигрыш</span> — множитель рассчитается автоматически.</li>
-                <li>Нажмите <span class="highlight-light">«Выполнено»</span> если цель достигнута, или <span class="highlight-dark">«Провалено»</span>.</li>
-                <li>При успехе — очки начисляются, <span class="highlight-light">команда продолжает ход</span> (максимум 3 подряд).</li>
-                <li>При провале — ход <span class="highlight-dark">переходит другой команде</span>.</li>
-                <li>🏆 <span class="highlight">Топ иксовок</span> — лучший множитель (выигрыш/стоимость) получает <span class="prize">5000 ₽</span>.</li>
+                <li>🏰 <span class="highlight">20 комнат</span> — в каждой выбери уровень сложности.</li>
+                <li>🪙 <span class="highlight-coin">Монета</span> (лёгкое) — <strong>+10 очков</strong>.</li>
+                <li>💎 <span class="highlight-diamond">Алмаз</span> (среднее) — <strong>+25 очков</strong>.</li>
+                <li>👑 <span class="highlight-crown">Корона</span> (сложное) — <strong>+50 очков</strong>.</li>
+                <li>После выбора уровня введите стоимость и выигрыш — множитель рассчитается автоматически.</li>
+                <li>Нажмите <span class="highlight">«Выполнено»</span> или <span class="highlight-dark">«Провалено»</span>.</li>
+                <li>При успехе — очки начисляются, команда продолжает (макс. 3 подряд).</li>
+                <li>При провале — ход переходит другой команде.</li>
+                <li>🏆 <span class="highlight">Топ иксовок</span> — лучший множитель получает <span class="prize">5000 ₽</span>.</li>
                 <li>💰 Команда-победитель — каждый участник получает <span class="prize">3000 ₽</span>.</li>
                 <li>🥇 Лучший игрок команды-победителя — <span class="prize">10 000 ₽</span>, второй — <span class="prize">5 000 ₽</span>.</li>
             </ul>
-            <button class="start-btn" id="welcomeStartBtn">Начать квест!</button>
+            <button class="start-btn" id="welcomeStartBtn">Начать!</button>
         </div>
     </div>
 
@@ -1443,12 +1149,12 @@
         <div class="modal-rules">
             <h2>📜 Правила</h2>
             <ul class="rules-list">
-                <li>🎯 <span class="highlight-light">20 комнат</span> — в каждой игрок выбирает уровень сложности.</li>
+                <li>🎯 <span class="highlight-light">20 комнат</span> — каждая комната содержит три задания разной сложности.</li>
                 <li>🪙 <span class="highlight-coin">Монета</span> (лёгкое) — <strong>+10 очков</strong>.</li>
                 <li>💎 <span class="highlight-diamond">Алмаз</span> (среднее) — <strong>+25 очков</strong>.</li>
                 <li>👑 <span class="highlight-crown">Корона</span> (сложное) — <strong>+50 очков</strong>.</li>
                 <li>⛔ Одна команда <span class="highlight-light">не может выполнить больше 3 заданий подряд</span> — ход переходит автоматически.</li>
-                <li>🎲 Участник выбирается <span class="highlight-dark">случайным образом</span> из доступных в команде.</li>
+                <li>🎲 Участник выбирается <span class="highlight-dark">случайным образом</span> (каждый участник обязан сыграть хотя бы 1 раз).</li>
                 <li>💬 Имена можно менять <span class="highlight-light">кликом по ним</span> в таблице.</li>
                 <li>✅ <span class="highlight-light">Выполненное</span> задание приносит очки и даёт право на следующий ход (до 3 подряд).</li>
                 <li>❌ <span class="highlight-dark">Проваленное</span> задание — очки не начисляются, ход переходит к другой команде.</li>
@@ -1460,7 +1166,7 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА ТОПА ИКСОВОК -->
+    <!-- МОДАЛКА ТОПА -->
     <div class="modal-top-overlay" id="topModal">
         <div class="modal-top">
             <h2>🏆 Топ иксовок</h2>
@@ -1526,13 +1232,11 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА КОНЦА КВЕСТА -->
+    <!-- МОДАЛКА КОНЦА -->
     <div class="modal-final-overlay" id="finalModal">
         <div class="modal-final">
             <h2>🏆 КВЕСТ ЗАВЕРШЁН!</h2>
-            <div class="final-results" id="finalResults">
-                <!-- заполняется скриптом -->
-            </div>
+            <div class="final-results" id="finalResults"></div>
             <button class="close-final-btn" id="closeFinalBtn">Закрыть</button>
         </div>
     </div>
@@ -1661,12 +1365,10 @@
                 streak: 0,
                 isPlayerSelected: false,
                 typeIndex: { coin: 0, diamond: 0, crown: 0 },
-                // Гарантированное участие
                 participationCounts: {
                     light: [0, 0, 0, 0, 0],
                     dark: [0, 0, 0, 0, 0]
-                },
-                allParticipated: false
+                }
             };
 
             let currentRoomId = null;
@@ -1735,10 +1437,10 @@
                 notif.style.cssText = `
                     position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
                     background: rgba(20,18,30,0.95); border: 1px solid rgba(255,215,0,0.12);
-                    padding: 12px 24px; border-radius: 40px; color: #f0e8f8;
+                    padding: 8px 20px; border-radius: 40px; color: #f0e8f8;
                     font-weight: 500; z-index: 9999; backdrop-filter: blur(8px);
                     animation: fadeIn 0.3s ease; max-width: 90%; text-align: center;
-                    font-size: 0.9rem;
+                    font-size: 0.85rem;
                 `;
                 notif.textContent = msg;
                 document.body.appendChild(notif);
@@ -1771,7 +1473,6 @@
                 return indexed;
             }
 
-            // Выбор случайного участника с гарантией первого участия
             function pickRandomPlayer() {
                 let teamKey = state.currentTeam;
                 if (!teamKey) {
@@ -1780,13 +1481,10 @@
                 }
 
                 const team = state.teams[teamKey];
-                const available = [];
                 const counts = state.participationCounts[teamKey];
-
-                // Определяем, все ли уже участвовали
                 const allHaveParticipated = counts.every(c => c > 0);
 
-                // Если не все участвовали — выбираем только тех, кто ещё не участвовал
+                let available = [];
                 for (let i = 0; i < 5; i++) {
                     if (team.members[i] && team.members[i].trim()) {
                         if (!allHaveParticipated && counts[i] === 0) {
@@ -1797,34 +1495,25 @@
                     }
                 }
 
-                // Если доступных нет (например, все имена пустые) — сообщаем
                 if (available.length === 0) {
-                    if (!allHaveParticipated) {
-                        // Возможно, все уже участвовали, но мы ошиблись — проверяем ещё раз
-                        const allAvailable = [];
-                        for (let i = 0; i < 5; i++) {
-                            if (team.members[i] && team.members[i].trim()) {
-                                allAvailable.push(i);
-                            }
+                    const allAvailable = [];
+                    for (let i = 0; i < 5; i++) {
+                        if (team.members[i] && team.members[i].trim()) {
+                            allAvailable.push(i);
                         }
-                        if (allAvailable.length === 0) {
-                            showNotification(`⚠️ В команде ${teamKey === 'light' ? 'Света' : 'Тьмы'} нет участников! Добавьте имена (клик на имя в таблице).`);
-                            return;
-                        } else {
-                            // Если есть участники, но все уже участвовали, то берём любого
-                            const idx = allAvailable[Math.floor(Math.random() * allAvailable.length)];
-                            state.currentMemberIndex = idx;
-                            state.isPlayerSelected = true;
-                            state.turnNumber++;
-                            counts[idx] = (counts[idx] || 0) + 1;
-                            updatePlayerBanner();
-                            updateUI();
-                            openNextRoom();
-                            return;
-                        }
-                    } else {
-                        // Просто нет участников с именами
+                    }
+                    if (allAvailable.length === 0) {
                         showNotification(`⚠️ В команде ${teamKey === 'light' ? 'Света' : 'Тьмы'} нет участников! Добавьте имена (клик на имя в таблице).`);
+                        return;
+                    } else {
+                        const idx = allAvailable[Math.floor(Math.random() * allAvailable.length)];
+                        state.currentMemberIndex = idx;
+                        state.isPlayerSelected = true;
+                        state.turnNumber++;
+                        counts[idx] = (counts[idx] || 0) + 1;
+                        updatePlayerBanner();
+                        updateUI();
+                        openNextRoom();
                         return;
                     }
                 }
@@ -1834,7 +1523,6 @@
                 state.isPlayerSelected = true;
                 state.turnNumber++;
                 counts[idx] = (counts[idx] || 0) + 1;
-
                 updatePlayerBanner();
                 updateUI();
                 openNextRoom();
@@ -2246,7 +1934,6 @@
 
                 finalResults.innerHTML = html;
                 finalModal.classList.add('active');
-                // также показываем топ иксовок автоматически
                 setTimeout(() => {
                     renderTopModal();
                     topModal.classList.add('active');
@@ -2402,7 +2089,6 @@
 
                 renderAll();
 
-                // Выбор уровня
                 document.querySelectorAll('.chest-btn').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const type = this.dataset.type;
@@ -2410,7 +2096,6 @@
                     });
                 });
 
-                // Статус выполнения
                 statusSuccess.addEventListener('click', function() {
                     selectedStatus = 'success';
                     this.className = 'active-success';
@@ -2422,7 +2107,6 @@
                     statusSuccess.className = '';
                 });
 
-                // Основные кнопки
                 pickPlayerBtn.addEventListener('click', pickRandomPlayer);
                 forceSwitchBtn.addEventListener('click', () => {
                     switchTeam();
@@ -2444,7 +2128,6 @@
                     }
                 });
 
-                // Кнопки модалок
                 rulesOpenBtn.addEventListener('click', openRulesModal);
                 rulesCloseBtn.addEventListener('click', closeRulesModal);
                 rulesModal.addEventListener('click', (e) => {
@@ -2463,11 +2146,7 @@
 
                 setupNameEditing();
 
-                // Автоматическое открытие топа при завершении
-                // уже в showFinalResults
-
                 console.log('⚔️ Битва Королевств загружена!');
-                console.log(`🏰 Всего комнат: ${ROOMS.length}`);
             }
 
             window.__state = state;
@@ -2476,5 +2155,6 @@
             init();
         })();
     </script>
+
 </body>
 </html>
