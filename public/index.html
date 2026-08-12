@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <title>⚔️ Битва Королевств</title>
     <style>
+        /* ====== Все стили такие же, как в предыдущей версии ====== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', system-ui, sans-serif;
         }
-
         body {
             min-height: 100vh;
             display: flex;
@@ -27,7 +27,6 @@
                 url('chatmost_ru_1786482668814.png') center/cover fixed no-repeat;
             background-blend-mode: overlay, overlay, normal, normal;
         }
-
         body::before {
             content: '';
             position: fixed;
@@ -36,7 +35,6 @@
             z-index: 0;
             pointer-events: none;
         }
-
         .container {
             max-width: 1400px;
             width: 100%;
@@ -50,7 +48,6 @@
             z-index: 1;
             overflow: hidden;
         }
-
         .container::before {
             content: '';
             position: absolute;
@@ -62,13 +59,11 @@
             animation: rotateGlow 40s linear infinite;
             pointer-events: none;
         }
-
         @keyframes rotateGlow {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
-        /* ========== ХЕДЕР ========== */
+        /* ====== ХЕДЕР ====== */
         .header {
             display: flex;
             justify-content: space-between;
@@ -79,13 +74,11 @@
             position: relative;
             z-index: 1;
         }
-
         .title-group {
             display: flex;
             align-items: center;
             gap: 14px;
         }
-
         .title-group h1 {
             font-size: 2.4rem;
             font-weight: 800;
@@ -96,25 +89,21 @@
             text-shadow: 0 0 40px rgba(245, 166, 35, 0.15);
             letter-spacing: 1px;
         }
-
         .title-group .icon {
             font-size: 2.4rem;
             filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.2));
             animation: float 3s ease-in-out infinite;
         }
-
         @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-6px); }
         }
-
         .subtitle {
             color: #8a7a9a;
             font-size: 0.85rem;
             letter-spacing: 2px;
             font-weight: 300;
         }
-
         .btn-reset {
             background: rgba(255, 50, 50, 0.08);
             border: 1px solid rgba(255, 50, 50, 0.15);
@@ -127,12 +116,11 @@
             z-index: 2;
             position: relative;
         }
-
         .btn-reset:hover {
             background: rgba(255, 50, 50, 0.18);
         }
 
-        /* ========== ПЛАШКА ПРАВИЛ ========== */
+        /* ====== ПЛАШКА ПРАВИЛ ====== */
         .rules-banner {
             background: rgba(0, 0, 0, 0.4);
             border-radius: 30px;
@@ -150,11 +138,9 @@
             cursor: pointer;
             transition: 0.2s;
         }
-
         .rules-banner:hover {
             border-color: rgba(255, 215, 0, 0.15);
         }
-
         .rules-banner .rules-text {
             display: flex;
             flex-wrap: wrap;
@@ -162,24 +148,20 @@
             font-size: 0.85rem;
             color: #b0a8c0;
         }
-
         .rules-banner .rules-text .rule-item {
             display: flex;
             align-items: center;
             gap: 6px;
         }
-
         .rules-banner .rules-text .highlight-coin { color: #cd7f32; font-weight: 600; }
         .rules-banner .rules-text .highlight-diamond { color: #c0c0c0; font-weight: 600; }
         .rules-banner .rules-text .highlight-crown { color: #f7d44a; font-weight: 600; }
         .rules-banner .rules-text .highlight-light { color: #f7d44a; font-weight: 600; }
         .rules-banner .rules-text .highlight-dark { color: #b388ff; font-weight: 600; }
-
         .rules-banner .banner-buttons {
             display: flex;
             gap: 8px;
         }
-
         .rules-banner .banner-btn {
             background: rgba(255, 215, 0, 0.06);
             border: 1px solid rgba(255, 215, 0, 0.08);
@@ -191,12 +173,11 @@
             transition: 0.2s;
             white-space: nowrap;
         }
-
         .rules-banner .banner-btn:hover {
             background: rgba(255, 215, 0, 0.12);
         }
 
-        /* ========== ПЛАШКА ТЕКУЩЕГО УЧАСТНИКА ========== */
+        /* ====== ПЛАШКА УЧАСТНИКА ====== */
         .current-player-banner {
             display: none;
             background: rgba(0, 0, 0, 0.45);
@@ -212,42 +193,34 @@
             z-index: 1;
             animation: fadeIn 0.3s ease;
         }
-
         .current-player-banner.active {
             display: flex;
         }
-
         .current-player-banner .player-avatar {
             font-size: 2rem;
             line-height: 1;
         }
-
         .current-player-banner .player-info {
             display: flex;
             flex-direction: column;
         }
-
         .current-player-banner .player-name {
             font-weight: 700;
             font-size: 1.2rem;
             color: #f0e8f8;
         }
-
         .current-player-banner .player-team {
             font-size: 0.85rem;
             color: #8a7a9a;
         }
-
         .current-player-banner .player-team .team-light-label {
             color: #f7d44a;
             font-weight: 600;
         }
-
         .current-player-banner .player-team .team-dark-label {
             color: #b388ff;
             font-weight: 600;
         }
-
         .current-player-banner .player-turn-hint {
             margin-left: auto;
             font-size: 0.85rem;
@@ -258,7 +231,7 @@
             border: 1px solid rgba(255, 215, 0, 0.04);
         }
 
-        /* ========== СТАТУС-БАР ========== */
+        /* ====== СТАТУС-БАР ====== */
         .status-bar {
             display: flex;
             justify-content: space-between;
@@ -273,25 +246,21 @@
             position: relative;
             z-index: 1;
         }
-
         .turn-indicator {
             display: flex;
             align-items: center;
             gap: 14px;
         }
-
         .turn-indicator .label {
             color: #8a7a9a;
             font-size: 0.85rem;
         }
-
         .turn-indicator .team-name {
             font-weight: 700;
             font-size: 1.1rem;
             padding: 4px 16px;
             border-radius: 30px;
         }
-
         .team-light .team-name {
             color: #f7d44a;
             background: rgba(247, 212, 74, 0.08);
@@ -300,7 +269,6 @@
             color: #b388ff;
             background: rgba(179, 136, 255, 0.08);
         }
-
         .turn-counter {
             color: #8a7a9a;
             font-size: 0.85rem;
@@ -309,7 +277,6 @@
             color: #f0e8f8;
             font-weight: 600;
         }
-
         .btn-gold {
             background: linear-gradient(135deg, #f7d44a, #f5a623);
             border: none;
@@ -321,18 +288,15 @@
             transition: 0.3s;
             font-size: 0.95rem;
         }
-
         .btn-gold:hover {
             transform: scale(1.04);
             box-shadow: 0 0 30px rgba(245, 166, 35, 0.2);
         }
-
         .btn-gold:disabled {
             opacity: 0.4;
             cursor: not-allowed;
             transform: none;
         }
-
         .stat-pill {
             background: rgba(0, 0, 0, 0.3);
             padding: 4px 16px;
@@ -345,7 +309,7 @@
             font-weight: 600;
         }
 
-        /* ========== КОМАНДЫ (две колонки) ========== */
+        /* ====== КОМАНДЫ ====== */
         .teams-section {
             display: flex;
             justify-content: space-between;
@@ -355,7 +319,6 @@
             position: relative;
             z-index: 1;
         }
-
         .team-block {
             flex: 1;
             min-width: 260px;
@@ -366,17 +329,14 @@
             backdrop-filter: blur(4px);
             transition: 0.3s;
         }
-
         .team-block.light {
             border-color: rgba(247, 212, 74, 0.12);
             background: rgba(60, 50, 20, 0.08);
         }
-
         .team-block.dark {
             border-color: rgba(179, 136, 255, 0.12);
             background: rgba(40, 20, 60, 0.08);
         }
-
         .team-block .team-title {
             display: flex;
             justify-content: space-between;
@@ -385,12 +345,10 @@
             padding-bottom: 8px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         }
-
         .team-block .team-title h3 {
             font-weight: 600;
             font-size: 1.1rem;
         }
-
         .team-block.light .team-title h3 {
             color: #f7d44a;
             text-shadow: 0 0 20px rgba(247, 212, 74, 0.15);
@@ -399,20 +357,17 @@
             color: #b388ff;
             text-shadow: 0 0 20px rgba(179, 136, 255, 0.15);
         }
-
         .team-block .team-title .team-total {
             font-size: 1.6rem;
             font-weight: 800;
             color: #f0e8f8;
         }
-
         .team-block.light .team-title .team-total {
             color: #f7d44a;
         }
         .team-block.dark .team-title .team-total {
             color: #b388ff;
         }
-
         .team-block .member-row {
             display: flex;
             justify-content: space-between;
@@ -423,42 +378,36 @@
             transition: 0.2s;
             cursor: pointer;
         }
-
         .team-block .member-row:hover {
             background: rgba(255, 255, 255, 0.03);
         }
-
         .team-block .member-row .member-name {
             color: #c0b8d0;
             font-size: 0.95rem;
         }
-
         .team-block.light .member-row .member-name {
             color: #e8d8b0;
         }
         .team-block.dark .member-row .member-name {
             color: #b8b0d0;
         }
-
         .team-block .member-row .member-score {
             font-weight: 600;
             font-size: 0.95rem;
         }
-
         .team-block.light .member-row .member-score {
             color: #f7d44a;
         }
         .team-block.dark .member-row .member-score {
             color: #b388ff;
         }
-
         .team-block .member-row.active-turn {
             background: rgba(255, 215, 0, 0.06);
             border-left: 2px solid #f5a623;
             border-radius: 20px 4px 4px 20px;
         }
 
-        /* ========== ПРОГРЕСС ========== */
+        /* ====== ПРОГРЕСС ====== */
         .progress-wrap {
             background: rgba(0, 0, 0, 0.5);
             border-radius: 30px;
@@ -470,7 +419,6 @@
             position: relative;
             z-index: 1;
         }
-
         .progress-bar {
             height: 100%;
             width: 0%;
@@ -480,13 +428,12 @@
             border-radius: 30px;
             transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-
         @keyframes shimmer {
             0% { background-position: -200% 0; }
             100% { background-position: 200% 0; }
         }
 
-        /* ========== СЕТКА КОМНАТ (только здесь уменьшено!) ========== */
+        /* ====== СЕТКА КОМНАТ ====== */
         .grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -495,7 +442,6 @@
             position: relative;
             z-index: 1;
         }
-
         .cell {
             aspect-ratio: 1 / 1;
             border-radius: 16px;
@@ -513,7 +459,6 @@
             border: 2px solid rgba(255, 255, 255, 0.04);
             background: rgba(20, 18, 30, 0.4);
         }
-
         .cell::before {
             content: '';
             position: absolute;
@@ -529,7 +474,6 @@
             opacity: 0;
             transition: 0.4s;
         }
-
         .cell:hover:not(.done)::before {
             opacity: 1;
         }
@@ -537,7 +481,6 @@
             transform: translateY(-3px);
             border-color: rgba(255, 215, 0, 0.12);
         }
-
         .cell .cell-number {
             font-size: 1.4rem;
             font-weight: 800;
@@ -545,7 +488,6 @@
             transition: 0.3s;
             line-height: 1;
         }
-
         .cell .cell-type-label {
             font-size: 0.5rem;
             text-transform: uppercase;
@@ -553,7 +495,6 @@
             color: rgba(255, 255, 255, 0.06);
             margin-top: 2px;
         }
-
         .cell.done {
             border-color: rgba(46, 204, 113, 0.2);
             background: rgba(20, 50, 30, 0.2);
@@ -561,7 +502,6 @@
             transform: scale(0.96);
             opacity: 0.5;
         }
-
         .cell.done .cell-number {
             color: #2ecc71;
             font-size: 1.2rem;
@@ -569,21 +509,19 @@
         .cell.done .cell-type-label {
             color: rgba(46, 204, 113, 0.2);
         }
-
         .cell .cell-result {
             font-size: 0.5rem;
             color: #f7d44a;
             margin-top: 2px;
             font-weight: 600;
         }
-
         .cell .cell-multiplier {
             font-size: 0.5rem;
             color: #b388ff;
             margin-top: 1px;
         }
 
-        /* ========== КНОПКА СМЕНЫ КОМАНДЫ ========== */
+        /* ====== КНОПКА СМЕНЫ КОМАНДЫ ====== */
         .force-switch-wrap {
             text-align: center;
             position: relative;
@@ -591,8 +529,8 @@
             margin-bottom: 6px;
         }
 
-        /* ========== МОДАЛКИ ========== */
-        .modal-overlay, .modal-rules-overlay, .modal-top-overlay, .modal-final-overlay, .modal-welcome-overlay {
+        /* ====== МОДАЛКИ ====== */
+        .modal-overlay, .modal-top-overlay, .modal-final-overlay {
             display: none;
             position: fixed;
             inset: 0;
@@ -603,15 +541,14 @@
             align-items: center;
             animation: fadeIn 0.35s ease;
         }
-        .modal-overlay.active, .modal-rules-overlay.active, .modal-top-overlay.active, .modal-final-overlay.active, .modal-welcome-overlay.active {
+        .modal-overlay.active, .modal-top-overlay.active, .modal-final-overlay.active {
             display: flex;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
         }
-
-        .modal, .modal-rules, .modal-top, .modal-final, .modal-welcome {
+        .modal, .modal-top, .modal-final {
             background: linear-gradient(160deg, #1a1828, #12101e);
             border-radius: 48px;
             max-width: 640px;
@@ -624,7 +561,7 @@
             max-height: 85vh;
             overflow-y: auto;
         }
-        .modal::before, .modal-rules::before, .modal-top::before, .modal-final::before, .modal-welcome::before {
+        .modal::before, .modal-top::before, .modal-final::before {
             content: '';
             position: absolute;
             top: -50%;
@@ -635,8 +572,7 @@
             animation: rotateGlow 20s linear infinite;
             pointer-events: none;
         }
-
-        .modal h2, .modal-rules h2, .modal-top h2, .modal-final h2, .modal-welcome h2 {
+        .modal h2, .modal-top h2, .modal-final h2 {
             position: relative;
             z-index: 1;
             font-size: 1.8rem;
@@ -646,7 +582,40 @@
             margin-bottom: 16px;
         }
 
-        /* Модалка правил (ПОДРОБНАЯ) */
+        /* ====== МОДАЛКА ПРАВИЛ (она же приветствие) ====== */
+        .modal-rules {
+            background: linear-gradient(160deg, #1a1828, #12101e);
+            border-radius: 48px;
+            max-width: 640px;
+            width: 92%;
+            padding: 36px 32px 32px;
+            border: 1px solid rgba(255, 215, 0, 0.08);
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.95);
+            position: relative;
+            overflow: hidden;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .modal-rules::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg at 50% 50%, transparent 0%, rgba(255, 215, 0, 0.03) 25%, transparent 50%, rgba(138, 43, 226, 0.03) 75%, transparent 100%);
+            animation: rotateGlow 20s linear infinite;
+            pointer-events: none;
+        }
+        .modal-rules h2 {
+            position: relative;
+            z-index: 1;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #f0e8f8;
+            text-align: center;
+            margin-bottom: 16px;
+        }
         .modal-rules .rules-list {
             position: relative;
             z-index: 1;
@@ -665,8 +634,41 @@
         .modal-rules .rules-list .highlight-light { color: #f7d44a; font-weight: 600; }
         .modal-rules .rules-list .highlight-dark { color: #b388ff; font-weight: 600; }
         .modal-rules .rules-list .prize { color: #f7d44a; font-weight: 700; }
+        .modal-rules .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .modal-rules .btn-group button {
+            padding: 10px 30px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 1rem;
+        }
+        .modal-rules .btn-group .btn-start {
+            background: linear-gradient(135deg, #f7d44a, #f5a623);
+            color: #0a0a0f;
+        }
+        .modal-rules .btn-group .btn-start:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 30px rgba(245, 166, 35, 0.15);
+        }
+        .modal-rules .btn-group .btn-close-rules {
+            background: rgba(255, 255, 255, 0.04);
+            color: #b0a8c0;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .modal-rules .btn-group .btn-close-rules:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
 
-        /* Модалка топа */
+        /* ====== МОДАЛКА ТОПА ====== */
         .modal-top .top-list {
             position: relative;
             z-index: 1;
@@ -729,8 +731,29 @@
             text-align: center;
             padding: 30px 0;
         }
+        .modal-top .close-top-btn {
+            background: linear-gradient(135deg, #f7d44a, #f5a623);
+            border: none;
+            color: #0a0a0f;
+            padding: 10px 30px;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 1rem;
+            margin-top: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+            z-index: 1;
+        }
+        .modal-top .close-top-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 30px rgba(245, 166, 35, 0.15);
+        }
 
-        /* Модалка финала */
+        /* ====== МОДАЛКА ФИНАЛА ====== */
         .modal-final .final-results {
             position: relative;
             z-index: 1;
@@ -798,29 +821,29 @@
         .modal-final .final-winner .win-team {
             color: #f7d44a;
         }
-
-        /* Модалка приветствия (кратко) */
-        .modal-welcome ul {
-            color: #c0b8d0;
-            font-size: 0.95rem;
-            line-height: 1.7;
-            padding-left: 20px;
+        .modal-final .close-final-btn {
+            background: linear-gradient(135deg, #f7d44a, #f5a623);
+            border: none;
+            color: #0a0a0f;
+            padding: 10px 30px;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 1rem;
+            margin-top: 16px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
             position: relative;
             z-index: 1;
         }
-        .modal-welcome ul li {
-            margin-bottom: 6px;
-        }
-        .modal-welcome .highlight {
-            color: #f7d44a;
-            font-weight: 600;
-        }
-        .modal-welcome .highlight-dark {
-            color: #b388ff;
-            font-weight: 600;
+        .modal-final .close-final-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 30px rgba(245, 166, 35, 0.15);
         }
 
-        /* Модалка задания */
+        /* ====== МОДАЛКА ЗАДАНИЯ ====== */
         .modal .modal-header {
             text-align: center;
             position: relative;
@@ -835,7 +858,6 @@
             color: #f7d44a;
             font-weight: 600;
         }
-
         .chest-choice {
             display: flex;
             gap: 16px;
@@ -1009,37 +1031,14 @@
             border-color: rgba(255, 255, 255, 0.10);
         }
 
-        /* Кнопки закрытия */
-        .close-btn, .close-rules-btn, .close-top-btn, .close-final-btn, .start-btn {
-            background: linear-gradient(135deg, #f7d44a, #f5a623);
-            border: none;
-            color: #0a0a0f;
-            padding: 10px 30px;
-            border-radius: 40px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 1rem;
-            margin-top: 16px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            position: relative;
-            z-index: 1;
-        }
-        .close-btn:hover, .close-rules-btn:hover, .close-top-btn:hover, .close-final-btn:hover, .start-btn:hover {
-            transform: scale(1.03);
-            box-shadow: 0 0 30px rgba(245, 166, 35, 0.15);
-        }
-
-        /* ========== АДАПТИВ ========== */
+        /* ====== АДАПТИВ ====== */
         @media (max-width: 900px) {
             .grid { grid-template-columns: repeat(4, 1fr); }
         }
         @media (max-width: 700px) {
             .grid { grid-template-columns: repeat(3, 1fr); }
             .teams-section { flex-direction: column; }
-            .modal { padding: 24px 20px; }
+            .modal, .modal-rules, .modal-top, .modal-final { padding: 24px 20px; }
         }
         @media (max-width: 500px) {
             .grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
@@ -1051,7 +1050,7 @@
 <body>
 
     <div class="container">
-        <!-- ХЕДЕР -->
+        <!-- ====== ХЕДЕР ====== -->
         <div class="header">
             <div class="title-group">
                 <span class="icon">⚔️</span>
@@ -1063,7 +1062,7 @@
             <button id="resetBtn" class="btn-reset">🔄 Сбросить всё</button>
         </div>
 
-        <!-- ПЛАШКА ПРАВИЛ -->
+        <!-- ====== ПЛАШКА ПРАВИЛ ====== -->
         <div class="rules-banner" id="rulesBanner">
             <div class="rules-text">
                 <span class="rule-item">🏰 <span class="highlight-light">20 комнат</span> — выбери уровень</span>
@@ -1079,7 +1078,7 @@
             </div>
         </div>
 
-        <!-- ПЛАШКА ТЕКУЩЕГО УЧАСТНИКА -->
+        <!-- ====== ПЛАШКА ТЕКУЩЕГО УЧАСТНИКА ====== -->
         <div class="current-player-banner" id="currentPlayerBanner">
             <span class="player-avatar" id="playerAvatar">⚔️</span>
             <div class="player-info">
@@ -1089,7 +1088,7 @@
             <span class="player-turn-hint">🎯 Сейчас ходит</span>
         </div>
 
-        <!-- СТАТУС-БАР -->
+        <!-- ====== СТАТУС-БАР ====== -->
         <div class="status-bar" id="statusBar">
             <div class="turn-indicator" id="turnIndicator">
                 <span class="label">⚡ Ход:</span>
@@ -1102,7 +1101,7 @@
             </div>
         </div>
 
-        <!-- КОМАНДЫ -->
+        <!-- ====== КОМАНДЫ ====== -->
         <div class="teams-section">
             <div class="team-block light" id="teamLightBlock">
                 <div class="team-title">
@@ -1121,15 +1120,15 @@
             </div>
         </div>
 
-        <!-- ПРОГРЕСС -->
+        <!-- ====== ПРОГРЕСС ====== -->
         <div class="progress-wrap">
             <div class="progress-bar" id="progressBar"></div>
         </div>
 
-        <!-- СЕТКА КОМНАТ -->
+        <!-- ====== СЕТКА КОМНАТ ====== -->
         <div class="grid" id="gridContainer"></div>
 
-        <!-- ПРИНУДИТЕЛЬНАЯ СМЕНА -->
+        <!-- ====== ПРИНУДИТЕЛЬНАЯ СМЕНА ====== -->
         <div class="force-switch-wrap">
             <button id="forceSwitchBtn" class="btn-reset" style="background:rgba(255,215,0,0.03); border-color:rgba(255,215,0,0.08); color:#8a7a9a;">
                 🔄 Принудительная смена команды
@@ -1137,31 +1136,10 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА ПРИВЕТСТВИЯ (КРАТКАЯ, ОТКРЫВАЕТСЯ 1 РАЗ) -->
-    <div class="modal-welcome-overlay" id="welcomeModal">
-        <div class="modal-welcome">
-            <h2>⚔️ Добро пожаловать в «Битву Королевств»!</h2>
-            <ul>
-                <li>🏰 <span class="highlight">20 комнат</span> — каждая комната содержит три задания разной сложности.</li>
-                <li>🪙 <span class="highlight-coin">Монета</span> (лёгкое) — даёт <strong>10 очков</strong>.</li>
-                <li>💎 <span class="highlight-diamond">Алмаз</span> (среднее) — даёт <strong>25 очков</strong>.</li>
-                <li>👑 <span class="highlight-crown">Корона</span> (сложное) — даёт <strong>50 очков</strong>.</li>
-                <li>После выбора уровня откроется задание. Введите <span class="highlight">стоимость</span> и <span class="highlight">выигрыш</span> — множитель рассчитается автоматически.</li>
-                <li>Нажмите <span class="highlight-light">«Выполнено»</span> или <span class="highlight-dark">«Провалено»</span>.</li>
-                <li>При успехе — очки начисляются, <span class="highlight-light">команда продолжает ход</span> (макс. 3 подряд).</li>
-                <li>При провале — ход <span class="highlight-dark">переходит другой команде</span>.</li>
-                <li>🏆 <span class="highlight">Топ иксовок</span> — лучший множитель получает <span class="prize">5000 ₽</span>.</li>
-                <li>💰 Команда-победитель — каждый участник получает <span class="prize">3000 ₽</span>.</li>
-                <li>🥇 Лучший игрок команды-победителя — <span class="prize">10 000 ₽</span>, второй — <span class="prize">5 000 ₽</span>.</li>
-            </ul>
-            <button class="start-btn" id="welcomeStartBtn">Начать квест!</button>
-        </div>
-    </div>
-
-    <!-- МОДАЛКА ПРАВИЛ (ПОДРОБНАЯ, ОТКРЫВАЕТСЯ ПО КНОПКЕ) -->
+    <!-- ====== МОДАЛКА ПРАВИЛ (она же приветствие) ====== -->
     <div class="modal-rules-overlay" id="rulesModal">
         <div class="modal-rules">
-            <h2>📜 Полные правила</h2>
+            <h2>📜 Добро пожаловать в «Битву Королевств»!</h2>
             <ul class="rules-list">
                 <li><strong>Цель квеста</strong> — пройти <span class="highlight-light">20 комнат</span>, выполняя задания. Каждая комната содержит три уровня сложности, которые выбирает игрок.</li>
                 <li><strong>Команды</strong> — две команды по 5 участников: <span class="highlight-light">Королевство Света</span> и <span class="highlight-dark">Королевство Тьмы</span>. Побеждает команда, набравшая больше очков по итогам всех комнат.</li>
@@ -1196,11 +1174,14 @@
                 <li><strong>Имена участников</strong> можно менять <span class="highlight-light">кликом по ним</span> в таблице.</li>
                 <li><strong>Внимание!</strong> Система строго следит за честностью: все результаты фиксируются, и после завершения квеста данные сохраняются в локальном хранилище.</li>
             </ul>
-            <button class="close-rules-btn" id="rulesCloseBtn">Понятно!</button>
+            <div class="btn-group" id="rulesButtonGroup">
+                <button class="btn-start" id="rulesStartBtn">Начать квест!</button>
+                <button class="btn-close-rules" id="rulesCloseBtn" style="display:none;">Закрыть</button>
+            </div>
         </div>
     </div>
 
-    <!-- МОДАЛКА ТОПА -->
+    <!-- ====== МОДАЛКА ТОПА ====== -->
     <div class="modal-top-overlay" id="topModal">
         <div class="modal-top">
             <h2>🏆 Топ иксовок</h2>
@@ -1209,7 +1190,7 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА ЗАДАНИЯ -->
+    <!-- ====== МОДАЛКА ЗАДАНИЯ ====== -->
     <div class="modal-overlay" id="taskModal">
         <div class="modal">
             <div class="modal-header">
@@ -1266,7 +1247,7 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА КОНЦА -->
+    <!-- ====== МОДАЛКА КОНЦА ====== -->
     <div class="modal-final-overlay" id="finalModal">
         <div class="modal-final">
             <h2>🏆 КВЕСТ ЗАВЕРШЁН!</h2>
@@ -1440,6 +1421,7 @@
             const playerTeamDisplay = document.getElementById('playerTeamDisplay');
             const rulesOpenBtn = document.getElementById('rulesOpenBtn');
             const rulesModal = document.getElementById('rulesModal');
+            const rulesStartBtn = document.getElementById('rulesStartBtn');
             const rulesCloseBtn = document.getElementById('rulesCloseBtn');
             const topOpenBtn = document.getElementById('topOpenBtn');
             const topModal = document.getElementById('topModal');
@@ -1448,8 +1430,6 @@
             const finalModal = document.getElementById('finalModal');
             const finalResults = document.getElementById('finalResults');
             const closeFinalBtn = document.getElementById('closeFinalBtn');
-            const welcomeModal = document.getElementById('welcomeModal');
-            const welcomeStartBtn = document.getElementById('welcomeStartBtn');
 
             // ======================== ФУНКЦИИ ========================
 
@@ -2082,15 +2062,27 @@
                 showNotification('🔄 Квест полностью сброшен. Начните заново.');
             }
 
-            // ======================== ПРАВИЛА И ТОП ========================
+            // ======================== ПРАВИЛА ========================
 
-            function openRulesModal() {
+            function openRulesModal(mode) {
+                // mode: 'start' или 'rules'
+                const startBtn = document.getElementById('rulesStartBtn');
+                const closeBtn = document.getElementById('rulesCloseBtn');
+                if (mode === 'start') {
+                    startBtn.style.display = 'inline-block';
+                    closeBtn.style.display = 'none';
+                } else {
+                    startBtn.style.display = 'none';
+                    closeBtn.style.display = 'inline-block';
+                }
                 rulesModal.classList.add('active');
             }
 
             function closeRulesModal() {
                 rulesModal.classList.remove('active');
             }
+
+            // ======================== ТОП ========================
 
             function openTopModal() {
                 renderTopModal();
@@ -2107,17 +2099,34 @@
                 loadNames();
                 const loaded = loadFromLocal();
 
-                // Если прогресса нет — показываем приветствие
+                // Если прогресса нет, показываем правила в режиме "старт"
                 if (!loaded || state.completed.length === 0) {
-                    welcomeModal.classList.add('active');
+                    openRulesModal('start');
                 }
 
-                // Закрываем приветствие и начинаем игру
-                welcomeStartBtn.addEventListener('click', () => {
-                    welcomeModal.classList.remove('active');
-                    // Никаких дополнительных открытий правил!
+                // Кнопка "Начать квест!"
+                rulesStartBtn.addEventListener('click', () => {
+                    closeRulesModal();
+                    // Теперь можно начать игру
+                    showNotification('🎯 Квест начат! Нажмите "Выбрать участника".', 3000);
                 });
 
+                // Кнопка "Закрыть" в правилах
+                rulesCloseBtn.addEventListener('click', closeRulesModal);
+
+                // Кнопка "Правила" в плашке
+                rulesOpenBtn.addEventListener('click', () => {
+                    openRulesModal('rules');
+                });
+
+                // Кнопка "Топ" в плашке
+                topOpenBtn.addEventListener('click', openTopModal);
+                topCloseBtn.addEventListener('click', closeTopModal);
+                topModal.addEventListener('click', (e) => {
+                    if (e.target === topModal) closeTopModal();
+                });
+
+                // Остальные элементы интерфейса
                 renderAll();
 
                 // Навешиваем обработчики на кнопки выбора уровня
@@ -2160,20 +2169,6 @@
                         if (topModal.classList.contains('active')) closeTopModal();
                         if (rulesModal.classList.contains('active')) closeRulesModal();
                     }
-                });
-
-                // Правила – открываются только по кнопке
-                rulesOpenBtn.addEventListener('click', openRulesModal);
-                rulesCloseBtn.addEventListener('click', closeRulesModal);
-                rulesModal.addEventListener('click', (e) => {
-                    if (e.target === rulesModal) closeRulesModal();
-                });
-
-                // Топ
-                topOpenBtn.addEventListener('click', openTopModal);
-                topCloseBtn.addEventListener('click', closeTopModal);
-                topModal.addEventListener('click', (e) => {
-                    if (e.target === topModal) closeTopModal();
                 });
 
                 closeFinalBtn.addEventListener('click', () => {
